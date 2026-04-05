@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+/* PWA safe areas for notched devices */
+html {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Prevent iOS rubber-banding / overscroll on the body */
+html, body {
+  overscroll-behavior: none;
+}
+
+/* Smooth scrolling for the app */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Better touch targets for mobile */
+@media (pointer: coarse) {
+  button, select, input[type="number"] {
+    min-height: 44px;
+  }
+}

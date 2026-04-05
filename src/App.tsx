@@ -17,6 +17,7 @@ import ValidationTab from './components/ValidationTab';
 import AssistantTab from './components/AssistantTab';
 import ProjectManager from './components/ProjectManager';
 import KnowledgeManager from './components/KnowledgeManager';
+import InstallBanner from './components/InstallBanner';
 import Tip from './components/Tip';
 import TIPS from './data/tips';
 
@@ -315,6 +316,9 @@ export default function App() {
           />
         )}
       </div>
+
+      {/* PWA Install Banner */}
+      <InstallBanner />
 
       {/* Knowledge Manager Modal */}
       <KnowledgeManager
