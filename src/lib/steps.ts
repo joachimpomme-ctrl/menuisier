@@ -1,6 +1,7 @@
 import type { AppState, Step } from '../types';
 import { MATERIALS } from '../data/materials';
 import { SYSTEME_32_RULES, ASSEMBLAGES, FINISHES, ORIENTATION_RULES } from '../data/knowledge';
+import { calculateDoor } from './helpers';
 
 export function generateSteps(st: AppState): Step[] {
   const { project: pr, panel: pn, bodies: bs, materialKey: mk } = st;
@@ -11,6 +12,9 @@ export function generateSteps(st: AppState): Step[] {
   // Règle d'orientation pour le matériau courant
   const matType = mk.startsWith('cp_') ? 'contreplaqué' : mk === 'osb' ? 'OSB' : mk === 'mdf' || mk === 'melamine' ? 'MDF et panneau de particules' : '';
   const orientRule = ORIENTATION_RULES.find((r) => r.materiau === matType);
+
+  // Any bodies with doors?
+  const bodiesWithDoors = bs.filter((b) => b.doorConfig);
 
   steps.push({
     title: "1. Relevé de cotes terrain",
@@ -50,7 +54,6 @@ export function generateSteps(st: AppState): Step[] {
       ],
     });
   } else {
-    // Perçages système 32 avec cotes exactes de la base de connaissances
     const entraxe = SYSTEME_32_RULES.find((r) => r.id === 'entraxe');
     const axeChant = SYSTEME_32_RULES.find((r) => r.id === 'axe_chant');
     const diam5 = SYSTEME_32_RULES.find((r) => r.id === 'diam_5');
@@ -76,6 +79,34 @@ export function generateSteps(st: AppState): Step[] {
       `Scie sauteuse lame fine + ponçage`,
     ],
   });
+
+  // Perçage cuvettes portes (avant assemblage !)
+  if (bodiesWithDoors.length > 0) {
+    const doorItems: string[] = [
+      '⚠ Percer les cuvettes AVANT assemblage du caisson',
+      `Fraise Forstner Ø35 mm — perceuse à colonne recommandée`,
+      `Profondeur cuvette : 12-13 mm`,
+      `Centre cuvette : 21-22 mm du chant de la porte`,
+    ];
+
+    bodiesWithDoors.forEach((b) => {
+      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType);
+      doorItems.push(
+        `${b.name} — ${b.doorConfig!.count} porte${b.doorConfig!.count > 1 ? 's' : ''} (${dims.poseLabel}) :`
+      );
+      doorItems.push(
+        `  → Porte ${dims.doorWidth}×${dims.doorHeight} cm — ${dims.hingeCount} cuvettes/porte`
+      );
+      doorItems.push(
+        `  → Positions depuis le bas : ${dims.hingePositions.map((p) => `${p} mm`).join(', ')}`
+      );
+    });
+
+    steps.push({
+      title: "4b. Perçage cuvettes charnières Ø35",
+      items: doorItems,
+    });
+  }
 
   // Assemblages disponibles selon la base de connaissances
   const assemblyTypes = ASSEMBLAGES.filter((a) => a.famille === 'caisson');
@@ -114,6 +145,37 @@ export function generateSteps(st: AppState): Step[] {
       `Décalage prof. ${bs.length >= 2 ? bs[1].depth - bs[0].depth : "?"} cm intentionnel`,
     ],
   });
+
+  // Pose des portes (après mise en place)
+  if (bodiesWithDoors.length > 0) {
+    const totalHinges = bodiesWithDoors.reduce((sum, b) => {
+      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType);
+      return sum + dims.hingeCount * b.doorConfig!.count;
+    }, 0);
+
+    const doorPoseItems: string[] = [
+      `${totalHinges} charnières Ø35 + platines de montage`,
+      `Visser les platines sur les joues (vis Ø4×16, positions système 32)`,
+      `Clipser les charnières sur les platines`,
+      `Réglage en 3 axes :`,
+      `  1. Latéral : vis de réglage gauche/droite → jeu uniforme entre portes`,
+      `  2. Profondeur : vis avant/arrière → aplomb de la porte`,
+      `  3. Hauteur : vis de fixation platine → alignement haut/bas`,
+      `Vérifier le jeu de 2 mm entre portes adjacentes`,
+    ];
+
+    bodiesWithDoors.forEach((b) => {
+      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType);
+      doorPoseItems.push(`${b.name} : ${b.doorConfig!.count}× porte ${dims.doorWidth}×${dims.doorHeight} cm (${dims.poseLabel})`);
+    });
+
+    doorPoseItems.push('Ajouter amortisseurs soft-close si non intégrés');
+
+    steps.push({
+      title: "6b. Pose des portes",
+      items: doorPoseItems,
+    });
+  }
 
   // Finitions enrichies avec la base de connaissances
   const kbFinishes = FINISHES.filter((f) =>

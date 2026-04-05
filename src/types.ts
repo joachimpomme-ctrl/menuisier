@@ -37,12 +37,20 @@ export interface Piece {
   type: PieceType;
 }
 
+export type DoorPoseType = 'enveloppante' | 'demi-recouvrement' | 'affleurante';
+
+export interface DoorConfig {
+  count: 1 | 2;
+  poseType: DoorPoseType;
+}
+
 export interface Body {
   id: string;
   name: string;
   width: number;
   depth: number;
   pieces: Piece[];
+  doorConfig?: DoorConfig;
 }
 
 export interface Project {

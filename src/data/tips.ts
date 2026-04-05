@@ -83,6 +83,9 @@ const TIPS: Record<string, string> = {
   // ===== PORTES & TIROIRS =====
   'charniere': "La charnière standard (Ø35 mm, type Blum/Hettich) s'encastre dans une cuvette fraisée dans la porte. Réglable en 3 axes après pose. Prévoir 2 charnières pour une porte < 60 cm, 3 au-delà.",
   'porte-pose': "Trois poses possibles : enveloppante (recouvre la joue), demi-recouvrement (2 portes sur même joue), affleurante (porte dans le cadre). Chaque pose demande une charnière avec une coudure différente.",
+  'porte-pose-enveloppante': "Enveloppante (recouvrement total) : la porte recouvre entièrement le chant de la joue. C'est la pose la plus courante et la plus simple. Charnière avec coudure 0 mm. Jeu de 2 mm entre portes.",
+  'porte-pose-demi-recouvrement': "Demi-recouvrement : la porte recouvre la moitié du chant de la joue. Utilisé quand 2 portes se partagent la même joue centrale. Charnière avec coudure = demi-épaisseur de la joue.",
+  'porte-pose-affleurante': "Affleurante (intérieure) : la porte s'insère dans le cadre, affleurant le chant de la joue. Rendu le plus élégant mais le plus exigeant : le moindre défaut d'équerrage se voit. Jeu de 2 mm tout autour.",
   'porte-jeu': "Toujours prévoir 2 mm de jeu entre portes adjacentes et 2 mm en haut/bas. Sans jeu, les portes frottent et s'abîment. Trop de jeu = aspect négligé.",
   'tiroir-coulisse': "Coulisses à galets (économiques, ouverture 75%) ou à billes (sortie totale, plus robuste). Prévoir 12.5 mm de jeu latéral de chaque côté pour les coulisses standard.",
   'tiroir-dim': "Hauteur caisson tiroir = hauteur façade - 25 mm. Profondeur = profondeur intérieure - 10 mm. Fond en HDF 3 mm rainuré à 8 mm du bas.",

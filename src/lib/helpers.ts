@@ -13,3 +13,87 @@ export function clampInt(value: string, fallback: number, min: number, max: numb
   if (isNaN(n)) return fallback;
   return Math.max(min, Math.min(max, n));
 }
+
+// ---------------------------------------------------------------------------
+// Calculs portes & charnières
+// ---------------------------------------------------------------------------
+import type { DoorPoseType } from '../types';
+
+export interface DoorDimensions {
+  doorWidth: number;   // cm
+  doorHeight: number;  // cm
+  hingeCount: number;
+  hingePositions: number[]; // mm from bottom of door
+  poseLabel: string;
+}
+
+/** Calcule les dimensions d'une porte et les positions de charnières */
+export function calculateDoor(
+  bodyWidth: number,
+  bodyHeight: number, // joue height = usable height
+  thickness: number,
+  doorCount: 1 | 2,
+  poseType: DoorPoseType,
+): DoorDimensions {
+  const innerWidth = +(bodyWidth - 2 * thickness).toFixed(1);
+  const JEU = 0.2; // 2mm = 0.2cm
+
+  let doorWidth: number;
+  let doorHeight: number;
+  let poseLabel: string;
+
+  switch (poseType) {
+    case 'enveloppante':
+      poseLabel = 'Enveloppante (recouvrement total)';
+      doorHeight = +(bodyHeight - JEU).toFixed(1);
+      if (doorCount === 1) {
+        doorWidth = +(bodyWidth - JEU).toFixed(1);
+      } else {
+        doorWidth = +(bodyWidth / 2 - JEU * 0.75).toFixed(1);
+      }
+      break;
+    case 'demi-recouvrement':
+      poseLabel = 'Demi-recouvrement';
+      doorHeight = +(bodyHeight - JEU).toFixed(1);
+      if (doorCount === 1) {
+        doorWidth = +(innerWidth + thickness - JEU).toFixed(1);
+      } else {
+        doorWidth = +(innerWidth / 2 + thickness / 2 - JEU / 2).toFixed(1);
+      }
+      break;
+    case 'affleurante':
+      poseLabel = 'Affleurante (intérieure)';
+      doorHeight = +(bodyHeight - 2 * thickness - 2 * JEU).toFixed(1);
+      if (doorCount === 1) {
+        doorWidth = +(innerWidth - 2 * JEU).toFixed(1);
+      } else {
+        doorWidth = +(innerWidth / 2 - 1.5 * JEU).toFixed(1);
+      }
+      break;
+  }
+
+  // Nombre de charnières selon hauteur (en cm)
+  const hCm = doorHeight;
+  let hingeCount: number;
+  if (hCm < 60) hingeCount = 2;
+  else if (hCm < 120) hingeCount = 3;
+  else if (hCm < 180) hingeCount = 4;
+  else hingeCount = 5;
+
+  // Positions des charnières (mm depuis le bas de la porte)
+  const TOP_OFFSET = 80; // mm
+  const BOT_OFFSET = 80; // mm
+  const totalMm = hCm * 10;
+  const hingePositions: number[] = [];
+  hingePositions.push(BOT_OFFSET);
+  hingePositions.push(totalMm - TOP_OFFSET);
+  if (hingeCount > 2) {
+    const span = (totalMm - TOP_OFFSET) - BOT_OFFSET;
+    for (let i = 1; i < hingeCount - 1; i++) {
+      hingePositions.push(Math.round(BOT_OFFSET + (span * i) / (hingeCount - 1)));
+    }
+  }
+  hingePositions.sort((a, b) => a - b);
+
+  return { doorWidth, doorHeight, hingeCount, hingePositions, poseLabel };
+}
