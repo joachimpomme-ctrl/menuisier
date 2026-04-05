@@ -114,7 +114,7 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
     const knowledgeBase = buildKnowledgeSummary();
     const userKnowledge = buildUserKnowledgeContext();
 
-    return `Tu es un assistant menuiserie expert intégré à un outil de conception de bibliothèque sur mesure. Réponds en français, concis et technique. Cite tes sources quand tu utilises la base de connaissances (ex: [Dunod 2022]).
+    return `Tu es un assistant menuiserie expert intégré à un outil de conception de meubles sur mesure (bibliothèques, rangements, dressings, buffets, meubles TV, etc. — toute menuiserie intérieure en panneaux). Réponds en français, concis et technique. Cite tes sources quand tu utilises la base de connaissances (ex: [Dunod 2022]).
 
 ${images.length > 0 ? `L'utilisateur a joint ${images.length} photo(s) de son chantier/projet. Analyse-les attentivement : vérifie les dimensions apparentes, la qualité des assemblages, les défauts visibles, la planéité, l'équerrage, l'état du mur, etc. Donne des conseils concrets basés sur ce que tu vois.` : ''}
 

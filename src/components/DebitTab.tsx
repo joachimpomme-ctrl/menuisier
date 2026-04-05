@@ -66,11 +66,11 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
 
       {/* Unplaced pieces warning */}
       {unplaced.length > 0 && (
-        <div className="rounded-xl border border-red-900/50 bg-red-950/20 p-4 mb-4">
-          <Tip text={TIPS['piece-non-placable']}><h4 className="text-red-400 font-semibold text-sm mb-2">Pièces non placables</h4></Tip>
-          <p className="text-xs text-red-300/70 mb-2">Ces pièces dépassent les dimensions du panneau :</p>
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 mb-4">
+          <Tip text={TIPS['piece-non-placable']}><h4 className="text-red-600 font-semibold text-sm mb-2">Pièces non placables</h4></Tip>
+          <p className="text-xs text-red-500 mb-2">Ces pièces dépassent les dimensions du panneau :</p>
           {unplaced.map((p, i) => (
-            <div key={i} className="text-xs text-red-300/60 py-0.5">
+            <div key={i} className="text-xs text-red-400 py-0.5">
               {p.name} ({p.length}×{p.width} cm) — {p.bodyName}
             </div>
           ))}
@@ -103,14 +103,14 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
             </div>
             <div className="overflow-x-auto">
               <svg width={SVG_WIDTH} height={svgHeight} className="rounded-lg">
-                <rect width={SVG_WIDTH} height={svgHeight} fill="#1c1917" rx="8" />
+                <rect width={SVG_WIDTH} height={svgHeight} fill="#f5f0eb" rx="8" />
                 {Array.from({ length: Math.floor(state.panel.width / 10) + 1 }, (_, i) => (
-                  <line key={`v${i}`} x1={MARGIN + i * 10 * scale} y1={MARGIN} x2={MARGIN + i * 10 * scale} y2={svgHeight - MARGIN} stroke="#292524" strokeWidth=".5" />
+                  <line key={`v${i}`} x1={MARGIN + i * 10 * scale} y1={MARGIN} x2={MARGIN + i * 10 * scale} y2={svgHeight - MARGIN} stroke="#d6cfc7" strokeWidth=".5" />
                 ))}
                 {Array.from({ length: Math.floor(state.panel.height / 10) + 1 }, (_, i) => (
-                  <line key={`h${i}`} x1={MARGIN} y1={MARGIN + i * 10 * scale} x2={SVG_WIDTH - MARGIN} y2={MARGIN + i * 10 * scale} stroke="#292524" strokeWidth=".5" />
+                  <line key={`h${i}`} x1={MARGIN} y1={MARGIN + i * 10 * scale} x2={SVG_WIDTH - MARGIN} y2={MARGIN + i * 10 * scale} stroke="#d6cfc7" strokeWidth=".5" />
                 ))}
-                <rect x={MARGIN} y={MARGIN} width={state.panel.width * scale} height={state.panel.height * scale} fill="none" stroke="#44403c" strokeWidth="2" rx="2" />
+                <rect x={MARGIN} y={MARGIN} width={state.panel.width * scale} height={state.panel.height * scale} fill="none" stroke="#a8a29e" strokeWidth="2" rx="2" />
                 {bin.pl.map((p, j) => {
                   const px = MARGIN + p.x * scale;
                   const py = MARGIN + p.y * scale;

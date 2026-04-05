@@ -44,12 +44,12 @@ export default function MontageTab({ state }: Props) {
             viewBox={`0 0 ${SVG_WIDTH} ${svgHeight}`}
             className="rounded-lg"
           >
-            <rect width={SVG_WIDTH} height={svgHeight} fill="#1c1917" rx="8" />
+            <rect width={SVG_WIDTH} height={svgHeight} fill="#f5f0eb" rx="8" />
             {/* Floor line */}
             <line
               x1={MARGIN - 10} y1={MARGIN + usableHeight * scale}
               x2={SVG_WIDTH - MARGIN + 10} y2={MARGIN + usableHeight * scale}
-              stroke="#44403c" strokeWidth="1" strokeDasharray="6,3"
+              stroke="#a8a29e" strokeWidth="1" strokeDasharray="6,3"
             />
 
             {state.bodies.map((b, bi) => {
@@ -76,8 +76,8 @@ export default function MontageTab({ state }: Props) {
                   {/* Right joue */}
                   <rect x={bx + bw - tw} y={MARGIN} width={tw} height={bh} fill={color} opacity=".25" rx="1" />
                   {/* Plinthe cuts */}
-                  <rect x={bx} y={MARGIN + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#1c1917" stroke="#44403c" strokeWidth=".5" />
-                  <rect x={bx + bw - tw} y={MARGIN + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#1c1917" stroke="#44403c" strokeWidth=".5" />
+                  <rect x={bx} y={MARGIN + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#f5f0eb" stroke="#a8a29e" strokeWidth=".5" />
+                  <rect x={bx + bw - tw} y={MARGIN + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#f5f0eb" stroke="#a8a29e" strokeWidth=".5" />
                   {/* Fixed shelves */}
                   {fixedPositions.map((h, fi) => (
                     <rect key={fi} x={bx + tw} y={MARGIN + bh - h * scale - tw / 2} width={bw - 2 * tw} height={tw} fill="#10b981" opacity=".45" rx="1" />

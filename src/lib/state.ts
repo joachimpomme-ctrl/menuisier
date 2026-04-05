@@ -8,7 +8,7 @@ export function createInitialState(mk: MaterialKey = 'cp_bouleau'): AppState {
   return {
     materialKey: mk,
     project: {
-      name: "Bibliothèque Bureau",
+      name: "Mon meuble",
       wallWidth: 250,
       ceilingHeight: 254,
       plinthHeight: 13,

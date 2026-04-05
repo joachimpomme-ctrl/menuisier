@@ -18,6 +18,7 @@ import AssistantTab from './components/AssistantTab';
 import ProjectManager from './components/ProjectManager';
 import KnowledgeManager from './components/KnowledgeManager';
 import InstallBanner from './components/InstallBanner';
+import NewProjectWizard from './components/NewProjectWizard';
 import Tip from './components/Tip';
 import TIPS from './data/tips';
 
@@ -65,6 +66,7 @@ export default function App() {
   const [projects, setProjects] = useState<ProjectMeta[]>(repo.list());
   const [showProjects, setShowProjects] = useState(false);
   const [showKnowledge, setShowKnowledge] = useState(false);
+  const [showNewWizard, setShowNewWizard] = useState(false);
   const [, setKnowledgeVersion] = useState(0); // trigger re-render on knowledge update
   const [importError, setImportError] = useState<string | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
@@ -111,15 +113,19 @@ export default function App() {
   }, [projectId, state, refreshProjects]);
 
   const handleNewProject = useCallback(() => {
+    setShowProjects(false);
+    setShowNewWizard(true);
+  }, []);
+
+  const handleCreateFromWizard = useCallback((newState: AppState) => {
     repo.save(projectId, state);
     const newId = Math.random().toString(36).slice(2, 8);
-    const newState = createInitialState('cp_bouleau');
     repo.save(newId, newState);
     repo.setCurrentId(newId);
     setProjectId(newId);
     setState(newState);
     refreshProjects();
-    setShowProjects(false);
+    setShowNewWizard(false);
   }, [projectId, state, refreshProjects]);
 
   const handleDuplicate = useCallback((id: string) => {
@@ -313,6 +319,13 @@ export default function App() {
 
       {/* PWA Install Banner */}
       <InstallBanner />
+
+      {/* New Project Wizard */}
+      <NewProjectWizard
+        isOpen={showNewWizard}
+        onClose={() => setShowNewWizard(false)}
+        onCreate={handleCreateFromWizard}
+      />
 
       {/* Knowledge Manager Modal */}
       <KnowledgeManager

@@ -8,8 +8,8 @@ const TIPS: Record<string, string> = {
   // ===== STRUCTURE TAB — Matériau =====
   'materiau': "Le choix du matériau conditionne tout : solidité, esthétique, prix et méthodes d'assemblage. Le contreplaqué bouleau est le plus polyvalent pour un meuble sur mesure.",
   'densite': "La densité (kg/m³) indique le poids du matériau. Plus c'est dense, plus c'est lourd mais souvent plus résistant. Le MDF (750) est plus lourd que l'OSB (600).",
-  'flexMPa': "La résistance en flexion (MPa = MégaPascal) mesure la charge que supporte une étagère avant de plier. Plus c'est élevé, plus vous pouvez faire des portées longues.",
-  'portee-max': "La portée max est la longueur maximale d'une étagère sans support intermédiaire, pour 18 mm d'épaisseur. Au-delà, l'étagère va fléchir sous le poids des livres (~8 kg/mètre).",
+  'flexMPa': "La résistance en flexion (MPa = MégaPascal) mesure la charge que supporte une tablette avant de plier. Plus c'est élevé, plus vous pouvez faire des portées longues.",
+  'portee-max': "La portée max est la longueur maximale d'une tablette sans support intermédiaire, pour 18 mm d'épaisseur. Au-delà, elle va fléchir sous la charge (~8 kg/mètre pour des livres).",
   'vis': "La tenue des vis dans le matériau. « Excellent » = vis directe possible. « Faible » = il faut des excentriques ou tourillons, jamais de vis dans les chants.",
 
   // ===== STRUCTURE TAB — Projet =====
@@ -25,9 +25,9 @@ const TIPS: Record<string, string> = {
   'panneau-epaisseur': "L'épaisseur du panneau en cm (1.8 = 18 mm). L'épaisseur standard pour un meuble est 18 mm. Pour des fonds de meuble, on utilise 6 mm.",
 
   // ===== STRUCTURE TAB — Corps =====
-  'corps': "Un « corps » est un module indépendant de la bibliothèque. On assemble chaque corps séparément puis on les fixe côte à côte sur le mur. Cela facilite le transport et le montage.",
+  'corps': "Un « corps » est un module indépendant du meuble. On assemble chaque corps séparément puis on les fixe côte à côte (au mur ou entre eux). Cela facilite le transport et le montage.",
   'corps-largeur': "La largeur extérieure du corps. La largeur intérieure (pour les tablettes) sera automatiquement réduite de 2× l'épaisseur du panneau (pour les joues gauche et droite).",
-  'corps-profondeur': "La profondeur du corps, du mur vers l'avant. Pour des livres standard, 25-30 cm suffit. Pour des livres d'art ou vinyles, prévoir 35-40 cm.",
+  'corps-profondeur': "La profondeur du corps, de l'arrière vers l'avant. 25-30 cm pour des livres, 35-40 cm pour un dressing ou un buffet, 50-60 cm pour un plan de travail.",
   'int-tablette': "Largeur intérieure utile = largeur du corps - 2× l'épaisseur des joues. C'est la longueur que doivent faire vos tablettes.",
   'poids-corps': "Poids estimé de toutes les pièces du corps, basé sur la densité du matériau. Utile pour anticiper le transport et la fixation au mur.",
 
@@ -44,7 +44,7 @@ const TIPS: Record<string, string> = {
   'panneaux-total': "Le nombre de panneaux bruts nécessaires après optimisation du placement. L'algorithme teste 6 stratégies différentes et garde la meilleure.",
   'rendement': "Le pourcentage de matière réellement utilisée. Au-dessus de 70% c'est bon. En-dessous de 50%, envisagez de réorganiser vos pièces ou de changer de format de panneau.",
   'surface-utile': "La surface totale de bois qui deviendra des pièces de votre meuble. C'est ce que vous « payez utile ».",
-  'surface-chute': "La surface perdue en chutes. Gardez les grandes chutes pour de futurs projets (petites étagères, boîtes, prototypes).",
+  'surface-chute': "La surface perdue en chutes. Gardez les grandes chutes pour de futurs projets (petits rangements, boîtes, prototypes).",
   'strategie': "L'algorithme qui a donné le meilleur résultat. « Étagère » place les pièces ligne par ligne. « Guillotine » fait des coupes droites successives comme une scie à panneaux.",
   'trait-scie': "L'épaisseur du trait de scie (kerf) en mm. Une scie circulaire fait environ 3 mm de trait. Ce matériau est perdu à chaque coupe.",
   'piece-non-placable': "Ces pièces sont trop grandes pour tenir dans un seul panneau, même en les tournant. Il faut soit réduire la pièce, soit choisir un format de panneau plus grand.",
@@ -56,7 +56,7 @@ const TIPS: Record<string, string> = {
   'cout-chutes': "La part du coût qui finit en chutes. Une indication pour juger si le calepinage est économique.",
 
   // ===== MONTAGE TAB =====
-  'elevation': "Vue de face (élévation frontale) de votre bibliothèque. Les rectangles colorés représentent les joues et tablettes. Les pointillés indiquent les tablettes réglables.",
+  'elevation': "Vue de face (élévation frontale) de votre meuble. Les rectangles colorés représentent les joues et tablettes. Les pointillés indiquent les tablettes réglables.",
   'joint-corps': "La ligne pointillée jaune indique la hauteur de joint entre joues basses et joues hautes (à 180 cm). La tablette fixe à ce niveau renforce et cache le joint.",
 
   // ===== NOTICE TAB =====
@@ -73,7 +73,7 @@ const TIPS: Record<string, string> = {
   // ===== VALIDATION TAB =====
   'erreur': "Les erreurs sont bloquantes : elles indiquent un problème dimensionnel concret (pièce plus grande que le panneau, joues qui ne font pas la bonne hauteur, etc.).",
   'avertissement': "Les avertissements signalent un risque potentiel. Vous pouvez continuer, mais vérifiez et corrigez si nécessaire.",
-  'flexion': "La flèche est la courbure d'une étagère sous charge. Au-delà de L/200 (longueur divisée par 200), la déformation est visible à l'œil nu. Réduisez la portée ou augmentez l'épaisseur.",
+  'flexion': "La flèche est la courbure d'une tablette sous charge. Au-delà de L/200 (longueur divisée par 200), la déformation est visible à l'œil nu. Réduisez la portée ou augmentez l'épaisseur.",
   'formaldehyde': "Le formaldéhyde est un composé volatil irritant émis par les colles des panneaux. En France, la classe E1 est obligatoire depuis 2006. Préférez E0.5 pour un usage intérieur.",
   'orientation-debit': "Certains panneaux (CP, OSB) ont un sens de fil qui affecte la résistance et l'esthétique. Le MDF et le mélaminé n'ont pas de sens, ce qui facilite le calepinage.",
 
