@@ -21,8 +21,8 @@ interface UploadedImage {
   preview: string; // data URL for thumbnail
 }
 
-const cardClass = "rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 mb-4";
-const inputClass = "w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-colors";
+const cardClass = "rounded-2xl border border-stone-700/40 bg-stone-800/50 backdrop-blur-sm p-4 mb-4";
+const inputClass = "w-full rounded-xl border border-stone-600/50 bg-stone-800/60 px-3 py-2.5 text-sm text-stone-100 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
 
 export default function AssistantTab({ state, validation, allPieces, totalPieces, panelCount }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -231,12 +231,12 @@ ${userKnowledge}`;
           </Tip>
           <div className="flex items-center gap-1.5">
             {attachCount > 0 && (
-              <span className="text-xs text-zinc-500">{attachCount} pj</span>
+              <span className="text-xs text-stone-500">{attachCount} pj</span>
             )}
             {/* Camera button — mobile only uses capture */}
             <button
               onClick={() => cameraRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700 transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 border border-stone-700 transition-colors"
               title="Prendre une photo"
             >
               📷
@@ -244,7 +244,7 @@ ${userKnowledge}`;
             {/* Photo gallery */}
             <button
               onClick={() => photoRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700 transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 border border-stone-700 transition-colors"
               title="Choisir une photo"
             >
               🖼
@@ -252,7 +252,7 @@ ${userKnowledge}`;
             {/* PDF */}
             <button
               onClick={() => fileRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700 transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 border border-stone-700 transition-colors"
               title="Ajouter un PDF"
             >
               PDF
@@ -272,26 +272,26 @@ ${userKnowledge}`;
                 <img
                   src={img.preview}
                   alt={img.name}
-                  className="w-14 h-14 rounded-lg object-cover border border-zinc-700"
+                  className="w-14 h-14 rounded-lg object-cover border border-stone-700"
                 />
                 <button
                   onClick={() => setImages((imgs) => imgs.filter((_, j) => j !== i))}
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-zinc-800 border border-zinc-600 text-zinc-400 hover:text-red-400 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-stone-800 border border-stone-600 text-stone-400 hover:text-red-400 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   x
                 </button>
               </div>
             ))}
             {pdfs.map((d, i) => (
-              <span key={`pdf-${i}`} className="text-xs bg-zinc-800 rounded-lg px-2.5 py-1 text-zinc-300 flex items-center gap-1.5 border border-zinc-700 h-14">
+              <span key={`pdf-${i}`} className="text-xs bg-stone-800 rounded-lg px-2.5 py-1 text-stone-300 flex items-center gap-1.5 border border-stone-700 h-14">
                 📄 {d.name.length > 15 ? d.name.slice(0, 12) + '...' : d.name}
-                <button onClick={() => setPdfs((ds) => ds.filter((_, j) => j !== i))} className="text-zinc-500 hover:text-red-400">x</button>
+                <button onClick={() => setPdfs((ds) => ds.filter((_, j) => j !== i))} className="text-stone-500 hover:text-red-400">x</button>
               </span>
             ))}
           </div>
         )}
 
-        <div className="text-xs text-zinc-500 mb-3">
+        <div className="text-xs text-stone-500 mb-3">
           Contexte : structure + {mat.name} + validation ({validation.errors.length}e/{validation.warnings.length}w)
           + base connaissances{kbDocCount > 0 ? ` + ${kbDocCount} doc${kbDocCount > 1 ? 's' : ''} perso` : ''}
           {images.length > 0 ? ` + ${images.length} photo${images.length > 1 ? 's' : ''}` : ''}
@@ -305,15 +305,15 @@ ${userKnowledge}`;
         )}
 
         {/* Messages */}
-        <div className="rounded-xl bg-zinc-950/50 p-4 mb-3 min-h-[200px] max-h-[400px] overflow-y-auto">
+        <div className="rounded-xl bg-stone-950/50 p-4 mb-3 min-h-[200px] max-h-[400px] overflow-y-auto">
           {messages.length === 0 && (
-            <div className="text-zinc-600 text-sm text-center py-8">
-              <div className="mb-3 text-zinc-500">Exemples de questions :</div>
+            <div className="text-stone-600 text-sm text-center py-8">
+              <div className="mb-3 text-stone-500">Exemples de questions :</div>
               <div className="space-y-1">
                 {suggestions.map((q, i) => (
                   <button
                     key={i}
-                    className="block w-full text-left px-3 py-2 rounded-lg text-xs text-zinc-500 hover:bg-zinc-800/50 hover:text-amber-400 transition-colors"
+                    className="block w-full text-left px-3 py-2 rounded-lg text-xs text-stone-500 hover:bg-stone-800/50 hover:text-amber-400 transition-colors"
                     onClick={() => setInput(q)}
                   >
                     {q}
@@ -327,14 +327,14 @@ ${userKnowledge}`;
               <div className={`inline-block max-w-[85%] rounded-xl px-4 py-2.5 text-sm ${
                 m.role === 'user'
                   ? 'bg-amber-600 text-white'
-                  : 'bg-zinc-800 text-zinc-200 border border-zinc-700'
+                  : 'bg-stone-800 text-stone-200 border border-stone-700'
               }`}>
                 <div style={{ whiteSpace: 'pre-wrap' }}>{m.content}</div>
               </div>
             </div>
           ))}
           {loading && (
-            <div className="text-zinc-500 text-sm flex items-center gap-2">
+            <div className="text-stone-500 text-sm flex items-center gap-2">
               <span className="inline-block w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
               Réflexion...
             </div>

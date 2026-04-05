@@ -13,7 +13,7 @@ interface Props {
   onPriceChange: (price: number) => void;
 }
 
-const cardClass = "rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 mb-4";
+const cardClass = "rounded-2xl border border-stone-700/40 bg-stone-800/50 backdrop-blur-sm p-4 mb-4";
 
 export default function DebitTab({ state, allPieces, nesting, cost, onPriceChange }: Props) {
   const mat = MATERIALS[state.materialKey];
@@ -41,24 +41,24 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
           <div>
             <div className="text-2xl font-bold text-amber-400">{metrics.panelCount}</div>
-            <Tip text={TIPS['panneaux-total']}><div className="text-xs text-zinc-500">panneaux</div></Tip>
+            <Tip text={TIPS['panneaux-total']}><div className="text-xs text-stone-500">panneaux</div></Tip>
           </div>
           <div>
             <div className={`text-2xl font-bold ${metrics.efficiency > 70 ? 'text-emerald-400' : metrics.efficiency > 50 ? 'text-yellow-400' : 'text-red-400'}`}>
               {metrics.efficiency.toFixed(1)}%
             </div>
-            <Tip text={TIPS['rendement']}><div className="text-xs text-zinc-500">rendement</div></Tip>
+            <Tip text={TIPS['rendement']}><div className="text-xs text-stone-500">rendement</div></Tip>
           </div>
           <div>
-            <div className="text-2xl font-bold text-zinc-300">{(metrics.usedArea / 10000).toFixed(2)}</div>
-            <Tip text={TIPS['surface-utile']}><div className="text-xs text-zinc-500">m² utile</div></Tip>
+            <div className="text-2xl font-bold text-stone-300">{(metrics.usedArea / 10000).toFixed(2)}</div>
+            <Tip text={TIPS['surface-utile']}><div className="text-xs text-stone-500">m² utile</div></Tip>
           </div>
           <div>
-            <div className="text-2xl font-bold text-zinc-500">{(metrics.wasteArea / 10000).toFixed(2)}</div>
-            <Tip text={TIPS['surface-chute']}><div className="text-xs text-zinc-500">m² chute</div></Tip>
+            <div className="text-2xl font-bold text-stone-500">{(metrics.wasteArea / 10000).toFixed(2)}</div>
+            <Tip text={TIPS['surface-chute']}><div className="text-xs text-stone-500">m² chute</div></Tip>
           </div>
         </div>
-        <div className="mt-3 pt-3 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-500">
+        <div className="mt-3 pt-3 border-t border-stone-800 flex items-center justify-between text-xs text-stone-500">
           <Tip text={TIPS['trait-scie']}><span>{mat.short} · {state.panel.width}×{state.panel.height} cm · trait {state.kerf} mm</span></Tip>
           <Tip text={TIPS['strategie']}><span>Stratégie : {strategyLabels[strategy] ?? strategy}</span></Tip>
         </div>
@@ -98,19 +98,19 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
         return (
           <div key={binIndex} className={cardClass}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-zinc-300">Panneau {binIndex + 1}</span>
-              <span className="text-xs text-zinc-500">{binEfficiency.toFixed(0)}% · {bin.pl.length} pièces</span>
+              <span className="text-xs font-medium text-stone-300">Panneau {binIndex + 1}</span>
+              <span className="text-xs text-stone-500">{binEfficiency.toFixed(0)}% · {bin.pl.length} pièces</span>
             </div>
             <div className="overflow-x-auto">
               <svg width={SVG_WIDTH} height={svgHeight} className="rounded-lg">
-                <rect width={SVG_WIDTH} height={svgHeight} fill="#18181b" rx="8" />
+                <rect width={SVG_WIDTH} height={svgHeight} fill="#1c1917" rx="8" />
                 {Array.from({ length: Math.floor(state.panel.width / 10) + 1 }, (_, i) => (
-                  <line key={`v${i}`} x1={MARGIN + i * 10 * scale} y1={MARGIN} x2={MARGIN + i * 10 * scale} y2={svgHeight - MARGIN} stroke="#27272a" strokeWidth=".5" />
+                  <line key={`v${i}`} x1={MARGIN + i * 10 * scale} y1={MARGIN} x2={MARGIN + i * 10 * scale} y2={svgHeight - MARGIN} stroke="#292524" strokeWidth=".5" />
                 ))}
                 {Array.from({ length: Math.floor(state.panel.height / 10) + 1 }, (_, i) => (
-                  <line key={`h${i}`} x1={MARGIN} y1={MARGIN + i * 10 * scale} x2={SVG_WIDTH - MARGIN} y2={MARGIN + i * 10 * scale} stroke="#27272a" strokeWidth=".5" />
+                  <line key={`h${i}`} x1={MARGIN} y1={MARGIN + i * 10 * scale} x2={SVG_WIDTH - MARGIN} y2={MARGIN + i * 10 * scale} stroke="#292524" strokeWidth=".5" />
                 ))}
-                <rect x={MARGIN} y={MARGIN} width={state.panel.width * scale} height={state.panel.height * scale} fill="none" stroke="#3f3f46" strokeWidth="2" rx="2" />
+                <rect x={MARGIN} y={MARGIN} width={state.panel.width * scale} height={state.panel.height * scale} fill="none" stroke="#44403c" strokeWidth="2" rx="2" />
                 {bin.pl.map((p, j) => {
                   const px = MARGIN + p.x * scale;
                   const py = MARGIN + p.y * scale;
@@ -146,13 +146,13 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
           {[...allPieces]
             .sort((a, b) => b.length * b.width * b.qty - a.length * a.width * a.qty)
             .map((p, i) => (
-              <div key={i} className="flex items-center justify-between text-xs py-1.5 px-2 rounded-lg hover:bg-zinc-800/50">
+              <div key={i} className="flex items-center justify-between text-xs py-1.5 px-2 rounded-lg hover:bg-stone-800/50">
                 <span className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: PIECE_COLORS[p.type] }} />
-                  <span className="text-zinc-300">{p.name}</span>
-                  <span className="text-zinc-600">{p.bodyName}</span>
+                  <span className="text-stone-300">{p.name}</span>
+                  <span className="text-stone-600">{p.bodyName}</span>
                 </span>
-                <span className="font-mono text-zinc-500">{p.length}×{p.width} ×{p.qty}</span>
+                <span className="font-mono text-stone-500">{p.length}×{p.width} ×{p.qty}</span>
               </div>
             ))}
         </div>

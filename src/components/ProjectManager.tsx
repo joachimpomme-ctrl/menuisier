@@ -86,15 +86,15 @@ export default function ProjectManager({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg mx-4 max-h-[85vh] flex flex-col bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl"
+        className="w-full max-w-lg mx-4 max-h-[85vh] flex flex-col bg-stone-900 border border-stone-700 rounded-xl shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-700">
-          <h2 className="text-lg font-semibold text-zinc-100">Mes projets</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-700">
+          <h2 className="text-lg font-semibold text-stone-100">Mes projets</h2>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-zinc-100 text-2xl leading-none transition-colors"
+            className="text-stone-400 hover:text-stone-100 text-2xl leading-none transition-colors"
           >
             &times;
           </button>
@@ -104,7 +104,7 @@ export default function ProjectManager({
         <div className="px-6 pt-4">
           <button
             onClick={onNew}
-            className="w-full py-2.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-zinc-950 font-medium transition-colors"
+            className="w-full py-2.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-stone-950 font-medium transition-colors"
           >
             Nouveau projet
           </button>
@@ -113,7 +113,7 @@ export default function ProjectManager({
         {/* Project list */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
           {sorted.length === 0 ? (
-            <p className="text-center text-zinc-500 py-8">Aucun projet sauvegard&eacute;</p>
+            <p className="text-center text-stone-500 py-8">Aucun projet sauvegard&eacute;</p>
           ) : (
             sorted.map((project) => {
               const isCurrent = project.id === currentId;
@@ -125,8 +125,8 @@ export default function ProjectManager({
                   key={project.id}
                   className={`rounded-xl border p-4 transition-colors ${
                     isCurrent
-                      ? 'border-amber-600/50 bg-zinc-800/80'
-                      : 'border-zinc-700/50 bg-zinc-800/40 hover:bg-zinc-800/70'
+                      ? 'border-amber-600/50 bg-stone-800/80'
+                      : 'border-stone-700/50 bg-stone-800/40 hover:bg-stone-800/70'
                   }`}
                 >
                   {/* Top row: name + current indicator */}
@@ -143,7 +143,7 @@ export default function ProjectManager({
                               if (e.key === 'Escape') cancelRename();
                             }}
                             autoFocus
-                            className="flex-1 px-2 py-1 rounded-md bg-zinc-700 border border-zinc-600 text-zinc-100 text-sm focus:outline-none focus:border-amber-500"
+                            className="flex-1 px-2 py-1 rounded-md bg-stone-700 border border-stone-600 text-stone-100 text-sm focus:outline-none focus:border-amber-500"
                           />
                           <button
                             onClick={() => confirmRename(project.id)}
@@ -153,7 +153,7 @@ export default function ProjectManager({
                           </button>
                           <button
                             onClick={cancelRename}
-                            className="text-xs text-zinc-400 hover:text-zinc-300 transition-colors"
+                            className="text-xs text-stone-400 hover:text-stone-300 transition-colors"
                           >
                             Annuler
                           </button>
@@ -161,7 +161,7 @@ export default function ProjectManager({
                       ) : (
                         <button
                           onClick={() => onLoad(project.id)}
-                          className="text-sm font-bold text-zinc-100 hover:text-amber-400 transition-colors truncate block text-left"
+                          className="text-sm font-bold text-stone-100 hover:text-amber-400 transition-colors truncate block text-left"
                         >
                           {project.name}
                         </button>
@@ -176,11 +176,11 @@ export default function ProjectManager({
                   </div>
 
                   {/* Details row */}
-                  <div className="mt-1.5 flex items-center gap-3 text-xs text-zinc-400">
+                  <div className="mt-1.5 flex items-center gap-3 text-xs text-stone-400">
                     <span>{project.materialShort}</span>
-                    <span className="text-zinc-600">&middot;</span>
+                    <span className="text-stone-600">&middot;</span>
                     <span>{project.bodyCount} corps</span>
-                    <span className="text-zinc-600">&middot;</span>
+                    <span className="text-stone-600">&middot;</span>
                     <span>{formatDate(project.updatedAt)}</span>
                   </div>
 
@@ -197,7 +197,7 @@ export default function ProjectManager({
                         </button>
                         <button
                           onClick={cancelDelete}
-                          className="text-xs px-2.5 py-1 rounded-md text-zinc-400 hover:text-zinc-300 transition-colors"
+                          className="text-xs px-2.5 py-1 rounded-md text-stone-400 hover:text-stone-300 transition-colors"
                         >
                           Annuler
                         </button>
@@ -206,19 +206,19 @@ export default function ProjectManager({
                       <>
                         <button
                           onClick={() => onDuplicate(project.id)}
-                          className="text-xs px-2.5 py-1 rounded-md bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700 transition-colors"
+                          className="text-xs px-2.5 py-1 rounded-md bg-stone-700/50 text-stone-300 hover:bg-stone-700 transition-colors"
                         >
                           Dupliquer
                         </button>
                         <button
                           onClick={() => startRename(project.id, project.name)}
-                          className="text-xs px-2.5 py-1 rounded-md bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700 transition-colors"
+                          className="text-xs px-2.5 py-1 rounded-md bg-stone-700/50 text-stone-300 hover:bg-stone-700 transition-colors"
                         >
                           Renommer
                         </button>
                         <button
                           onClick={() => startDelete(project.id)}
-                          className="text-xs px-2.5 py-1 rounded-md bg-zinc-700/50 text-red-400 hover:bg-red-600/20 transition-colors"
+                          className="text-xs px-2.5 py-1 rounded-md bg-stone-700/50 text-red-400 hover:bg-red-600/20 transition-colors"
                         >
                           Supprimer
                         </button>

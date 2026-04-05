@@ -191,85 +191,81 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <div className="max-w-3xl mx-auto px-4 py-6">
+    <div className="min-h-screen min-h-dvh text-stone-100">
+      <div className="max-w-3xl mx-auto px-4 pt-4 pb-24 sm:py-6">
         {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <h1 className="text-xl font-bold text-amber-400 tracking-wide truncate">{state.project.name}</h1>
-              <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500 flex-wrap">
-                <span>{mat.short} {state.panel.thickness * 10}mm</span>
-                <span className="text-zinc-700">·</span>
-                <span>{totalPieces} pcs</span>
-                <span className="text-zinc-700">·</span>
-                <span>{nesting.metrics.panelCount} panneaux</span>
-                <span className="text-zinc-700">·</span>
-                <span>{usableHeight} cm utile</span>
+        <div className="mb-5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg sm:text-xl font-bold text-amber-400 tracking-wide truncate">{state.project.name}</h1>
+              <div className="mt-1 flex items-center gap-1.5 text-xs text-stone-500 flex-wrap">
+                <span className="bg-stone-800/80 rounded-md px-1.5 py-0.5">{mat.short} {state.panel.thickness * 10}mm</span>
+                <span className="bg-stone-800/80 rounded-md px-1.5 py-0.5">{totalPieces} pcs</span>
+                <span className="bg-stone-800/80 rounded-md px-1.5 py-0.5">{nesting.metrics.panelCount} pan.</span>
                 {cost.configured && (
-                  <>
-                    <span className="text-zinc-700">·</span>
-                    <span className="text-amber-400 font-medium">{cost.totalMaterial.toFixed(0)}€</span>
-                  </>
+                  <span className="bg-amber-900/30 text-amber-400 rounded-md px-1.5 py-0.5 font-medium">{cost.totalMaterial.toFixed(0)} EUR</span>
                 )}
                 {validation.errors.length > 0 && (
-                  <>
-                    <span className="text-zinc-700">·</span>
-                    <span className="text-red-400 font-medium">{validation.errors.length} err.</span>
-                  </>
+                  <span className="bg-red-900/30 text-red-400 rounded-md px-1.5 py-0.5 font-medium">{validation.errors.length} err.</span>
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
+            {/* Action buttons — row on mobile */}
+            <div className="flex items-center gap-1.5 flex-shrink-0">
               <button
                 onClick={() => setShowProjects(true)}
-                className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
+                className="text-xs px-3 py-2 rounded-xl bg-stone-800 text-stone-300 hover:text-white border border-stone-700 hover:border-amber-600/50 hover:bg-stone-700 active:scale-95 transition-all"
               >
                 Projets
-              </button>
-              <Tip text={TIPS['savoirs']} side="bottom">
-                <button
-                  onClick={() => setShowKnowledge(true)}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
-                >
-                  Savoirs
-                </button>
-              </Tip>
-              <Tip text={TIPS['export-json']} side="bottom">
-                <button
-                  onClick={() => exportToJson(state)}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
-                >
-                  JSON
-                </button>
-              </Tip>
-              <button
-                onClick={() => importRef.current?.click()}
-                className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
-              >
-                Import
               </button>
               <Tip text={TIPS['export-pdf']} side="bottom">
                 <button
                   onClick={handleExportPdf}
                   disabled={pdfLoading}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 disabled:opacity-50 transition-colors"
+                  className="text-xs px-3 py-2 rounded-xl bg-amber-600 text-white font-semibold hover:bg-amber-500 active:scale-95 disabled:opacity-50 transition-all shadow-lg shadow-amber-600/20"
                 >
-                  {pdfLoading ? 'PDF...' : 'PDF'}
+                  {pdfLoading ? '...' : 'PDF'}
                 </button>
               </Tip>
-              <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
             </div>
           </div>
+
+          {/* Secondary actions — collapsible row */}
+          <div className="mt-3 flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
+            <Tip text={TIPS['savoirs']} side="bottom">
+              <button
+                onClick={() => setShowKnowledge(true)}
+                className="text-[11px] px-2.5 py-1.5 rounded-lg bg-stone-800/60 text-stone-400 hover:text-stone-200 border border-stone-700/50 whitespace-nowrap transition-colors"
+              >
+                Savoirs
+              </button>
+            </Tip>
+            <Tip text={TIPS['export-json']} side="bottom">
+              <button
+                onClick={() => exportToJson(state)}
+                className="text-[11px] px-2.5 py-1.5 rounded-lg bg-stone-800/60 text-stone-400 hover:text-stone-200 border border-stone-700/50 whitespace-nowrap transition-colors"
+              >
+                JSON
+              </button>
+            </Tip>
+            <button
+              onClick={() => importRef.current?.click()}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-stone-800/60 text-stone-400 hover:text-stone-200 border border-stone-700/50 whitespace-nowrap transition-colors"
+            >
+              Import
+            </button>
+            <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
+          </div>
+
           {importError && (
-            <div className="mt-2 text-xs text-red-400 bg-red-950/30 border border-red-900/30 rounded-lg px-3 py-2">
+            <div className="mt-2 text-xs text-red-400 bg-red-950/30 border border-red-900/30 rounded-xl px-3 py-2">
               {importError}
             </div>
           )}
         </div>
 
-        {/* Tab bar */}
-        <div className="flex gap-1.5 mb-6 overflow-x-auto pb-1 -mx-1 px-1">
+        {/* Tab bar — scrollable, pill style */}
+        <div className="flex gap-1 mb-5 overflow-x-auto hide-scrollbar pb-0.5 -mx-1 px-1 snap-x">
           {TABS.map((t) => {
             const isValidation = t.key === 'validation';
             const hasErrors = validation.errors.length > 0;
@@ -280,10 +276,10 @@ export default function App() {
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap snap-start active:scale-95 transition-all ${
                   tab === t.key
-                    ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20'
-                    : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 border border-zinc-800'
+                    ? 'bg-amber-600 text-white shadow-lg shadow-amber-900/40'
+                    : 'bg-stone-800/80 text-stone-400 hover:bg-stone-700 hover:text-stone-200 border border-stone-700/50'
                 }`}
               >
                 {icon} {label}

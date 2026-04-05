@@ -10,9 +10,9 @@ interface Props {
   onChange: (state: AppState) => void;
 }
 
-const inputClass = "w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-colors";
-const labelClass = "block text-xs font-medium text-zinc-400 mb-1";
-const cardClass = "rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 mb-4";
+const inputClass = "w-full rounded-xl border border-stone-600/50 bg-stone-800/60 px-3 py-2.5 text-sm text-stone-100 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
+const labelClass = "block text-xs font-medium text-stone-400 mb-1.5";
+const cardClass = "rounded-2xl border border-stone-700/40 bg-stone-800/50 backdrop-blur-sm p-4 mb-4";
 const sectionTitle = "text-amber-400 font-semibold text-xs uppercase tracking-widest mb-3";
 
 function NumberInput({ label, value, onChange, step = 1, min, max, suffix, tip }: {
@@ -78,7 +78,36 @@ export default function StructureTab({ state, onChange }: Props) {
   const updateBody = (id: string, key: keyof Body, value: string | number) => {
     onChange({
       ...state,
-      bodies: state.bodies.map((b) => (b.id === id ? { ...b, [key]: value } : b)),
+      bodies: state.bodies.map((b) => {
+        if (b.id !== id) return b;
+        const updated = { ...b, [key]: value };
+
+        // Auto-update pieces when width or depth changes
+        if (key === 'width' || key === 'depth') {
+          const newWidth = key === 'width' ? (value as number) : b.width;
+          const newDepth = key === 'depth' ? (value as number) : b.depth;
+          const thickness = state.panel.thickness;
+          const innerWidth = +(newWidth - 2 * thickness).toFixed(1);
+
+          updated.pieces = b.pieces.map((p) => {
+            if (p.type === 'joue') {
+              // Joues: profondeur = profondeur du corps
+              return { ...p, width: newDepth };
+            }
+            if (p.type === 'tablette-fixe' || p.type === 'tablette-reglable') {
+              // Tablettes: longueur = largeur intérieure, profondeur = profondeur du corps
+              return { ...p, length: innerWidth, width: newDepth };
+            }
+            if (p.type === 'bandeau') {
+              // Bandeau: longueur = largeur du corps
+              return { ...p, length: newWidth };
+            }
+            return p;
+          });
+        }
+
+        return updated;
+      }),
     });
   };
 
@@ -139,13 +168,13 @@ export default function StructureTab({ state, onChange }: Props) {
             <option key={k} value={k}>{m.name}</option>
           ))}
         </select>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-zinc-400 mb-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-stone-400 mb-2">
           <Tip text={TIPS['densite']}><span>{mat.density} kg/m³</span></Tip>
           <Tip text={TIPS['flexMPa']}><span>{mat.flexMPa} MPa</span></Tip>
           <Tip text={TIPS['portee-max']}><span>Portée max {mat.maxSpan18} cm</span></Tip>
           <Tip text={TIPS['vis']}><span>Vis: {mat.screwHolding}</span></Tip>
         </div>
-        <p className="text-xs text-zinc-500">{mat.notes}</p>
+        <p className="text-xs text-stone-500">{mat.notes}</p>
         {mat.warnings.length > 0 && (
           <div className="mt-2 space-y-1">
             {mat.warnings.map((w, i) => (
@@ -178,7 +207,7 @@ export default function StructureTab({ state, onChange }: Props) {
           {mat.panels.map((p, i) => (
             <button
               key={i}
-              className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-amber-400 border border-zinc-700 transition-colors"
+              className="text-xs px-3 py-1.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 hover:text-amber-400 border border-stone-700 transition-colors"
               onClick={() => onChange({
                 ...state,
                 panel: { ...state.panel, width: p.w, height: p.h },
@@ -215,13 +244,13 @@ export default function StructureTab({ state, onChange }: Props) {
           >
             <div className="flex items-center justify-between mb-3">
               <input
-                className="bg-transparent text-sm font-semibold text-zinc-100 border-b border-transparent hover:border-zinc-600 focus:border-amber-500 focus:outline-none transition-colors"
+                className="bg-transparent text-sm font-semibold text-stone-100 border-b border-transparent hover:border-stone-600 focus:border-amber-500 focus:outline-none transition-colors"
                 value={b.name}
                 onChange={(e) => updateBody(b.id, 'name', e.target.value)}
               />
               <button
                 onClick={() => removeBody(b.id)}
-                className="text-xs text-zinc-500 hover:text-red-400 transition-colors"
+                className="text-xs text-stone-500 hover:text-red-400 transition-colors"
               >
                 Supprimer
               </button>
@@ -232,7 +261,7 @@ export default function StructureTab({ state, onChange }: Props) {
               <NumberInput label="Profondeur" suffix="cm" value={b.depth} min={10} max={200} step={0.1} onChange={(v) => updateBody(b.id, 'depth', v)} tip={TIPS['corps-profondeur']} />
             </div>
 
-            <div className="text-xs text-zinc-500 mb-3 flex items-center gap-1 flex-wrap">
+            <div className="text-xs text-stone-500 mb-3 flex items-center gap-1 flex-wrap">
               <Tip text={TIPS['int-tablette']}><span>Int. tablette : {(b.width - 2 * state.panel.thickness).toFixed(1)} cm</span></Tip>
               <span className="mx-1">·</span>
               <Tip text={TIPS['poids-corps']}><span>~{totalWeight.toFixed(1)} kg</span></Tip>
@@ -243,7 +272,7 @@ export default function StructureTab({ state, onChange }: Props) {
               {b.pieces.map((p) => (
                 <div
                   key={p.id}
-                  className="flex items-center gap-2 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm"
+                  className="flex items-center gap-2 rounded-lg bg-stone-800/50 px-3 py-2 text-sm"
                 >
                   <span
                     className="w-2 h-2 rounded-full flex-shrink-0"
@@ -298,14 +327,14 @@ export default function StructureTab({ state, onChange }: Props) {
                       onClick={() => setEditingPiece(p.id)}
                     >
                       <span className="truncate">{p.name}</span>
-                      <span className="text-zinc-500 text-xs font-mono ml-2 flex-shrink-0">
+                      <span className="text-stone-500 text-xs font-mono ml-2 flex-shrink-0">
                         {p.length} x {p.width} x{p.qty}
                       </span>
                     </div>
                   )}
                   <button
                     onClick={() => editingPiece === p.id ? setEditingPiece(null) : removePiece(b.id, p.id)}
-                    className="text-xs text-zinc-500 hover:text-red-400 flex-shrink-0 transition-colors"
+                    className="text-xs text-stone-500 hover:text-red-400 flex-shrink-0 transition-colors"
                   >
                     {editingPiece === p.id ? "✓" : "×"}
                   </button>

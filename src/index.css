@@ -1,27 +1,87 @@
 @import "tailwindcss";
 
-/* PWA safe areas for notched devices */
-html {
-  padding-top: env(safe-area-inset-top);
+/* ========== WARM WOOD DESIGN SYSTEM ========== */
+
+:root {
+  --bg-base: #1c1917;       /* stone-900 - warm dark */
+  --bg-surface: #292524;    /* stone-800 */
+  --bg-elevated: #44403c;   /* stone-700 */
+  --border-subtle: #44403c; /* stone-700 */
+  --border-muted: #57534e;  /* stone-600 */
 }
 
+html {
+  padding-top: env(safe-area-inset-top);
+  background: var(--bg-base);
+}
+
+body {
+  background: linear-gradient(180deg, #1c1917 0%, #171412 100%);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Safe areas */
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Prevent iOS rubber-banding / overscroll on the body */
+/* Native feel */
 html, body {
   overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth scrolling for the app */
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Better touch targets for mobile */
+/* Touch targets (WCAG 2.5.8) */
 @media (pointer: coarse) {
-  button, select, input[type="number"] {
+  button, select, [role="button"] {
     min-height: 44px;
+    min-width: 44px;
   }
+
+  input[type="number"], input[type="text"] {
+    min-height: 44px;
+    font-size: 16px !important; /* prevents iOS zoom on focus */
+  }
+}
+
+/* Scrollbar styling for tab bar */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Number input: remove spinners on mobile for cleaner look */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Focus visible for a11y */
+:focus-visible {
+  outline: 2px solid #d97706;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Smooth transitions */
+* {
+  transition-duration: 150ms;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(217, 119, 6, 0.3);
 }

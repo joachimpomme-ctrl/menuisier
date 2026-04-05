@@ -8,7 +8,7 @@ interface Props {
   thickness: number;
 }
 
-const cardClass = "rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 mb-4";
+const cardClass = "rounded-2xl border border-stone-700/40 bg-stone-800/50 backdrop-blur-sm p-4 mb-4";
 
 // Map step title prefixes to tip keys
 const STEP_TIPS: Record<string, string> = {
@@ -32,7 +32,7 @@ function getStepTip(title: string): string | undefined {
 export default function NoticeTab({ steps, materialName, thickness }: Props) {
   return (
     <div>
-      <div className="text-sm text-zinc-400 mb-4">
+      <div className="text-sm text-stone-400 mb-4">
         Notice de montage — {materialName} {thickness * 10} mm
       </div>
       {steps.map((s, i) => {
@@ -55,12 +55,12 @@ export default function NoticeTab({ steps, materialName, thickness }: Props) {
                     key={j}
                     className={`text-sm py-0.5 flex items-start gap-1 ${
                       item.startsWith("  →")
-                        ? "text-zinc-500 pl-4 font-mono text-xs"
+                        ? "text-stone-500 pl-4 font-mono text-xs"
                         : item.startsWith("⚠") || item.startsWith("⚡")
                         ? "text-yellow-400/80"
                         : item.startsWith("💡")
                         ? "text-blue-300/80"
-                        : "text-zinc-300"
+                        : "text-stone-300"
                     }`}
                   >
                     <span className="flex-1">{item}</span>
