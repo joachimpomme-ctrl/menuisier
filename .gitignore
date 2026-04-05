@@ -4,3 +4,4 @@ dist
 .env.local
 *.local
 .claude/
+.DS_Store
