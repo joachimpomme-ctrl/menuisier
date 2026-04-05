@@ -1,11 +1,16 @@
 import type { AppState, Step } from '../types';
 import { MATERIALS } from '../data/materials';
+import { SYSTEME_32_RULES, ASSEMBLAGES, FINISHES, ORIENTATION_RULES } from '../data/knowledge';
 
 export function generateSteps(st: AppState): Step[] {
   const { project: pr, panel: pn, bodies: bs, materialKey: mk } = st;
   const mat = MATERIALS[mk];
   const usableHeight = pr.ceilingHeight - pr.plinthHeight;
   const steps: Step[] = [];
+
+  // Règle d'orientation pour le matériau courant
+  const matType = mk.startsWith('cp_') ? 'contreplaqué' : mk === 'osb' ? 'OSB' : mk === 'mdf' || mk === 'melamine' ? 'MDF et panneau de particules' : '';
+  const orientRule = ORIENTATION_RULES.find((r) => r.materiau === matType);
 
   steps.push({
     title: "1. Relevé de cotes terrain",
@@ -22,6 +27,7 @@ export function generateSteps(st: AppState): Step[] {
     title: `2. Débit — ${mat.name} ${pn.thickness * 10} mm`,
     items: [
       `Panneau ${pn.width}×${pn.height} cm`,
+      ...(orientRule ? [`⚡ ${orientRule.regle} (${orientRule.impact})`] : []),
       `Découpe grands panneaux en magasin`,
       `Finitions scie circulaire sur rail`,
       ...(mk === "melamine" ? ["⚠ Lame trapézoïdale anti-éclats"] : []),
@@ -44,12 +50,21 @@ export function generateSteps(st: AppState): Step[] {
       ],
     });
   } else {
+    // Perçages système 32 avec cotes exactes de la base de connaissances
+    const entraxe = SYSTEME_32_RULES.find((r) => r.id === 'entraxe');
+    const axeChant = SYSTEME_32_RULES.find((r) => r.id === 'axe_chant');
+    const diam5 = SYSTEME_32_RULES.find((r) => r.id === 'diam_5');
+    const diam68 = SYSTEME_32_RULES.find((r) => r.id === 'diam_6_8');
+
     steps.push({
-      title: "3. Perçages taquets",
+      title: "3. Perçages taquets — Système 32 [Dunod 2022]",
       items: [
-        `Perçages Ø5, entraxe 32 mm, prof 12 mm`,
-        `Gabarit de perçage obligatoire`,
-        ...bs.map((b) => `${b.name} : 2 rangées/joue à 5 cm et ${b.depth - 5} cm`),
+        `Entraxe perçages : ${entraxe?.valeur ?? '32 mm'} (norme système 32)`,
+        `Distance axe / chant vertical : ${axeChant?.valeur ?? '37 mm'}`,
+        `${diam5?.regle ?? 'Taquets, charnières, coulisses'} : ${diam5?.valeur ?? 'Ø 5 mm'}`,
+        `${diam68?.regle ?? 'Tourillons'} : ${diam68?.valeur ?? 'Ø 6 ou 8 mm'}`,
+        `Profondeur : 12 mm — gabarit de perçage obligatoire`,
+        ...bs.map((b) => `${b.name} : 2 rangées/joue à 37 mm et ${b.depth * 10 - 37} mm du chant`),
       ],
     });
   }
@@ -61,6 +76,9 @@ export function generateSteps(st: AppState): Step[] {
       `Scie sauteuse lame fine + ponçage`,
     ],
   });
+
+  // Assemblages disponibles selon la base de connaissances
+  const assemblyTypes = ASSEMBLAGES.filter((a) => a.famille === 'caisson');
 
   bs.forEach((b, i) => {
     const fixedCount = b.pieces
@@ -74,6 +92,7 @@ export function generateSteps(st: AppState): Step[] {
       title: `5.${i + 1}. Assemblage ${b.name}`,
       items: [
         `Joues bas à plat sur tréteaux`,
+        `Techniques caisson possibles : ${assemblyTypes.map((a) => a.nom).join(', ')} [Dunod 2022]`,
         ...mat.assembly,
         `${fixedCount} tablettes fixes : basse ~${usableHeight - 45} cm / haute 180 cm`,
         `Joues hautes — tablette fixe couvre le joint`,
@@ -96,6 +115,11 @@ export function generateSteps(st: AppState): Step[] {
     ],
   });
 
+  // Finitions enrichies avec la base de connaissances
+  const kbFinishes = FINISHES.filter((f) =>
+    mat.finish.some((mf) => mf.toLowerCase().includes(f.nom.toLowerCase()))
+  );
+
   steps.push({
     title: "7. Finitions",
     items: [
@@ -105,6 +129,7 @@ export function generateSteps(st: AppState): Step[] {
       `Tablettes réglables en place`,
       mat.edgeFinish,
       `Options : ${mat.finish.join(", ")}`,
+      ...kbFinishes.map((f) => `  💡 ${f.nom} : ${f.notes}`),
     ],
   });
 

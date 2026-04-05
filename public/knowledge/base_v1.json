@@ -1,0 +1,2496 @@
+{
+  "metadata": {
+    "name": "menuiserie_knowledge_base",
+    "version": "1.0.0",
+    "language": "fr",
+    "status": {
+      "schema": "complete",
+      "verified_seed_data": "partial_but_verifiee",
+      "notes": "Tous les champs et jeux de données présents ont été remplis uniquement à partir des informations explicitement visibles dans les deux PDF fournis. Les domaines non encore extraits en détail restent dans le schéma avec tableaux vides."
+    },
+    "sources": [
+      {
+        "id": "dunod_2022",
+        "title": "Menuiserie, agencement et ébénisterie - 100 fiches pratiques",
+        "publisher": "Dunod",
+        "year": 2022,
+        "file": "660019727-100-fiches-pratiques-de-menuiserie-agencement-et-b-nisterie-wawacity-boo.pdf"
+      },
+      {
+        "id": "fleurus_menuiserie",
+        "title": "Menuiserie",
+        "publisher": "Éditions Fleurus",
+        "file": "267296606-Guide-de-La-Menuiserie.pdf",
+        "note": "PDF image-only ; utilisé comme source secondaire visuelle pour confirmer la structure générale et les thèmes, mais la majorité des données vérifiées chiffrées proviennent du manuel Dunod."
+      }
+    ]
+  },
+  "schema": {
+    "tables": {
+      "essences": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "nom": "string",
+          "famille_botanique": "enum(resineux, feuillu)",
+          "origine_geographique": "enum(indigene, nord, tropical, asie_oceanie, afrique, amerique_du_sud, inconnu)",
+          "masse_volumique_12_pct_kg_m3": "number|null",
+          "densite_12_pct": "number|null",
+          "couleur": "string|null",
+          "odeur": "string|null",
+          "grain": "string|null",
+          "proprietes_resume": "string|null",
+          "faconnage_resume": "string|null",
+          "durabilite_resume": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "essence_proprietes_mecaniques": {
+        "primary_key": "essence_id",
+        "fields": {
+          "essence_id": "string",
+          "compression_axiale_mpa": "number|null",
+          "traction_axiale_mpa": "number|null",
+          "flexion_parallele_mpa": "number|null",
+          "module_elasticite_longitudinal_flexion_mpa": "number|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "essence_retraits": {
+        "primary_key": "essence_id",
+        "fields": {
+          "essence_id": "string",
+          "coefficient_retrait_radial_pct_par_point_humidite": "number|null",
+          "coefficient_retrait_tangentiel_pct_par_point_humidite": "number|null",
+          "coefficient_retrait_volumetrique_pct_par_point_humidite": "number|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "essence_durabilite": {
+        "primary_key": "essence_id",
+        "fields": {
+          "essence_id": "string",
+          "classe_champignons_duramen": "integer|null",
+          "classe_insectes": "enum(D,S,null)",
+          "classe_termites": "enum(D,M,S,null)",
+          "aubier_champignons_classe": "integer|null",
+          "aubier_termites_sensible": "boolean|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "essence_impregnabilite": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "essence_id": "string",
+          "partie_bois": "enum(aubier, duramen, non_precise)",
+          "classe_impregnabilite": "integer",
+          "libelle": "string",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "essence_usages": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "essence_id": "string",
+          "usage": "string",
+          "details": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "classes_emploi": {
+        "primary_key": "code",
+        "fields": {
+          "code": "string",
+          "destination": "string",
+          "risques": "array",
+          "choix_essences_resume": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "humidite_cibles": {
+        "primary_key": "contexte",
+        "fields": {
+          "contexte": "string",
+          "humidite_max_pct": "number|null",
+          "humidite_min_pct": "number|null",
+          "reference_normative": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "equilibres_hygroscopiques": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "temperature_c": "number",
+          "humidite_relative_pct": "number",
+          "humidite_bois_equilibre_pct": "number",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "panneaux": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "type": "string",
+          "variante": "string|null",
+          "composition_resume": "string|null",
+          "epaisseurs_mm": "array",
+          "formats_mm": "array",
+          "variation_longueur_pct": "number|null",
+          "variation_largeur_pct": "number|null",
+          "variation_epaisseur_pct": "number|null",
+          "masse_volumique_min_kg_m3": "number|null",
+          "masse_volumique_max_kg_m3": "number|null",
+          "resistance_humidite": "string|null",
+          "usages_resume": "array",
+          "notes": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "classes_panneaux": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "panneau_id": "string",
+          "norme": "string|null",
+          "classe_code": "string",
+          "usage": "string",
+          "milieu": "string|null",
+          "details": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "emissions_formaldehyde": {
+        "primary_key": "classe",
+        "fields": {
+          "classe": "string",
+          "teneur_mg_pour_100g_max": "number|null",
+          "teneur_mg_pour_100g_min": "number|null",
+          "emission_ppm_max": "number|null",
+          "emission_mg_l_max": "number|null",
+          "details": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "certifications_formaldehyde": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "nom": "string",
+          "details": "string",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "orientation_debit_panneaux": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "materiau": "string",
+          "regle": "string",
+          "impact": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "traitements_bois": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "nom": "string",
+          "type": "enum(surface, profondeur, produit)",
+          "classe_emploi_cible": "array",
+          "profondeur_penetration": "string|null",
+          "retention_pct": "number|null",
+          "description": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "machines": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "nom": "string",
+          "famille": "string",
+          "description": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "anomalies_usinage": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "machine_id": "string",
+          "anomalie": "string",
+          "causes": "array",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "regles_metier": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "domaine": "string",
+          "condition": "string",
+          "action": "string",
+          "description": "string",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "formules": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "nom": "string",
+          "variables": "array",
+          "expression": "string",
+          "unite_resultat": "string",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "ouvrages": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "nom": "string",
+          "famille": "string",
+          "notes": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "assemblages": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "nom": "string",
+          "famille": "string",
+          "notes": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "systeme_32_regles": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "regle": "string",
+          "valeur": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      },
+      "finitions": {
+        "primary_key": "id",
+        "fields": {
+          "id": "string",
+          "nom": "string",
+          "type": "string",
+          "notes": "string|null",
+          "verified": "boolean",
+          "source_refs": "array"
+        }
+      }
+    }
+  },
+  "verified_data": {
+    "essences": [
+      {
+        "id": "meleze",
+        "nom": "Mélèze",
+        "famille_botanique": "resineux",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 600,
+        "densite_12_pct": 0.6,
+        "proprietes_resume": "Résistance variable. Très fissile. Résistance moyenne aux chocs.",
+        "faconnage_resume": "Facile à travailler. Encrassement possible par la résine. Collage difficile.",
+        "durabilite_resume": "Moyennement durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p2_tableau_1_1"
+        ]
+      },
+      {
+        "id": "douglas",
+        "nom": "Douglas",
+        "famille_botanique": "resineux",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 540,
+        "densite_12_pct": 0.54,
+        "proprietes_resume": "Bois tendre. Bonne résistance à la compression, à la flexion et à la traction.",
+        "faconnage_resume": "Facile à scier, désaffûtant. Bois hétérogène influant sur la qualité de surface.",
+        "durabilite_resume": "Assez durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p2_tableau_1_1"
+        ]
+      },
+      {
+        "id": "pin_sylvestre",
+        "nom": "Pin sylvestre",
+        "famille_botanique": "resineux",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 530,
+        "densite_12_pct": 0.53,
+        "proprietes_resume": "Résistance variable. Moyennement stable. Relativement nerveux. Assez fissile.",
+        "faconnage_resume": "Facile à travailler. Collage difficile si le bois est très résineux.",
+        "durabilite_resume": "Non durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p2_tableau_1_1"
+        ]
+      },
+      {
+        "id": "pin_maritime",
+        "nom": "Pin maritime",
+        "famille_botanique": "resineux",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 510,
+        "densite_12_pct": 0.51,
+        "proprietes_resume": "Faible résistance. Moyennement nerveux. Moins élastique que le pin sylvestre.",
+        "faconnage_resume": "Facile à travailler. Encrassement possible par la résine. Collage difficile si très résineux.",
+        "durabilite_resume": "Duramen durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p2_tableau_1_1"
+        ]
+      },
+      {
+        "id": "epicea",
+        "nom": "Épicéa",
+        "famille_botanique": "resineux",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 450,
+        "densite_12_pct": 0.45,
+        "proprietes_resume": "Bois tendre. Faible résistance. Très fissile.",
+        "faconnage_resume": "Facile à travailler, désaffûtant.",
+        "durabilite_resume": "Non durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p2_tableau_1_1"
+        ]
+      },
+      {
+        "id": "sapin",
+        "nom": "Sapin",
+        "famille_botanique": "resineux",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 450,
+        "densite_12_pct": 0.45,
+        "proprietes_resume": "Bois tendre. Faible résistance. Très fissile.",
+        "faconnage_resume": "Très facile à travailler. Risque d’arrachement des fibres. Collage très facile avec tous types de colles.",
+        "durabilite_resume": "Non durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p2_tableau_1_1"
+        ]
+      },
+      {
+        "id": "frene",
+        "nom": "Frêne",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 720,
+        "densite_12_pct": 0.72,
+        "proprietes_resume": "Bois dur. Très bonne résistance à la traction et à la flexion. Peu fissile.",
+        "faconnage_resume": "Facile à travailler. Bois absorbant ; utiliser des colles à haute viscosité.",
+        "durabilite_resume": "Non durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p3_tableau_1_2"
+        ]
+      },
+      {
+        "id": "chene",
+        "nom": "Chêne",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 710,
+        "densite_12_pct": 0.71,
+        "proprietes_resume": "Bois mi-dur à dur. Bons comportements à la compression et à la flexion. Assez résilient. Bois nerveux. Moyennement fissile.",
+        "faconnage_resume": "Besoin de puissance pour les bois les plus nerveux. Bois dense et acide. Se tache facilement avec des colles alcalines.",
+        "durabilite_resume": "Durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p3_tableau_1_2"
+        ]
+      },
+      {
+        "id": "hetre",
+        "nom": "Hêtre",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 680,
+        "densite_12_pct": 0.68,
+        "proprietes_resume": "Bois mi-dur. Parfois nerveux. Bonne résistance en compression. Peu fissile.",
+        "faconnage_resume": "Facile à travailler. Se cintre bien. Facile à teinter. Collage : risque de cémentation, forte pression de serrage nécessaire.",
+        "durabilite_resume": "Non durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p3_tableau_1_2"
+        ]
+      },
+      {
+        "id": "chataignier",
+        "nom": "Châtaignier",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 620,
+        "densite_12_pct": 0.62,
+        "proprietes_resume": "Bois mi-dur à dur. Assez bonnes propriétés mécaniques.",
+        "faconnage_resume": "Facile à travailler. Se cintre bien. Bois dense et acide. Se tache facilement avec des colles alcalines.",
+        "durabilite_resume": "Très durable aux intempéries.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p3_tableau_1_2"
+        ]
+      },
+      {
+        "id": "merisier",
+        "nom": "Merisier",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 610,
+        "densite_12_pct": 0.61,
+        "proprietes_resume": "Bois mi-dur, moyennement stable. Bonnes propriétés mécaniques.",
+        "faconnage_resume": "Facile à travailler. Se cintre et se colle bien.",
+        "durabilite_resume": "Non durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p3_tableau_1_2"
+        ]
+      },
+      {
+        "id": "aulne",
+        "nom": "Aulne",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 530,
+        "densite_12_pct": 0.53,
+        "proprietes_resume": "Bois tendre. Résistance mécanique moyenne.",
+        "faconnage_resume": "Facile à usiner. Collage très facile avec tous types de colles.",
+        "durabilite_resume": "Non durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p3_tableau_1_2"
+        ]
+      },
+      {
+        "id": "peuplier",
+        "nom": "Peuplier",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "indigene",
+        "masse_volumique_12_pct_kg_m3": 460,
+        "densite_12_pct": 0.46,
+        "proprietes_resume": "Bois très tendre. Moyennement stable. Résistance mécanique faible.",
+        "faconnage_resume": "Usinage assez difficile (peluchage). Collage : bois absorbant, risque de poches d’humidité.",
+        "durabilite_resume": "Non durable.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p3_tableau_1_2"
+        ]
+      },
+      {
+        "id": "iroko",
+        "nom": "Iroko",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "afrique",
+        "masse_volumique_12_pct_kg_m3": 650,
+        "densite_12_pct": 0.65,
+        "proprietes_resume": null,
+        "faconnage_resume": null,
+        "durabilite_resume": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "sipo",
+        "nom": "Sipo",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "afrique",
+        "masse_volumique_12_pct_kg_m3": 620,
+        "densite_12_pct": 0.62,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "sapelli",
+        "nom": "Sapelli",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "afrique",
+        "masse_volumique_12_pct_kg_m3": 690,
+        "densite_12_pct": 0.69,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "doussie",
+        "nom": "Doussié",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "afrique",
+        "masse_volumique_12_pct_kg_m3": 800,
+        "densite_12_pct": 0.8,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "framire",
+        "nom": "Framiré",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "afrique",
+        "masse_volumique_12_pct_kg_m3": 500,
+        "densite_12_pct": 0.5,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "movingui",
+        "nom": "Movingui",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "afrique",
+        "masse_volumique_12_pct_kg_m3": 730,
+        "densite_12_pct": 0.73,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "niangon",
+        "nom": "Niangon",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "afrique",
+        "masse_volumique_12_pct_kg_m3": 700,
+        "densite_12_pct": 0.7,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "okoume",
+        "nom": "Okoumé",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "afrique",
+        "masse_volumique_12_pct_kg_m3": 440,
+        "densite_12_pct": 0.44,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "ramin",
+        "nom": "Ramin",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "asie_oceanie",
+        "masse_volumique_12_pct_kg_m3": 660,
+        "densite_12_pct": 0.66,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "meranti",
+        "nom": "Meranti",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "asie_oceanie",
+        "masse_volumique_12_pct_kg_m3": 680,
+        "densite_12_pct": 0.68,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "eucalyptus",
+        "nom": "Eucalyptus",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "asie_oceanie",
+        "masse_volumique_12_pct_kg_m3": 650,
+        "densite_12_pct": 0.65,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "teck",
+        "nom": "Teck",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "asie_oceanie",
+        "masse_volumique_12_pct_kg_m3": 670,
+        "densite_12_pct": 0.67,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "ipe",
+        "nom": "Ipé",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "amerique_du_sud",
+        "masse_volumique_12_pct_kg_m3": 1040,
+        "densite_12_pct": 1.04,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "angelim",
+        "nom": "Angelim",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "amerique_du_sud",
+        "masse_volumique_12_pct_kg_m3": 800,
+        "densite_12_pct": 0.8,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      },
+      {
+        "id": "amarante",
+        "nom": "Amarante",
+        "famille_botanique": "feuillu",
+        "origine_geographique": "amerique_du_sud",
+        "masse_volumique_12_pct_kg_m3": 800,
+        "densite_12_pct": 0.8,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p5_tableau_2_1"
+        ]
+      }
+    ],
+    "essence_proprietes_mecaniques": [
+      {
+        "essence_id": "frene",
+        "compression_axiale_mpa": 51,
+        "traction_axiale_mpa": 145,
+        "flexion_parallele_mpa": 113,
+        "module_elasticite_longitudinal_flexion_mpa": 12900,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p11_tableau_5_1"
+        ]
+      },
+      {
+        "essence_id": "chene",
+        "compression_axiale_mpa": 58,
+        "traction_axiale_mpa": 100,
+        "flexion_parallele_mpa": 97,
+        "module_elasticite_longitudinal_flexion_mpa": 12500,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p11_tableau_5_1"
+        ]
+      },
+      {
+        "essence_id": "hetre",
+        "compression_axiale_mpa": 58,
+        "traction_axiale_mpa": 117,
+        "flexion_parallele_mpa": 107,
+        "module_elasticite_longitudinal_flexion_mpa": 14300,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p11_tableau_5_1"
+        ]
+      },
+      {
+        "essence_id": "peuplier",
+        "compression_axiale_mpa": 33,
+        "traction_axiale_mpa": 72,
+        "flexion_parallele_mpa": 65,
+        "module_elasticite_longitudinal_flexion_mpa": 8800,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p11_tableau_5_1"
+        ]
+      },
+      {
+        "essence_id": "meleze",
+        "compression_axiale_mpa": 53,
+        "traction_axiale_mpa": 101,
+        "flexion_parallele_mpa": 93,
+        "module_elasticite_longitudinal_flexion_mpa": 12500,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p11_tableau_5_1"
+        ]
+      },
+      {
+        "essence_id": "douglas",
+        "compression_axiale_mpa": 55,
+        "traction_axiale_mpa": 93,
+        "flexion_parallele_mpa": 85,
+        "module_elasticite_longitudinal_flexion_mpa": 12100,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p11_tableau_5_1"
+        ]
+      },
+      {
+        "essence_id": "sapin",
+        "compression_axiale_mpa": 46,
+        "traction_axiale_mpa": 86,
+        "flexion_parallele_mpa": 68,
+        "module_elasticite_longitudinal_flexion_mpa": 12200,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p11_tableau_5_1"
+        ]
+      }
+    ],
+    "essence_retraits": [
+      {
+        "essence_id": "chene",
+        "coefficient_retrait_radial_pct_par_point_humidite": 0.17,
+        "coefficient_retrait_tangentiel_pct_par_point_humidite": 0.32,
+        "coefficient_retrait_volumetrique_pct_par_point_humidite": 0.49,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p17_tableau_8_1"
+        ]
+      },
+      {
+        "essence_id": "douglas",
+        "coefficient_retrait_radial_pct_par_point_humidite": 0.17,
+        "coefficient_retrait_tangentiel_pct_par_point_humidite": 0.27,
+        "coefficient_retrait_volumetrique_pct_par_point_humidite": 0.44,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p17_tableau_8_1"
+        ]
+      },
+      {
+        "essence_id": "epicea",
+        "coefficient_retrait_radial_pct_par_point_humidite": 0.17,
+        "coefficient_retrait_tangentiel_pct_par_point_humidite": 0.31,
+        "coefficient_retrait_volumetrique_pct_par_point_humidite": 0.58,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p17_tableau_8_1"
+        ]
+      },
+      {
+        "essence_id": "frene",
+        "coefficient_retrait_radial_pct_par_point_humidite": 0.19,
+        "coefficient_retrait_tangentiel_pct_par_point_humidite": 0.32,
+        "coefficient_retrait_volumetrique_pct_par_point_humidite": 0.51,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p17_tableau_8_1"
+        ]
+      },
+      {
+        "essence_id": "hetre",
+        "coefficient_retrait_radial_pct_par_point_humidite": 0.21,
+        "coefficient_retrait_tangentiel_pct_par_point_humidite": 0.41,
+        "coefficient_retrait_volumetrique_pct_par_point_humidite": 0.62,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p17_tableau_8_1"
+        ]
+      },
+      {
+        "essence_id": "merisier",
+        "coefficient_retrait_radial_pct_par_point_humidite": 0.17,
+        "coefficient_retrait_tangentiel_pct_par_point_humidite": 0.28,
+        "coefficient_retrait_volumetrique_pct_par_point_humidite": 0.45,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p17_tableau_8_1"
+        ]
+      },
+      {
+        "essence_id": "pin_sylvestre",
+        "coefficient_retrait_radial_pct_par_point_humidite": 0.17,
+        "coefficient_retrait_tangentiel_pct_par_point_humidite": 0.31,
+        "coefficient_retrait_volumetrique_pct_par_point_humidite": 0.48,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p17_tableau_8_1"
+        ]
+      },
+      {
+        "essence_id": "sapin",
+        "coefficient_retrait_radial_pct_par_point_humidite": 0.14,
+        "coefficient_retrait_tangentiel_pct_par_point_humidite": 0.31,
+        "coefficient_retrait_volumetrique_pct_par_point_humidite": 0.45,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p17_tableau_8_1"
+        ]
+      }
+    ],
+    "classes_emploi": [
+      {
+        "code": "1",
+        "destination": "Bois d’intérieur ; menuiserie d’intérieur, mobilier et agencement",
+        "risques": [
+          "Insectes à larves xylophages",
+          "Termites"
+        ],
+        "choix_essences_resume": "Certaines essences purgées de leur aubier n’ont pas besoin de traitement contre les insectes xylophages, sauf termites.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p23_tableau_10_1"
+        ]
+      },
+      {
+        "code": "2",
+        "destination": "Bois sous abri et non exposé aux intempéries ; charpente, ossature",
+        "risques": [
+          "Insectes xylophages",
+          "Termites",
+          "Champignons en cas d’humidité temporaire"
+        ],
+        "choix_essences_resume": "Bois naturellement résistants aux insectes ou traités.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p23_tableau_10_1"
+        ]
+      },
+      {
+        "code": "3.1",
+        "destination": "Bois en extérieur sans contact avec le sol ; exposition aux intempéries avec séchage rapide ; portes, fenêtres, bardages",
+        "risques": [
+          "Champignons",
+          "Pourritures si humidité > 20 % sur longue période",
+          "Insectes à larves xylophages",
+          "Termites"
+        ],
+        "choix_essences_resume": "Exemples sans traitement : chêne, châtaignier, pin, mélèze, douglas ; ou essences suffisamment imprégnables.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p23_tableau_10_1"
+        ]
+      },
+      {
+        "code": "3.2",
+        "destination": "Bois en extérieur sans contact avec le sol ; exposition aux intempéries avec humidification prolongée",
+        "risques": [
+          "Champignons",
+          "Pourritures",
+          "Insectes à larves xylophages",
+          "Termites"
+        ],
+        "choix_essences_resume": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p23_tableau_10_1"
+        ]
+      },
+      {
+        "code": "4",
+        "destination": "Bois en extérieur en contact avec le sol ou l’eau douce ; clôtures, poteaux",
+        "risques": [
+          "Champignons",
+          "Pourritures",
+          "Insectes à larves xylophages",
+          "Termites"
+        ],
+        "choix_essences_resume": "Essences naturellement durables (essences tropicales et robinier) ou très imprégnables.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p23_tableau_10_1"
+        ]
+      },
+      {
+        "code": "5",
+        "destination": "Bois en contact avec l’eau de mer ; aménagement de bord de mer",
+        "risques": [
+          "Pourriture",
+          "Térébrants marins"
+        ],
+        "choix_essences_resume": "Pas de traitement à ce jour pour atteindre cette classe d’emploi.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p23_tableau_10_1"
+        ]
+      }
+    ],
+    "humidite_cibles": [
+      {
+        "contexte": "charpente_et_escalier_bois",
+        "humidite_max_pct": 22,
+        "humidite_min_pct": null,
+        "reference_normative": "DTU 31.1 / NF EN 14250",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p14_fiche_7"
+        ]
+      },
+      {
+        "contexte": "charpente_industrielle",
+        "humidite_max_pct": 22,
+        "humidite_min_pct": null,
+        "reference_normative": "EN 14250",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p14_fiche_7"
+        ]
+      },
+      {
+        "contexte": "maison_ossature_bois",
+        "humidite_max_pct": 18,
+        "humidite_min_pct": null,
+        "reference_normative": "DTU 31.2",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p14_fiche_7"
+        ]
+      },
+      {
+        "contexte": "menuiserie_exterieure",
+        "humidite_max_pct": 18,
+        "humidite_min_pct": null,
+        "reference_normative": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p14_fiche_7"
+        ]
+      },
+      {
+        "contexte": "siege",
+        "humidite_max_pct": 12,
+        "humidite_min_pct": null,
+        "reference_normative": "NF D 61-010",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p14_fiche_7"
+        ]
+      },
+      {
+        "contexte": "menuiserie_interieure_agencement_ebenisterie",
+        "humidite_max_pct": 12,
+        "humidite_min_pct": 10,
+        "reference_normative": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p14_fiche_7"
+        ]
+      }
+    ],
+    "equilibres_hygroscopiques": [
+      {
+        "id": "eq_20c_71hr",
+        "temperature_c": 20,
+        "humidite_relative_pct": 71,
+        "humidite_bois_equilibre_pct": 13,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p15_fig_7_1"
+        ]
+      },
+      {
+        "id": "eq_20c_80hr",
+        "temperature_c": 20,
+        "humidite_relative_pct": 80,
+        "humidite_bois_equilibre_pct": 16,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p15_fig_7_1"
+        ]
+      }
+    ],
+    "essence_impregnabilite": [
+      {
+        "id": "imp_hêtre",
+        "essence_id": "hetre",
+        "partie_bois": "non_precise",
+        "classe_impregnabilite": 1,
+        "libelle": "Imprégnable (facile à traiter)",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_tableau_11_1"
+        ]
+      },
+      {
+        "id": "imp_frêne",
+        "essence_id": "frene",
+        "partie_bois": "non_precise",
+        "classe_impregnabilite": 2,
+        "libelle": "Moyennement imprégnable (assez facile à traiter)",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_tableau_11_1"
+        ]
+      },
+      {
+        "id": "imp_sapin",
+        "essence_id": "sapin",
+        "partie_bois": "non_precise",
+        "classe_impregnabilite": 2,
+        "libelle": "Moyennement imprégnable (assez facile à traiter)",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_tableau_11_1"
+        ]
+      },
+      {
+        "id": "imp_okoume",
+        "essence_id": "okoume",
+        "partie_bois": "non_precise",
+        "classe_impregnabilite": 3,
+        "libelle": "Peu imprégnable (difficile à traiter)",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_tableau_11_1"
+        ]
+      },
+      {
+        "id": "imp_peuplier",
+        "essence_id": "peuplier",
+        "partie_bois": "non_precise",
+        "classe_impregnabilite": 3,
+        "libelle": "Peu imprégnable (difficile à traiter)",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_tableau_11_1"
+        ]
+      },
+      {
+        "id": "imp_epicea",
+        "essence_id": "epicea",
+        "partie_bois": "non_precise",
+        "classe_impregnabilite": 3,
+        "libelle": "Peu imprégnable (difficile à traiter)",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_tableau_11_1"
+        ]
+      },
+      {
+        "id": "imp_chataignier",
+        "essence_id": "chataignier",
+        "partie_bois": "non_precise",
+        "classe_impregnabilite": 4,
+        "libelle": "Non imprégnable (impossible à traiter)",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_tableau_11_1"
+        ]
+      },
+      {
+        "id": "imp_chene",
+        "essence_id": "chene",
+        "partie_bois": "non_precise",
+        "classe_impregnabilite": 4,
+        "libelle": "Non imprégnable (impossible à traiter)",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_tableau_11_1"
+        ]
+      },
+      {
+        "id": "imp_douglas",
+        "essence_id": "douglas",
+        "partie_bois": "non_precise",
+        "classe_impregnabilite": 4,
+        "libelle": "Non imprégnable (impossible à traiter)",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_tableau_11_1"
+        ]
+      },
+      {
+        "id": "imp_iroko",
+        "essence_id": "iroko",
+        "partie_bois": "non_precise",
+        "classe_impregnabilite": 4,
+        "libelle": "Non imprégnable (impossible à traiter)",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_tableau_11_1"
+        ]
+      },
+      {
+        "id": "imp_niangon",
+        "essence_id": "niangon",
+        "partie_bois": "non_precise",
+        "classe_impregnabilite": 4,
+        "libelle": "Non imprégnable (impossible à traiter)",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_tableau_11_1"
+        ]
+      }
+    ],
+    "panneaux": [
+      {
+        "id": "contreplaque",
+        "type": "contreplaqué",
+        "variante": null,
+        "composition_resume": "Superposition croisée de couches de placage déroulé, en nombre impair, croisées à 90°. Plis en pin, bouleau, hêtre, principalement peuplier ou okoumé. Résines thermodurcissables.",
+        "epaisseurs_mm": [
+          3,
+          4,
+          5,
+          6,
+          8,
+          10,
+          12,
+          15,
+          18,
+          22,
+          25,
+          30
+        ],
+        "formats_mm": [
+          [
+            2500,
+            1220
+          ],
+          [
+            3100,
+            1530
+          ]
+        ],
+        "variation_longueur_pct": 0.15,
+        "variation_largeur_pct": 0.15,
+        "variation_epaisseur_pct": 4,
+        "masse_volumique_min_kg_m3": 400,
+        "masse_volumique_max_kg_m3": 660,
+        "resistance_humidite": "Dépend de la classe du panneau et du choix colle/essence.",
+        "usages_resume": [
+          "Intérieur",
+          "Extérieur selon classe",
+          "Pièces cintrées pour variante cintrable",
+          "Coffrage pour CTB-C",
+          "Construction navale pour marine"
+        ],
+        "notes": "Fil apparent du pli extérieur dans le sens de la longueur.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p30_31_fiche_12"
+        ]
+      },
+      {
+        "id": "latte",
+        "type": "latté",
+        "variante": null,
+        "composition_resume": "Contreplaqué latté : âme constituée d’une multitude de lattes juxtaposées en peuplier ou résineux, 7 à 30 mm de large, collées à plat joint ; deux plis de placage croisés à 90° avec les lattes.",
+        "epaisseurs_mm": [
+          15,
+          19,
+          22,
+          30
+        ],
+        "formats_mm": [
+          [
+            2500,
+            1220
+          ],
+          [
+            3100,
+            1530
+          ],
+          [
+            3500,
+            1530
+          ]
+        ],
+        "variation_longueur_pct": null,
+        "variation_largeur_pct": null,
+        "variation_epaisseur_pct": null,
+        "masse_volumique_min_kg_m3": null,
+        "masse_volumique_max_kg_m3": null,
+        "resistance_humidite": "Sensible à l’eau.",
+        "usages_resume": [
+          "Ébénisterie",
+          "Menuiserie d’agencement"
+        ],
+        "notes": "Excellente résistance mécanique dans le sens des lattes, faible poids. Fil apparent du pli extérieur dans le sens de la largeur car les lattes sont dans le sens de la longueur.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p32_fiche_13"
+        ]
+      },
+      {
+        "id": "osb",
+        "type": "OSB",
+        "variante": null,
+        "composition_resume": "Panneau à lamelles minces longues et orientées de 0,6 à 0,8 mm. Les plus fines composent l’âme ; les plus larges composent les couches extérieures, orientées parallèlement à la longueur. Résines mélamine-urée-phénol-formol.",
+        "epaisseurs_mm": [
+          8,
+          10,
+          12,
+          15,
+          18,
+          22
+        ],
+        "formats_mm": [
+          [
+            2500,
+            1250
+          ],
+          [
+            5000,
+            1250
+          ],
+          [
+            5000,
+            2500
+          ]
+        ],
+        "variation_longueur_pct": 0.2,
+        "variation_largeur_pct": 0.3,
+        "variation_epaisseur_pct": 6,
+        "masse_volumique_min_kg_m3": 550,
+        "masse_volumique_max_kg_m3": 720,
+        "resistance_humidite": "Selon type OSB 1 à 4.",
+        "usages_resume": [
+          "Agencement intérieur",
+          "Planchers",
+          "Étagères",
+          "Poutres en I",
+          "Emballage",
+          "Construction MOB"
+        ],
+        "notes": "Résistance mécanique renforcée dans le sens de la longueur.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p33_fiche_14"
+        ]
+      },
+      {
+        "id": "mdf",
+        "type": "MDF",
+        "variante": null,
+        "composition_resume": "Panneau de fibres de bois collées par résines thermodurcissables, procédé par voie sèche ; fibres d’environ 1,5 mm ; pré-pressage puis pressage.",
+        "epaisseurs_mm": [
+          3,
+          5,
+          6,
+          10,
+          12,
+          16,
+          19,
+          22,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50
+        ],
+        "formats_mm": [
+          [
+            2070,
+            2800
+          ],
+          [
+            2500,
+            1250
+          ],
+          [
+            5000,
+            1250
+          ],
+          [
+            5000,
+            2500
+          ]
+        ],
+        "variation_longueur_pct": 0.3,
+        "variation_largeur_pct": 0.3,
+        "variation_epaisseur_pct": 6,
+        "masse_volumique_min_kg_m3": 450,
+        "masse_volumique_max_kg_m3": 900,
+        "resistance_humidite": "Selon variantes MDF standard, LA, HLS.",
+        "usages_resume": [
+          "Agencement",
+          "Fabrication de meubles",
+          "Éléments porteurs selon variantes",
+          "Sols stratifiés",
+          "Pièces cintrées pour variante cintrable"
+        ],
+        "notes": "Pas de sens de débit à respecter pour le MDF standard.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p34_35_fiche_15",
+          "dunod_2022:p43_fiche_19"
+        ]
+      },
+      {
+        "id": "panneau_particules",
+        "type": "panneau de particules",
+        "variante": null,
+        "composition_resume": "Panneau de copeaux fins séchés puis triés ; couches externes fines et âme plus grossière pour panneau trois couches ; résines urée-formol.",
+        "epaisseurs_mm": [
+          6,
+          8,
+          10,
+          12,
+          15,
+          19,
+          22,
+          25,
+          30
+        ],
+        "formats_mm": [
+          [
+            2070,
+            2800
+          ],
+          [
+            3050,
+            1850
+          ],
+          [
+            4100,
+            1850
+          ]
+        ],
+        "variation_longueur_pct": 0.3,
+        "variation_largeur_pct": 0.3,
+        "variation_epaisseur_pct": 6,
+        "masse_volumique_min_kg_m3": 500,
+        "masse_volumique_max_kg_m3": 800,
+        "resistance_humidite": "Selon classes P1 à P5.",
+        "usages_resume": [
+          "Agencement",
+          "Mobilier",
+          "Planchers",
+          "Cloisons",
+          "Support de couverture",
+          "Portes à âme pleine pour extrudé"
+        ],
+        "notes": "Le panneau extrudé a une masse volumique de 380 à 520 kg/m3 ; pas de sens de débit structurel à respecter pour particules standard.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p36_37_fiche_16",
+          "dunod_2022:p43_fiche_19"
+        ]
+      },
+      {
+        "id": "stratifie",
+        "type": "stratifié",
+        "variante": null,
+        "composition_resume": "Plusieurs feuilles de papier kraft imprégnées de résine phénolique ; couche décorative en papier saturé en mélamine ; épaisseur totale ≤ 1,3 mm.",
+        "epaisseurs_mm": [
+          1.3
+        ],
+        "formats_mm": [],
+        "variation_longueur_pct": null,
+        "variation_largeur_pct": null,
+        "variation_epaisseur_pct": null,
+        "masse_volumique_min_kg_m3": null,
+        "masse_volumique_max_kg_m3": null,
+        "resistance_humidite": "Très résistant aux produits domestiques et alimentaires, à l’abrasion et aux UV.",
+        "usages_resume": [
+          "Revêtement décoratif collé sur support",
+          "Plans et éléments d’agencement"
+        ],
+        "notes": "Doit obligatoirement être collé sur support ; le panneau de particules est le support principal ; recommandé sur les deux faces pour stabilité.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p38_40_fiche_17"
+        ]
+      }
+    ],
+    "classes_panneaux": [
+      {
+        "id": "cp_cl1",
+        "panneau_id": "contreplaque",
+        "norme": "NF EN 636",
+        "classe_code": "1",
+        "usage": "Contreplaqué en milieu sec",
+        "milieu": "sec",
+        "details": "Utilisé en intérieur, à l’abri de l’humidité.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p31_fiche_12"
+        ]
+      },
+      {
+        "id": "cp_cl2",
+        "panneau_id": "contreplaque",
+        "norme": "NF EN 636",
+        "classe_code": "2",
+        "usage": "Contreplaqué en milieu humide",
+        "milieu": "humide",
+        "details": "Utilisé en intérieur avec humidité maximale de 85 % ou à l’extérieur mais abrité.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p31_fiche_12"
+        ]
+      },
+      {
+        "id": "cp_cl3",
+        "panneau_id": "contreplaque",
+        "norme": "NF EN 636",
+        "classe_code": "3",
+        "usage": "Contreplaqué extérieur",
+        "milieu": "extérieur",
+        "details": "Nommé CTB-X, résistant aux intempéries même prolongées.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p31_fiche_12"
+        ]
+      },
+      {
+        "id": "osb_1",
+        "panneau_id": "osb",
+        "norme": "NF EN 300",
+        "classe_code": "OSB 1",
+        "usage": "Agencement intérieur",
+        "milieu": "sec",
+        "details": "Panneau pour l’agencement intérieur, utilisé en milieu sec.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p33_fiche_14"
+        ]
+      },
+      {
+        "id": "osb_2",
+        "panneau_id": "osb",
+        "norme": "NF EN 300",
+        "classe_code": "OSB 2",
+        "usage": "Panneau travaillant",
+        "milieu": "sec",
+        "details": "Plancher, étagères…",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p33_fiche_14"
+        ]
+      },
+      {
+        "id": "osb_3",
+        "panneau_id": "osb",
+        "norme": "NF EN 300",
+        "classe_code": "OSB 3",
+        "usage": "Panneau travaillant",
+        "milieu": "humide",
+        "details": "Plancher, poutre en I, emballage…",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p33_fiche_14"
+        ]
+      },
+      {
+        "id": "osb_4",
+        "panneau_id": "osb",
+        "norme": "NF EN 300",
+        "classe_code": "OSB 4",
+        "usage": "Panneau travaillant sous contrainte élevée",
+        "milieu": "humide",
+        "details": "Construction de maison ossature bois.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p33_fiche_14"
+        ]
+      },
+      {
+        "id": "mdf_standard",
+        "panneau_id": "mdf",
+        "norme": "NF EN 622-1 / NF EN 662-5 / NF EN 316",
+        "classe_code": "MDF standard",
+        "usage": "Agencement et fabrication de meubles",
+        "milieu": "sec",
+        "details": "Usage courant en milieu sec.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p35_fiche_15"
+        ]
+      },
+      {
+        "id": "mdf_la",
+        "panneau_id": "mdf",
+        "norme": "NF EN 622-1 / NF EN 662-5 / NF EN 316",
+        "classe_code": "MDF-LA",
+        "usage": "Éléments porteurs",
+        "milieu": "sec",
+        "details": "Planchers, étagères, plans de travail.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p35_fiche_15"
+        ]
+      },
+      {
+        "id": "mdf_hls",
+        "panneau_id": "mdf",
+        "norme": "NF EN 622-1 / NF EN 662-5 / NF EN 316",
+        "classe_code": "MDF-HLS",
+        "usage": "Éléments porteurs",
+        "milieu": "humide",
+        "details": "Intérieur ou sous abri ; lames de sols stratifiés pour salles de bains.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p35_fiche_15"
+        ]
+      },
+      {
+        "id": "particules_p1",
+        "panneau_id": "panneau_particules",
+        "norme": "NF EN 309 / NF EN 312",
+        "classe_code": "P1",
+        "usage": "Usage général",
+        "milieu": "sec",
+        "details": "Panneau pour l’usage général.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p37_fiche_16"
+        ]
+      },
+      {
+        "id": "particules_p2",
+        "panneau_id": "panneau_particules",
+        "norme": "NF EN 309 / NF EN 312",
+        "classe_code": "P2",
+        "usage": "Agencement et mobilier",
+        "milieu": "sec",
+        "details": "Panneau pour l’agencement et le mobilier.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p37_fiche_16"
+        ]
+      },
+      {
+        "id": "particules_p3",
+        "panneau_id": "panneau_particules",
+        "norme": "NF EN 309 / NF EN 312",
+        "classe_code": "P3",
+        "usage": "Agencement intérieur",
+        "milieu": "humide",
+        "details": "Exposé à l’humidité, ex. salles de bains.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p37_fiche_16"
+        ]
+      },
+      {
+        "id": "particules_p4",
+        "panneau_id": "panneau_particules",
+        "norme": "NF EN 309 / NF EN 312",
+        "classe_code": "P4",
+        "usage": "Panneau travaillant / CTB-S",
+        "milieu": "sec",
+        "details": "Plancher et cloison ; aussi agencement et mobilier.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p37_fiche_16"
+        ]
+      },
+      {
+        "id": "particules_p5",
+        "panneau_id": "panneau_particules",
+        "norme": "NF EN 309 / NF EN 312",
+        "classe_code": "P5",
+        "usage": "Panneau travaillant / CTB-H",
+        "milieu": "humide",
+        "details": "Plancher, cloison, support de couverture ; aussi agencement.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p37_fiche_16"
+        ]
+      }
+    ],
+    "emissions_formaldehyde": [
+      {
+        "classe": "E2",
+        "teneur_mg_pour_100g_max": 30,
+        "teneur_mg_pour_100g_min": 8,
+        "emission_ppm_max": null,
+        "emission_mg_l_max": null,
+        "details": "8 à 30 mg de formaldéhyde pour 100 g de panneau.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p41_42_fiche_18"
+        ]
+      },
+      {
+        "classe": "E1",
+        "teneur_mg_pour_100g_max": 8,
+        "teneur_mg_pour_100g_min": null,
+        "emission_ppm_max": 0.1,
+        "emission_mg_l_max": null,
+        "details": "Classe minimale obligatoire en France depuis 2006.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p41_42_fiche_18"
+        ]
+      },
+      {
+        "classe": "E0.5",
+        "teneur_mg_pour_100g_max": 5,
+        "teneur_mg_pour_100g_min": null,
+        "emission_ppm_max": null,
+        "emission_mg_l_max": null,
+        "details": "≤ 4 mg pour panneaux de particules et OSB ; ≤ 5 mg pour MDF.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p41_42_fiche_18"
+        ]
+      },
+      {
+        "classe": "F4",
+        "teneur_mg_pour_100g_max": null,
+        "teneur_mg_pour_100g_min": null,
+        "emission_ppm_max": null,
+        "emission_mg_l_max": 0.3,
+        "details": "Teneur inférieure ou égale à 0,3 mg/L.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p41_42_fiche_18"
+        ]
+      }
+    ],
+    "certifications_formaldehyde": [
+      {
+        "id": "ctb_air_plus",
+        "nom": "CTB Air +",
+        "details": "Certification française correspondant à la norme EN-13986 : classes E1, E0.5 ou F4.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p41_42_fiche_18"
+        ]
+      },
+      {
+        "id": "carb_p2",
+        "nom": "CARB P2",
+        "details": "Certification California Air Resources Board. CARB Phase 2 : depuis le 1er janvier 2011, émission limitée à 0,09 ppm pour particules et 0,11 ppm pour MDF ; 0,13 ppm pour MDF minces depuis le 1er janvier 2012.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p41_42_fiche_18"
+        ]
+      }
+    ],
+    "orientation_debit_panneaux": [
+      {
+        "id": "debit_cp",
+        "materiau": "contreplaqué",
+        "regle": "Tenir compte si besoin du sens du fil apparent (dernier pli de surface).",
+        "impact": "Affecte l’aspect visuel et l’orientation des pièces.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p43_fiche_19"
+        ]
+      },
+      {
+        "id": "debit_latte",
+        "materiau": "latté",
+        "regle": "Respecter le sens des lattes, qui donnent l’essentiel de la résistance mécanique.",
+        "impact": "Affecte fortement la résistance mécanique.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p43_fiche_19"
+        ]
+      },
+      {
+        "id": "debit_osb",
+        "materiau": "OSB",
+        "regle": "Les copeaux sont orientés dans le sens de la longueur pour une meilleure résistance mécanique.",
+        "impact": "Résistance supérieure dans la longueur.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p43_fiche_19"
+        ]
+      },
+      {
+        "id": "debit_motifs",
+        "materiau": "panneaux à décor",
+        "regle": "Respecter le sens du motif apparent pour panneaux plaqués, mélaminés et stratifiés.",
+        "impact": "Affecte l’esthétique et le nombre de pièces calepinables.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p43_44_fiche_19"
+        ]
+      },
+      {
+        "id": "debit_cintrables",
+        "materiau": "panneaux cintrables",
+        "regle": "Suivre impérativement le sens de pliage du panneau.",
+        "impact": "Conditionne la possibilité de cintrage.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p43_fiche_19"
+        ]
+      },
+      {
+        "id": "debit_mdf_particules",
+        "materiau": "MDF et panneau de particules",
+        "regle": "Pas de sens de débit structurel à respecter, structure identique dans tous les sens.",
+        "impact": "Facilite l’optimisation de débit.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p43_44_fiche_19"
+        ]
+      }
+    ],
+    "traitements_bois": [
+      {
+        "id": "badigeonnage",
+        "nom": "Badigeonnage",
+        "type": "surface",
+        "classe_emploi_cible": [
+          "1",
+          "2"
+        ],
+        "profondeur_penetration": "3 mm (NP1)",
+        "retention_pct": 50,
+        "description": "Application au pinceau ou à la brosse, utile pour petites surfaces ou rattrapages.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_27_fiche_11"
+        ]
+      },
+      {
+        "id": "aspersion",
+        "nom": "Aspersion",
+        "type": "surface",
+        "classe_emploi_cible": [
+          "1",
+          "2",
+          "3.1"
+        ],
+        "profondeur_penetration": "3 mm (NP1) pour classes 1 à 3.1",
+        "retention_pct": 50,
+        "description": "Produit pulvérisé par rampe d’aspersion sur le bois.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_27_fiche_11"
+        ]
+      },
+      {
+        "id": "trempage",
+        "nom": "Trempage",
+        "type": "surface",
+        "classe_emploi_cible": [
+          "1",
+          "2",
+          "3.1"
+        ],
+        "profondeur_penetration": "3 mm (NP1) pour classes 1 à 3.1",
+        "retention_pct": 50,
+        "description": "Bois immergé en pile dans un bac ; durée selon essence et profondeur désirée.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_27_fiche_11"
+        ]
+      },
+      {
+        "id": "autoclave_np3",
+        "nom": "Autoclave semi-profondeur",
+        "type": "profondeur",
+        "classe_emploi_cible": [
+          "3.2"
+        ],
+        "profondeur_penetration": "6 mm et plus (NP3)",
+        "retention_pct": 100,
+        "description": "Traitement autoclave pour classe 3.2.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_27_fiche_11"
+        ]
+      },
+      {
+        "id": "autoclave_np4",
+        "nom": "Autoclave pleine masse",
+        "type": "profondeur",
+        "classe_emploi_cible": [
+          "4"
+        ],
+        "profondeur_penetration": "Toute la masse (NP4)",
+        "retention_pct": 100,
+        "description": "Bois facilement imprégnable ; autoclave pleine masse pour classe 4.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_27_fiche_11"
+        ]
+      },
+      {
+        "id": "produit_hydrodispersable",
+        "nom": "Produit hydrodispersable",
+        "type": "produit",
+        "classe_emploi_cible": [
+          "1",
+          "2"
+        ],
+        "profondeur_penetration": null,
+        "retention_pct": null,
+        "description": "Huile en émulsion dans l’eau ; répond aux exigences des classes de risque 1 et 2.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p27_fiche_11"
+        ]
+      },
+      {
+        "id": "produit_solvant_organique",
+        "nom": "Produit en solvants organiques",
+        "type": "produit",
+        "classe_emploi_cible": [],
+        "profondeur_penetration": null,
+        "retention_pct": null,
+        "description": "Solvant dérivé du pétrole ; utilisé efficacement pour le traitement curatif des bois ; usage à maîtriser pour raisons sanitaires.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p27_fiche_11"
+        ]
+      },
+      {
+        "id": "sels_hydrosolubles",
+        "nom": "Sels hydrosolubles",
+        "type": "produit",
+        "classe_emploi_cible": [
+          "4"
+        ],
+        "profondeur_penetration": null,
+        "retention_pct": null,
+        "description": "Appliqués uniquement par autoclave ; permettent à certaines essences d’atteindre les exigences des classes 3 et 4.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p28_fiche_11"
+        ]
+      }
+    ],
+    "machines": [
+      {
+        "id": "scie_ruban",
+        "nom": "Scie à ruban",
+        "famille": "scie",
+        "description": "Machine-outil bois pour coupes diverses ; la base comprend une table d’anomalies de sciage vérifiée.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:toc_p174_177"
+        ]
+      },
+      {
+        "id": "scie_circulaire",
+        "nom": "Scie circulaire",
+        "famille": "scie",
+        "description": "Scie à format et scie à table pour délignage, tronçonnage et mise au format des panneaux.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p179_fiche_85"
+        ]
+      },
+      {
+        "id": "degauchisseuse",
+        "nom": "Dégauchisseuse",
+        "famille": "corroyage",
+        "description": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:toc_p185_186"
+        ]
+      },
+      {
+        "id": "raboteuse",
+        "nom": "Raboteuse",
+        "famille": "corroyage",
+        "description": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:toc_p187_188"
+        ]
+      },
+      {
+        "id": "toupie",
+        "nom": "Toupie",
+        "famille": "usinage_profil",
+        "description": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:toc_p189_197"
+        ]
+      },
+      {
+        "id": "mortaiseuse_meche",
+        "nom": "Mortaiseuse à mèche",
+        "famille": "perçage_assemblage",
+        "description": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:toc_p199_202"
+        ]
+      },
+      {
+        "id": "lamelleuse",
+        "nom": "Lamelleuse",
+        "famille": "assemblage",
+        "description": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:toc_p205"
+        ]
+      }
+    ],
+    "anomalies_usinage": [
+      {
+        "id": "ruban_deviation_trace",
+        "machine_id": "scie_ruban",
+        "anomalie": "Déviation par rapport au tracé",
+        "causes": [
+          "Défaut de voie (asymétrie ou usure)",
+          "Guide mal réglé",
+          "Mauvaise tension du ruban",
+          "Lame désaffûtée"
+        ],
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p177_tableau_84_1"
+        ]
+      },
+      {
+        "id": "ruban_battement",
+        "machine_id": "scie_ruban",
+        "anomalie": "Battement du ruban",
+        "causes": [
+          "Mauvaise position du ruban sur le volant",
+          "Trop de soudures de réparation",
+          "Crique (fissure) annonçant une casse imminente"
+        ],
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p177_tableau_84_1"
+        ]
+      },
+      {
+        "id": "ruban_bruit_strident",
+        "machine_id": "scie_ruban",
+        "anomalie": "Bruit strident",
+        "causes": [
+          "Guides-lames latéraux bloqués",
+          "Pression excessive du ruban contre le galet arrière du guide-lame"
+        ],
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p177_tableau_84_1"
+        ]
+      },
+      {
+        "id": "ruban_vibration",
+        "machine_id": "scie_ruban",
+        "anomalie": "Vibration du ruban",
+        "causes": [
+          "Tension insuffisante"
+        ],
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p177_tableau_84_1"
+        ]
+      },
+      {
+        "id": "ruban_exces_poussiere",
+        "machine_id": "scie_ruban",
+        "anomalie": "Excès de poussière",
+        "causes": [
+          "Aspiration insuffisante",
+          "Machine insuffisamment nettoyée entre chaque utilisation"
+        ],
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p177_tableau_84_1"
+        ]
+      },
+      {
+        "id": "ruban_encrasse",
+        "machine_id": "scie_ruban",
+        "anomalie": "Ruban encrassé",
+        "causes": [
+          "Brosses inefficaces",
+          "Nature du bois (excès de résine…)",
+          "Denture inadéquate"
+        ],
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p177_tableau_84_1"
+        ]
+      },
+      {
+        "id": "ruban_casse",
+        "machine_id": "scie_ruban",
+        "anomalie": "Ruban cassé",
+        "causes": [
+          "Tension trop forte du ruban",
+          "Mauvaise manipulation de la pièce",
+          "Ruban inadapté à l’usinage (trop petit)",
+          "Usinage trop rapide"
+        ],
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p177_tableau_84_1"
+        ]
+      }
+    ],
+    "ouvrages": [
+      {
+        "id": "menuiserie_interieure",
+        "nom": "Menuiserie intérieure",
+        "famille": "ouvrage",
+        "notes": "Couverte notamment par classes d’emploi 1 et humidité 10-12 %.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p14_fiche_7",
+          "dunod_2022:p23_tableau_10_1"
+        ]
+      },
+      {
+        "id": "menuiserie_exterieure",
+        "nom": "Menuiserie extérieure",
+        "famille": "ouvrage",
+        "notes": "Couverte notamment par humidité max 18 % et classes d’emploi 3.1 / 3.2.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p14_fiche_7",
+          "dunod_2022:p23_tableau_10_1"
+        ]
+      },
+      {
+        "id": "caisson",
+        "nom": "Caisson",
+        "famille": "agencement",
+        "notes": "Assemblages et système 32 présents dans le manuel.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:toc_p118_120"
+        ]
+      },
+      {
+        "id": "escalier",
+        "nom": "Escalier",
+        "famille": "ouvrage",
+        "notes": "Présent au sommaire, avec généralités et traçage.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:toc_p128_130"
+        ]
+      },
+      {
+        "id": "parquet_massif",
+        "nom": "Parquet massif",
+        "famille": "sol",
+        "notes": "Présent au sommaire.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:toc_p132_138"
+        ]
+      },
+      {
+        "id": "agencement_cuisine",
+        "nom": "Agencement d’une cuisine",
+        "famille": "agencement",
+        "notes": "Présent au sommaire.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:toc_p140"
+        ]
+      }
+    ],
+    "assemblages": [
+      {
+        "id": "languette_rapportee",
+        "nom": "Languette rapportée",
+        "famille": "caisson",
+        "notes": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p118_figure_54_1"
+        ]
+      },
+      {
+        "id": "tourillons",
+        "nom": "Tourillons",
+        "famille": "caisson",
+        "notes": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p118_figure_54_1"
+        ]
+      },
+      {
+        "id": "lamelles",
+        "nom": "Lamelles",
+        "famille": "caisson",
+        "notes": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p118_figure_54_1"
+        ]
+      },
+      {
+        "id": "onglet_verrouille",
+        "nom": "À onglet verrouillé",
+        "famille": "caisson",
+        "notes": null,
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p118_figure_54_1"
+        ]
+      }
+    ],
+    "systeme_32_regles": [
+      {
+        "id": "sys32_entraxe",
+        "regle": "Le système 32 est basé sur un entraxe de perçages de 32 mm.",
+        "valeur": "32 mm",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p119_fiche_55"
+        ]
+      },
+      {
+        "id": "sys32_axe_chant",
+        "regle": "La distance de l’axe de perçage doit être à 37 mm du chant vertical du panneau.",
+        "valeur": "37 mm",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p119_fiche_55"
+        ]
+      },
+      {
+        "id": "sys32_diametre_5",
+        "regle": "Diamètre 5 mm pour taquets, charnières, coulisses, goujons, vis de fixation de quincaillerie et vis d’assemblage.",
+        "valeur": "5 mm",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p119_fiche_55"
+        ]
+      },
+      {
+        "id": "sys32_diametre_6_8",
+        "regle": "Diamètres 6 et 8 mm pour les tourillons.",
+        "valeur": "6 mm / 8 mm",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p119_fiche_55"
+        ]
+      },
+      {
+        "id": "sys32_diametre_7",
+        "regle": "Diamètre 7 mm dans les côtés de meuble pour le collet des vis d’assemblage.",
+        "valeur": "7 mm",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p119_fiche_55"
+        ]
+      }
+    ],
+    "finitions": [
+      {
+        "id": "cire",
+        "nom": "Cire",
+        "type": "finition",
+        "notes": "Application manuelle possible au pinceau, chiffon, mèche de coton ; brillant obtenu par lustrage après séchage.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p78_fiche_39"
+        ]
+      },
+      {
+        "id": "huile",
+        "nom": "Huile",
+        "type": "finition",
+        "notes": "Application manuelle facile ; l’huile de lin peut être fluidifiée au bain-marie à 60 °C pour meilleure pénétration.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p78_fiche_39"
+        ]
+      },
+      {
+        "id": "vernis",
+        "nom": "Vernis",
+        "type": "finition",
+        "notes": "Application manuelle au pinceau, rouleau ou tampon ; pour masquer les traces de pinceau, dernier passage dans le sens du veinage.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p78_fiche_39"
+        ]
+      },
+      {
+        "id": "gomme_laque",
+        "nom": "Vernis gomme-laque",
+        "type": "finition",
+        "notes": "Application au tampon avec mèche dans un tissu de coton.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p78_fiche_39"
+        ]
+      }
+    ],
+    "regles_metier": [
+      {
+        "id": "R_HUM_001",
+        "domaine": "humidite",
+        "condition": "contexte == 'menuiserie_interieure_agencement_ebenisterie'",
+        "action": "humidite_bois_cible in [10,12]",
+        "description": "En menuiserie intérieure, agencement et ébénisterie, viser 10 à 12 % d’humidité.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p14_fiche_7"
+        ]
+      },
+      {
+        "id": "R_HUM_002",
+        "domaine": "humidite",
+        "condition": "contexte == 'menuiserie_exterieure'",
+        "action": "humidite_bois_max = 18",
+        "description": "En menuiserie extérieure, humidité maximale recommandée 18 %.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p14_fiche_7"
+        ]
+      },
+      {
+        "id": "R_HUM_003",
+        "domaine": "humidite",
+        "condition": "humidite_bois > 30",
+        "action": "etat_eau = 'eau libre + eau liée'",
+        "description": "Au-dessus de 30 %, le bois contient encore de l’eau libre ; 30 % est le point de saturation des fibres.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p14_fiche_7"
+        ]
+      },
+      {
+        "id": "R_RET_001",
+        "domaine": "retractabilite",
+        "condition": "humidite varie entre 30 et 0",
+        "action": "appliquer coefficients de retrait radial/tangentiel",
+        "description": "Le bois varie en dimension uniquement entre 30 % et 0 % de son humidité.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p17_fiche_8"
+        ]
+      },
+      {
+        "id": "R_RET_002",
+        "domaine": "retractabilite",
+        "condition": "debit == 'sur_quartier'",
+        "action": "stabilite_superieure = true",
+        "description": "Les planches sur quartier restent planes malgré les variations hygrométriques.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p16_fiche_8"
+        ]
+      },
+      {
+        "id": "R_TRT_001",
+        "domaine": "traitement",
+        "condition": "classe_emploi == '4'",
+        "action": "traitement_recommande = 'autoclave_np4'",
+        "description": "La classe 4 nécessite un traitement en profondeur sur toute la masse pour les bois imprégnables.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p25_27_fiche_11"
+        ]
+      },
+      {
+        "id": "R_PAN_001",
+        "domaine": "panneaux",
+        "condition": "type_panneau == 'OSB'",
+        "action": "sens_resistance_principal = 'longueur'",
+        "description": "Les couches externes de l’OSB sont orientées parallèlement à la longueur, ce qui augmente la résistance dans ce sens.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p33_fiche_14",
+          "dunod_2022:p43_fiche_19"
+        ]
+      },
+      {
+        "id": "R_PAN_002",
+        "domaine": "debit",
+        "condition": "type_panneau in ['MDF','panneau de particules']",
+        "action": "pas_de_sens_debit_structurel",
+        "description": "Pour le MDF et le panneau de particules, il n’y a pas de sens de débit à respecter.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p43_fiche_19"
+        ]
+      },
+      {
+        "id": "R_STRAT_001",
+        "domaine": "stratifie",
+        "condition": "revetement == 'stratifie'",
+        "action": "coller_sur_support = true",
+        "description": "Le stratifié est cassant et doit être obligatoirement collé sur un support.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p38_fiche_17"
+        ]
+      },
+      {
+        "id": "R_STRAT_002",
+        "domaine": "stratifie",
+        "condition": "revetement == 'stratifie'",
+        "action": "contrebalancement_recommande = true",
+        "description": "Pour la stabilité, coller du stratifié sur les deux faces permet des tensions symétriques et une bonne planéité.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p40_fiche_17"
+        ]
+      },
+      {
+        "id": "R_SYS32_001",
+        "domaine": "caisson",
+        "condition": "systeme == '32'",
+        "action": "entraxe_percages = 32",
+        "description": "Le système 32 est basé sur un entraxe de 32 mm.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p119_fiche_55"
+        ]
+      },
+      {
+        "id": "R_SYS32_002",
+        "domaine": "caisson",
+        "condition": "systeme == '32'",
+        "action": "axe_percage_au_chant = 37",
+        "description": "Pour charnières et coulisses, l’axe des perçages se situe à 37 mm du chant vertical.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p119_fiche_55"
+        ]
+      },
+      {
+        "id": "R_DIAG_001",
+        "domaine": "diagnostic_machine",
+        "condition": "machine == 'scie_ruban' and anomalie == 'Déviation par rapport au tracé'",
+        "action": "verifier ['voie','guide','tension','affutage']",
+        "description": "Les causes principales sont défaut de voie, guide mal réglé, mauvaise tension ou lame désaffûtée.",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p177_tableau_84_1"
+        ]
+      }
+    ],
+    "formules": [
+      {
+        "id": "F_RET_RADIAL",
+        "nom": "Retrait radial",
+        "variables": [
+          "r",
+          "L",
+          "deltaH"
+        ],
+        "expression": "(r * L * deltaH) / 100",
+        "unite_resultat": "mm",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p17_fiche_8"
+        ]
+      },
+      {
+        "id": "F_RET_TANGENTIEL",
+        "nom": "Retrait tangentiel",
+        "variables": [
+          "t",
+          "L",
+          "deltaH"
+        ],
+        "expression": "(t * L * deltaH) / 100",
+        "unite_resultat": "mm",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p17_fiche_8"
+        ]
+      },
+      {
+        "id": "F_EX_SAPIN_GONFLEMENT_RADIAL",
+        "nom": "Exemple sapin gonflement radial",
+        "variables": [
+          "r=0.14",
+          "L=100",
+          "deltaH=5"
+        ],
+        "expression": "(0.14 * 100 * 5) / 100 = 0.7",
+        "unite_resultat": "mm",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p18_exemple_fiche_8"
+        ]
+      },
+      {
+        "id": "F_EX_SAPIN_RETRAIT_RADIAL",
+        "nom": "Exemple sapin retrait radial",
+        "variables": [
+          "r=0.14",
+          "L=100",
+          "deltaH=3"
+        ],
+        "expression": "(0.14 * 100 * 3) / 100 = 0.42",
+        "unite_resultat": "mm",
+        "verified": true,
+        "source_refs": [
+          "dunod_2022:p19_exemple_fiche_8"
+        ]
+      }
+    ]
+  },
+  "coverage": {
+    "verified_populated_domains": [
+      "classification botanique",
+      "classification géographique",
+      "propriétés physiques",
+      "propriétés mécaniques",
+      "défauts et altérations",
+      "humidité et équilibre hygroscopique",
+      "rétractabilité et formules",
+      "séchage",
+      "durabilité et classes d’emploi",
+      "imprégnabilité et traitements",
+      "contreplaqué",
+      "latté",
+      "OSB",
+      "MDF",
+      "panneaux de particules",
+      "stratifié",
+      "formaldéhyde",
+      "débit des dérivés du bois",
+      "système 32",
+      "assemblages de caissons (noms visibles)",
+      "anomalies scie à ruban",
+      "scie circulaire (description minimale)",
+      "finitions manuelles (cire, huile, vernis)"
+    ],
+    "schema_only_domains_pending_extraction": [
+      "colles détaillées",
+      "abrasifs détaillés",
+      "teintes détaillées",
+      "vernis au pistolet détaillé",
+      "ouvrages bois massif détaillés",
+      "assemblages bois massif détaillés",
+      "principes de construction des caissons détaillés",
+      "composants du système 32 détaillés",
+      "parquets détaillés",
+      "relevés de chantier détaillés",
+      "fixation des ouvrages détaillée",
+      "sécurité atelier détaillée",
+      "paramètres d’usinage détaillés",
+      "maintenance détaillée de toutes les machines"
+    ]
+  }
+}

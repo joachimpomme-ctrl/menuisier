@@ -8,6 +8,7 @@ import { generateSteps } from './lib/steps';
 import { estimateCost } from './lib/cost';
 // PDF lazy-loaded pour code-split (jsPDF est gros)
 import { LocalProjectRepository, exportToJson, importFromJson } from './lib/storage';
+import { seedBaseKnowledge } from './lib/knowledgeStore';
 import StructureTab from './components/StructureTab';
 import DebitTab from './components/DebitTab';
 import MontageTab from './components/MontageTab';
@@ -15,6 +16,7 @@ import NoticeTab from './components/NoticeTab';
 import ValidationTab from './components/ValidationTab';
 import AssistantTab from './components/AssistantTab';
 import ProjectManager from './components/ProjectManager';
+import KnowledgeManager from './components/KnowledgeManager';
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'structure', label: 'Structure', icon: '⚙' },
@@ -59,6 +61,8 @@ export default function App() {
   const [tab, setTab] = useState<TabKey>('structure');
   const [projects, setProjects] = useState<ProjectMeta[]>(repo.list());
   const [showProjects, setShowProjects] = useState(false);
+  const [showKnowledge, setShowKnowledge] = useState(false);
+  const [, setKnowledgeVersion] = useState(0); // trigger re-render on knowledge update
   const [importError, setImportError] = useState<string | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
@@ -77,6 +81,9 @@ export default function App() {
   const cost = useMemo(() => estimateCost(state, nesting), [state, nesting]);
 
   const refreshProjects = useCallback(() => setProjects(repo.list()), []);
+
+  // Seed base knowledge on first launch
+  useEffect(() => { seedBaseKnowledge(); }, []);
 
   // Auto-save
   useEffect(() => {
@@ -218,6 +225,12 @@ export default function App() {
                 Projets
               </button>
               <button
+                onClick={() => setShowKnowledge(true)}
+                className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
+              >
+                Savoirs
+              </button>
+              <button
                 onClick={() => exportToJson(state)}
                 className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
               >
@@ -294,6 +307,13 @@ export default function App() {
           />
         )}
       </div>
+
+      {/* Knowledge Manager Modal */}
+      <KnowledgeManager
+        isOpen={showKnowledge}
+        onClose={() => setShowKnowledge(false)}
+        onUpdate={() => setKnowledgeVersion((v) => v + 1)}
+      />
 
       {/* Project Manager Modal */}
       <ProjectManager

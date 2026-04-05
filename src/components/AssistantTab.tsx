@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import type { AppState, ChatMessage, UploadedPdf, ValidationResult, PieceWithBody } from '../types';
 import { MATERIALS } from '../data/materials';
+import { buildKnowledgeSummary } from '../data/knowledge';
+import { buildUserKnowledgeContext, listKnowledgeDocs } from '../lib/knowledgeStore';
 
 interface Props {
   state: AppState;
@@ -52,8 +54,13 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
     }
   };
 
+  const kbDocCount = listKnowledgeDocs().length;
+
   const buildSystemPrompt = (): string => {
-    return `Tu es un assistant menuiserie expert intégré à un outil de conception de bibliothèque. Réponds en français, concis et technique.
+    const knowledgeBase = buildKnowledgeSummary();
+    const userKnowledge = buildUserKnowledgeContext();
+
+    return `Tu es un assistant menuiserie expert intégré à un outil de conception de bibliothèque. Réponds en français, concis et technique. Cite tes sources quand tu utilises la base de connaissances (ex: [Dunod 2022]).
 
 PROJET : mur ${state.project.wallWidth}×${state.project.ceilingHeight} cm, plinthe ${state.project.plinthHeight} cm, hauteur utile ${usableHeight} cm
 ${state.bodies.length} corps : ${state.bodies.map(b => `${b.name} ${b.width}×${b.depth}cm (${b.pieces.length} pièces)`).join(' / ')}
@@ -71,7 +78,9 @@ ${validation.errors.map(e => '❌ ' + e).join('\n')}
 ${validation.warnings.map(w => '⚠ ' + w).join('\n')}
 
 ${pdfs.length ? `${pdfs.length} PDF de référence fournis — utilise-les.` : ''}
-Calcul flexion : f = (5·q·L⁴)/(384·E·I), I = b·h³/12. Si modification recommandée, donne la valeur exacte.`;
+
+${knowledgeBase}
+${userKnowledge}`;
   };
 
   const send = async () => {
@@ -166,6 +175,7 @@ Calcul flexion : f = (5·q·L⁴)/(384·E·I), I = b·h³/12. Si modification re
 
         <div className="text-xs text-zinc-500 mb-3">
           Contexte : structure + {mat.name} + validation ({validation.errors.length}e/{validation.warnings.length}w)
+          + base connaissances{kbDocCount > 0 ? ` + ${kbDocCount} doc${kbDocCount > 1 ? 's' : ''} perso` : ''}
           {pdfs.length > 0 ? ` + ${pdfs.length} PDF` : ''}
         </div>
 
