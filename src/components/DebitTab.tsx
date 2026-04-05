@@ -2,6 +2,8 @@ import type { AppState, PieceWithBody, NestingResult } from '../types';
 import type { CostEstimate } from '../lib/cost';
 import { MATERIALS, PIECE_COLORS } from '../data/materials';
 import CostPanel from './CostPanel';
+import Tip from './Tip';
+import TIPS from '../data/tips';
 
 interface Props {
   state: AppState;
@@ -39,33 +41,33 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
           <div>
             <div className="text-2xl font-bold text-amber-400">{metrics.panelCount}</div>
-            <div className="text-xs text-zinc-500">panneaux</div>
+            <Tip text={TIPS['panneaux-total']}><div className="text-xs text-zinc-500">panneaux</div></Tip>
           </div>
           <div>
             <div className={`text-2xl font-bold ${metrics.efficiency > 70 ? 'text-emerald-400' : metrics.efficiency > 50 ? 'text-yellow-400' : 'text-red-400'}`}>
               {metrics.efficiency.toFixed(1)}%
             </div>
-            <div className="text-xs text-zinc-500">rendement</div>
+            <Tip text={TIPS['rendement']}><div className="text-xs text-zinc-500">rendement</div></Tip>
           </div>
           <div>
             <div className="text-2xl font-bold text-zinc-300">{(metrics.usedArea / 10000).toFixed(2)}</div>
-            <div className="text-xs text-zinc-500">m² utile</div>
+            <Tip text={TIPS['surface-utile']}><div className="text-xs text-zinc-500">m² utile</div></Tip>
           </div>
           <div>
             <div className="text-2xl font-bold text-zinc-500">{(metrics.wasteArea / 10000).toFixed(2)}</div>
-            <div className="text-xs text-zinc-500">m² chute</div>
+            <Tip text={TIPS['surface-chute']}><div className="text-xs text-zinc-500">m² chute</div></Tip>
           </div>
         </div>
         <div className="mt-3 pt-3 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-500">
-          <span>{mat.short} · {state.panel.width}×{state.panel.height} cm · trait {state.kerf} mm</span>
-          <span>Stratégie : {strategyLabels[strategy] ?? strategy}</span>
+          <Tip text={TIPS['trait-scie']}><span>{mat.short} · {state.panel.width}×{state.panel.height} cm · trait {state.kerf} mm</span></Tip>
+          <Tip text={TIPS['strategie']}><span>Stratégie : {strategyLabels[strategy] ?? strategy}</span></Tip>
         </div>
       </div>
 
       {/* Unplaced pieces warning */}
       {unplaced.length > 0 && (
         <div className="rounded-xl border border-red-900/50 bg-red-950/20 p-4 mb-4">
-          <h4 className="text-red-400 font-semibold text-sm mb-2">Pièces non plaçables</h4>
+          <Tip text={TIPS['piece-non-placable']}><h4 className="text-red-400 font-semibold text-sm mb-2">Pièces non placables</h4></Tip>
           <p className="text-xs text-red-300/70 mb-2">Ces pièces dépassent les dimensions du panneau :</p>
           {unplaced.map((p, i) => (
             <div key={i} className="text-xs text-red-300/60 py-0.5">

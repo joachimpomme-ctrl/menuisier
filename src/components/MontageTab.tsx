@@ -1,5 +1,7 @@
 import type { AppState } from '../types';
 import { MATERIALS, BODY_COLORS } from '../data/materials';
+import Tip from './Tip';
+import TIPS from '../data/tips';
 
 interface Props {
   state: AppState;
@@ -29,7 +31,9 @@ export default function MontageTab({ state }: Props) {
   return (
     <div>
       <div className="text-sm text-zinc-400 mb-4">
-        Élévation frontale — {mat.short} {thickness * 10} mm
+        <Tip text={TIPS['elevation']}>
+          <span>Élévation frontale — {mat.short} {thickness * 10} mm</span>
+        </Tip>
       </div>
 
       <div className={cardClass}>

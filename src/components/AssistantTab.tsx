@@ -3,6 +3,8 @@ import type { AppState, ChatMessage, UploadedPdf, ValidationResult, PieceWithBod
 import { MATERIALS } from '../data/materials';
 import { buildKnowledgeSummary } from '../data/knowledge';
 import { buildUserKnowledgeContext, listKnowledgeDocs } from '../lib/knowledgeStore';
+import Tip from './Tip';
+import TIPS from '../data/tips';
 
 interface Props {
   state: AppState;
@@ -10,6 +12,13 @@ interface Props {
   allPieces: PieceWithBody[];
   totalPieces: number;
   panelCount: number;
+}
+
+interface UploadedImage {
+  name: string;
+  data: string; // base64
+  mediaType: string; // image/jpeg, image/png, etc.
+  preview: string; // data URL for thumbnail
 }
 
 const cardClass = "rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 mb-4";
@@ -21,8 +30,11 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pdfs, setPdfs] = useState<UploadedPdf[]>([]);
+  const [images, setImages] = useState<UploadedImage[]>([]);
   const endRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const photoRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
 
   const mat = MATERIALS[state.materialKey];
   const usableHeight = state.project.ceilingHeight - state.project.plinthHeight;
@@ -52,6 +64,48 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
     } catch {
       setError('Erreur de lecture du PDF');
     }
+    e.target.value = '';
+  };
+
+  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    for (const file of Array.from(files)) {
+      if (file.size > 15 * 1024 * 1024) {
+        setError(`Image trop volumineuse : ${file.name} (max 15 Mo)`);
+        continue;
+      }
+
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        setError(`Format non supporté : ${file.name}. Utilisez JPG, PNG, GIF ou WebP.`);
+        continue;
+      }
+
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        const base64 = dataUrl.split(',')[1];
+        const mediaType = file.type;
+
+        setImages((prev) => [...prev, {
+          name: file.name,
+          data: base64,
+          mediaType,
+          preview: dataUrl,
+        }]);
+        setError(null);
+      } catch {
+        setError(`Erreur de lecture : ${file.name}`);
+      }
+    }
+    e.target.value = '';
   };
 
   const kbDocCount = listKnowledgeDocs().length;
@@ -60,7 +114,9 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
     const knowledgeBase = buildKnowledgeSummary();
     const userKnowledge = buildUserKnowledgeContext();
 
-    return `Tu es un assistant menuiserie expert intégré à un outil de conception de bibliothèque. Réponds en français, concis et technique. Cite tes sources quand tu utilises la base de connaissances (ex: [Dunod 2022]).
+    return `Tu es un assistant menuiserie expert intégré à un outil de conception de bibliothèque sur mesure. Réponds en français, concis et technique. Cite tes sources quand tu utilises la base de connaissances (ex: [Dunod 2022]).
+
+${images.length > 0 ? `L'utilisateur a joint ${images.length} photo(s) de son chantier/projet. Analyse-les attentivement : vérifie les dimensions apparentes, la qualité des assemblages, les défauts visibles, la planéité, l'équerrage, l'état du mur, etc. Donne des conseils concrets basés sur ce que tu vois.` : ''}
 
 PROJET : mur ${state.project.wallWidth}×${state.project.ceilingHeight} cm, plinthe ${state.project.plinthHeight} cm, hauteur utile ${usableHeight} cm
 ${state.bodies.length} corps : ${state.bodies.map(b => `${b.name} ${b.width}×${b.depth}cm (${b.pieces.length} pièces)`).join(' / ')}
@@ -96,17 +152,37 @@ ${userKnowledge}`;
 
     try {
       const apiMessages = newMessages.map((m, i) => {
-        if (m.role === 'user' && pdfs.length > 0 && i === newMessages.length - 1) {
-          return {
-            role: 'user' as const,
-            content: [
-              ...pdfs.map(d => ({
-                type: 'document' as const,
-                source: { type: 'base64' as const, media_type: 'application/pdf' as const, data: d.data },
-              })),
-              { type: 'text' as const, text: m.content },
-            ],
-          };
+        if (m.role === 'user' && i === newMessages.length - 1) {
+          // Build multimodal content for the last user message
+          const content: Array<Record<string, unknown>> = [];
+
+          // Add PDFs
+          if (pdfs.length > 0) {
+            pdfs.forEach(d => {
+              content.push({
+                type: 'document',
+                source: { type: 'base64', media_type: 'application/pdf', data: d.data },
+              });
+            });
+          }
+
+          // Add images
+          if (images.length > 0) {
+            images.forEach(img => {
+              content.push({
+                type: 'image',
+                source: { type: 'base64', media_type: img.mediaType, data: img.data },
+              });
+            });
+          }
+
+          // Add text
+          content.push({ type: 'text', text: m.content });
+
+          // If we have attachments, use multimodal format
+          if (content.length > 1) {
+            return { role: 'user' as const, content };
+          }
         }
         return { role: m.role, content: m.content };
       });
@@ -136,38 +212,80 @@ ${userKnowledge}`;
     setLoading(false);
   };
 
+  const attachCount = pdfs.length + images.length;
+
   const suggestions = [
     `Portée max tablettes en ${mat.short} ?`,
     `8 kg/mètre de livres sur ${allPieces.find(p => p.type === 'tablette-reglable')?.length || 96} cm ?`,
     `Revue critique — quels risques ?`,
     `Comment traiter la jonction des 2 corps ?`,
+    ...(images.length > 0 ? ['Analyse cette photo de mon chantier'] : []),
   ];
 
   return (
     <div>
       <div className={cardClass}>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-amber-400 font-semibold text-sm">Assistant IA — {mat.short}</h4>
-          <div className="flex items-center gap-2">
-            {pdfs.length > 0 && (
-              <span className="text-xs text-zinc-500">{pdfs.length} PDF</span>
+          <Tip text={TIPS['assistant-ia']}>
+            <h4 className="text-amber-400 font-semibold text-sm">Assistant IA — {mat.short}</h4>
+          </Tip>
+          <div className="flex items-center gap-1.5">
+            {attachCount > 0 && (
+              <span className="text-xs text-zinc-500">{attachCount} pj</span>
             )}
+            {/* Camera button — mobile only uses capture */}
+            <button
+              onClick={() => cameraRef.current?.click()}
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700 transition-colors"
+              title="Prendre une photo"
+            >
+              📷
+            </button>
+            {/* Photo gallery */}
+            <button
+              onClick={() => photoRef.current?.click()}
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700 transition-colors"
+              title="Choisir une photo"
+            >
+              🖼
+            </button>
+            {/* PDF */}
             <button
               onClick={() => fileRef.current?.click()}
-              className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700 transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700 transition-colors"
+              title="Ajouter un PDF"
             >
-              + PDF réf.
+              PDF
             </button>
+            {/* Hidden file inputs */}
+            <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleImage} />
+            <input ref={photoRef} type="file" accept="image/*" multiple className="hidden" onChange={handleImage} />
             <input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={handlePdf} />
           </div>
         </div>
 
-        {pdfs.length > 0 && (
+        {/* Attachments preview */}
+        {(pdfs.length > 0 || images.length > 0) && (
           <div className="flex flex-wrap gap-1.5 mb-3">
+            {images.map((img, i) => (
+              <div key={`img-${i}`} className="relative group">
+                <img
+                  src={img.preview}
+                  alt={img.name}
+                  className="w-14 h-14 rounded-lg object-cover border border-zinc-700"
+                />
+                <button
+                  onClick={() => setImages((imgs) => imgs.filter((_, j) => j !== i))}
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-zinc-800 border border-zinc-600 text-zinc-400 hover:text-red-400 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  x
+                </button>
+              </div>
+            ))}
             {pdfs.map((d, i) => (
-              <span key={i} className="text-xs bg-zinc-800 rounded-lg px-2.5 py-1 text-zinc-300 flex items-center gap-1.5 border border-zinc-700">
-                {d.name}
-                <button onClick={() => setPdfs((ds) => ds.filter((_, j) => j !== i))} className="text-zinc-500 hover:text-red-400">×</button>
+              <span key={`pdf-${i}`} className="text-xs bg-zinc-800 rounded-lg px-2.5 py-1 text-zinc-300 flex items-center gap-1.5 border border-zinc-700 h-14">
+                📄 {d.name.length > 15 ? d.name.slice(0, 12) + '...' : d.name}
+                <button onClick={() => setPdfs((ds) => ds.filter((_, j) => j !== i))} className="text-zinc-500 hover:text-red-400">x</button>
               </span>
             ))}
           </div>
@@ -176,6 +294,7 @@ ${userKnowledge}`;
         <div className="text-xs text-zinc-500 mb-3">
           Contexte : structure + {mat.name} + validation ({validation.errors.length}e/{validation.warnings.length}w)
           + base connaissances{kbDocCount > 0 ? ` + ${kbDocCount} doc${kbDocCount > 1 ? 's' : ''} perso` : ''}
+          {images.length > 0 ? ` + ${images.length} photo${images.length > 1 ? 's' : ''}` : ''}
           {pdfs.length > 0 ? ` + ${pdfs.length} PDF` : ''}
         </div>
 
@@ -227,7 +346,7 @@ ${userKnowledge}`;
         <div className="flex gap-2">
           <input
             className={inputClass + " flex-1"}
-            placeholder="Ta question..."
+            placeholder={images.length > 0 ? "Décris ce que tu veux vérifier sur la photo..." : "Ta question..."}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {

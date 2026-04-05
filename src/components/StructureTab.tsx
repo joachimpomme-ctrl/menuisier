@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { AppState, MaterialKey, PieceType, Body } from '../types';
 import { MATERIALS, PIECE_COLORS, BODY_COLORS, PIECE_TYPES } from '../data/materials';
 import { uid, parseNumber, clampInt } from '../lib/helpers';
+import Tip from './Tip';
+import TIPS from '../data/tips';
 
 interface Props {
   state: AppState;
@@ -13,9 +15,9 @@ const labelClass = "block text-xs font-medium text-zinc-400 mb-1";
 const cardClass = "rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 mb-4";
 const sectionTitle = "text-amber-400 font-semibold text-xs uppercase tracking-widest mb-3";
 
-function NumberInput({ label, value, onChange, step = 1, min, max, suffix }: {
+function NumberInput({ label, value, onChange, step = 1, min, max, suffix, tip }: {
   label: string; value: number; onChange: (v: number) => void;
-  step?: number; min?: number; max?: number; suffix?: string;
+  step?: number; min?: number; max?: number; suffix?: string; tip?: string;
 }) {
   const [raw, setRaw] = useState(String(value));
   const [focused, setFocused] = useState(false);
@@ -24,7 +26,13 @@ function NumberInput({ label, value, onChange, step = 1, min, max, suffix }: {
 
   return (
     <div>
-      <label className={labelClass}>{label}{suffix ? ` (${suffix})` : ''}</label>
+      <label className={labelClass}>
+        {tip ? (
+          <Tip text={tip}><span>{label}{suffix ? ` (${suffix})` : ''}</span></Tip>
+        ) : (
+          <>{label}{suffix ? ` (${suffix})` : ''}</>
+        )}
+      </label>
       <input
         type="number"
         step={step}
@@ -121,7 +129,7 @@ export default function StructureTab({ state, onChange }: Props) {
     <div className="space-y-4">
       {/* Material */}
       <div className={cardClass}>
-        <h3 className={sectionTitle}>Matériau</h3>
+        <Tip text={TIPS['materiau']}><h3 className={sectionTitle}>Matériau</h3></Tip>
         <select
           className={inputClass + " mb-3"}
           value={state.materialKey}
@@ -132,10 +140,10 @@ export default function StructureTab({ state, onChange }: Props) {
           ))}
         </select>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-zinc-400 mb-2">
-          <span>{mat.density} kg/m³</span>
-          <span>{mat.flexMPa} MPa</span>
-          <span>Portée max {mat.maxSpan18} cm</span>
-          <span>Vis: {mat.screwHolding}</span>
+          <Tip text={TIPS['densite']}><span>{mat.density} kg/m³</span></Tip>
+          <Tip text={TIPS['flexMPa']}><span>{mat.flexMPa} MPa</span></Tip>
+          <Tip text={TIPS['portee-max']}><span>Portée max {mat.maxSpan18} cm</span></Tip>
+          <Tip text={TIPS['vis']}><span>Vis: {mat.screwHolding}</span></Tip>
         </div>
         <p className="text-xs text-zinc-500">{mat.notes}</p>
         {mat.warnings.length > 0 && (
@@ -151,20 +159,20 @@ export default function StructureTab({ state, onChange }: Props) {
       <div className={cardClass}>
         <h3 className={sectionTitle}>Projet</h3>
         <div className="grid grid-cols-2 gap-3">
-          <NumberInput label="Largeur mur" suffix="cm" value={state.project.wallWidth} min={10} max={1000} step={0.1} onChange={(v) => updateProject('wallWidth', v)} />
-          <NumberInput label="Hauteur plafond" suffix="cm" value={state.project.ceilingHeight} min={100} max={500} step={0.1} onChange={(v) => updateProject('ceilingHeight', v)} />
-          <NumberInput label="Hauteur plinthe" suffix="cm" value={state.project.plinthHeight} min={0} max={50} step={0.1} onChange={(v) => updateProject('plinthHeight', v)} />
-          <NumberInput label="Profondeur plinthe" suffix="cm" value={state.project.plinthDepth} min={0} max={20} step={0.1} onChange={(v) => updateProject('plinthDepth', v)} />
+          <NumberInput label="Largeur mur" suffix="cm" value={state.project.wallWidth} min={10} max={1000} step={0.1} onChange={(v) => updateProject('wallWidth', v)} tip={TIPS['largeur-mur']} />
+          <NumberInput label="Hauteur plafond" suffix="cm" value={state.project.ceilingHeight} min={100} max={500} step={0.1} onChange={(v) => updateProject('ceilingHeight', v)} tip={TIPS['hauteur-plafond']} />
+          <NumberInput label="Hauteur plinthe" suffix="cm" value={state.project.plinthHeight} min={0} max={50} step={0.1} onChange={(v) => updateProject('plinthHeight', v)} tip={TIPS['hauteur-plinthe']} />
+          <NumberInput label="Profondeur plinthe" suffix="cm" value={state.project.plinthDepth} min={0} max={20} step={0.1} onChange={(v) => updateProject('plinthDepth', v)} tip={TIPS['profondeur-plinthe']} />
         </div>
       </div>
 
       {/* Panel */}
       <div className={cardClass}>
-        <h3 className={sectionTitle}>Panneau</h3>
+        <Tip text={TIPS['panneau']}><h3 className={sectionTitle}>Panneau</h3></Tip>
         <div className="grid grid-cols-3 gap-3">
-          <NumberInput label="Largeur" suffix="cm" value={state.panel.width} min={10} max={500} onChange={(v) => updatePanel('width', v)} />
-          <NumberInput label="Hauteur" suffix="cm" value={state.panel.height} min={10} max={500} onChange={(v) => updatePanel('height', v)} />
-          <NumberInput label="Épaisseur" suffix="cm" value={state.panel.thickness} min={0.3} max={5} step={0.1} onChange={(v) => updatePanel('thickness', v)} />
+          <NumberInput label="Largeur" suffix="cm" value={state.panel.width} min={10} max={500} onChange={(v) => updatePanel('width', v)} tip={TIPS['panneau-largeur']} />
+          <NumberInput label="Hauteur" suffix="cm" value={state.panel.height} min={10} max={500} onChange={(v) => updatePanel('height', v)} tip={TIPS['panneau-hauteur']} />
+          <NumberInput label="Épaisseur" suffix="cm" value={state.panel.thickness} min={0.3} max={5} step={0.1} onChange={(v) => updatePanel('thickness', v)} tip={TIPS['panneau-epaisseur']} />
         </div>
         <div className="mt-3 flex gap-2">
           {mat.panels.map((p, i) => (
@@ -185,7 +193,7 @@ export default function StructureTab({ state, onChange }: Props) {
 
       {/* Bodies */}
       <div className="flex items-center justify-between mb-2">
-        <h3 className={sectionTitle + " mb-0"}>Corps ({state.bodies.length})</h3>
+        <Tip text={TIPS['corps']}><h3 className={sectionTitle + " mb-0"}>Corps ({state.bodies.length})</h3></Tip>
         <button
           onClick={addBody}
           className="text-xs px-4 py-2 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 transition-colors"
@@ -220,14 +228,14 @@ export default function StructureTab({ state, onChange }: Props) {
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-3">
-              <NumberInput label="Largeur" suffix="cm" value={b.width} min={10} max={500} step={0.1} onChange={(v) => updateBody(b.id, 'width', v)} />
-              <NumberInput label="Profondeur" suffix="cm" value={b.depth} min={10} max={200} step={0.1} onChange={(v) => updateBody(b.id, 'depth', v)} />
+              <NumberInput label="Largeur" suffix="cm" value={b.width} min={10} max={500} step={0.1} onChange={(v) => updateBody(b.id, 'width', v)} tip={TIPS['corps-largeur']} />
+              <NumberInput label="Profondeur" suffix="cm" value={b.depth} min={10} max={200} step={0.1} onChange={(v) => updateBody(b.id, 'depth', v)} tip={TIPS['corps-profondeur']} />
             </div>
 
-            <div className="text-xs text-zinc-500 mb-3">
-              Int. tablette : {(b.width - 2 * state.panel.thickness).toFixed(1)} cm
-              <span className="mx-2">·</span>
-              ~{totalWeight.toFixed(1)} kg
+            <div className="text-xs text-zinc-500 mb-3 flex items-center gap-1 flex-wrap">
+              <Tip text={TIPS['int-tablette']}><span>Int. tablette : {(b.width - 2 * state.panel.thickness).toFixed(1)} cm</span></Tip>
+              <span className="mx-1">·</span>
+              <Tip text={TIPS['poids-corps']}><span>~{totalWeight.toFixed(1)} kg</span></Tip>
             </div>
 
             {/* Pieces */}

@@ -17,6 +17,8 @@ import ValidationTab from './components/ValidationTab';
 import AssistantTab from './components/AssistantTab';
 import ProjectManager from './components/ProjectManager';
 import KnowledgeManager from './components/KnowledgeManager';
+import Tip from './components/Tip';
+import TIPS from './data/tips';
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'structure', label: 'Structure', icon: '⚙' },
@@ -224,31 +226,37 @@ export default function App() {
               >
                 Projets
               </button>
-              <button
-                onClick={() => setShowKnowledge(true)}
-                className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
-              >
-                Savoirs
-              </button>
-              <button
-                onClick={() => exportToJson(state)}
-                className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
-              >
-                JSON
-              </button>
+              <Tip text={TIPS['savoirs']} side="bottom">
+                <button
+                  onClick={() => setShowKnowledge(true)}
+                  className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
+                >
+                  Savoirs
+                </button>
+              </Tip>
+              <Tip text={TIPS['export-json']} side="bottom">
+                <button
+                  onClick={() => exportToJson(state)}
+                  className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
+                >
+                  JSON
+                </button>
+              </Tip>
               <button
                 onClick={() => importRef.current?.click()}
                 className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
               >
                 Import
               </button>
-              <button
-                onClick={handleExportPdf}
-                disabled={pdfLoading}
-                className="text-xs px-3 py-1.5 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 disabled:opacity-50 transition-colors"
-              >
-                {pdfLoading ? 'PDF...' : 'PDF'}
-              </button>
+              <Tip text={TIPS['export-pdf']} side="bottom">
+                <button
+                  onClick={handleExportPdf}
+                  disabled={pdfLoading}
+                  className="text-xs px-3 py-1.5 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 disabled:opacity-50 transition-colors"
+                >
+                  {pdfLoading ? 'PDF...' : 'PDF'}
+                </button>
+              </Tip>
               <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
             </div>
           </div>
