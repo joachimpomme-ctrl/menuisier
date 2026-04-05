@@ -63,6 +63,7 @@ export default function StructureTab({ state, onChange }: Props) {
       ...state,
       materialKey: key,
       panel: { ...state.panel, width: p.w, height: p.h, thickness: m.defaultThickness / 10 },
+      costConfig: { panelPrice: p.defaultPrice },
     });
   };
 
@@ -170,9 +171,13 @@ export default function StructureTab({ state, onChange }: Props) {
             <button
               key={i}
               className="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-amber-400 border border-zinc-700 transition-colors"
-              onClick={() => onChange({ ...state, panel: { ...state.panel, width: p.w, height: p.h } })}
+              onClick={() => onChange({
+                ...state,
+                panel: { ...state.panel, width: p.w, height: p.h },
+                costConfig: { panelPrice: p.defaultPrice },
+              })}
             >
-              {p.w} x {p.h}
+              {p.w}×{p.h} ({p.defaultPrice}€)
             </button>
           ))}
         </div>

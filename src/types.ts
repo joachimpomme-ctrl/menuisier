@@ -5,6 +5,7 @@ export type MaterialKey = 'cp_bouleau' | 'cp_peuplier' | 'cp_okoume' | 'mdf' | '
 export interface PanelSize {
   w: number;
   h: number;
+  defaultPrice: number; // EUR HT, prix indicatif par panneau
 }
 
 export interface Material {
@@ -58,12 +59,17 @@ export interface Panel {
   thickness: number;
 }
 
+export interface CostConfig {
+  panelPrice: number; // EUR par panneau, 0 = non renseigné
+}
+
 export interface AppState {
   materialKey: MaterialKey;
   project: Project;
   panel: Panel;
   kerf: number;
   bodies: Body[];
+  costConfig: CostConfig;
 }
 
 export interface ValidationResult {
@@ -102,17 +108,53 @@ export interface PackingBin {
   pl: PackedPiece[];
 }
 
+export interface NestingMetrics {
+  panelCount: number;
+  usedArea: number;    // cm²
+  totalArea: number;   // cm²
+  wasteArea: number;   // cm²
+  efficiency: number;  // 0-100
+}
+
+export interface NestingResult {
+  bins: PackingBin[];
+  unplaced: PieceWithBody[];
+  metrics: NestingMetrics;
+  strategy: string;
+}
+
 export type TabKey = 'structure' | 'debit' | 'montage' | 'notice' | 'validation' | 'ia';
 
-// For pieces with body context (used in allPieces computed)
 export interface PieceWithBody extends Piece {
   bodyName: string;
   bodyId: string;
 }
 
-// Storage format version for future migrations
+// Project management
+export interface ProjectMeta {
+  id: string;
+  name: string;
+  materialShort: string;
+  bodyCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface StoredProject {
-  version: 1;
+  version: 2;
   state: AppState;
   savedAt: string;
+}
+
+// Repository abstraction — prépare l'auth future (E)
+// Aujourd'hui : LocalProjectRepository (localStorage)
+// Demain : RemoteProjectRepository (API + auth) même interface
+export interface ProjectRepository {
+  list(): ProjectMeta[];
+  load(id: string): AppState | null;
+  save(id: string, state: AppState): void;
+  delete(id: string): void;
+  duplicate(id: string, newName: string): string | null;
+  getCurrentId(): string | null;
+  setCurrentId(id: string | null): void;
 }

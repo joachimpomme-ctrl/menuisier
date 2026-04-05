@@ -20,6 +20,9 @@ export function createInitialState(mk: MaterialKey = 'cp_bouleau'): AppState {
       thickness: m.defaultThickness / 10,
     },
     kerf: 0.3,
+    costConfig: {
+      panelPrice: p.defaultPrice,
+    },
     bodies: [
       {
         id: "left",
@@ -51,4 +54,14 @@ export function createInitialState(mk: MaterialKey = 'cp_bouleau'): AppState {
       },
     ],
   };
+}
+
+// Normalise un état chargé depuis le stockage (migration v1 → v2)
+export function migrateState(state: AppState): AppState {
+  if (!state.costConfig) {
+    const m = MATERIALS[state.materialKey];
+    const panel = m?.panels.find(p => p.w === state.panel.width && p.h === state.panel.height);
+    return { ...state, costConfig: { panelPrice: panel?.defaultPrice ?? 0 } };
+  }
+  return state;
 }

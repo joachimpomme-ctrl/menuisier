@@ -1,10 +1,12 @@
 import type { Material, MaterialKey, PieceType } from '../types';
 
+// Prix indicatifs HT en EUR, France métropolitaine, 2024-2025
+// Source : négoces bois courants. À ajuster selon fournisseur local.
 export const MATERIALS: Record<MaterialKey, Material> = {
   cp_bouleau: {
     name: "Contreplaqué bouleau", short: "CP bouleau", density: 680, flexMPa: 40,
     thicknesses: [6, 10, 12, 15, 18, 22, 25], defaultThickness: 18,
-    panels: [{ w: 250, h: 125 }, { w: 305, h: 152 }],
+    panels: [{ w: 250, h: 125, defaultPrice: 75 }, { w: 305, h: 152, defaultPrice: 120 }],
     maxSpan18: 80, screwHolding: "excellent", dowels: true, edgeBanding: false,
     edgeFinish: "Ponçage 120→180, vernis ou huile",
     assembly: ["Tourillons Ø8 + colle vinylique D3", "Vis 4×40 en renfort", "Fond agrafé CP peuplier 6 mm"],
@@ -16,7 +18,7 @@ export const MATERIALS: Record<MaterialKey, Material> = {
   cp_peuplier: {
     name: "Contreplaqué peuplier", short: "CP peuplier", density: 450, flexMPa: 25,
     thicknesses: [3, 5, 6, 8, 10, 12, 15, 18], defaultThickness: 18,
-    panels: [{ w: 250, h: 122 }],
+    panels: [{ w: 250, h: 122, defaultPrice: 45 }],
     maxSpan18: 65, screwHolding: "bon", dowels: true, edgeBanding: false,
     edgeFinish: "Ponçage 120→180, vernis ou peinture",
     assembly: ["Tourillons Ø8 + colle", "Vis 4×40", "Fond agrafé"],
@@ -28,7 +30,7 @@ export const MATERIALS: Record<MaterialKey, Material> = {
   cp_okoume: {
     name: "Contreplaqué okoumé", short: "CP okoumé", density: 500, flexMPa: 30,
     thicknesses: [4, 5, 6, 8, 10, 12, 15, 18, 22, 25], defaultThickness: 18,
-    panels: [{ w: 250, h: 122 }, { w: 310, h: 153 }],
+    panels: [{ w: 250, h: 122, defaultPrice: 55 }, { w: 310, h: 153, defaultPrice: 90 }],
     maxSpan18: 70, screwHolding: "bon", dowels: true, edgeBanding: false,
     edgeFinish: "Ponçage 120→180, vernis marin ou huile",
     assembly: ["Tourillons Ø8 + colle D3", "Vis 4×40", "Fond agrafé"],
@@ -40,7 +42,7 @@ export const MATERIALS: Record<MaterialKey, Material> = {
   mdf: {
     name: "MDF (Medium)", short: "MDF", density: 750, flexMPa: 30,
     thicknesses: [3, 6, 10, 12, 16, 18, 19, 22, 25], defaultThickness: 18,
-    panels: [{ w: 280, h: 207 }, { w: 244, h: 122 }],
+    panels: [{ w: 280, h: 207, defaultPrice: 25 }, { w: 244, h: 122, defaultPrice: 15 }],
     maxSpan18: 60, screwHolding: "moyen", dowels: true, edgeBanding: false,
     edgeFinish: "Ponçage fin + apprêt obligatoire avant peinture",
     assembly: ["Vis + colle obligatoire (vis seules = arrachement)", "Pré-perçage systématique", "Tourillons Ø8 + colle", "Excentriques recommandés", "Fond cloué ou agrafé"],
@@ -52,7 +54,7 @@ export const MATERIALS: Record<MaterialKey, Material> = {
   melamine: {
     name: "Mélaminé (particules)", short: "Mélaminé", density: 650, flexMPa: 14,
     thicknesses: [8, 16, 18, 22, 25], defaultThickness: 18,
-    panels: [{ w: 280, h: 207 }, { w: 244, h: 122 }],
+    panels: [{ w: 280, h: 207, defaultPrice: 22 }, { w: 244, h: 122, defaultPrice: 14 }],
     maxSpan18: 55, screwHolding: "faible", dowels: false, edgeBanding: true,
     edgeFinish: "Chant mélaminé thermocollant obligatoire (fer à repasser)",
     assembly: ["Excentriques + tourillons (JAMAIS de vis dans le chant)", "Pré-perçage 3 mm face", "Colle contact en renfort", "Fond HDF 3 mm en rainure"],
@@ -64,7 +66,7 @@ export const MATERIALS: Record<MaterialKey, Material> = {
   osb: {
     name: "OSB3", short: "OSB", density: 600, flexMPa: 20,
     thicknesses: [9, 12, 15, 18, 22], defaultThickness: 18,
-    panels: [{ w: 250, h: 125 }],
+    panels: [{ w: 250, h: 125, defaultPrice: 18 }],
     maxSpan18: 60, screwHolding: "moyen", dowels: false, edgeBanding: false,
     edgeFinish: "Chant brut — ponçage grossier, pas de finition fine",
     assembly: ["Vis à bois 4×50", "Colle PU pour joints", "Pas de tourillons (structure hétérogène)"],
