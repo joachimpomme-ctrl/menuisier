@@ -620,11 +620,21 @@ export default function StructureTab({ state, onChange }: Props) {
                       </span>
                     </div>
                   )}
+                  {editingPiece === p.id && (
+                    <button
+                      onClick={() => setEditingPiece(null)}
+                      className="text-xs text-emerald-600 hover:text-emerald-800 flex-shrink-0 transition-colors font-bold"
+                      title="Valider"
+                    >
+                      ✓
+                    </button>
+                  )}
                   <button
-                    onClick={() => editingPiece === p.id ? setEditingPiece(null) : removePiece(b.id, p.id)}
-                    className="text-xs text-stone-500 hover:text-red-400 flex-shrink-0 transition-colors"
+                    onClick={() => { removePiece(b.id, p.id); if (editingPiece === p.id) setEditingPiece(null); }}
+                    className="text-xs text-stone-400 hover:text-red-500 flex-shrink-0 transition-colors"
+                    title="Supprimer cette pièce"
                   >
-                    {editingPiece === p.id ? "✓" : "×"}
+                    ✕
                   </button>
                 </div>
               ))}
