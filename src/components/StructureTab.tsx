@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { AppState, MaterialKey, PieceType, Body, DoorPoseType, DoorConfig } from '../types';
 import { MATERIALS, PIECE_COLORS, BODY_COLORS, PIECE_TYPES } from '../data/materials';
-import { uid, parseNumber, clampInt, calculateDoor } from '../lib/helpers';
+import { uid, parseNumber, clampInt, calculateDoor, getBodyInnerWidth, isSharedLeft } from '../lib/helpers';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 
@@ -22,7 +22,7 @@ const GLOSSARY: { type: PieceType; label: string; icon: string; desc: string; il
   {
     type: 'joue', label: 'Joue', icon: '📏',
     desc: "Panneau vertical qui forme le côté gauche ou droit du meuble. C'est la pièce structurelle principale : elle porte tout le poids des tablettes et de leur contenu.",
-    illustration: "Un meuble a 2 joues (gauche + droite). Leur hauteur = hauteur utile du meuble. Leur largeur = profondeur du meuble.",
+    illustration: "Un meuble a 2 joues (gauche + droite). Quand 2 corps sont collés, on peut partager une seule joue entre les deux (joue commune).",
   },
   {
     type: 'tablette-fixe', label: 'Tablette fixe', icon: '🔩',
@@ -94,12 +94,39 @@ function NumberInput({ label, value, onChange, step = 1, min, max, suffix, tip }
 }
 
 // ---------------------------------------------------------------------------
+// Helpers joue commune
+// ---------------------------------------------------------------------------
+
+/** Identifie les joues "gauche" par nom */
+function findLeftJoueIds(pieces: Body['pieces']): string[] {
+  const byName = pieces.filter(p => p.type === 'joue' && /gauche|\bG\s*[—–-]/i.test(p.name)).map(p => p.id);
+  if (byName.length > 0) return byName;
+  // Fallback : pas de nom reconnaissable → prendre la première moitié des joues
+  const joues = pieces.filter(p => p.type === 'joue');
+  if (joues.length <= 1) {
+    // Un seul morceau de joue avec qty ≥ 2 → on ne supprime pas la pièce, on réduira la qty
+    return [];
+  }
+  return joues.slice(0, Math.ceil(joues.length / 2)).map(p => p.id);
+}
+
+function findRightJoues(pieces: Body['pieces']) {
+  const byName = pieces.filter(p => p.type === 'joue' && /droite|\bD\s*[—–-]/i.test(p.name));
+  if (byName.length > 0) return byName;
+  const joues = pieces.filter(p => p.type === 'joue');
+  return joues.slice(Math.floor(joues.length / 2));
+}
+
+// ---------------------------------------------------------------------------
 // Configurateur de portes pour un corps
 // ---------------------------------------------------------------------------
-function DoorConfigurator({ body, state, onChange }: { body: Body; state: AppState; onChange: (state: AppState) => void }) {
+function DoorConfigurator({ body, bodyIndex, state, onChange }: {
+  body: Body; bodyIndex: number; state: AppState; onChange: (state: AppState) => void;
+}) {
   const usableHeight = state.project.ceilingHeight - state.project.plinthHeight;
   const thickness = state.panel.thickness;
-  const joueH = usableHeight; // simplified: door covers full body height
+  const shared = state.sharedBoundaries ?? [];
+  const innerW = getBodyInnerWidth(body.width, bodyIndex, state.bodies.length, shared, thickness);
 
   const config = body.doorConfig;
 
@@ -108,14 +135,13 @@ function DoorConfigurator({ body, state, onChange }: { body: Body; state: AppSta
       ...state,
       bodies: state.bodies.map((b) => {
         if (b.id !== body.id) return b;
-        // Remove existing door pieces
         const piecesWithoutDoors = b.pieces.filter((p) => p.type !== 'porte');
 
         if (!newConfig) {
           return { ...b, doorConfig: undefined, pieces: piecesWithoutDoors };
         }
 
-        const dims = calculateDoor(b.width, joueH, thickness, newConfig.count, newConfig.poseType);
+        const dims = calculateDoor(b.width, usableHeight, thickness, newConfig.count, newConfig.poseType, innerW);
         const doorPieces = Array.from({ length: newConfig.count }, (_, i) => ({
           id: uid(),
           name: newConfig.count === 1 ? `Porte ${b.name}` : `Porte ${i === 0 ? 'G' : 'D'} ${b.name}`,
@@ -134,7 +160,7 @@ function DoorConfigurator({ body, state, onChange }: { body: Body; state: AppSta
     });
   };
 
-  const doorInfo = config ? calculateDoor(body.width, joueH, thickness, config.count, config.poseType) : null;
+  const doorInfo = config ? calculateDoor(body.width, usableHeight, thickness, config.count, config.poseType, innerW) : null;
 
   if (!config) {
     return (
@@ -196,7 +222,6 @@ function DoorConfigurator({ body, state, onChange }: { body: Body; state: AppSta
         </div>
       </div>
 
-      {/* Résumé automatique */}
       {doorInfo && (
         <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 text-xs text-orange-800 space-y-1">
           <div className="font-semibold">{config.count} porte{config.count > 1 ? 's' : ''} — {doorInfo.poseLabel}</div>
@@ -217,11 +242,21 @@ function DoorConfigurator({ body, state, onChange }: { body: Body; state: AppSta
   );
 }
 
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 export default function StructureTab({ state, onChange }: Props) {
   const [editingPiece, setEditingPiece] = useState<string | null>(null);
   const [showGlossary, setShowGlossary] = useState(false);
   const mat = MATERIALS[state.materialKey];
+  const shared = state.sharedBoundaries ?? [];
+  const th = state.panel.thickness;
 
+  // ---------- helpers for sharing-aware inner width ----------
+  const innerWidthOf = (bi: number) =>
+    getBodyInnerWidth(state.bodies[bi].width, bi, state.bodies.length, shared, th);
+
+  // ---------- state updaters ----------
   const updateProject = (key: string, value: number) => {
     onChange({ ...state, project: { ...state.project, [key]: value } });
   };
@@ -244,19 +279,22 @@ export default function StructureTab({ state, onChange }: Props) {
   const updateBody = (id: string, key: keyof Body, value: string | number) => {
     onChange({
       ...state,
-      bodies: state.bodies.map((b) => {
+      bodies: state.bodies.map((b, i) => {
         if (b.id !== id) return b;
         const updated = { ...b, [key]: value };
 
-        // Auto-update pieces when width or depth changes
         if (key === 'width' || key === 'depth') {
           const newWidth = key === 'width' ? (value as number) : b.width;
           const newDepth = key === 'depth' ? (value as number) : b.depth;
           const oldWidth = b.width;
           const oldDepth = b.depth;
           const thickness = state.panel.thickness;
-          const innerWidth = +(newWidth - 2 * thickness).toFixed(1);
-          const oldInnerWidth = +(oldWidth - 2 * thickness).toFixed(1);
+
+          // Sharing-aware inner width
+          const sl = isSharedLeft(i, shared);
+          const leftTh = sl ? 0 : thickness;
+          const innerWidth = +(newWidth - leftTh - thickness).toFixed(1);
+          const oldInnerWidth = +(oldWidth - leftTh - thickness).toFixed(1);
 
           updated.pieces = b.pieces.map((p) => {
             const piece = { ...p };
@@ -268,8 +306,7 @@ export default function StructureTab({ state, onChange }: Props) {
             } else if (p.type === 'bandeau') {
               piece.length = newWidth;
             } else if (p.type === 'porte') {
-              // Doors will be recalculated via DoorConfigurator
-              // For now, adapt depth (width of the door piece)
+              // recalculated via door config below
             } else {
               if (key === 'depth' && Math.abs(p.width - oldDepth) < 0.5) {
                 piece.width = newDepth;
@@ -284,14 +321,12 @@ export default function StructureTab({ state, onChange }: Props) {
             return piece;
           });
 
-          // Re-calculate doors if door config exists
+          // Recalculate doors
           if (b.doorConfig) {
             const usableH = state.project.ceilingHeight - state.project.plinthHeight;
-            const dims = calculateDoor(newWidth, usableH, thickness, b.doorConfig.count, b.doorConfig.poseType);
+            const dims = calculateDoor(newWidth, usableH, thickness, b.doorConfig.count, b.doorConfig.poseType, innerWidth);
             updated.pieces = updated.pieces.map((p) => {
-              if (p.type === 'porte') {
-                return { ...p, length: dims.doorHeight, width: dims.doorWidth };
-              }
+              if (p.type === 'porte') return { ...p, length: dims.doorHeight, width: dims.doorWidth };
               return p;
             });
           }
@@ -337,34 +372,160 @@ export default function StructureTab({ state, onChange }: Props) {
   const duplicateBody = (id: string) => {
     const source = state.bodies.find((b) => b.id === id);
     if (!source) return;
+    const idx = state.bodies.findIndex((b) => b.id === id);
     const newBody = {
       ...source,
       id: uid(),
       name: `${source.name} (copie)`,
       pieces: source.pieces.map((p) => ({ ...p, id: uid() })),
     };
-    const idx = state.bodies.findIndex((b) => b.id === id);
     const bodies = [...state.bodies];
     bodies.splice(idx + 1, 0, newBody);
-    onChange({ ...state, bodies });
+    // Insert a false entry in sharedBoundaries at the insertion point
+    const newShared = [...shared];
+    newShared.splice(idx, 0, false);
+    onChange({ ...state, bodies, sharedBoundaries: newShared });
   };
 
   const addBody = () => {
+    const newShared = [...shared, false];
     onChange({
       ...state,
       bodies: [...state.bodies, { id: uid(), name: `Corps ${state.bodies.length + 1}`, width: 80, depth: 30, pieces: [] }],
+      sharedBoundaries: newShared,
     });
   };
 
   const removeBody = (id: string) => {
-    onChange({ ...state, bodies: state.bodies.filter((b) => b.id !== id) });
+    const idx = state.bodies.findIndex((b) => b.id === id);
+    const newBodies = state.bodies.filter((b) => b.id !== id);
+    const newShared = [...shared];
+    // Remove the boundary entry for this body
+    if (idx > 0) {
+      newShared.splice(idx - 1, 1);
+    } else if (newShared.length > 0) {
+      newShared.splice(0, 1);
+    }
+    onChange({ ...state, bodies: newBodies, sharedBoundaries: newShared });
   };
 
-  // Piece type label for display
+  // ---------- TOGGLE JOUE COMMUNE ----------
+  const toggleSharing = (boundaryIdx: number, enabled: boolean) => {
+    const wasEnabled = shared[boundaryIdx] ?? false;
+    if (wasEnabled === enabled) return;
+
+    const newShared = [...shared];
+    while (newShared.length < state.bodies.length - 1) newShared.push(false);
+    newShared[boundaryIdx] = enabled;
+
+    const usableH = state.project.ceilingHeight - state.project.plinthHeight;
+    const newBodies = state.bodies.map((b) => ({
+      ...b,
+      pieces: b.pieces.map((p) => ({ ...p })),
+    }));
+
+    const leftBody = newBodies[boundaryIdx];
+    const rightBody = newBodies[boundaryIdx + 1];
+
+    if (enabled) {
+      // ===== ACTIVER LA JOUE COMMUNE =====
+      // 1. Élargir les deux corps pour compenser la joue supprimée (maintenir la largeur totale)
+      leftBody.width = +(leftBody.width + th / 2).toFixed(1);
+      rightBody.width = +(rightBody.width + th / 2).toFixed(1);
+
+      // 2. Supprimer les joues gauche du corps droit
+      const leftJoueIds = findLeftJoueIds(rightBody.pieces);
+      if (leftJoueIds.length > 0) {
+        rightBody.pieces = rightBody.pieces.filter((p) => !leftJoueIds.includes(p.id));
+      } else {
+        // Fallback : joue unique avec qty ≥ 2 → réduire la qty
+        const joues = rightBody.pieces.filter((p) => p.type === 'joue');
+        if (joues.length === 1 && joues[0].qty >= 2) {
+          joues[0].qty = Math.ceil(joues[0].qty / 2);
+        } else if (joues.length >= 2) {
+          const half = Math.ceil(joues.length / 2);
+          const removeIds = new Set(joues.slice(0, half).map((p) => p.id));
+          rightBody.pieces = rightBody.pieces.filter((p) => !removeIds.has(p.id));
+        }
+      }
+
+      // 3. Joue commune = joue droite du corps gauche → adapter la profondeur au max
+      if (leftBody.depth !== rightBody.depth) {
+        const maxD = Math.max(leftBody.depth, rightBody.depth);
+        const rightJoues = findRightJoues(leftBody.pieces);
+        rightJoues.forEach((j) => { j.width = maxD; });
+        // Si aucune joue droite identifiable, mettre à jour toutes les joues
+        if (rightJoues.length === 0) {
+          leftBody.pieces.filter(p => p.type === 'joue').forEach(j => { j.width = maxD; });
+        }
+      }
+    } else {
+      // ===== DÉSACTIVER LA JOUE COMMUNE =====
+      // 1. Réduire les largeurs
+      leftBody.width = +(leftBody.width - th / 2).toFixed(1);
+      rightBody.width = +(rightBody.width - th / 2).toFixed(1);
+
+      // 2. Rajouter les joues gauche au corps droit
+      const rightJoues = findRightJoues(rightBody.pieces);
+      if (rightJoues.length > 0) {
+        const newLeftJoues = rightJoues.map((p) => ({
+          ...p,
+          id: uid(),
+          name: p.name.replace(/droite/gi, 'gauche').replace(/D\s*([—–-])/g, 'G $1'),
+          width: rightBody.depth,
+        }));
+        rightBody.pieces = [...newLeftJoues, ...rightBody.pieces];
+      } else {
+        // Fallback : qty doublée ou ajout standard
+        const joues = rightBody.pieces.filter((p) => p.type === 'joue');
+        if (joues.length === 1) {
+          joues[0].qty *= 2;
+        } else if (joues.length === 0) {
+          rightBody.pieces.unshift({
+            id: uid(), name: 'Joue gauche', length: usableH, width: rightBody.depth, qty: 1, type: 'joue' as PieceType,
+          });
+        }
+      }
+
+      // 3. Réinitialiser la profondeur des joues droite du corps gauche
+      findRightJoues(leftBody.pieces).forEach((j) => { j.width = leftBody.depth; });
+    }
+
+    // 4. Recalculer tablettes et portes de TOUS les corps
+    const finalBodies = newBodies.map((b, i) => {
+      const sl = isSharedLeft(i, newShared);
+      const leftTh = sl ? 0 : th;
+      const iw = +(b.width - leftTh - th).toFixed(1);
+
+      b.pieces = b.pieces.map((p) => {
+        if (p.type === 'tablette-fixe' || p.type === 'tablette-reglable') {
+          return { ...p, length: iw };
+        }
+        return p;
+      });
+
+      if (b.doorConfig) {
+        const dims = calculateDoor(b.width, usableH, th, b.doorConfig.count, b.doorConfig.poseType, iw);
+        b.pieces = b.pieces.map((p) => {
+          if (p.type === 'porte') return { ...p, length: dims.doorHeight, width: dims.doorWidth };
+          return p;
+        });
+      }
+
+      return b;
+    });
+
+    onChange({ ...state, bodies: finalBodies, sharedBoundaries: newShared });
+  };
+
+  // ---------- display helpers ----------
   const pieceTypeLabel = (type: PieceType): string => {
     const entry = GLOSSARY.find((g) => g.type === type);
     return entry?.label ?? type;
   };
+
+  // Compute total physical width (accounting for shared boundaries)
+  const totalPhysical = state.bodies.reduce((s, b) => s + b.width, 0) - shared.filter(Boolean).length * th;
 
   return (
     <div className="space-y-4">
@@ -400,23 +561,18 @@ export default function StructureTab({ state, onChange }: Props) {
               </div>
             ))}
 
-            {/* Mini-schéma anatomie d'un corps */}
+            {/* Mini-schéma anatomie */}
             <div className="bg-stone-50 border border-stone-200 rounded-xl p-3 mt-3">
               <p className="text-[10px] font-semibold text-stone-600 mb-2">ANATOMIE D'UN CORPS (vue de face)</p>
               <svg viewBox="0 0 200 160" className="w-full max-w-[280px] mx-auto" style={{ height: 160 }}>
                 <rect x="10" y="5" width="180" height="150" fill="none" stroke="#d6d3d1" strokeWidth="1" strokeDasharray="4,2" />
-                {/* Joues */}
                 <rect x="15" y="10" width="12" height="140" fill="#3b82f6" opacity=".3" stroke="#3b82f6" strokeWidth="1" rx="1" />
                 <rect x="173" y="10" width="12" height="140" fill="#3b82f6" opacity=".3" stroke="#3b82f6" strokeWidth="1" rx="1" />
-                {/* Tablettes fixes */}
                 <rect x="27" y="12" width="146" height="8" fill="#10b981" opacity=".4" stroke="#10b981" strokeWidth="1" rx="1" />
                 <rect x="27" y="135" width="146" height="8" fill="#10b981" opacity=".4" stroke="#10b981" strokeWidth="1" rx="1" />
-                {/* Tablettes réglables */}
                 <line x1="30" y1="55" x2="170" y2="55" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="4,3" />
                 <line x1="30" y1="90" x2="170" y2="90" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="4,3" />
-                {/* Bandeau */}
                 <rect x="10" y="0" width="180" height="6" fill="#8b5cf6" opacity=".3" stroke="#8b5cf6" strokeWidth="0.5" rx="1" />
-                {/* Labels */}
                 <text x="5" y="85" fontSize="7" fill="#3b82f6" fontWeight="600" transform="rotate(-90,5,85)" textAnchor="middle">Joue G</text>
                 <text x="195" y="85" fontSize="7" fill="#3b82f6" fontWeight="600" transform="rotate(90,195,85)" textAnchor="middle">Joue D</text>
                 <text x="100" y="8" fontSize="7" fill="#8b5cf6" fontWeight="600" textAnchor="middle" dy="-4">Bandeau</text>
@@ -506,149 +662,208 @@ export default function StructureTab({ state, onChange }: Props) {
         </button>
       </div>
 
+      {/* Total width info */}
+      {state.bodies.length > 1 && (
+        <div className="text-[10px] text-stone-400 -mt-1 mb-2 px-1">
+          Largeur physique totale : <span className="font-semibold">{totalPhysical.toFixed(1)} cm</span>
+          {shared.some(Boolean) && (
+            <span className="text-amber-600 ml-1">
+              (économie de {(shared.filter(Boolean).length * th).toFixed(1)} cm grâce aux joues communes)
+            </span>
+          )}
+        </div>
+      )}
+
       {state.bodies.map((b, bi) => {
         const totalWeight = (
           b.pieces.reduce((s, p) => s + p.length * p.width * p.qty, 0) / 10000
         ) * state.panel.thickness / 100 * mat.density;
 
+        const sl = isSharedLeft(bi, shared);
+        const sr = bi < state.bodies.length - 1 && (shared[bi] ?? false);
+        const iw = innerWidthOf(bi);
+
         return (
-          <div
-            key={b.id}
-            className={cardClass}
-            style={{ borderLeftWidth: '3px', borderLeftColor: BODY_COLORS[bi % BODY_COLORS.length] }}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <input
-                className="bg-transparent text-sm font-semibold text-stone-800 border-b border-transparent hover:border-stone-300 focus:border-amber-500 focus:outline-none transition-colors"
-                value={b.name}
-                onChange={(e) => updateBody(b.id, 'name', e.target.value)}
-              />
-              <div className="flex items-center gap-2">
+          <div key={b.id}>
+            {/* Sharing toggle BEFORE this body (between bi-1 and bi) */}
+            {bi > 0 && (
+              <div className="flex items-center justify-center gap-2 py-2 -mt-2 mb-2">
+                <div className="flex-1 h-px bg-stone-200" />
                 <button
-                  onClick={() => duplicateBody(b.id)}
-                  className="text-xs text-stone-500 hover:text-amber-600 transition-colors"
+                  onClick={() => toggleSharing(bi - 1, !(shared[bi - 1] ?? false))}
+                  className={`text-[11px] px-3 py-1.5 rounded-full border transition-all ${
+                    shared[bi - 1]
+                      ? 'bg-blue-100 border-blue-300 text-blue-800 font-semibold shadow-sm'
+                      : 'bg-white border-stone-200 text-stone-400 hover:border-blue-200 hover:text-blue-600'
+                  }`}
                 >
-                  Dupliquer
+                  {shared[bi - 1] ? '⚙ Joue commune ✓' : '⊕ Joue commune ?'}
                 </button>
-                <button
-                  onClick={() => removeBody(b.id)}
-                  className="text-xs text-stone-500 hover:text-red-400 transition-colors"
-                >
-                  Supprimer
-                </button>
+                <div className="flex-1 h-px bg-stone-200" />
               </div>
-            </div>
+            )}
 
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <NumberInput label="Largeur" suffix="cm" value={b.width} min={10} max={500} step={0.1} onChange={(v) => updateBody(b.id, 'width', v)} tip={TIPS['corps-largeur']} />
-              <NumberInput label="Profondeur" suffix="cm" value={b.depth} min={10} max={200} step={0.1} onChange={(v) => updateBody(b.id, 'depth', v)} tip={TIPS['corps-profondeur']} />
-            </div>
-
-            <div className="text-xs text-stone-500 mb-3 flex items-center gap-1 flex-wrap">
-              <Tip text={TIPS['int-tablette']}><span>Int. tablette : {(b.width - 2 * state.panel.thickness).toFixed(1)} cm</span></Tip>
-              <span className="mx-1">·</span>
-              <Tip text={TIPS['poids-corps']}><span>~{totalWeight.toFixed(1)} kg</span></Tip>
-            </div>
-
-            {/* Pieces */}
-            <div className="space-y-1.5">
-              {b.pieces.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm"
-                >
-                  <Tip text={TIPS[`piece-${p.type}`] || ''}>
-                    <span
-                      className="w-2 h-2 rounded-full flex-shrink-0 cursor-help"
-                      style={{ backgroundColor: PIECE_COLORS[p.type] || PIECE_COLORS.autre }}
-                    />
-                  </Tip>
-                  {editingPiece === p.id ? (
-                    <div className="flex-1 grid grid-cols-5 gap-1.5 items-center">
-                      <input
-                        className={inputClass + " col-span-2 !py-1"}
-                        value={p.name}
-                        onChange={(e) => updatePiece(b.id, p.id, 'name', e.target.value)}
-                      />
-                      <input
-                        type="number"
-                        step="0.1"
-                        min={1}
-                        className={inputClass + " !py-1"}
-                        value={p.length}
-                        onChange={(e) => updatePiece(b.id, p.id, 'length', parseNumber(e.target.value, p.length, 1))}
-                      />
-                      <input
-                        type="number"
-                        step="0.1"
-                        min={1}
-                        className={inputClass + " !py-1"}
-                        value={p.width}
-                        onChange={(e) => updatePiece(b.id, p.id, 'width', parseNumber(e.target.value, p.width, 1))}
-                      />
-                      <div className="flex gap-1">
-                        <input
-                          type="number"
-                          min={1}
-                          max={99}
-                          className={inputClass + " !py-1 w-12"}
-                          value={p.qty}
-                          onChange={(e) => updatePiece(b.id, p.id, 'qty', clampInt(e.target.value, p.qty, 1, 99))}
-                        />
-                        <select
-                          className={inputClass + " !py-1 text-xs"}
-                          value={p.type}
-                          onChange={(e) => updatePiece(b.id, p.id, 'type', e.target.value)}
-                        >
-                          {PIECE_TYPES.map((t) => (
-                            <option key={t} value={t}>{pieceTypeLabel(t)}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      className="flex-1 min-w-0 flex justify-between cursor-pointer hover:text-amber-700 transition-colors"
-                      onClick={() => setEditingPiece(p.id)}
-                    >
-                      <span className="truncate">
-                        {p.name}
-                        <span className="text-[10px] text-stone-400 ml-1.5">{pieceTypeLabel(p.type)}</span>
-                      </span>
-                      <span className="text-stone-500 text-xs font-mono ml-2 flex-shrink-0">
-                        {p.length}×{p.width} ×{p.qty}
-                      </span>
-                    </div>
-                  )}
-                  {editingPiece === p.id && (
-                    <button
-                      onClick={() => setEditingPiece(null)}
-                      className="text-xs text-emerald-600 hover:text-emerald-800 flex-shrink-0 transition-colors font-bold"
-                      title="Valider"
-                    >
-                      ✓
-                    </button>
-                  )}
+            <div
+              className={cardClass}
+              style={{ borderLeftWidth: '3px', borderLeftColor: BODY_COLORS[bi % BODY_COLORS.length] }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <input
+                  className="bg-transparent text-sm font-semibold text-stone-800 border-b border-transparent hover:border-stone-300 focus:border-amber-500 focus:outline-none transition-colors"
+                  value={b.name}
+                  onChange={(e) => updateBody(b.id, 'name', e.target.value)}
+                />
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={() => { removePiece(b.id, p.id); if (editingPiece === p.id) setEditingPiece(null); }}
-                    className="text-xs text-stone-400 hover:text-red-500 flex-shrink-0 transition-colors"
-                    title="Supprimer cette pièce"
+                    onClick={() => duplicateBody(b.id)}
+                    className="text-xs text-stone-500 hover:text-amber-600 transition-colors"
                   >
-                    ✕
+                    Dupliquer
+                  </button>
+                  <button
+                    onClick={() => removeBody(b.id)}
+                    className="text-xs text-stone-500 hover:text-red-400 transition-colors"
+                  >
+                    Supprimer
                   </button>
                 </div>
-              ))}
+              </div>
+
+              {/* Sharing indicators */}
+              {(sl || sr) && (
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {sl && (
+                    <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2 py-0.5 font-medium">
+                      ⚙ Joue G commune avec {state.bodies[bi - 1]?.name}
+                    </span>
+                  )}
+                  {sr && (
+                    <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2 py-0.5 font-medium">
+                      ⚙ Joue D commune avec {state.bodies[bi + 1]?.name}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <NumberInput label="Largeur" suffix="cm" value={b.width} min={10} max={500} step={0.1} onChange={(v) => updateBody(b.id, 'width', v)} tip={TIPS['corps-largeur']} />
+                <NumberInput label="Profondeur" suffix="cm" value={b.depth} min={10} max={200} step={0.1} onChange={(v) => updateBody(b.id, 'depth', v)} tip={TIPS['corps-profondeur']} />
+              </div>
+
+              <div className="text-xs text-stone-500 mb-3 flex items-center gap-1 flex-wrap">
+                <Tip text={sl
+                  ? "Largeur intérieure augmentée : la joue gauche est commune avec le corps voisin. Pas de double épaisseur à la jonction."
+                  : TIPS['int-tablette']
+                }>
+                  <span>
+                    Int. tablette : <span className={`font-semibold ${sl ? 'text-blue-700' : ''}`}>{iw} cm</span>
+                    {sl && <span className="text-[10px] text-blue-500 ml-1">(joue commune)</span>}
+                  </span>
+                </Tip>
+                <span className="mx-1">·</span>
+                <Tip text={TIPS['poids-corps']}><span>~{totalWeight.toFixed(1)} kg</span></Tip>
+              </div>
+
+              {/* Pieces */}
+              <div className="space-y-1.5">
+                {b.pieces.map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm"
+                  >
+                    <Tip text={TIPS[`piece-${p.type}`] || ''}>
+                      <span
+                        className="w-2 h-2 rounded-full flex-shrink-0 cursor-help"
+                        style={{ backgroundColor: PIECE_COLORS[p.type] || PIECE_COLORS.autre }}
+                      />
+                    </Tip>
+                    {editingPiece === p.id ? (
+                      <div className="flex-1 grid grid-cols-5 gap-1.5 items-center">
+                        <input
+                          className={inputClass + " col-span-2 !py-1"}
+                          value={p.name}
+                          onChange={(e) => updatePiece(b.id, p.id, 'name', e.target.value)}
+                        />
+                        <input
+                          type="number"
+                          step="0.1"
+                          min={1}
+                          className={inputClass + " !py-1"}
+                          value={p.length}
+                          onChange={(e) => updatePiece(b.id, p.id, 'length', parseNumber(e.target.value, p.length, 1))}
+                        />
+                        <input
+                          type="number"
+                          step="0.1"
+                          min={1}
+                          className={inputClass + " !py-1"}
+                          value={p.width}
+                          onChange={(e) => updatePiece(b.id, p.id, 'width', parseNumber(e.target.value, p.width, 1))}
+                        />
+                        <div className="flex gap-1">
+                          <input
+                            type="number"
+                            min={1}
+                            max={99}
+                            className={inputClass + " !py-1 w-12"}
+                            value={p.qty}
+                            onChange={(e) => updatePiece(b.id, p.id, 'qty', clampInt(e.target.value, p.qty, 1, 99))}
+                          />
+                          <select
+                            className={inputClass + " !py-1 text-xs"}
+                            value={p.type}
+                            onChange={(e) => updatePiece(b.id, p.id, 'type', e.target.value)}
+                          >
+                            {PIECE_TYPES.map((t) => (
+                              <option key={t} value={t}>{pieceTypeLabel(t)}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        className="flex-1 min-w-0 flex justify-between cursor-pointer hover:text-amber-700 transition-colors"
+                        onClick={() => setEditingPiece(p.id)}
+                      >
+                        <span className="truncate">
+                          {p.name}
+                          <span className="text-[10px] text-stone-400 ml-1.5">{pieceTypeLabel(p.type)}</span>
+                        </span>
+                        <span className="text-stone-500 text-xs font-mono ml-2 flex-shrink-0">
+                          {p.length}×{p.width} ×{p.qty}
+                        </span>
+                      </div>
+                    )}
+                    {editingPiece === p.id && (
+                      <button
+                        onClick={() => setEditingPiece(null)}
+                        className="text-xs text-emerald-600 hover:text-emerald-800 flex-shrink-0 transition-colors font-bold"
+                        title="Valider"
+                      >
+                        ✓
+                      </button>
+                    )}
+                    <button
+                      onClick={() => { removePiece(b.id, p.id); if (editingPiece === p.id) setEditingPiece(null); }}
+                      className="text-xs text-stone-400 hover:text-red-500 flex-shrink-0 transition-colors"
+                      title="Supprimer cette pièce"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => addPiece(b.id)}
+                className="mt-3 text-xs text-amber-500 hover:text-amber-700 transition-colors"
+              >
+                + Ajouter une pièce
+              </button>
+
+              {/* Door Configurator */}
+              <DoorConfigurator body={b} bodyIndex={bi} state={state} onChange={onChange} />
             </div>
-
-            <button
-              onClick={() => addPiece(b.id)}
-              className="mt-3 text-xs text-amber-500 hover:text-amber-700 transition-colors"
-            >
-              + Ajouter une pièce
-            </button>
-
-            {/* Door Configurator */}
-            <DoorConfigurator body={b} state={state} onChange={onChange} />
           </div>
         );
       })}

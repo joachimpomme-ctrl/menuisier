@@ -15,6 +15,39 @@ export function clampInt(value: string, fallback: number, min: number, max: numb
 }
 
 // ---------------------------------------------------------------------------
+// Joue commune — calcul de la largeur intérieure effective
+// ---------------------------------------------------------------------------
+
+/**
+ * Calcule la largeur intérieure effective d'un corps en tenant compte
+ * des joues communes avec les corps adjacents.
+ *
+ * Quand un corps partage sa joue gauche avec le voisin de gauche,
+ * il n'a pas sa propre joue gauche → la largeur intérieure augmente.
+ */
+export function getBodyInnerWidth(
+  bodyWidth: number,
+  bodyIndex: number,
+  bodyCount: number,
+  sharedBoundaries: boolean[],
+  thickness: number,
+): number {
+  const sharedLeft = bodyIndex > 0 && (sharedBoundaries[bodyIndex - 1] ?? false);
+  const leftTh = sharedLeft ? 0 : thickness;
+  return +(bodyWidth - leftTh - thickness).toFixed(1);
+}
+
+/** Renvoie true si ce corps n'a pas de joue gauche propre (partagée avec le voisin) */
+export function isSharedLeft(bodyIndex: number, sharedBoundaries: boolean[]): boolean {
+  return bodyIndex > 0 && (sharedBoundaries[bodyIndex - 1] ?? false);
+}
+
+/** Renvoie true si la joue droite de ce corps est partagée avec le voisin */
+export function isSharedRight(bodyIndex: number, bodyCount: number, sharedBoundaries: boolean[]): boolean {
+  return bodyIndex < bodyCount - 1 && (sharedBoundaries[bodyIndex] ?? false);
+}
+
+// ---------------------------------------------------------------------------
 // Calculs portes & charnières
 // ---------------------------------------------------------------------------
 import type { DoorPoseType } from '../types';
@@ -27,15 +60,20 @@ export interface DoorDimensions {
   poseLabel: string;
 }
 
-/** Calcule les dimensions d'une porte et les positions de charnières */
+/**
+ * Calcule les dimensions d'une porte et les positions de charnières.
+ * @param effectiveInnerWidth - Si fourni, utilise cette largeur intérieure au lieu de bodyWidth - 2*thickness.
+ *   Nécessaire quand le corps a une joue commune (la largeur intérieure est plus grande).
+ */
 export function calculateDoor(
   bodyWidth: number,
-  bodyHeight: number, // joue height = usable height
+  bodyHeight: number,
   thickness: number,
   doorCount: 1 | 2,
   poseType: DoorPoseType,
+  effectiveInnerWidth?: number,
 ): DoorDimensions {
-  const innerWidth = +(bodyWidth - 2 * thickness).toFixed(1);
+  const innerWidth = effectiveInnerWidth ?? +(bodyWidth - 2 * thickness).toFixed(1);
   const JEU = 0.2; // 2mm = 0.2cm
 
   let doorWidth: number;

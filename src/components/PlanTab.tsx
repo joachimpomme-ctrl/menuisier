@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { AppState } from '../types';
 import { MATERIALS, BODY_COLORS, PIECE_COLORS } from '../data/materials';
+import { getBodyInnerWidth, isSharedLeft } from '../lib/helpers';
 import Tip from './Tip';
 
 interface Props {
@@ -110,8 +111,10 @@ export default function PlanTab({ state }: Props) {
             <g key={b.id}>
               {/* Body outline */}
               <rect x={bx} y={M} width={bw} height={bh} fill="none" stroke={color} strokeWidth="1" opacity=".3" rx="1" />
-              {/* Left joue */}
-              <rect x={bx} y={M} width={tw} height={bh} fill={PIECE_COLORS.joue} opacity=".15" stroke={PIECE_COLORS.joue} strokeWidth="0.5" />
+              {/* Left joue (skip if shared) */}
+              {!isSharedLeft(state.bodies.findIndex(bb => bb.id === b.id), state.sharedBoundaries ?? []) && (
+                <rect x={bx} y={M} width={tw} height={bh} fill={PIECE_COLORS.joue} opacity=".15" stroke={PIECE_COLORS.joue} strokeWidth="0.5" />
+              )}
               {/* Right joue */}
               <rect x={bx + bw - tw} y={M} width={tw} height={bh} fill={PIECE_COLORS.joue} opacity=".15" stroke={PIECE_COLORS.joue} strokeWidth="0.5" />
 
@@ -164,9 +167,18 @@ export default function PlanTab({ state }: Props) {
               {/* Dimensions */}
               {/* Width */}
               <DimLine x1={bx} y1={M + bh} x2={bx + bw} y2={M + bh} label={`${b.width}`} offset={18} />
-              {/* Inner width */}
-              <DimLine x1={bx + tw} y1={M + bh} x2={bx + bw - tw} y2={M + bh}
-                label={`${(b.width - 2 * th).toFixed(1)}`} offset={32} color="#a8a29e" fontSize={7} />
+              {/* Inner width (sharing-aware) */}
+              {(() => {
+                const realBi = state.bodies.findIndex(bb => bb.id === b.id);
+                const shared = state.sharedBoundaries ?? [];
+                const sl = isSharedLeft(realBi, shared);
+                const iw = getBodyInnerWidth(b.width, realBi, state.bodies.length, shared, th);
+                const x1 = sl ? bx : bx + tw;
+                return (
+                  <DimLine x1={x1} y1={M + bh} x2={bx + bw - tw} y2={M + bh}
+                    label={`${iw}`} offset={32} color={sl ? "#3b82f6" : "#a8a29e"} fontSize={7} />
+                );
+              })()}
 
               {/* Label */}
               <text x={bx + bw / 2} y={M - 8} textAnchor="middle" fill={color} fontSize="9" fontWeight="600" fontFamily="system-ui">{b.name}</text>

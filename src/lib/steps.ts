@@ -1,7 +1,7 @@
 import type { AppState, Step } from '../types';
 import { MATERIALS } from '../data/materials';
 import { SYSTEME_32_RULES, ASSEMBLAGES, FINISHES, ORIENTATION_RULES } from '../data/knowledge';
-import { calculateDoor } from './helpers';
+import { calculateDoor, getBodyInnerWidth } from './helpers';
 
 export function generateSteps(st: AppState): Step[] {
   const { project: pr, panel: pn, bodies: bs, materialKey: mk } = st;
@@ -90,7 +90,9 @@ export function generateSteps(st: AppState): Step[] {
     ];
 
     bodiesWithDoors.forEach((b) => {
-      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType);
+      const bi = bs.indexOf(b);
+      const iw = getBodyInnerWidth(b.width, bi, bs.length, sharedBounds, pn.thickness);
+      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
       doorItems.push(
         `${b.name} — ${b.doorConfig!.count} porte${b.doorConfig!.count > 1 ? 's' : ''} (${dims.poseLabel}) :`
       );
@@ -111,6 +113,8 @@ export function generateSteps(st: AppState): Step[] {
   // Assemblages disponibles selon la base de connaissances
   const assemblyTypes = ASSEMBLAGES.filter((a) => a.famille === 'caisson');
 
+  const sharedBounds = st.sharedBoundaries ?? [];
+
   bs.forEach((b, i) => {
     const fixedCount = b.pieces
       .filter((p) => p.type === "tablette-fixe")
@@ -119,9 +123,16 @@ export function generateSteps(st: AppState): Step[] {
       .filter((p) => p.type === "tablette-reglable")
       .reduce((s, p) => s + p.qty, 0);
 
+    const sl = i > 0 && (sharedBounds[i - 1] ?? false);
+    const sr = i < bs.length - 1 && (sharedBounds[i] ?? false);
+    const sharingNotes: string[] = [];
+    if (sl) sharingNotes.push(`⚙ Joue gauche = joue commune avec ${bs[i - 1]?.name} (pas de joue gauche propre)`);
+    if (sr) sharingNotes.push(`⚙ Joue droite = joue commune avec ${bs[i + 1]?.name} (profondeur adaptée au max des 2 corps)`);
+
     steps.push({
       title: `5.${i + 1}. Assemblage ${b.name}`,
       items: [
+        ...sharingNotes,
         `Joues bas à plat sur tréteaux`,
         `Techniques caisson possibles : ${assemblyTypes.map((a) => a.nom).join(', ')} [Dunod 2022]`,
         ...mat.assembly,
@@ -149,7 +160,9 @@ export function generateSteps(st: AppState): Step[] {
   // Pose des portes (après mise en place)
   if (bodiesWithDoors.length > 0) {
     const totalHinges = bodiesWithDoors.reduce((sum, b) => {
-      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType);
+      const bi = bs.indexOf(b);
+      const iw = getBodyInnerWidth(b.width, bi, bs.length, sharedBounds, pn.thickness);
+      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
       return sum + dims.hingeCount * b.doorConfig!.count;
     }, 0);
 
@@ -165,7 +178,9 @@ export function generateSteps(st: AppState): Step[] {
     ];
 
     bodiesWithDoors.forEach((b) => {
-      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType);
+      const bi = bs.indexOf(b);
+      const iw = getBodyInnerWidth(b.width, bi, bs.length, sharedBounds, pn.thickness);
+      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
       doorPoseItems.push(`${b.name} : ${b.doorConfig!.count}× porte ${dims.doorWidth}×${dims.doorHeight} cm (${dims.poseLabel})`);
     });
 

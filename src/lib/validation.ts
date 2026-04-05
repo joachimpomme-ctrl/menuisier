@@ -1,6 +1,7 @@
 import type { AppState, ValidationResult } from '../types';
 import { MATERIALS } from '../data/materials';
 import { ORIENTATION_RULES, FORMALDEHYDE_CLASSES } from '../data/knowledge';
+import { getBodyInnerWidth, isSharedLeft } from './helpers';
 
 // ---------------------------------------------------------------------------
 // Calcul de flèche (Dunod 2022) : f = (5·q·L⁴) / (384·E·I), I = b·h³/12
@@ -42,9 +43,10 @@ export function validate(st: AppState): ValidationResult {
     warnings.push('Aucun corps défini — ajoutez au moins un corps pour commencer');
   }
 
-  const totalWidth = bs.reduce((s, b) => s + b.width, 0);
+  const sharedCount = (st.sharedBoundaries ?? []).filter(Boolean).length;
+  const totalWidth = bs.reduce((s, b) => s + b.width, 0) - sharedCount * pn.thickness;
   if (totalWidth > pr.wallWidth && pr.wallWidth > 0) {
-    errors.push(`Largeur totale (${totalWidth} cm) > mur (${pr.wallWidth} cm)`);
+    errors.push(`Largeur physique totale (${totalWidth.toFixed(1)} cm) > mur (${pr.wallWidth} cm)`);
   } else if (totalWidth > 0 && pr.wallWidth > 0 && totalWidth < pr.wallWidth) {
     warnings.push(`Espace résiduel ${(pr.wallWidth - totalWidth).toFixed(1)} cm sur le mur`);
   }
@@ -75,14 +77,20 @@ export function validate(st: AppState): ValidationResult {
   }
 
   // ===== CONTRÔLES PAR CORPS =====
-  bs.forEach((b) => {
-    const expectedTabWidth = +(b.width - 2 * pn.thickness).toFixed(1);
+  const shared = st.sharedBoundaries ?? [];
+  bs.forEach((b, bi) => {
+    const sl = isSharedLeft(bi, shared);
+    const expectedTabWidth = getBodyInnerWidth(b.width, bi, bs.length, shared, pn.thickness);
+    const minJoues = sl ? 1 : 2; // corps avec joue commune = 1 joue propre minimum
 
     // Cohérence dimensionnelle du corps
     if (b.width <= 0) errors.push(`${b.name} : largeur invalide (${b.width} cm)`);
     if (b.depth <= 0) errors.push(`${b.name} : profondeur invalide (${b.depth} cm)`);
-    if (b.width < 2 * pn.thickness + 1) {
+    if (!sl && b.width < 2 * pn.thickness + 1) {
       errors.push(`${b.name} : largeur ${b.width} cm trop petite pour 2 joues de ${pn.thickness} cm`);
+    }
+    if (sl && b.width < pn.thickness + 1) {
+      errors.push(`${b.name} : largeur ${b.width} cm trop petite (joue commune + 1 joue propre)`);
     }
     if (expectedTabWidth <= 0) {
       errors.push(`${b.name} : largeur intérieure négative ou nulle (${expectedTabWidth} cm)`);
@@ -103,25 +111,30 @@ export function validate(st: AppState): ValidationResult {
     // on vérifie aussi les joues individuelles
     if (joues.length > 0) {
       // Vérifier que la profondeur des joues correspond à la profondeur du corps
+      // Exception : joue commune peut être plus profonde (= max des 2 corps)
+      const sr = bi < bs.length - 1 && (shared[bi] ?? false);
       joues.forEach((p) => {
-        if (Math.abs(p.width - b.depth) > 0.2) {
+        const isSharedJoue = sr && p.width > b.depth && /droite|\bD\s*[—–-]|commune/i.test(p.name);
+        if (!isSharedJoue && Math.abs(p.width - b.depth) > 0.2) {
           errors.push(`${b.name} : "${p.name}" profondeur ${p.width} cm ≠ profondeur corps ${b.depth} cm`);
         }
       });
 
-      // Vérifier que les joues ne dépassent pas la hauteur utile
+      // Les joues font la HAUTEUR TOTALE (ceilingHeight), pas la hauteur utile.
+      // Elles sont entaillées à l'arrière pour enjamber la plinthe, mais leur longueur = hauteur plafond.
+      const joueMaxHeight = pr.ceilingHeight;
       joues.forEach((p) => {
-        if (p.length > usableHeight + 0.5 && usableHeight > 0) {
-          errors.push(`${b.name} : "${p.name}" hauteur ${p.length} cm > hauteur utile ${usableHeight} cm`);
+        if (p.length > joueMaxHeight + 0.5 && joueMaxHeight > 0) {
+          errors.push(`${b.name} : "${p.name}" hauteur ${p.length} cm > hauteur disponible ${joueMaxHeight} cm`);
         }
       });
 
-      // Si joues par paires (haut/bas), vérifier la somme
+      // Si joues par paires (haut/bas), vérifier la somme = hauteur totale
       for (let i = 0; i < joues.length - 1; i += 2) {
         const sum = joues[i].length + (joues[i + 1]?.length || 0);
-        if (joues[i + 1] && Math.abs(sum - usableHeight) > 0.5 && usableHeight > 0) {
-          errors.push(
-            `${b.name} : joues "${joues[i].name}" + "${joues[i + 1]?.name}" = ${sum} cm ≠ ${usableHeight} cm`
+        if (joues[i + 1] && Math.abs(sum - joueMaxHeight) > 0.5 && joueMaxHeight > 0) {
+          warnings.push(
+            `${b.name} : joues "${joues[i].name}" + "${joues[i + 1]?.name}" = ${sum} cm (hauteur dispo = ${joueMaxHeight} cm)`
           );
         }
       }

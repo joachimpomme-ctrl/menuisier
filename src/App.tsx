@@ -308,7 +308,7 @@ export default function App() {
         )}
         {tab === 'montage' && <MontageTab state={state} />}
         {tab === 'notice' && <NoticeTab steps={steps} materialName={mat.name} thickness={state.panel.thickness} />}
-        {tab === 'validation' && <ValidationTab validation={validation} />}
+        {tab === 'validation' && <ValidationTab validation={validation} onGoToStructure={() => setTab('structure')} />}
         {tab === 'ia' && (
           <AssistantTab
             state={state}

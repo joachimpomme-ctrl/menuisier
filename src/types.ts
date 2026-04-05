@@ -78,6 +78,7 @@ export interface AppState {
   kerf: number;
   bodies: Body[];
   costConfig: CostConfig;
+  sharedBoundaries?: boolean[]; // length = bodies.length - 1; true = joue commune entre bodies[i] et bodies[i+1]
 }
 
 export interface ValidationResult {
