@@ -15,6 +15,7 @@ import MontageTab from './components/MontageTab';
 import NoticeTab from './components/NoticeTab';
 import ValidationTab from './components/ValidationTab';
 import AssistantTab from './components/AssistantTab';
+import PlanTab from './components/PlanTab';
 import ProjectManager from './components/ProjectManager';
 import KnowledgeManager from './components/KnowledgeManager';
 import InstallBanner from './components/InstallBanner';
@@ -24,6 +25,7 @@ import TIPS from './data/tips';
 
 const TABS: { key: TabKey; label: string; shortLabel: string; icon: string }[] = [
   { key: 'structure', label: 'Structure', shortLabel: 'Struct.', icon: '⚙' },
+  { key: 'plans', label: 'Plans 2D', shortLabel: 'Plans', icon: '📏' },
   { key: 'debit', label: 'Débit', shortLabel: 'Débit', icon: '✂' },
   { key: 'montage', label: 'Montage', shortLabel: 'Mont.', icon: '📐' },
   { key: 'notice', label: 'Notice', shortLabel: 'Notice', icon: '📋' },
@@ -294,6 +296,7 @@ export default function App() {
 
         {/* Content */}
         {tab === 'structure' && <StructureTab state={state} onChange={setState} />}
+        {tab === 'plans' && <PlanTab state={state} />}
         {tab === 'debit' && (
           <DebitTab
             state={state}

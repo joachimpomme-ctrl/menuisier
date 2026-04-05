@@ -1,0 +1,2170 @@
+{
+  "metadata": {
+    "name": "menuiserie_knowledge_base_v2_consolidee",
+    "version": "2.0.0",
+    "status": "verified_from_uploaded_documents",
+    "language": "fr",
+    "sources": [
+      {
+        "id": "source_dunod_2022",
+        "title": "Menuiserie, agencement et ébénisterie - 100 fiches pratiques",
+        "type": "pdf"
+      },
+      {
+        "id": "source_guide_menuiserie",
+        "title": "Guide de la menuiserie",
+        "type": "pdf",
+        "note": "document image-based, peu exploitable automatiquement dans cette consolidation"
+      }
+    ],
+    "design_principles": [
+      "ne conserver que des savoirs explicitement vérifiés dans les documents",
+      "séparer données, règles métier, formules et diagnostics",
+      "rendre la base directement exploitable pour applications de menuiserie, agencement, aide au débit et aide à l'usinage"
+    ],
+    "memory_status": {
+      "insufficient_memory": false,
+      "need_new_conversation": false,
+      "note": "La consolidation v2 livrée ici tient dans cette discussion. Une autre discussion ne devient utile que pour un enrichissement fiche-par-fiche encore plus exhaustif du manuel complet."
+    }
+  },
+  "schema_outline": {
+    "domains": [
+      "essences",
+      "proprietes_physiques",
+      "proprietes_mecaniques",
+      "defauts_et_pathologies",
+      "humidite",
+      "retractabilite",
+      "sechage",
+      "durabilite_et_traitements",
+      "panneaux_derives",
+      "formaldehyde",
+      "debit_et_calepinage",
+      "assemblages",
+      "caissons",
+      "systeme_32",
+      "quincailleries",
+      "machines",
+      "usinages",
+      "outils_de_coupe",
+      "parametres_usinage",
+      "etat_de_surface",
+      "securite",
+      "maintenance",
+      "regles_metier",
+      "formules"
+    ]
+  },
+  "essences": {
+    "resineux_indigenes": [
+      {
+        "nom": "Mélèze",
+        "masse_volumique_12_pct_kg_m3": 600,
+        "proprietes": [
+          "résistance variable",
+          "très fissile",
+          "résistance moyenne aux chocs"
+        ],
+        "faconnage": [
+          "facile à travailler",
+          "encrassement possible par la résine",
+          "collage difficile"
+        ],
+        "durabilite_qualitative": "moyennement durable"
+      },
+      {
+        "nom": "Douglas",
+        "masse_volumique_12_pct_kg_m3": 540,
+        "proprietes": [
+          "bois tendre",
+          "bonne résistance à la compression",
+          "bonne résistance à la flexion",
+          "bonne résistance à la traction"
+        ],
+        "faconnage": [
+          "facile à scier",
+          "désaffûtant",
+          "bois hétérogène influant sur la qualité de surface"
+        ],
+        "durabilite_qualitative": "assez durable"
+      },
+      {
+        "nom": "Pin sylvestre",
+        "masse_volumique_12_pct_kg_m3": 530,
+        "proprietes": [
+          "résistance variable",
+          "moyennement stable",
+          "relativement nerveux",
+          "assez fissile"
+        ],
+        "faconnage": [
+          "facile à travailler",
+          "collage difficile si très résineux"
+        ],
+        "durabilite_qualitative": "non durable"
+      },
+      {
+        "nom": "Pin maritime",
+        "masse_volumique_12_pct_kg_m3": 510,
+        "proprietes": [
+          "faible résistance",
+          "moyennement nerveux",
+          "moins élastique que le pin sylvestre"
+        ],
+        "faconnage": [
+          "facile à travailler",
+          "encrassement possible par la résine",
+          "collage difficile si très résineux"
+        ],
+        "durabilite_qualitative": "duramen durable"
+      },
+      {
+        "nom": "Épicéa",
+        "masse_volumique_12_pct_kg_m3": 450,
+        "proprietes": [
+          "bois tendre",
+          "faible résistance",
+          "très fissile"
+        ],
+        "faconnage": [
+          "facile à travailler",
+          "désaffûtant"
+        ],
+        "durabilite_qualitative": "non durable"
+      },
+      {
+        "nom": "Sapin",
+        "masse_volumique_12_pct_kg_m3": 450,
+        "proprietes": [
+          "bois tendre",
+          "faible résistance",
+          "très fissile"
+        ],
+        "faconnage": [
+          "très facile à travailler",
+          "risque d'arrachement des fibres",
+          "collage très facile avec tous types de colles"
+        ],
+        "durabilite_qualitative": "non durable"
+      }
+    ],
+    "feuillus_indigenes": [
+      {
+        "nom": "Frêne",
+        "masse_volumique_12_pct_kg_m3": 720,
+        "proprietes": [
+          "bois dur",
+          "très bonne résistance à la traction",
+          "très bonne résistance à la flexion",
+          "peu fissile"
+        ],
+        "faconnage": [
+          "facile à travailler",
+          "bois absorbant",
+          "utiliser des colles à haute viscosité"
+        ],
+        "durabilite_qualitative": "non durable"
+      },
+      {
+        "nom": "Chêne",
+        "masse_volumique_12_pct_kg_m3": 710,
+        "proprietes": [
+          "bois mi-dur à dur",
+          "bons comportements à la compression et à la flexion",
+          "assez résilient",
+          "bois nerveux",
+          "moyennement fissile"
+        ],
+        "faconnage": [
+          "besoin de puissance pour les bois les plus nerveux",
+          "bois dense et acide",
+          "se tache facilement avec des colles alcalines"
+        ],
+        "durabilite_qualitative": "durable"
+      },
+      {
+        "nom": "Hêtre",
+        "masse_volumique_12_pct_kg_m3": 680,
+        "proprietes": [
+          "bois mi-dur",
+          "parfois nerveux",
+          "bonne résistance en compression",
+          "peu fissile"
+        ],
+        "faconnage": [
+          "facile à travailler",
+          "se cintre bien",
+          "facile à teinter",
+          "risque de cémentation",
+          "forte pression de serrage nécessaire"
+        ],
+        "durabilite_qualitative": "peu durable / non durable"
+      },
+      {
+        "nom": "Châtaignier",
+        "masse_volumique_12_pct_kg_m3": 620,
+        "proprietes": [
+          "bois mi-dur à dur",
+          "assez bonnes propriétés mécaniques"
+        ],
+        "faconnage": [
+          "facile à travailler",
+          "se cintre bien",
+          "bois dense et acide",
+          "se tache facilement avec des colles alcalines"
+        ],
+        "durabilite_qualitative": "très durable aux intempéries"
+      },
+      {
+        "nom": "Merisier",
+        "masse_volumique_12_pct_kg_m3": 610,
+        "proprietes": [
+          "bois mi-dur",
+          "moyennement stable",
+          "bonnes propriétés mécaniques"
+        ],
+        "faconnage": [
+          "facile à travailler",
+          "se cintre bien",
+          "se colle bien"
+        ],
+        "durabilite_qualitative": "non durable"
+      },
+      {
+        "nom": "Aulne",
+        "masse_volumique_12_pct_kg_m3": 530,
+        "proprietes": [
+          "bois tendre",
+          "résistance mécanique moyenne"
+        ],
+        "faconnage": [
+          "facile à usiner",
+          "collage très facile avec tous types de colles"
+        ],
+        "durabilite_qualitative": "non durable"
+      },
+      {
+        "nom": "Peuplier",
+        "masse_volumique_12_pct_kg_m3": 460,
+        "proprietes": [
+          "bois très tendre",
+          "moyennement stable",
+          "résistance mécanique faible"
+        ],
+        "faconnage": [
+          "usinage assez difficile",
+          "peluchage",
+          "bois absorbant",
+          "risque de poches d'humidité au collage"
+        ],
+        "durabilite_qualitative": "non durable"
+      }
+    ],
+    "tropicaux_exemples": [
+      {
+        "nom": "Iroko",
+        "origine": "Afrique",
+        "emplois": [
+          "menuiserie intérieure",
+          "menuiserie extérieure",
+          "agencement",
+          "parquets",
+          "mobilier ébénisterie"
+        ],
+        "densite": 0.65
+      },
+      {
+        "nom": "Sipo",
+        "origine": "Afrique",
+        "emplois": [
+          "menuiserie intérieure",
+          "menuiserie extérieure",
+          "agencement",
+          "mobilier ébénisterie",
+          "massif",
+          "placage"
+        ],
+        "densite": 0.62
+      },
+      {
+        "nom": "Sapelli",
+        "origine": "Afrique",
+        "emplois": [
+          "menuiserie intérieure",
+          "menuiserie extérieure",
+          "agencement",
+          "parquets",
+          "mobilier ébénisterie",
+          "massif",
+          "placage"
+        ],
+        "densite": 0.69
+      },
+      {
+        "nom": "Doussié",
+        "origine": "Afrique",
+        "emplois": [
+          "menuiserie intérieure",
+          "menuiserie extérieure",
+          "mobilier ébénisterie",
+          "massif",
+          "placage"
+        ],
+        "densite": 0.8
+      },
+      {
+        "nom": "Framiré",
+        "origine": "Afrique",
+        "emplois": [
+          "menuiserie intérieure",
+          "menuiserie extérieure",
+          "mobilier ébénisterie",
+          "massif",
+          "placage"
+        ],
+        "densite": 0.5
+      },
+      {
+        "nom": "Movingui",
+        "origine": "Afrique",
+        "emplois": [
+          "menuiserie intérieure",
+          "menuiserie extérieure",
+          "escaliers",
+          "parquets",
+          "ébénisterie"
+        ],
+        "densite": 0.73
+      },
+      {
+        "nom": "Niangon",
+        "origine": "Afrique",
+        "emplois": [
+          "menuiserie intérieure",
+          "menuiserie extérieure",
+          "parquets",
+          "mobilier ébénisterie"
+        ],
+        "densite": 0.7
+      },
+      {
+        "nom": "Okoumé",
+        "origine": "Afrique",
+        "emplois": [
+          "menuiserie intérieure",
+          "moulures",
+          "lambris",
+          "contreplaqué"
+        ],
+        "densite": 0.44
+      },
+      {
+        "nom": "Ramin",
+        "origine": "Asie/Océanie",
+        "emplois": [
+          "menuiserie intérieure",
+          "moulures",
+          "lambris",
+          "parquets",
+          "contreplaqué"
+        ],
+        "densite": 0.66
+      },
+      {
+        "nom": "Meranti",
+        "origine": "Asie/Océanie",
+        "emplois": [
+          "menuiserie intérieure",
+          "ameublement",
+          "mobilier ébénisterie",
+          "massif",
+          "placage"
+        ],
+        "densite": 0.68
+      },
+      {
+        "nom": "Eucalyptus",
+        "origine": "Asie/Océanie",
+        "emplois": [
+          "menuiserie intérieure",
+          "ameublement",
+          "mobilier ébénisterie",
+          "massif",
+          "placage"
+        ],
+        "densite": 0.65
+      },
+      {
+        "nom": "Teck",
+        "origine": "Asie/Océanie",
+        "emplois": [
+          "mobilier",
+          "agencement",
+          "ébénisterie",
+          "construction navale",
+          "massif",
+          "placage"
+        ],
+        "densite": 0.67
+      },
+      {
+        "nom": "Ipé",
+        "origine": "Amérique du Sud",
+        "emplois": [
+          "menuiserie extérieure",
+          "menuiserie intérieure",
+          "parquets",
+          "mobilier ébénisterie",
+          "construction navale",
+          "massif",
+          "placage"
+        ],
+        "densite": 1.04
+      },
+      {
+        "nom": "Angelim",
+        "origine": "Amérique du Sud",
+        "emplois": [
+          "charpente",
+          "menuiserie extérieure",
+          "menuiserie intérieure",
+          "ameublement",
+          "mobilier ébénisterie",
+          "massif",
+          "placage"
+        ],
+        "densite": 0.8
+      },
+      {
+        "nom": "Amarante",
+        "origine": "Amérique du Sud",
+        "emplois": [
+          "mobilier ébénisterie",
+          "sculpture",
+          "massif",
+          "placage"
+        ],
+        "densite": 0.8
+      }
+    ]
+  },
+  "proprietes_physiques": {
+    "categories": [
+      "couleur",
+      "odeur",
+      "grain",
+      "hygroscopicité",
+      "rétractabilité",
+      "conductibilité"
+    ],
+    "conductivite_thermique_lambda_W_mK": [
+      {
+        "materiau": "Hêtre, chêne",
+        "lambda": 0.2
+      },
+      {
+        "materiau": "Sapin, pin",
+        "lambda": 0.13
+      },
+      {
+        "materiau": "Panneau de fibres (500 < ρ < 700 kg/m3)",
+        "lambda": 0.14
+      },
+      {
+        "materiau": "Contreplaqué (400 < ρ < 600 kg/m3)",
+        "lambda": 0.15
+      }
+    ],
+    "densite_classification_12_pct": {
+      "feuillus": [
+        {
+          "range": "< 0.5",
+          "classement": "Très léger",
+          "exemple": "Balsa"
+        },
+        {
+          "range": "0.5 à 0.64",
+          "classement": "Léger",
+          "exemple": "Peuplier"
+        },
+        {
+          "range": "0.65 à 0.79",
+          "classement": "Mi-lourd",
+          "exemple": "Chêne"
+        },
+        {
+          "range": "0.8 à 1",
+          "classement": "Lourd",
+          "exemple": "Merbau"
+        },
+        {
+          "range": "> 1",
+          "classement": "Très lourd",
+          "exemple": "Ipé"
+        }
+      ],
+      "resineux": [
+        {
+          "range": "< 0.4",
+          "classement": "Très léger",
+          "exemple": "Western Red Cedar"
+        },
+        {
+          "range": "0.4 à 0.49",
+          "classement": "Léger",
+          "exemple": "Sapin"
+        },
+        {
+          "range": "0.5 à 0.59",
+          "classement": "Mi-lourd",
+          "exemple": "Douglas"
+        },
+        {
+          "range": "0.6 à 0.69",
+          "classement": "Lourd",
+          "exemple": "Mélèze"
+        }
+      ]
+    }
+  },
+  "proprietes_mecaniques": {
+    "bonnes_resistances": [
+      "compression axiale",
+      "traction axiale",
+      "cisaillement tangentiel"
+    ],
+    "faibles_resistances": [
+      "compression transversale",
+      "traction transversale",
+      "cisaillement axial"
+    ],
+    "flexion": {
+      "face_concave": "fibres comprimées",
+      "axe": "fibres neutres",
+      "face_convexe": "fibres tendues"
+    },
+    "flambage": {
+      "definition": "raccourcissement dû à la compression dans l’axe",
+      "regle_simple": "on en tient compte dans les calculs de résistance quand L > 5 l"
+    },
+    "tableau_exemples": [
+      {
+        "nom": "Frêne",
+        "compression_axiale_MPa": 51,
+        "traction_axiale_MPa": 145,
+        "flexion_parallele_MPa": 113,
+        "module_elasticite_longitudinal_flexion_MPa": 12900
+      },
+      {
+        "nom": "Chêne",
+        "compression_axiale_MPa": 58,
+        "traction_axiale_MPa": 100,
+        "flexion_parallele_MPa": 97,
+        "module_elasticite_longitudinal_flexion_MPa": 12500
+      },
+      {
+        "nom": "Hêtre",
+        "compression_axiale_MPa": 58,
+        "traction_axiale_MPa": 117,
+        "flexion_parallele_MPa": 107,
+        "module_elasticite_longitudinal_flexion_MPa": 14300
+      },
+      {
+        "nom": "Peuplier",
+        "compression_axiale_MPa": 33,
+        "traction_axiale_MPa": 72,
+        "flexion_parallele_MPa": 65,
+        "module_elasticite_longitudinal_flexion_MPa": 8800
+      },
+      {
+        "nom": "Mélèze",
+        "compression_axiale_MPa": 53,
+        "traction_axiale_MPa": 101,
+        "flexion_parallele_MPa": 93,
+        "module_elasticite_longitudinal_flexion_MPa": 12500
+      },
+      {
+        "nom": "Douglas",
+        "compression_axiale_MPa": 55,
+        "traction_axiale_MPa": 93,
+        "flexion_parallele_MPa": 85,
+        "module_elasticite_longitudinal_flexion_MPa": 12100
+      },
+      {
+        "nom": "Sapin",
+        "compression_axiale_MPa": 46,
+        "traction_axiale_MPa": 86,
+        "flexion_parallele_MPa": 68,
+        "module_elasticite_longitudinal_flexion_MPa": 12200
+      }
+    ]
+  },
+  "defauts_et_pathologies": {
+    "defauts_structure": [
+      "aubier",
+      "nœuds vifs",
+      "nœuds bouchons",
+      "nœuds morts",
+      "nœuds œil-de-perdrix"
+    ],
+    "anomalies_croissance": [
+      "fibres ondulées",
+      "ronces",
+      "entre-écorce",
+      "broussins",
+      "loupes",
+      "chaudrons"
+    ],
+    "blessures_accidentelles": [
+      "gélivures",
+      "fissures",
+      "roulures",
+      "cadrannures",
+      "fentes",
+      "gerces",
+      "lunure"
+    ],
+    "parasites_vegetaux": [
+      "chancre",
+      "gui"
+    ],
+    "champignons": [
+      {
+        "nom": "bleuissement",
+        "impact": "esthétique"
+      },
+      {
+        "nom": "échauffures",
+        "impact": "esthétique et mécanique"
+      },
+      {
+        "nom": "pourriture cubique",
+        "impact": "esthétique et mécanique"
+      },
+      {
+        "nom": "pourriture fibreuse",
+        "impact": "esthétique et mécanique"
+      }
+    ],
+    "insectes_xylophages_exemples": [
+      "sirex",
+      "lyctus",
+      "vrillette",
+      "bostryche capucin",
+      "termite"
+    ]
+  },
+  "humidite": {
+    "eau_dans_le_bois": [
+      "eau libre",
+      "eau de saturation / eau liée / eau d’imprégnation",
+      "eau de constitution"
+    ],
+    "point_saturation_fibres_pct": 30,
+    "sechage_naturel_cible_pct": 15,
+    "seuils_par_destination": [
+      {
+        "usage": "charpente et escalier bois",
+        "humidite_max_pct": 22
+      },
+      {
+        "usage": "charpente industrielle",
+        "humidite_max_pct": 22
+      },
+      {
+        "usage": "maison à ossature bois",
+        "humidite_max_pct": 18
+      },
+      {
+        "usage": "menuiserie extérieure",
+        "humidite_max_pct": 18
+      },
+      {
+        "usage": "siège",
+        "humidite_max_pct": 12
+      },
+      {
+        "usage": "menuiserie intérieure",
+        "humidite_max_pct": 12
+      },
+      {
+        "usage": "agencement",
+        "humidite_max_pct": 12
+      },
+      {
+        "usage": "ébénisterie",
+        "humidite_max_pct": 12
+      }
+    ],
+    "equilibre_hygroscopique_exemples": [
+      {
+        "temperature_C": 20,
+        "humidite_relative_air_pct": 71,
+        "humidite_bois_equilibre_pct": 13
+      },
+      {
+        "temperature_C": 20,
+        "humidite_relative_air_pct": 80,
+        "humidite_bois_equilibre_pct": 16
+      }
+    ]
+  },
+  "retractabilite": {
+    "directions": {
+      "axial": "retrait pratiquement négligeable",
+      "radial": "2 à 8 % de la largeur suivant les essences",
+      "tangentiel": "1,2 à 3 fois supérieur au retrait radial"
+    },
+    "deformations_typiques": [
+      {
+        "debit": "sur dosse",
+        "deformation": "tuilage / courbure"
+      },
+      {
+        "debit": "sur quartier",
+        "deformation": "reste plane, pièce recherchée"
+      },
+      {
+        "debit": "fausse dosse / faux quartier",
+        "deformation": "section en losange"
+      }
+    ],
+    "coefficients_exemples": [
+      {
+        "essence": "Chêne",
+        "radial_pct_par_1pct_H": 0.17,
+        "tangentiel_pct_par_1pct_H": 0.32,
+        "volumetrique_pct_par_1pct_H": 0.49
+      },
+      {
+        "essence": "Douglas",
+        "radial_pct_par_1pct_H": 0.17,
+        "tangentiel_pct_par_1pct_H": 0.27,
+        "volumetrique_pct_par_1pct_H": 0.44
+      },
+      {
+        "essence": "Épicéa",
+        "radial_pct_par_1pct_H": 0.17,
+        "tangentiel_pct_par_1pct_H": 0.31,
+        "volumetrique_pct_par_1pct_H": 0.58
+      },
+      {
+        "essence": "Frêne",
+        "radial_pct_par_1pct_H": 0.19,
+        "tangentiel_pct_par_1pct_H": 0.32,
+        "volumetrique_pct_par_1pct_H": 0.51
+      },
+      {
+        "essence": "Hêtre",
+        "radial_pct_par_1pct_H": 0.21,
+        "tangentiel_pct_par_1pct_H": 0.41,
+        "volumetrique_pct_par_1pct_H": 0.62
+      },
+      {
+        "essence": "Merisier",
+        "radial_pct_par_1pct_H": 0.17,
+        "tangentiel_pct_par_1pct_H": 0.28,
+        "volumetrique_pct_par_1pct_H": 0.45
+      },
+      {
+        "essence": "Pin sylvestre",
+        "radial_pct_par_1pct_H": 0.17,
+        "tangentiel_pct_par_1pct_H": 0.31,
+        "volumetrique_pct_par_1pct_H": 0.48
+      },
+      {
+        "essence": "Sapin",
+        "radial_pct_par_1pct_H": 0.14,
+        "tangentiel_pct_par_1pct_H": 0.31,
+        "volumetrique_pct_par_1pct_H": 0.45
+      }
+    ]
+  },
+  "sechage": {
+    "benefices": [
+      "améliore la durabilité",
+      "améliore la stabilité dimensionnelle",
+      "améliore la résistance aux moisissures",
+      "améliore la résistance aux insectes",
+      "facilite la transformation et la mise en œuvre"
+    ],
+    "regle_champignons": "en dessous de 20 % d’humidité, aucun champignon ne se développe",
+    "naturel": {
+      "conditions_qualite": [
+        "bonne circulation de l’air autour et à l’intérieur de la pile",
+        "épingles/baguettes intercalées"
+      ],
+      "alterations": [
+        "gauchissement",
+        "gerces",
+        "fentes en bout",
+        "échauffures",
+        "pourritures"
+      ],
+      "prevention_fentes_en_bout": [
+        "peinture",
+        "petite latte clouée",
+        "agrafes métalliques"
+      ],
+      "vitesse_influences": [
+        "essence",
+        "épaisseur et largeur des planches",
+        "saison / température / hygrométrie"
+      ]
+    },
+    "artificiel": {
+      "principe": [
+        "apport d’énergie",
+        "évacuation de l’humidité"
+      ],
+      "procedés": [
+        {
+          "nom": "séchoir à air chaud climatisé",
+          "temperature_max_C": 90
+        },
+        {
+          "nom": "séchoir par déshumidification",
+          "modes": [
+            "circuit fermé",
+            "circuit ouvert"
+          ]
+        },
+        {
+          "nom": "préséchoir",
+          "humidite_finale_pct": "20 à 30"
+        },
+        {
+          "nom": "SGCBT",
+          "capacite_max_m3": 1600,
+          "temperature_C": "30 à 40",
+          "duree_jours": "10 à 20"
+        },
+        {
+          "nom": "séchoir sous vide",
+          "vitesse_vs_ACC": "3 à 6 fois plus rapide"
+        },
+        {
+          "nom": "séchoir haute fréquence",
+          "vitesse_vs_autres": "10 à 100 fois plus rapide"
+        },
+        {
+          "nom": "séchoir solaire",
+          "caracteristique": "écologique"
+        }
+      ],
+      "comparatif_exemple_bois_resineux_140mm_45pct_vers_18pct": [
+        {
+          "procede": "air chaud climatisé",
+          "duree_cycle": "27 jours",
+          "energie_kWh_par_kg_eau": "5.8"
+        },
+        {
+          "procede": "sous vide + vapeur surchauffée",
+          "duree_cycle": "6 ou 7 jours",
+          "energie_kWh_par_kg_eau": "2.5 à 3"
+        },
+        {
+          "procede": "haute fréquence",
+          "duree_cycle": "0.5 jour",
+          "energie_kWh_par_kg_eau": "1.6 à 2.2"
+        }
+      ]
+    }
+  },
+  "durabilite_et_traitements": {
+    "classes_emploi_EN335": [
+      {
+        "classe": "1",
+        "destination": "bois d’intérieur / menuiserie d’intérieur / mobilier / agencement",
+        "risques": [
+          "insectes à larves xylophages",
+          "termites"
+        ]
+      },
+      {
+        "classe": "2",
+        "destination": "bois sous abri non exposé aux intempéries / charpente / ossature",
+        "risques": [
+          "insectes xylophages",
+          "termites",
+          "champignons en cas d’humidité temporaire"
+        ]
+      },
+      {
+        "classe": "3.1",
+        "destination": "bois en extérieur sans contact avec le sol, avec séchage rapide / menuiserie extérieure / bardages",
+        "risques": [
+          "champignons",
+          "pourritures",
+          "insectes à larves xylophages",
+          "termites"
+        ]
+      },
+      {
+        "classe": "3.2",
+        "destination": "bois en extérieur sans contact avec le sol, avec humidification prolongée",
+        "risques": [
+          "champignons",
+          "pourritures",
+          "insectes à larves xylophages",
+          "termites"
+        ]
+      },
+      {
+        "classe": "4",
+        "destination": "bois extérieur en contact avec le sol ou l’eau douce / clôtures / poteaux",
+        "risques": [
+          "champignons",
+          "pourritures",
+          "insectes à larves xylophages",
+          "termites"
+        ]
+      },
+      {
+        "classe": "5",
+        "destination": "bois en contact avec l’eau de mer",
+        "risques": [
+          "pourriture",
+          "térébrants marins"
+        ]
+      }
+    ],
+    "durabilite_champignons_classes": [
+      {
+        "classe": 1,
+        "libelle": "Très durable"
+      },
+      {
+        "classe": 2,
+        "libelle": "Durable"
+      },
+      {
+        "classe": 3,
+        "libelle": "Moyennement durable"
+      },
+      {
+        "classe": 4,
+        "libelle": "Faiblement durable"
+      },
+      {
+        "classe": 5,
+        "libelle": "Non durable"
+      }
+    ],
+    "durabilite_insectes_xylophages_classes": [
+      "D",
+      "S"
+    ],
+    "durabilite_termites_classes": [
+      "D",
+      "M",
+      "S"
+    ],
+    "impreignabilite_classes": [
+      {
+        "classe": 1,
+        "libelle": "Imprégnable",
+        "exemples": [
+          "Hêtre"
+        ]
+      },
+      {
+        "classe": 2,
+        "libelle": "Moyennement imprégnable",
+        "exemples": [
+          "Frêne",
+          "Sapin"
+        ]
+      },
+      {
+        "classe": 3,
+        "libelle": "Peu imprégnable",
+        "exemples": [
+          "Okoumé",
+          "Peuplier",
+          "Épicéa"
+        ]
+      },
+      {
+        "classe": 4,
+        "libelle": "Non imprégnable",
+        "exemples": [
+          "Châtaignier",
+          "Chêne",
+          "Douglas",
+          "Iroko",
+          "Niangon"
+        ]
+      }
+    ],
+    "traitements_par_classe_cible": [
+      {
+        "classe_emploi_cible": "1-2",
+        "methodes": [
+          "badigeonnage",
+          "aspersion",
+          "trempage"
+        ],
+        "penetration": "3 mm (NP1)",
+        "retention": "50 %"
+      },
+      {
+        "classe_emploi_cible": "3.1",
+        "methodes": [
+          "aspersion",
+          "trempage",
+          "autoclave"
+        ],
+        "penetration": "3 mm (NP1)",
+        "retention": "50 %"
+      },
+      {
+        "classe_emploi_cible": "3.2",
+        "methodes": [
+          "autoclave"
+        ],
+        "penetration": "semi-profondeur 6 mm et plus (NP3)",
+        "retention": "100 %"
+      },
+      {
+        "classe_emploi_cible": "4",
+        "methodes": [
+          "autoclave"
+        ],
+        "penetration": "toute la masse (NP4)",
+        "retention": "100 %"
+      }
+    ],
+    "processus_autoclave": [
+      "vide initial 0,1 bar",
+      "remplissage du tunnel",
+      "montée en pression > 12 bars",
+      "vide final",
+      "séchage / fixation du produit"
+    ],
+    "produits_traitement": [
+      {
+        "type": "hydrodispersables",
+        "usages": [
+          "classes 1 et 2"
+        ]
+      },
+      {
+        "type": "solvants organiques",
+        "usages": [
+          "traitement curatif",
+          "autoclave 3.2 selon tableau synthétique"
+        ]
+      },
+      {
+        "type": "sels hydrosolubles",
+        "usages": [
+          "classe 4",
+          "autoclave"
+        ]
+      }
+    ],
+    "alertes_environnement": [
+      "Les composants chimiques des produits peuvent être dangereux pour la santé et l’environnement",
+      "CCA/CCB : cuivre chrome arsenic ou bore, produits toxiques, interdits sur les aires de jeux pour enfants",
+      "La certification CTB-B+ est présentée comme garantissant efficacité et absence de toxicité des nouveaux produits biodégradables"
+    ]
+  },
+  "panneaux_derives": {
+    "contreplaque": {
+      "definition": "superposition croisée de plis de placage déroulé",
+      "structure": {
+        "plis_impairs": true,
+        "croisement_deg": 90,
+        "epaisseur_plis_mm": "0.8 à 3"
+      },
+      "essences_courantes": [
+        "pin",
+        "bouleau",
+        "hêtre",
+        "peuplier",
+        "okoumé"
+      ],
+      "formats": [
+        "2500x1220",
+        "3100x1530"
+      ],
+      "epaisseurs_mm_par_plis": {
+        "3 plis": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "5 plis": [
+          8,
+          10,
+          12
+        ],
+        "7 plis": [
+          15,
+          18
+        ],
+        "9 plis": [
+          22,
+          25
+        ],
+        "13 plis": [
+          30
+        ]
+      },
+      "variations_dimensionnelles": {
+        "longueur_pct": 0.15,
+        "largeur_pct": 0.15,
+        "epaisseur_pct": 4
+      },
+      "masse_volumique_kg_m3": "400 à 660",
+      "classes": [
+        {
+          "classe": 1,
+          "milieu": "sec"
+        },
+        {
+          "classe": 2,
+          "milieu": "humide intérieur / extérieur abrité"
+        },
+        {
+          "classe": 3,
+          "milieu": "extérieur",
+          "nom_commercial": "CTB-X"
+        }
+      ],
+      "types": [
+        "souple cintrable",
+        "ignifugé M1/M2",
+        "coffrage CTB-C",
+        "marine",
+        "lamibois LVL",
+        "bouleau carrosserie/aviation"
+      ]
+    },
+    "latte": {
+      "definition": "contreplaqué latté avec âme en lattes juxtaposées",
+      "largeur_lattes_mm": "7 à 30",
+      "caracteristiques": [
+        "excellente résistance mécanique dans le sens des lattes",
+        "faible poids",
+        "sensible à l’eau"
+      ],
+      "usages": [
+        "ébénisterie",
+        "menuiserie d’agencement"
+      ],
+      "epaisseurs_mm": [
+        15,
+        19,
+        22,
+        30
+      ],
+      "formats": [
+        "2500x1220",
+        "3100x1530",
+        "3500x1530"
+      ],
+      "orientation_fil_apparent": "sens de la largeur",
+      "types": [
+        "panneauté",
+        "lamellé",
+        "plaqué"
+      ]
+    },
+    "osb": {
+      "definition": "panneau à lamelles minces longues orientées",
+      "epaisseur_lamelles_mm": "0.6 à 0.8",
+      "composition": [
+        "bois frais de coupe",
+        "résineux majoritaires en Europe",
+        "essences complémentaires possibles en faible proportion"
+      ],
+      "formats": [
+        "2500x1250",
+        "5000x1250",
+        "5000x2500"
+      ],
+      "epaisseurs_mm": [
+        8,
+        10,
+        12,
+        15,
+        18,
+        22
+      ],
+      "variations_dimensionnelles": {
+        "longueur_pct": 0.2,
+        "largeur_pct": 0.3,
+        "epaisseur_pct": 6
+      },
+      "masse_volumique_kg_m3": "550 à 720",
+      "classes": [
+        {
+          "classe": "OSB1",
+          "usage": "agencement intérieur",
+          "milieu": "sec"
+        },
+        {
+          "classe": "OSB2",
+          "usage": "panneau travaillant",
+          "milieu": "sec"
+        },
+        {
+          "classe": "OSB3",
+          "usage": "panneau travaillant",
+          "milieu": "humide"
+        },
+        {
+          "classe": "OSB4",
+          "usage": "panneau travaillant sous contrainte élevée",
+          "milieu": "humide"
+        }
+      ]
+    },
+    "mdf": {
+      "definition": "panneau de fibres collées par résines thermodurcissables",
+      "fabrication": [
+        "voie sèche",
+        "fibres ~1.5 mm",
+        "séchage à 10 % humidité avant pressage",
+        "pré-pressage puis pressage",
+        "refroidissement, stabilisation, formatage, ponçage"
+      ],
+      "formats": [
+        "2070x2800",
+        "2500x1250",
+        "5000x1250",
+        "5000x2500"
+      ],
+      "epaisseurs_mm": [
+        3,
+        5,
+        6,
+        10,
+        12,
+        16,
+        19,
+        22,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50
+      ],
+      "variations_dimensionnelles": {
+        "longueur_pct": 0.3,
+        "largeur_pct": 0.3,
+        "epaisseur_pct": 6
+      },
+      "densites_kg_m3": {
+        "LDF": "450 à 650",
+        "MDF standard": "650 à 800",
+        "HDF": "800 à 900"
+      },
+      "types": [
+        "MDF standard",
+        "MDF-LA",
+        "MDF-HLS",
+        "HDF",
+        "LDF",
+        "ignifugé M1/M2",
+        "cintrable",
+        "plaqué",
+        "mélaminé"
+      ]
+    },
+    "panneau_particules": {
+      "definition": "panneau fabriqué à partir de copeaux fins issus de rondins et déchets/chutes de première transformation",
+      "conformations": [
+        "monocouche",
+        "trois couches",
+        "multicouche",
+        "extrudé"
+      ],
+      "formats": [
+        "2070x2800",
+        "3050x1850",
+        "4100x1850"
+      ],
+      "epaisseurs_mm": [
+        6,
+        8,
+        10,
+        12,
+        15,
+        19,
+        22,
+        25,
+        30
+      ],
+      "variations_dimensionnelles": {
+        "longueur_pct": 0.3,
+        "largeur_pct": 0.3,
+        "epaisseur_pct": 6
+      },
+      "masse_volumique_kg_m3": "500 à 800",
+      "masse_volumique_extrude_kg_m3": "380 à 520",
+      "types": [
+        "P1",
+        "P2",
+        "P3",
+        "P4/CTB-S",
+        "P5/CTB-H",
+        "ignifugé M1/M2",
+        "plaqué",
+        "PPSM",
+        "extrudé"
+      ]
+    },
+    "stratifie": {
+      "definition": "feuilles de papier kraft imprégnées de résine phénolique avec couche décorative mélaminée",
+      "epaisseur_max_mm": 1.3,
+      "support_obligatoire": true,
+      "support_principal_recommande": "panneau de particules",
+      "contrebalancement_recommande": true,
+      "resistances": [
+        "produits domestiques et alimentaires jusqu’à 180 °C",
+        "produits de nettoyage",
+        "abrasion",
+        "lumière UV"
+      ],
+      "types": [
+        "standard",
+        "ignifugé M1/M2",
+        "postformable à chaud",
+        "teinté dans la masse"
+      ],
+      "mise_en_oeuvre": [
+        "travailler sur surfaces propres, planes et lisses",
+        "température minimale 15 °C",
+        "humidité relative 50 à 60 %",
+        "surdimensionner les plaques de 5 à 10 mm sur toute la périphérie",
+        "encoller stratifié et support",
+        "laisser sécher jusqu’au temps de gommage",
+        "positionner des baguettes/cales propres",
+        "positionner le stratifié",
+        "retirer les baguettes en commençant par le milieu",
+        "maroufler du centre vers les bords",
+        "réaliser le contre-balancement",
+        "affleurer les chants"
+      ],
+      "objectif_contrebalancement": [
+        "tensions symétriques sur les deux faces",
+        "bonne planéité de l’ensemble"
+      ]
+    }
+  },
+  "formaldehyde": {
+    "description": "gaz présent dans l’environnement, utilisé dans les colles sous forme de formol",
+    "panneaux_plus_emetteurs": [
+      "panneaux de particules non revêtus",
+      "panneaux de fibres non revêtus",
+      "OSB non revêtus"
+    ],
+    "risques": [
+      "volatile",
+      "inflammable",
+      "allergies",
+      "eczéma",
+      "asthme",
+      "substance cancérogène avérée pour l’homme"
+    ],
+    "vlep": {
+      "8h": {
+        "ppm": 0.5,
+        "mg_m3": 0.62
+      },
+      "15min": {
+        "ppm": 1.0,
+        "mg_m3": 1.23
+      }
+    },
+    "classements": [
+      {
+        "classe": "E2",
+        "teneur_mg_pour_100g": "8 à 30"
+      },
+      {
+        "classe": "E1",
+        "teneur_mg_pour_100g": "< 8",
+        "equivalent_emission_ppm_max": 0.1
+      },
+      {
+        "classe": "E0.5",
+        "teneur_mg_pour_100g": "< 4 particules/OSB ou < 5 MDF"
+      },
+      {
+        "classe": "F4",
+        "teneur_mg_L": "<= 0.3"
+      }
+    ],
+    "certifications": [
+      "CTB Air +",
+      "CARB P2 / CARB Phase 2"
+    ]
+  },
+  "debit_et_calepinage": {
+    "regles_orientation": [
+      "contreplaqué : tenir compte du sens du fil apparent du pli de surface",
+      "latté : respecter le sens des lattes",
+      "OSB : copeaux orientés dans le sens de la longueur",
+      "panneaux plaqués ou décorés : respecter le sens du motif",
+      "panneaux cintrables : suivre impérativement le sens de pliage",
+      "MDF et panneau de particules : pas de sens de débit structurel à respecter"
+    ],
+    "calepinage": {
+      "objectif": "limiter la perte de matière",
+      "heuristique": [
+        "placer d’abord les plus grandes pièces",
+        "puis les moyennes",
+        "finir par les petites"
+      ],
+      "autres_contraintes": [
+        "choisir le format de panneau le plus adapté",
+        "intégrer coupe de rafraîchissement",
+        "intégrer largeur de trait de scie",
+        "évaluer chute exploitable ou non"
+      ]
+    }
+  },
+  "assemblages": {
+    "panneaux_derives_verifies": [
+      {
+        "nom": "Languette rapportée",
+        "demontable": false,
+        "colle_requise": true
+      },
+      {
+        "nom": "Tourillons",
+        "demontable": false,
+        "colle_requise": true,
+        "diametres_mm": [
+          6,
+          8
+        ]
+      },
+      {
+        "nom": "Lamelles",
+        "demontable": false,
+        "colle_requise": true
+      },
+      {
+        "nom": "Onglet verrouillé",
+        "demontable": false,
+        "colle_requise": true
+      }
+    ]
+  },
+  "caissons": {
+    "principes_construction": {
+      "largeurs_standard_mm": [
+        500,
+        600,
+        800,
+        1000
+      ],
+      "profondeur_typique_mm": 560,
+      "hauteur_corps_sans_pied_mm": {
+        "min": 700,
+        "max": 720
+      },
+      "hauteur_plinthe_mm": {
+        "min": 100,
+        "max": 150
+      },
+      "fond": {
+        "fonction": "maintien de l’équerrage du meuble",
+        "modes_montage": [
+          "en rainure dans dessus/dessous/côtés",
+          "en rainure dans dessus et côtés puis pointé/agrafé dans traverse d’écartement"
+        ]
+      },
+      "modes_conception": [
+        "démontable pour manutention, transport, stockage",
+        "non démontable pour meilleure résistance",
+        "avec traverses d’écartement à la place du dessus si plan de travail"
+      ]
+    },
+    "assemblages_recommandes": [
+      "languette rapportée",
+      "tourillons",
+      "lamelles",
+      "onglet verrouillé"
+    ]
+  },
+  "systeme_32": {
+    "entraxe_percages_mm": 32,
+    "distance_axe_depuis_chant_vertical_mm": 37,
+    "objectifs": [
+      "concevoir les meubles sur un multiple de 32 mm",
+      "intégrer facilement les quincailleries modernes",
+      "intervertir les quincailleries",
+      "réduire les temps et coûts de fabrication"
+    ],
+    "percements": {
+      "rangee_verticale_continue": true,
+      "diametres_mm": {
+        "5": [
+          "taquets",
+          "charnières",
+          "coulisses",
+          "goujons",
+          "vis de fixation de quincaillerie",
+          "vis d’assemblage"
+        ],
+        "6": [
+          "tourillons"
+        ],
+        "8": [
+          "tourillons"
+        ],
+        "7": [
+          "collet des vis d’assemblage dans les côtés"
+        ]
+      },
+      "note": "les profondeurs varient en fonction des quincailleries"
+    }
+  },
+  "quincailleries": {
+    "compatibles_systeme_32": [
+      "plaques de charnières invisibles",
+      "coulisses métalliques sortie totale",
+      "coulisses métalliques sortie partielle",
+      "équerres d’assemblage",
+      "compas d’abattants"
+    ],
+    "composants_caisson": [
+      {
+        "nom": "boîtiers excentriques",
+        "dimensions_mm": [
+          15,
+          25
+        ],
+        "fonction": [
+          "verrouillage",
+          "meuble démontable"
+        ]
+      },
+      {
+        "nom": "goujons d’assemblage",
+        "fonction": [
+          "assemblage par excentriques",
+          "fixation dans les côtés"
+        ]
+      },
+      {
+        "nom": "goujons articulés",
+        "fonction": [
+          "assemblages d’angle"
+        ]
+      },
+      {
+        "nom": "inserts",
+        "materiaux": [
+          "plastique",
+          "laiton"
+        ]
+      },
+      {
+        "nom": "vis d’assemblage",
+        "fonction": [
+          "verrouillage",
+          "complément tourillons/lamelles",
+          "meuble démontable"
+        ]
+      },
+      {
+        "nom": "vis de liaison",
+        "fonction": [
+          "relier les meubles entre eux",
+          "constituer un ensemble solidaire"
+        ]
+      }
+    ],
+    "composants_tablettes": [
+      {
+        "nom": "taquet plat"
+      },
+      {
+        "nom": "taquet cylindrique",
+        "options": [
+          "avec collerette",
+          "sans collerette"
+        ]
+      },
+      {
+        "nom": "taquet équerre",
+        "options": [
+          "avec ergots",
+          "sans ergots"
+        ],
+        "fonction": [
+          "maintien en position de la tablette"
+        ]
+      }
+    ]
+  },
+  "machines": {
+    "catalogue": [
+      {
+        "nom": "Scie à ruban",
+        "famille": "sciage"
+      },
+      {
+        "nom": "Scie circulaire à format",
+        "famille": "sciage"
+      },
+      {
+        "nom": "Scie à table",
+        "famille": "sciage"
+      },
+      {
+        "nom": "Scie à panneau",
+        "famille": "sciage"
+      },
+      {
+        "nom": "Dégauchisseuse",
+        "famille": "corroyage"
+      },
+      {
+        "nom": "Raboteuse",
+        "famille": "corroyage"
+      },
+      {
+        "nom": "Toupie",
+        "famille": "profilage"
+      },
+      {
+        "nom": "Mortaiseuse à mèche",
+        "famille": "mortaise"
+      },
+      {
+        "nom": "Lamelleuse",
+        "famille": "assemblage"
+      }
+    ],
+    "scie_a_ruban": {
+      "operations": [
+        "sciage suivant tracé droit ou courbe",
+        "sciage au guide parallèle",
+        "dédoublage si pièce corroyée",
+        "chantournement avec montage en plateau relevé"
+      ],
+      "securite": [
+        "porter correctement les EPI et attacher ses cheveux",
+        "mettre en fonction l’aspiration",
+        "placer la face bombée de la pièce sur la table",
+        "placer protecteur et guide-lame au-dessus de la pièce",
+        "ne jamais mettre les mains dans l’axe de la lame",
+        "garder une distance de sécurité de 150 mm autour",
+        "utiliser un poussoir à proximité de la lame",
+        "éviter de tordre le ruban",
+        "éviter de reculer la pièce lorsque la lame est en mouvement",
+        "réduire l’effort si le ruban talonne sur la butée du guide-lame"
+      ],
+      "anomalies_diagnostic": [
+        {
+          "anomalie": "déviation par rapport au tracé",
+          "causes": [
+            "défaut de voie",
+            "guide mal réglé",
+            "mauvaise tension du ruban",
+            "lame désaffûtée"
+          ]
+        },
+        {
+          "anomalie": "battement du ruban",
+          "causes": [
+            "mauvaise position du ruban sur le volant",
+            "trop de soudures de réparation",
+            "crique/fissure"
+          ]
+        },
+        {
+          "anomalie": "bruit strident",
+          "causes": [
+            "guides-lames latéraux bloqués",
+            "pression excessive contre galet arrière"
+          ]
+        },
+        {
+          "anomalie": "vibration du ruban",
+          "causes": [
+            "tension insuffisante"
+          ]
+        },
+        {
+          "anomalie": "excès de poussière",
+          "causes": [
+            "aspiration insuffisante",
+            "machine insuffisamment nettoyée"
+          ]
+        },
+        {
+          "anomalie": "ruban encrassé",
+          "causes": [
+            "brosses inefficaces",
+            "bois trop résineux",
+            "denture inadéquate"
+          ]
+        },
+        {
+          "anomalie": "ruban cassé",
+          "causes": [
+            "tension trop forte",
+            "mauvaise manipulation de la pièce",
+            "ruban inadapté",
+            "attaque trop rapide"
+          ]
+        }
+      ]
+    },
+    "scie_circulaire": {
+      "operations": [
+        "délignage",
+        "tronçonnage du bois massif",
+        "mise au format des panneaux"
+      ],
+      "types": {
+        "scie_a_format": {
+          "particularite": "présence d’un chariot de tronçonnage pour les grandes pièces"
+        },
+        "scie_a_table": {
+          "particularite": "machine plus simple et plus compacte"
+        }
+      },
+      "organes": [
+        {
+          "nom": "porte-outil",
+          "caracteristiques": [
+            "peut être inclinable",
+            "réglage de hauteur et d’inclinaison manuel ou numérique"
+          ]
+        },
+        {
+          "nom": "couteau diviseur",
+          "dimension": "0,5 mm plus petit que la largeur du trait de scie",
+          "role": "éviter resserrement du bois et recul/rejet"
+        },
+        {
+          "nom": "inciseur",
+          "presence": "sur certains modèles haut de gamme"
+        }
+      ]
+    },
+    "lamelleuse": {
+      "description": "machine portative pour rainures recevant une languette rapportée collée",
+      "alias": "lamello",
+      "butee_profondeur": {
+        "min": 0,
+        "max": 20
+      },
+      "operations_verifiees": [
+        "assemblage en L",
+        "assemblage en T"
+      ]
+    }
+  },
+  "usinages": {
+    "lamelleuse": {
+      "principe": "outil circulaire creuse une rainure dans laquelle on glisse une languette rapportée avec colle",
+      "assemblage_L_etapes": [
+        "tracer l’axe de la lamelle à cheval sur les deux panneaux",
+        "positionner le premier panneau en presse verticale",
+        "basculer l’appui perpendiculaire de la lamelleuse",
+        "vérifier le numéro de la lamelle sur la butée de profondeur",
+        "aligner le repère de la machine sur le tracé du chant",
+        "usiner sans bouger le support",
+        "positionner le deuxième panneau à plat, légèrement débordant",
+        "bloquer la pièce avec un serre-joint",
+        "aligner le repère sur le tracé",
+        "usiner"
+      ],
+      "assemblage_T_etapes": [
+        "tracer la position du premier panneau sur le deuxième",
+        "repérer les axes des lamelles sur le premier panneau uniquement",
+        "bloquer les deux pièces avec un serre-joint",
+        "usiner la première pièce en appui sur le chant de l’autre panneau",
+        "aligner le repère de semelle avec le tracé",
+        "usiner les lamelles",
+        "positionner la machine à plat sur le deuxième panneau",
+        "s’appuyer sur le chant à usiner",
+        "aligner le repère avec le tracé",
+        "usiner"
+      ]
+    }
+  },
+  "outils_de_coupe": {
+    "geometrie": [
+      "angles de coupe",
+      "angles de dépouille",
+      "dépouilles latérales possibles"
+    ],
+    "materiaux_aretes_tranchantes": [
+      {
+        "type": "Acier spécial SP",
+        "definition": "acier allié avec moins de 5 %"
+      },
+      {
+        "type": "Acier supérieur HL",
+        "definition": "acier allié à plus de 5 % de la masse"
+      },
+      {
+        "type": "Acier rapide HS / HSS",
+        "definition": "acier fortement allié à plus de 12 % de la masse"
+      },
+      {
+        "type": "Carbure métallique HM/HW",
+        "definition": "très grande résistance à l’usure",
+        "usages": [
+          "bois durs",
+          "bois abrasifs",
+          "panneaux dérivés",
+          "denture lames de scie circulaire",
+          "plaquettes de toupie",
+          "plaquettes de défonceuse",
+          "fers jetables de dégauchisseuse/raboteuse",
+          "pointes de foret matériaux durs"
+        ]
+      },
+      {
+        "type": "Polycristallin de diamant DIA",
+        "definition": "100 à 200 fois plus résistant à l’usure que le carbure",
+        "limites": [
+          "coût très élevé"
+        ],
+        "forme": [
+          "plaquettes rapportées non réaffûtables"
+        ]
+      }
+    ]
+  },
+  "parametres_usinage": {
+    "definition": "facteurs liés à l’outil, à la machine et au matériau qui déterminent le réglage des machines, la qualité des pièces et la sécurité de l’opérateur",
+    "variables_majeures": [
+      "profondeur de passe",
+      "vitesse d’avance",
+      "fréquence de rotation",
+      "nombre d’arêtes tranchantes",
+      "qualité et adaptation de l’outil"
+    ],
+    "etat_de_surface": {
+      "pas_principal_f": "avance pour un tour complet de l’outil",
+      "pas_secondaire_fz": "avance par dent / par arête tranchante",
+      "classes_qualite_fz_mm": {
+        "ebauche": {
+          "min": 1.2,
+          "max": 2.5
+        },
+        "moyen": {
+          "min": 0.8,
+          "max": 1.2
+        },
+        "finition": {
+          "min": 0.3,
+          "max": 0.8
+        }
+      },
+      "seuils_alerte": [
+        {
+          "condition": "fz < 0.2 mm",
+          "risque": "échauffement et brûlures sur la surface du bois"
+        },
+        {
+          "condition": "fz > 2.5 mm",
+          "risque": "éclats en surface et ondes très visibles"
+        }
+      ],
+      "parametres_ajustables": [
+        "fréquence de rotation de l’outil",
+        "vitesse d’avance de la pièce ou de l’outil"
+      ]
+    }
+  },
+  "securite": {
+    "machines_a_bois": {
+      "controles_avant_usage": {
+        "EPI": [
+          "chaussures de sécurité",
+          "vêtements de travail",
+          "casque ou bouchons anti-bruit",
+          "masque anti-poussières si absence d’aspiration"
+        ],
+        "zone_poste": [
+          "zone propre et non encombrée",
+          "organiser alimentation et évacuation des pièces",
+          "réduire manutention et déplacements",
+          "tenir compte des passages et des autres machines",
+          "éloigner les mouvements de manipulation de la zone dangereuse",
+          "remettre le poste en condition pour le prochain opérateur"
+        ],
+        "machine": [
+          "réglage des protecteurs",
+          "réglage des guides",
+          "réglage de l’outil",
+          "serrage des éléments",
+          "vérification profondeur de passe",
+          "vérification vitesse d’avance",
+          "vérification fréquence de rotation"
+        ],
+        "dechets": [
+          "allumer et éteindre l’aspiration avant/après chaque usinage",
+          "vérifier position des trappes",
+          "vérifier niveau de remplissage des sacs",
+          "prévoir une caisse à proximité pour les chutes"
+        ],
+        "piece": [
+          "attention aux pièces trop courtes",
+          "prévoir une servante pour les pièces trop grandes",
+          "vérifier absence de corps étrangers",
+          "vérifier absence de nœuds trop importants"
+        ],
+        "manipulations": [
+          "assurer le glissement des pièces avec paraffine ou équivalent",
+          "utiliser gants/poignées/chariots pour grands panneaux",
+          "se faire aider pour pièces lourdes ou longues"
+        ]
+      },
+      "maitrise_risques": {
+        "rejet_des_bois": [
+          "implanter les machines suivant leurs zones de rejet",
+          "maintenir organes de sécurité et outils en conformité",
+          "mettre en place des écrans de protection",
+          "utiliser presseurs et entraîneurs",
+          "travailler en opposition",
+          "éviter de rester dans l’axe de rotation de l’outil"
+        ],
+        "coupures_sectionnement": [
+          "maintenir carters, couteaux diviseurs et protecteurs",
+          "utiliser poussoirs et serre-pièces",
+          "garder une distance de sécurité entre les mains et l’outil",
+          "ne pas laisser une main dans la trajectoire de l’outil"
+        ],
+        "TMS": [
+          "organiser le stockage des matériaux et pièces",
+          "organiser le circuit des pièces et de fabrication",
+          "aménager le poste de travail",
+          "privilégier la manutention mécanique et les aides"
+        ],
+        "bruit": [
+          "isoler les machines bruyantes et le système d’aspiration",
+          "poser les machines sur des systèmes anti-vibrations",
+          "assurer la maintenance des machines",
+          "adapter les outils de coupe pour émettre moins de bruit",
+          "séparer la zone machines des autres postes"
+        ],
+        "poussieres": [
+          "relier toutes les machines au système d’aspiration centralisé",
+          "assurer un nettoyage quotidien du poste",
+          "remplacer balais et soufflettes par un aspirateur",
+          "séparer les zones émettrices de poussières"
+        ]
+      }
+    },
+    "chantier": {
+      "principes": [
+        "prévoir un établi équipé de machines semi-stationnaires et électroportatives selon les besoins",
+        "réaliser les découpes avec des outils reliés à un aspirateur équipé d’une filtration de classe M",
+        "porter les EPI et un masque respiratoire type P2 minimum",
+        "proscrire les balais et aspirer les poussières",
+        "identifier les produits chimiques utilisés",
+        "se procurer les FDS des produits chimiques"
+      ]
+    }
+  },
+  "maintenance": {
+    "maintenance_preventive": {
+      "definition": "maîtriser la dégradation des équipements afin d’éviter la panne imprévue",
+      "types": [
+        {
+          "nom": "conditionnelle",
+          "definition": "intervenir suivant l’état de dégradation et l’imminence d’une défaillance"
+        },
+        {
+          "nom": "systématique",
+          "definition": "intervenir suivant un temps d’utilisation ou un délai prédéfini, quel que soit l’état constaté"
+        }
+      ]
+    },
+    "intervenants_possibles": [
+      "constructeur / SAV",
+      "entreprise spécialisée extérieure",
+      "service de maintenance interne",
+      "opérateurs formés à la maintenance"
+    ],
+    "entretien_de_conduite": [
+      "graissage",
+      "surveillance des outils de coupe",
+      "surveillance des fusibles",
+      "rondes par le service maintenance ou l’opérateur"
+    ]
+  },
+  "regles_metier": [
+    {
+      "id": "R001",
+      "condition": "ouvrage.usage in ['menuiserie_intérieure','agencement','ébénisterie']",
+      "action": "exiger humidité bois <= 12 %",
+      "niveau": "critique"
+    },
+    {
+      "id": "R002",
+      "condition": "ouvrage.usage == 'menuiserie_extérieure'",
+      "action": "exiger humidité bois <= 18 %",
+      "niveau": "critique"
+    },
+    {
+      "id": "R003",
+      "condition": "ouvrage.usage in ['charpente','escalier bois']",
+      "action": "exiger humidité bois <= 22 %",
+      "niveau": "critique"
+    },
+    {
+      "id": "R004",
+      "condition": "environnement.milieu == 'humide' and panneau.type == 'OSB'",
+      "action": "refuser OSB1/OSB2 et recommander OSB3 ou OSB4",
+      "niveau": "bloquant"
+    },
+    {
+      "id": "R005",
+      "condition": "panneau.type == 'stratifié'",
+      "action": "exiger collage sur support et recommander contrebalancement",
+      "niveau": "critique"
+    },
+    {
+      "id": "R006",
+      "condition": "panneau.type in ['latté','contreplaqué décor','PPSM','stratifié décor'] and piece.orientation is None",
+      "action": "demander validation du sens décor/fil/lattes",
+      "niveau": "critique"
+    },
+    {
+      "id": "R007",
+      "condition": "assemblage.type == 'lamelles'",
+      "action": "colle obligatoire",
+      "niveau": "bloquant"
+    },
+    {
+      "id": "R008",
+      "condition": "ouvrage.type == 'caisson'",
+      "action": "marquer le fond comme élément de maintien de l’équerrage",
+      "niveau": "critique"
+    },
+    {
+      "id": "R009",
+      "condition": "ouvrage.type == 'caisson' and quincaillerie.systeme == 32",
+      "action": "appliquer perçages sur trame 32 mm avec axe à 37 mm du chant",
+      "niveau": "bloquant"
+    },
+    {
+      "id": "R010",
+      "condition": "piece.role == 'tourillon'",
+      "action": "autoriser perçage Ø6 ou Ø8",
+      "niveau": "critique"
+    },
+    {
+      "id": "R011",
+      "condition": "piece.role in ['taquet','charnière','coulisse','goujon','vis quincaillerie','vis assemblage']",
+      "action": "prévoir perçage Ø5",
+      "niveau": "critique"
+    },
+    {
+      "id": "R012",
+      "condition": "machine.nom == 'Scie à ruban'",
+      "action": "interdire recul de la pièce lame en mouvement",
+      "niveau": "bloquant"
+    },
+    {
+      "id": "R013",
+      "condition": "machine.nom == 'Scie circulaire'",
+      "action": "contrôler présence et conformité du couteau diviseur",
+      "niveau": "critique"
+    },
+    {
+      "id": "R014",
+      "condition": "atelier.aspirateur == False",
+      "action": "exiger masque anti-poussières avant usinage",
+      "niveau": "critique"
+    },
+    {
+      "id": "R015",
+      "condition": "atelier.nettoyage_methode in ['balai','soufflette']",
+      "action": "remplacer par aspirateur",
+      "niveau": "critique"
+    },
+    {
+      "id": "R016",
+      "condition": "parametres_usinage.fz < 0.2",
+      "action": "alerte échauffement/brûlure",
+      "niveau": "critique"
+    },
+    {
+      "id": "R017",
+      "condition": "parametres_usinage.fz > 2.5",
+      "action": "alerte surface grossière/éclats",
+      "niveau": "critique"
+    },
+    {
+      "id": "R018",
+      "condition": "maintenance.mode == 'préventive'",
+      "action": "choisir conditionnelle ou systématique selon criticité",
+      "niveau": "recommandation"
+    },
+    {
+      "id": "R019",
+      "condition": "classe_emploi in ['3.2','4'] and essence.impreignabilite in [3,4]",
+      "action": "vérifier faisabilité réelle du traitement avant validation",
+      "niveau": "critique"
+    },
+    {
+      "id": "R020",
+      "condition": "panneau.type == 'MDF' and piece.forme == 'cintrée'",
+      "action": "recommander MDF cintrable et respect du sens des rainures",
+      "niveau": "recommandation"
+    }
+  ],
+  "formules": [
+    {
+      "id": "F001",
+      "nom": "retrait_radial",
+      "formule": "Rr_mm = (r * L_mm * delta_H_pct) / 100",
+      "variables": {
+        "r": "coefficient de retrait radial en %",
+        "L_mm": "dimension radiale en mm",
+        "delta_H_pct": "écart d’humidité en points"
+      }
+    },
+    {
+      "id": "F002",
+      "nom": "retrait_tangentiel",
+      "formule": "Rt_mm = (t * L_mm * delta_H_pct) / 100",
+      "variables": {
+        "t": "coefficient de retrait tangentiel en %",
+        "L_mm": "dimension tangentielle en mm",
+        "delta_H_pct": "écart d’humidité en points"
+      }
+    },
+    {
+      "id": "F003",
+      "nom": "pas_secondaire_usinage",
+      "formule": "fz_mm = (Vf_m_min * 1000) / (n_tr_min * z)",
+      "variables": {
+        "Vf_m_min": "vitesse d’avance en m/min",
+        "n_tr_min": "fréquence de rotation en tr/min",
+        "z": "nombre d’arêtes tranchantes"
+      }
+    },
+    {
+      "id": "F004",
+      "nom": "vitesse_avance_depuis_fz",
+      "formule": "Vf_m_min = (fz_mm * n_tr_min * z) / 1000",
+      "variables": {
+        "fz_mm": "pas secondaire d’usinage en mm",
+        "n_tr_min": "fréquence de rotation en tr/min",
+        "z": "nombre d’arêtes tranchantes"
+      }
+    }
+  ]
+}

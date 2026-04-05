@@ -4,7 +4,7 @@
 // ---------------------------------------------------------------------------
 
 const KNOWLEDGE_KEY = 'menuisier_knowledge_docs';
-const SEED_FLAG = 'menuisier_knowledge_seeded';
+const SEED_FLAG = 'menuisier_knowledge_seeded_v2';
 
 export interface KnowledgeDoc {
   id: string;
@@ -107,9 +107,69 @@ function extractSummary(data: Record<string, unknown>): { summary: string; entry
     }
   }
 
+  // Règles métier v2 format (array at top-level)
+  if (data.regles_metier && Array.isArray(data.regles_metier)) {
+    const rules = data.regles_metier as Array<Record<string, unknown>>;
+    count += rules.length;
+    lines.push(`\n--- Règles métier (${rules.length}) ---`);
+    for (const r of rules.slice(0, 15)) {
+      if (r.action) lines.push(`• [${r.id || ''}] ${r.condition} → ${r.action} (${r.niveau || ''})`);
+    }
+  }
+
+  // V2 structure: deeply nested domains
+  const v2Domains = ['essences', 'proprietes_physiques', 'proprietes_mecaniques', 'defauts_et_pathologies',
+    'humidite', 'retractabilite', 'sechage', 'durabilite_et_traitements', 'panneaux_derives',
+    'formaldehyde', 'debit_et_calepinage', 'assemblages', 'caissons', 'systeme_32',
+    'quincailleries', 'machines', 'usinages', 'outils_de_coupe', 'parametres_usinage',
+    'securite', 'maintenance'];
+  for (const domain of v2Domains) {
+    const val = data[domain];
+    if (!val || typeof val !== 'object') continue;
+    const jsonStr = JSON.stringify(val);
+    const entryEstimate = (jsonStr.match(/"nom"/g) || []).length || Math.ceil(jsonStr.length / 500);
+    count += entryEstimate;
+    lines.push(`\n--- ${domain} ---`);
+    // Extract arrays of named objects
+    const extractNamed = (obj: unknown, depth = 0): void => {
+      if (depth > 2) return;
+      if (Array.isArray(obj)) {
+        for (const item of obj.slice(0, 5)) {
+          if (typeof item === 'object' && item !== null) {
+            const o = item as Record<string, unknown>;
+            if (o.nom) lines.push(`• ${o.nom}${o.masse_volumique_12_pct_kg_m3 ? ` (${o.masse_volumique_12_pct_kg_m3} kg/m³)` : ''}${o.durabilite_qualitative ? ` — ${o.durabilite_qualitative}` : ''}`);
+            else if (o.classe) lines.push(`• Classe ${o.classe}: ${o.destination || o.libelle || o.usage || o.milieu || ''}`);
+            else if (o.type) lines.push(`• ${o.type}: ${o.definition || ''}`);
+          }
+        }
+        if (obj.length > 5) lines.push(`  ... et ${obj.length - 5} autres`);
+      } else if (typeof obj === 'object' && obj !== null) {
+        for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
+          if (Array.isArray(v) && v.length > 0 && typeof v[0] === 'object') {
+            lines.push(`  ${k} (${v.length}):`);
+            extractNamed(v, depth + 1);
+          } else if (typeof v === 'string' || typeof v === 'number') {
+            if (String(v).length < 100) lines.push(`  ${k}: ${v}`);
+          }
+        }
+      }
+    };
+    extractNamed(val);
+  }
+
+  // Formules v2
+  if (data.formules && Array.isArray(data.formules)) {
+    const formules = data.formules as Array<Record<string, unknown>>;
+    count += formules.length;
+    lines.push(`\n--- Formules (${formules.length}) ---`);
+    for (const f of formules) {
+      lines.push(`• ${f.nom}: ${f.formule}`);
+    }
+  }
+
   // Fallback pour structure inconnue : résumer les clés top-level
   if (lines.length <= 2) {
-    const topKeys = Object.keys(data).filter((k) => !['nom', 'version', 'sources'].includes(k));
+    const topKeys = Object.keys(data).filter((k) => !['nom', 'version', 'sources', 'metadata', 'schema_outline'].includes(k));
     for (const key of topKeys.slice(0, 20)) {
       const val = data[key];
       if (Array.isArray(val)) {
@@ -185,26 +245,34 @@ export async function seedBaseKnowledge(): Promise<void> {
   try {
     if (localStorage.getItem(SEED_FLAG)) return;
 
-    const resp = await fetch('/knowledge/base_v1.json');
+    // Charger v2 en priorité, fallback sur v1
+    let resp = await fetch('/knowledge/base_v2.json');
+    if (!resp.ok) {
+      resp = await fetch('/knowledge/base_v1.json');
+    }
     if (!resp.ok) return;
 
     const data = await resp.json();
+    const meta = (data as Record<string, unknown>).metadata as Record<string, unknown> | undefined;
+    const version = meta?.version as string || '1.0';
+    const isV2 = version.startsWith('2');
+    const docId = isV2 ? 'base_v2' : 'base_v1';
+
     const { summary, entryCount } = extractSummary(data as Record<string, unknown>);
 
     const doc: KnowledgeDoc = {
-      id: 'base_v1',
-      name: (data as Record<string, unknown>).nom as string || 'Base menuiserie v1',
+      id: docId,
+      name: meta?.name as string || (data as Record<string, unknown>).nom as string || `Base menuiserie ${version}`,
       uploadedAt: new Date().toISOString(),
       summary,
       entryCount,
     };
 
     const docs = readDocs();
-    // Éviter doublon
-    if (!docs.some((d) => d.id === 'base_v1')) {
-      docs.unshift(doc);
-      writeDocs(docs);
-    }
+    // Remplacer l'ancienne base si elle existe
+    const filtered = docs.filter((d) => d.id !== 'base_v1' && d.id !== 'base_v2');
+    filtered.unshift(doc);
+    writeDocs(filtered);
 
     localStorage.setItem(SEED_FLAG, '1');
   } catch {

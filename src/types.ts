@@ -123,7 +123,7 @@ export interface NestingResult {
   strategy: string;
 }
 
-export type TabKey = 'structure' | 'debit' | 'montage' | 'notice' | 'validation' | 'ia';
+export type TabKey = 'structure' | 'plans' | 'debit' | 'montage' | 'notice' | 'validation' | 'ia';
 
 export interface PieceWithBody extends Piece {
   bodyName: string;
