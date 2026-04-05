@@ -157,6 +157,21 @@ export default function StructureTab({ state, onChange }: Props) {
     });
   };
 
+  const duplicateBody = (id: string) => {
+    const source = state.bodies.find((b) => b.id === id);
+    if (!source) return;
+    const newBody = {
+      ...source,
+      id: uid(),
+      name: `${source.name} (copie)`,
+      pieces: source.pieces.map((p) => ({ ...p, id: uid() })),
+    };
+    const idx = state.bodies.findIndex((b) => b.id === id);
+    const bodies = [...state.bodies];
+    bodies.splice(idx + 1, 0, newBody);
+    onChange({ ...state, bodies });
+  };
+
   const addBody = () => {
     onChange({
       ...state,
@@ -263,12 +278,20 @@ export default function StructureTab({ state, onChange }: Props) {
                 value={b.name}
                 onChange={(e) => updateBody(b.id, 'name', e.target.value)}
               />
-              <button
-                onClick={() => removeBody(b.id)}
-                className="text-xs text-stone-500 hover:text-red-400 transition-colors"
-              >
-                Supprimer
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => duplicateBody(b.id)}
+                  className="text-xs text-stone-500 hover:text-amber-600 transition-colors"
+                >
+                  Dupliquer
+                </button>
+                <button
+                  onClick={() => removeBody(b.id)}
+                  className="text-xs text-stone-500 hover:text-red-400 transition-colors"
+                >
+                  Supprimer
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-3">
