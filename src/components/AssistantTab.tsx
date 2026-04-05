@@ -21,8 +21,8 @@ interface UploadedImage {
   preview: string; // data URL for thumbnail
 }
 
-const cardClass = "rounded-2xl border border-stone-700/40 bg-stone-800/50 backdrop-blur-sm p-4 mb-4";
-const inputClass = "w-full rounded-xl border border-stone-600/50 bg-stone-800/60 px-3 py-2.5 text-sm text-stone-100 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
+const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
+const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
 
 export default function AssistantTab({ state, validation, allPieces, totalPieces, panelCount }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -227,7 +227,7 @@ ${userKnowledge}`;
       <div className={cardClass}>
         <div className="flex items-center justify-between mb-3">
           <Tip text={TIPS['assistant-ia']}>
-            <h4 className="text-amber-400 font-semibold text-sm">Assistant IA — {mat.short}</h4>
+            <h4 className="text-amber-700 font-semibold text-sm">Assistant IA — {mat.short}</h4>
           </Tip>
           <div className="flex items-center gap-1.5">
             {attachCount > 0 && (
@@ -236,7 +236,7 @@ ${userKnowledge}`;
             {/* Camera button — mobile only uses capture */}
             <button
               onClick={() => cameraRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 border border-stone-700 transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:bg-stone-100 border border-stone-200 transition-colors"
               title="Prendre une photo"
             >
               📷
@@ -244,7 +244,7 @@ ${userKnowledge}`;
             {/* Photo gallery */}
             <button
               onClick={() => photoRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 border border-stone-700 transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:bg-stone-100 border border-stone-200 transition-colors"
               title="Choisir une photo"
             >
               🖼
@@ -252,7 +252,7 @@ ${userKnowledge}`;
             {/* PDF */}
             <button
               onClick={() => fileRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 border border-stone-700 transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:bg-stone-100 border border-stone-200 transition-colors"
               title="Ajouter un PDF"
             >
               PDF
@@ -272,18 +272,18 @@ ${userKnowledge}`;
                 <img
                   src={img.preview}
                   alt={img.name}
-                  className="w-14 h-14 rounded-lg object-cover border border-stone-700"
+                  className="w-14 h-14 rounded-lg object-cover border border-stone-200"
                 />
                 <button
                   onClick={() => setImages((imgs) => imgs.filter((_, j) => j !== i))}
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-stone-800 border border-stone-600 text-stone-400 hover:text-red-400 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-stone-300 text-stone-500 hover:text-red-400 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   x
                 </button>
               </div>
             ))}
             {pdfs.map((d, i) => (
-              <span key={`pdf-${i}`} className="text-xs bg-stone-800 rounded-lg px-2.5 py-1 text-stone-300 flex items-center gap-1.5 border border-stone-700 h-14">
+              <span key={`pdf-${i}`} className="text-xs bg-white rounded-lg px-2.5 py-1 text-stone-400 flex items-center gap-1.5 border border-stone-200 h-14">
                 📄 {d.name.length > 15 ? d.name.slice(0, 12) + '...' : d.name}
                 <button onClick={() => setPdfs((ds) => ds.filter((_, j) => j !== i))} className="text-stone-500 hover:text-red-400">x</button>
               </span>
@@ -305,15 +305,15 @@ ${userKnowledge}`;
         )}
 
         {/* Messages */}
-        <div className="rounded-xl bg-stone-950/50 p-4 mb-3 min-h-[200px] max-h-[400px] overflow-y-auto">
+        <div className="rounded-xl bg-stone-50 p-4 mb-3 min-h-[200px] max-h-[400px] overflow-y-auto">
           {messages.length === 0 && (
-            <div className="text-stone-600 text-sm text-center py-8">
+            <div className="text-stone-400 text-sm text-center py-8">
               <div className="mb-3 text-stone-500">Exemples de questions :</div>
               <div className="space-y-1">
                 {suggestions.map((q, i) => (
                   <button
                     key={i}
-                    className="block w-full text-left px-3 py-2 rounded-lg text-xs text-stone-500 hover:bg-stone-800/50 hover:text-amber-400 transition-colors"
+                    className="block w-full text-left px-3 py-2 rounded-lg text-xs text-stone-500 hover:bg-white hover:text-amber-700 transition-colors"
                     onClick={() => setInput(q)}
                   >
                     {q}
@@ -327,7 +327,7 @@ ${userKnowledge}`;
               <div className={`inline-block max-w-[85%] rounded-xl px-4 py-2.5 text-sm ${
                 m.role === 'user'
                   ? 'bg-amber-600 text-white'
-                  : 'bg-stone-800 text-stone-200 border border-stone-700'
+                  : 'bg-white text-stone-700 border border-stone-200'
               }`}>
                 <div style={{ whiteSpace: 'pre-wrap' }}>{m.content}</div>
               </div>

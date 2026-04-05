@@ -191,30 +191,29 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen min-h-dvh text-stone-100">
+    <div className="min-h-screen min-h-dvh text-stone-800 bg-[#faf8f5]">
       <div className="max-w-3xl mx-auto px-4 pt-4 pb-24 sm:py-6">
         {/* Header */}
         <div className="mb-5">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h1 className="text-lg sm:text-xl font-bold text-amber-400 tracking-wide truncate">{state.project.name}</h1>
-              <div className="mt-1 flex items-center gap-1.5 text-xs text-stone-500 flex-wrap">
-                <span className="bg-stone-800/80 rounded-md px-1.5 py-0.5">{mat.short} {state.panel.thickness * 10}mm</span>
-                <span className="bg-stone-800/80 rounded-md px-1.5 py-0.5">{totalPieces} pcs</span>
-                <span className="bg-stone-800/80 rounded-md px-1.5 py-0.5">{nesting.metrics.panelCount} pan.</span>
+              <h1 className="text-lg sm:text-xl font-bold text-amber-800 tracking-wide truncate">{state.project.name}</h1>
+              <div className="mt-1.5 flex items-center gap-1.5 text-xs text-stone-500 flex-wrap">
+                <span className="bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2 py-0.5 font-medium">{mat.short} {state.panel.thickness * 10}mm</span>
+                <span className="bg-stone-100 border border-stone-200 rounded-full px-2 py-0.5">{totalPieces} pcs</span>
+                <span className="bg-stone-100 border border-stone-200 rounded-full px-2 py-0.5">{nesting.metrics.panelCount} pan.</span>
                 {cost.configured && (
-                  <span className="bg-amber-900/30 text-amber-400 rounded-md px-1.5 py-0.5 font-medium">{cost.totalMaterial.toFixed(0)} EUR</span>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2 py-0.5 font-medium">{cost.totalMaterial.toFixed(0)} EUR</span>
                 )}
                 {validation.errors.length > 0 && (
-                  <span className="bg-red-900/30 text-red-400 rounded-md px-1.5 py-0.5 font-medium">{validation.errors.length} err.</span>
+                  <span className="bg-red-50 text-red-600 border border-red-200 rounded-full px-2 py-0.5 font-medium">{validation.errors.length} err.</span>
                 )}
               </div>
             </div>
-            {/* Action buttons — row on mobile */}
             <div className="flex items-center gap-1.5 flex-shrink-0">
               <button
                 onClick={() => setShowProjects(true)}
-                className="text-xs px-3 py-2 rounded-xl bg-stone-800 text-stone-300 hover:text-white border border-stone-700 hover:border-amber-600/50 hover:bg-stone-700 active:scale-95 transition-all"
+                className="text-xs px-3 py-2 rounded-xl bg-white text-stone-600 hover:text-stone-900 border border-stone-200 hover:border-amber-300 hover:bg-amber-50 active:scale-95 transition-all shadow-sm"
               >
                 Projets
               </button>
@@ -222,7 +221,7 @@ export default function App() {
                 <button
                   onClick={handleExportPdf}
                   disabled={pdfLoading}
-                  className="text-xs px-3 py-2 rounded-xl bg-amber-600 text-white font-semibold hover:bg-amber-500 active:scale-95 disabled:opacity-50 transition-all shadow-lg shadow-amber-600/20"
+                  className="text-xs px-3 py-2 rounded-xl bg-amber-600 text-white font-semibold hover:bg-amber-700 active:scale-95 disabled:opacity-50 transition-all shadow-md shadow-amber-200"
                 >
                   {pdfLoading ? '...' : 'PDF'}
                 </button>
@@ -230,12 +229,11 @@ export default function App() {
             </div>
           </div>
 
-          {/* Secondary actions — collapsible row */}
           <div className="mt-3 flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
             <Tip text={TIPS['savoirs']} side="bottom">
               <button
                 onClick={() => setShowKnowledge(true)}
-                className="text-[11px] px-2.5 py-1.5 rounded-lg bg-stone-800/60 text-stone-400 hover:text-stone-200 border border-stone-700/50 whitespace-nowrap transition-colors"
+                className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
               >
                 Savoirs
               </button>
@@ -243,14 +241,14 @@ export default function App() {
             <Tip text={TIPS['export-json']} side="bottom">
               <button
                 onClick={() => exportToJson(state)}
-                className="text-[11px] px-2.5 py-1.5 rounded-lg bg-stone-800/60 text-stone-400 hover:text-stone-200 border border-stone-700/50 whitespace-nowrap transition-colors"
+                className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
               >
                 JSON
               </button>
             </Tip>
             <button
               onClick={() => importRef.current?.click()}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-stone-800/60 text-stone-400 hover:text-stone-200 border border-stone-700/50 whitespace-nowrap transition-colors"
+              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
             >
               Import
             </button>
@@ -258,13 +256,13 @@ export default function App() {
           </div>
 
           {importError && (
-            <div className="mt-2 text-xs text-red-400 bg-red-950/30 border border-red-900/30 rounded-xl px-3 py-2">
+            <div className="mt-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
               {importError}
             </div>
           )}
         </div>
 
-        {/* Tab bar — scrollable, pill style */}
+        {/* Tab bar */}
         <div className="flex gap-1 mb-5 overflow-x-auto hide-scrollbar pb-0.5 -mx-1 px-1 snap-x">
           {TABS.map((t) => {
             const isValidation = t.key === 'validation';
@@ -278,8 +276,8 @@ export default function App() {
                 onClick={() => setTab(t.key)}
                 className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap snap-start active:scale-95 transition-all ${
                   tab === t.key
-                    ? 'bg-amber-600 text-white shadow-lg shadow-amber-900/40'
-                    : 'bg-stone-800/80 text-stone-400 hover:bg-stone-700 hover:text-stone-200 border border-stone-700/50'
+                    ? 'bg-amber-600 text-white shadow-md shadow-amber-200'
+                    : 'bg-white text-stone-500 hover:bg-stone-50 hover:text-stone-700 border border-stone-200'
                 }`}
               >
                 {icon} {label}

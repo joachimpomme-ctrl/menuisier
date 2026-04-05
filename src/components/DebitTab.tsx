@@ -13,7 +13,7 @@ interface Props {
   onPriceChange: (price: number) => void;
 }
 
-const cardClass = "rounded-2xl border border-stone-700/40 bg-stone-800/50 backdrop-blur-sm p-4 mb-4";
+const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
 
 export default function DebitTab({ state, allPieces, nesting, cost, onPriceChange }: Props) {
   const mat = MATERIALS[state.materialKey];
@@ -40,7 +40,7 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
       <div className={cardClass}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
           <div>
-            <div className="text-2xl font-bold text-amber-400">{metrics.panelCount}</div>
+            <div className="text-2xl font-bold text-amber-700">{metrics.panelCount}</div>
             <Tip text={TIPS['panneaux-total']}><div className="text-xs text-stone-500">panneaux</div></Tip>
           </div>
           <div>
@@ -50,7 +50,7 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
             <Tip text={TIPS['rendement']}><div className="text-xs text-stone-500">rendement</div></Tip>
           </div>
           <div>
-            <div className="text-2xl font-bold text-stone-300">{(metrics.usedArea / 10000).toFixed(2)}</div>
+            <div className="text-2xl font-bold text-stone-400">{(metrics.usedArea / 10000).toFixed(2)}</div>
             <Tip text={TIPS['surface-utile']}><div className="text-xs text-stone-500">m² utile</div></Tip>
           </div>
           <div>
@@ -58,7 +58,7 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
             <Tip text={TIPS['surface-chute']}><div className="text-xs text-stone-500">m² chute</div></Tip>
           </div>
         </div>
-        <div className="mt-3 pt-3 border-t border-stone-800 flex items-center justify-between text-xs text-stone-500">
+        <div className="mt-3 pt-3 border-t border-stone-200 flex items-center justify-between text-xs text-stone-500">
           <Tip text={TIPS['trait-scie']}><span>{mat.short} · {state.panel.width}×{state.panel.height} cm · trait {state.kerf} mm</span></Tip>
           <Tip text={TIPS['strategie']}><span>Stratégie : {strategyLabels[strategy] ?? strategy}</span></Tip>
         </div>
@@ -98,7 +98,7 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
         return (
           <div key={binIndex} className={cardClass}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-stone-300">Panneau {binIndex + 1}</span>
+              <span className="text-xs font-medium text-stone-400">Panneau {binIndex + 1}</span>
               <span className="text-xs text-stone-500">{binEfficiency.toFixed(0)}% · {bin.pl.length} pièces</span>
             </div>
             <div className="overflow-x-auto">
@@ -141,16 +141,16 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
 
       {/* Cut list */}
       <div className={cardClass}>
-        <h4 className="text-amber-400 font-semibold text-xs uppercase tracking-widest mb-3">Liste de coupe</h4>
+        <h4 className="text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3">Liste de coupe</h4>
         <div className="space-y-1">
           {[...allPieces]
             .sort((a, b) => b.length * b.width * b.qty - a.length * a.width * a.qty)
             .map((p, i) => (
-              <div key={i} className="flex items-center justify-between text-xs py-1.5 px-2 rounded-lg hover:bg-stone-800/50">
+              <div key={i} className="flex items-center justify-between text-xs py-1.5 px-2 rounded-lg hover:bg-white">
                 <span className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: PIECE_COLORS[p.type] }} />
-                  <span className="text-stone-300">{p.name}</span>
-                  <span className="text-stone-600">{p.bodyName}</span>
+                  <span className="text-stone-400">{p.name}</span>
+                  <span className="text-stone-400">{p.bodyName}</span>
                 </span>
                 <span className="font-mono text-stone-500">{p.length}×{p.width} ×{p.qty}</span>
               </div>

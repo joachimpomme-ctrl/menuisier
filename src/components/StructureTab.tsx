@@ -10,10 +10,10 @@ interface Props {
   onChange: (state: AppState) => void;
 }
 
-const inputClass = "w-full rounded-xl border border-stone-600/50 bg-stone-800/60 px-3 py-2.5 text-sm text-stone-100 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
-const labelClass = "block text-xs font-medium text-stone-400 mb-1.5";
-const cardClass = "rounded-2xl border border-stone-700/40 bg-stone-800/50 backdrop-blur-sm p-4 mb-4";
-const sectionTitle = "text-amber-400 font-semibold text-xs uppercase tracking-widest mb-3";
+const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
+const labelClass = "block text-xs font-medium text-stone-500 mb-1.5";
+const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
+const sectionTitle = "text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3";
 
 function NumberInput({ label, value, onChange, step = 1, min, max, suffix, tip }: {
   label: string; value: number; onChange: (v: number) => void;
@@ -168,7 +168,7 @@ export default function StructureTab({ state, onChange }: Props) {
             <option key={k} value={k}>{m.name}</option>
           ))}
         </select>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-stone-400 mb-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-stone-500 mb-2">
           <Tip text={TIPS['densite']}><span>{mat.density} kg/m³</span></Tip>
           <Tip text={TIPS['flexMPa']}><span>{mat.flexMPa} MPa</span></Tip>
           <Tip text={TIPS['portee-max']}><span>Portée max {mat.maxSpan18} cm</span></Tip>
@@ -207,7 +207,7 @@ export default function StructureTab({ state, onChange }: Props) {
           {mat.panels.map((p, i) => (
             <button
               key={i}
-              className="text-xs px-3 py-1.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 hover:text-amber-400 border border-stone-700 transition-colors"
+              className="text-xs px-3 py-1.5 rounded-lg bg-white text-stone-400 hover:bg-stone-100 hover:text-amber-700 border border-stone-200 transition-colors"
               onClick={() => onChange({
                 ...state,
                 panel: { ...state.panel, width: p.w, height: p.h },
@@ -244,7 +244,7 @@ export default function StructureTab({ state, onChange }: Props) {
           >
             <div className="flex items-center justify-between mb-3">
               <input
-                className="bg-transparent text-sm font-semibold text-stone-100 border-b border-transparent hover:border-stone-600 focus:border-amber-500 focus:outline-none transition-colors"
+                className="bg-transparent text-sm font-semibold text-stone-800 border-b border-transparent hover:border-stone-300 focus:border-amber-500 focus:outline-none transition-colors"
                 value={b.name}
                 onChange={(e) => updateBody(b.id, 'name', e.target.value)}
               />
@@ -272,7 +272,7 @@ export default function StructureTab({ state, onChange }: Props) {
               {b.pieces.map((p) => (
                 <div
                   key={p.id}
-                  className="flex items-center gap-2 rounded-lg bg-stone-800/50 px-3 py-2 text-sm"
+                  className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm"
                 >
                   <span
                     className="w-2 h-2 rounded-full flex-shrink-0"
@@ -344,7 +344,7 @@ export default function StructureTab({ state, onChange }: Props) {
 
             <button
               onClick={() => addPiece(b.id)}
-              className="mt-3 text-xs text-amber-500 hover:text-amber-400 transition-colors"
+              className="mt-3 text-xs text-amber-500 hover:text-amber-700 transition-colors"
             >
               + Ajouter une pièce
             </button>

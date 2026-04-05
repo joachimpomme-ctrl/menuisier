@@ -63,7 +63,7 @@ export default function Tip({ text, children, side = 'bottom' }: Props) {
         <button
           type="button"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((o) => !o); }}
-          className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold leading-none bg-stone-700/60 text-stone-400 hover:bg-amber-600/30 hover:text-amber-400 transition-colors cursor-help flex-shrink-0"
+          className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold leading-none bg-stone-100/60 text-stone-500 hover:bg-amber-600/30 hover:text-amber-700 transition-colors cursor-help flex-shrink-0"
           aria-label="Aide"
           tabIndex={-1}
         >
@@ -72,7 +72,7 @@ export default function Tip({ text, children, side = 'bottom' }: Props) {
         {open && (
           <div
             ref={tooltipRef}
-            className={`absolute z-50 w-64 px-3 py-2.5 rounded-xl border border-stone-700 bg-stone-800 shadow-xl shadow-black/40 text-xs text-stone-300 leading-relaxed ${
+            className={`absolute z-50 w-64 px-3 py-2.5 rounded-xl border border-stone-200 bg-white shadow-xl shadow-stone-300/50 text-xs text-stone-400 leading-relaxed ${
               side === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
             } left-1/2 -translate-x-1/2`}
             style={{ pointerEvents: 'auto' }}

@@ -1,13 +1,15 @@
 @import "tailwindcss";
 
-/* ========== WARM WOOD DESIGN SYSTEM ========== */
+/* ========== WARM LIGHT DESIGN SYSTEM — Atelier Menuiserie ========== */
 
 :root {
-  --bg-base: #1c1917;       /* stone-900 - warm dark */
-  --bg-surface: #292524;    /* stone-800 */
-  --bg-elevated: #44403c;   /* stone-700 */
-  --border-subtle: #44403c; /* stone-700 */
-  --border-muted: #57534e;  /* stone-600 */
+  --bg-base: #faf8f5;       /* warm white */
+  --bg-surface: #f3efe9;    /* light warm beige */
+  --bg-elevated: #ffffff;   /* white cards */
+  --border-subtle: #e5ddd3; /* warm border */
+  --text-primary: #2c2520;  /* warm near-black */
+  --text-secondary: #78716c; /* stone-500 */
+  --accent: #b45309;        /* amber-700 */
 }
 
 html {
@@ -16,7 +18,8 @@ html {
 }
 
 body {
-  background: linear-gradient(180deg, #1c1917 0%, #171412 100%);
+  background: var(--bg-base);
+  color: var(--text-primary);
   min-height: 100vh;
   min-height: 100dvh;
 }
@@ -46,7 +49,7 @@ html, body {
 
   input[type="number"], input[type="text"] {
     min-height: 44px;
-    font-size: 16px !important; /* prevents iOS zoom on focus */
+    font-size: 16px !important;
   }
 }
 
@@ -59,7 +62,7 @@ html, body {
   display: none;
 }
 
-/* Number input: remove spinners on mobile for cleaner look */
+/* Number input: remove spinners */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -71,17 +74,12 @@ input[type="number"] {
 
 /* Focus visible for a11y */
 :focus-visible {
-  outline: 2px solid #d97706;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 8px;
 }
 
-/* Smooth transitions */
-* {
-  transition-duration: 150ms;
-}
-
 /* Selection color */
 ::selection {
-  background: rgba(217, 119, 6, 0.3);
+  background: rgba(180, 83, 9, 0.15);
 }

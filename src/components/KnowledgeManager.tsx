@@ -8,7 +8,7 @@ interface Props {
   onUpdate: () => void;
 }
 
-const cardClass = 'rounded-xl border border-stone-800 bg-stone-900/50 p-4';
+const cardClass = 'rounded-xl border border-stone-200 bg-white p-4';
 
 export default function KnowledgeManager({ isOpen, onClose, onUpdate }: Props) {
   const [docs, setDocs] = useState<KnowledgeDoc[]>(listKnowledgeDocs());
@@ -48,19 +48,19 @@ export default function KnowledgeManager({ isOpen, onClose, onUpdate }: Props) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg max-h-[80vh] flex flex-col rounded-2xl border border-stone-700 bg-stone-900 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/40  p-4">
+      <div className="w-full max-w-lg max-h-[80vh] flex flex-col rounded-2xl border border-stone-200 bg-white shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-800">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200">
           <div>
-            <h3 className="text-amber-400 font-bold text-sm">Base de connaissances</h3>
+            <h3 className="text-amber-700 font-bold text-sm">Base de connaissances</h3>
             <p className="text-xs text-stone-500 mt-0.5">
               {docs.length} document{docs.length > 1 ? 's' : ''} — enrichit l'IA et la validation
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-stone-500 hover:text-stone-300 text-lg px-2"
+            className="text-stone-500 hover:text-stone-400 text-lg px-2"
           >
             x
           </button>
@@ -75,7 +75,7 @@ export default function KnowledgeManager({ isOpen, onClose, onUpdate }: Props) {
           )}
 
           {docs.length === 0 && (
-            <div className="text-center py-8 text-stone-600 text-sm">
+            <div className="text-center py-8 text-stone-400 text-sm">
               <p className="mb-2">Aucun document de connaissances</p>
               <p className="text-xs text-stone-700">
                 Uploadez des fichiers JSON contenant des règles métier,
@@ -88,7 +88,7 @@ export default function KnowledgeManager({ isOpen, onClose, onUpdate }: Props) {
             <div key={doc.id} className={cardClass}>
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium text-sm text-stone-200 truncate">{doc.name}</div>
+                  <div className="font-medium text-sm text-stone-700 truncate">{doc.name}</div>
                   <div className="text-xs text-stone-500 mt-0.5">
                     {doc.entryCount} entrées — {doc.uploadedAt.slice(0, 10)}
                   </div>
@@ -96,13 +96,13 @@ export default function KnowledgeManager({ isOpen, onClose, onUpdate }: Props) {
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button
                     onClick={() => setExpandedId(expandedId === doc.id ? null : doc.id)}
-                    className="text-xs px-2 py-1 rounded bg-stone-800 text-stone-400 hover:text-stone-200 border border-stone-700"
+                    className="text-xs px-2 py-1 rounded bg-white text-stone-500 hover:text-stone-700 border border-stone-200"
                   >
                     {expandedId === doc.id ? 'Masquer' : 'Apercu'}
                   </button>
                   <button
                     onClick={() => handleDelete(doc.id)}
-                    className="text-xs px-2 py-1 rounded bg-stone-800 text-red-400 hover:text-red-300 border border-stone-700"
+                    className="text-xs px-2 py-1 rounded bg-white text-red-400 hover:text-red-300 border border-stone-200"
                   >
                     Suppr.
                   </button>
@@ -110,7 +110,7 @@ export default function KnowledgeManager({ isOpen, onClose, onUpdate }: Props) {
               </div>
 
               {expandedId === doc.id && (
-                <div className="mt-3 p-3 rounded-lg bg-stone-950/50 text-xs text-stone-400 max-h-48 overflow-y-auto whitespace-pre-wrap font-mono">
+                <div className="mt-3 p-3 rounded-lg bg-stone-50 text-xs text-stone-500 max-h-48 overflow-y-auto whitespace-pre-wrap font-mono">
                   {doc.summary.slice(0, 3000)}
                   {doc.summary.length > 3000 && '\n... (tronqué)'}
                 </div>
@@ -120,8 +120,8 @@ export default function KnowledgeManager({ isOpen, onClose, onUpdate }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-4 border-t border-stone-800 flex items-center justify-between gap-3">
-          <div className="text-xs text-stone-600">
+        <div className="px-5 py-4 border-t border-stone-200 flex items-center justify-between gap-3">
+          <div className="text-xs text-stone-400">
             Format : JSON avec tables, règles, propriétés...
           </div>
           <div className="flex items-center gap-2">

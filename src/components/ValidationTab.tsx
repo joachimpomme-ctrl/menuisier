@@ -6,7 +6,7 @@ interface Props {
   validation: ValidationResult;
 }
 
-const cardClass = "rounded-2xl border border-stone-700/40 bg-stone-800/50 backdrop-blur-sm p-4 mb-4";
+const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
 
 export default function ValidationTab({ validation }: Props) {
   const { errors, warnings } = validation;

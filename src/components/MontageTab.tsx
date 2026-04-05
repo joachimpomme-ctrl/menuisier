@@ -7,7 +7,7 @@ interface Props {
   state: AppState;
 }
 
-const cardClass = "rounded-2xl border border-stone-700/40 bg-stone-800/50 backdrop-blur-sm p-4 mb-4";
+const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
 
 export default function MontageTab({ state }: Props) {
   const mat = MATERIALS[state.materialKey];
@@ -30,7 +30,7 @@ export default function MontageTab({ state }: Props) {
 
   return (
     <div>
-      <div className="text-sm text-stone-400 mb-4">
+      <div className="text-sm text-stone-500 mb-4">
         <Tip text={TIPS['elevation']}>
           <span>Élévation frontale — {mat.short} {thickness * 10} mm</span>
         </Tip>
