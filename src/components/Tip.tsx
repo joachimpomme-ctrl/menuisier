@@ -72,7 +72,7 @@ export default function Tip({ text, children, side = 'bottom' }: Props) {
         {open && (
           <div
             ref={tooltipRef}
-            className={`absolute z-50 w-64 px-3 py-2.5 rounded-xl border border-stone-200 bg-white shadow-xl shadow-stone-300/50 text-xs text-stone-400 leading-relaxed ${
+            className={`absolute z-50 w-56 sm:w-64 px-3 py-2.5 rounded-xl border border-stone-200 bg-white shadow-xl shadow-stone-300/50 text-xs text-stone-600 leading-relaxed ${
               side === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
             } left-1/2 -translate-x-1/2`}
             style={{ pointerEvents: 'auto' }}

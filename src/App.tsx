@@ -22,13 +22,13 @@ import NewProjectWizard from './components/NewProjectWizard';
 import Tip from './components/Tip';
 import TIPS from './data/tips';
 
-const TABS: { key: TabKey; label: string; icon: string }[] = [
-  { key: 'structure', label: 'Structure', icon: '⚙' },
-  { key: 'debit', label: 'Débit', icon: '✂' },
-  { key: 'montage', label: 'Montage', icon: '📐' },
-  { key: 'notice', label: 'Notice', icon: '📋' },
-  { key: 'validation', label: 'Contrôle', icon: '●' },
-  { key: 'ia', label: 'Assistant IA', icon: '🤖' },
+const TABS: { key: TabKey; label: string; shortLabel: string; icon: string }[] = [
+  { key: 'structure', label: 'Structure', shortLabel: 'Struct.', icon: '⚙' },
+  { key: 'debit', label: 'Débit', shortLabel: 'Débit', icon: '✂' },
+  { key: 'montage', label: 'Montage', shortLabel: 'Mont.', icon: '📐' },
+  { key: 'notice', label: 'Notice', shortLabel: 'Notice', icon: '📋' },
+  { key: 'validation', label: 'Contrôle', shortLabel: 'Ctrl', icon: '●' },
+  { key: 'ia', label: 'Assistant IA', shortLabel: 'IA', icon: '🤖' },
 ];
 
 // Singleton repository — shared across renders
@@ -203,7 +203,7 @@ export default function App() {
         <div className="mb-5">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h1 className="text-lg sm:text-xl font-bold text-amber-800 tracking-wide truncate">{state.project.name}</h1>
+              <h1 className="text-base sm:text-xl font-bold text-amber-800 truncate">{state.project.name}</h1>
               <div className="mt-1.5 flex items-center gap-1.5 text-xs text-stone-500 flex-wrap">
                 <span className="bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2 py-0.5 font-medium">{mat.short} {state.panel.thickness * 10}mm</span>
                 <span className="bg-stone-100 border border-stone-200 rounded-full px-2 py-0.5">{totalPieces} pcs</span>
@@ -269,24 +269,24 @@ export default function App() {
         </div>
 
         {/* Tab bar */}
-        <div className="flex gap-1 mb-5 overflow-x-auto hide-scrollbar pb-0.5 -mx-1 px-1 snap-x">
+        <div className="flex gap-1 mb-5 overflow-x-auto hide-scrollbar pb-0.5 -mx-1 px-1">
           {TABS.map((t) => {
             const isValidation = t.key === 'validation';
             const hasErrors = validation.errors.length > 0;
             const icon = isValidation ? (hasErrors ? '🔴' : '🟢') : t.icon;
-            const label = isValidation && hasErrors ? `${t.label} (${validation.errors.length})` : t.label;
+            const errSuffix = isValidation && hasErrors ? ` (${validation.errors.length})` : '';
 
             return (
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap snap-start active:scale-95 transition-all ${
+                className={`px-2.5 sm:px-4 py-2.5 rounded-xl text-[11px] sm:text-xs font-semibold whitespace-nowrap active:scale-95 transition-all flex-shrink-0 ${
                   tab === t.key
                     ? 'bg-amber-600 text-white shadow-md shadow-amber-200'
                     : 'bg-white text-stone-500 hover:bg-stone-50 hover:text-stone-700 border border-stone-200'
                 }`}
               >
-                {icon} {label}
+                {icon} <span className="sm:hidden">{t.shortLabel}{errSuffix}</span><span className="hidden sm:inline">{t.label}{errSuffix}</span>
               </button>
             );
           })}

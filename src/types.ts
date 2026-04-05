@@ -1,4 +1,4 @@
-export type PieceType = 'joue' | 'tablette-fixe' | 'tablette-reglable' | 'bandeau' | 'autre';
+export type PieceType = 'joue' | 'tablette-fixe' | 'tablette-reglable' | 'bandeau' | 'porte' | 'tiroir-facade' | 'fond' | 'autre';
 
 export type MaterialKey = 'cp_bouleau' | 'cp_peuplier' | 'cp_okoume' | 'mdf' | 'melamine' | 'osb';
 

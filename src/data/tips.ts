@@ -36,6 +36,9 @@ const TIPS: Record<string, string> = {
   'piece-tablette-fixe': "Une tablette fixe est collée et vissée définitivement. Elle rigidifie le corps (comme un cadre). Il en faut au minimum 2 : une en haut et une en bas.",
   'piece-tablette-reglable': "Une tablette posée sur des taquets amovibles, qu'on peut repositionner pour s'adapter à la hauteur des livres. On les installe en dernier.",
   'piece-bandeau': "Le bandeau est une pièce décorative (souvent en haut) qui cache l'espace entre le meuble et le plafond. Il donne un aspect fini et intégré.",
+  'piece-porte': "La porte est une pièce mobile fixée par charnières. Prévoir 2 mm de jeu. Largeur max recommandée : 60 cm en 18 mm (risque de voile au-delà).",
+  'piece-tiroir-facade': "La façade de tiroir recouvre l'ouverture. Mêmes règles de jeu que les portes. Fixée par vis depuis l'intérieur du caisson tiroir.",
+  'piece-fond': "Le fond (ou dos) rigidifie le caisson. Généralement en HDF/CP 3-6 mm, rainuré ou agrafé. Indispensable pour l'équerrage.",
   'piece-longueur': "La plus grande dimension de la pièce en cm. Pour une joue, c'est sa hauteur. Pour une tablette, c'est sa portée (longueur d'un côté à l'autre).",
   'piece-largeur': "La plus petite dimension de la pièce en cm. Pour une joue, c'est la profondeur du meuble. Pour une tablette, c'est aussi la profondeur.",
   'piece-qty': "Le nombre d'exemplaires identiques à découper. Exemple : 2 joues par corps, 3 tablettes réglables identiques.",
@@ -76,6 +79,13 @@ const TIPS: Record<string, string> = {
   'flexion': "La flèche est la courbure d'une tablette sous charge. Au-delà de L/200 (longueur divisée par 200), la déformation est visible à l'œil nu. Réduisez la portée ou augmentez l'épaisseur.",
   'formaldehyde': "Le formaldéhyde est un composé volatil irritant émis par les colles des panneaux. En France, la classe E1 est obligatoire depuis 2006. Préférez E0.5 pour un usage intérieur.",
   'orientation-debit': "Certains panneaux (CP, OSB) ont un sens de fil qui affecte la résistance et l'esthétique. Le MDF et le mélaminé n'ont pas de sens, ce qui facilite le calepinage.",
+
+  // ===== PORTES & TIROIRS =====
+  'charniere': "La charnière standard (Ø35 mm, type Blum/Hettich) s'encastre dans une cuvette fraisée dans la porte. Réglable en 3 axes après pose. Prévoir 2 charnières pour une porte < 60 cm, 3 au-delà.",
+  'porte-pose': "Trois poses possibles : enveloppante (recouvre la joue), demi-recouvrement (2 portes sur même joue), affleurante (porte dans le cadre). Chaque pose demande une charnière avec une coudure différente.",
+  'porte-jeu': "Toujours prévoir 2 mm de jeu entre portes adjacentes et 2 mm en haut/bas. Sans jeu, les portes frottent et s'abîment. Trop de jeu = aspect négligé.",
+  'tiroir-coulisse': "Coulisses à galets (économiques, ouverture 75%) ou à billes (sortie totale, plus robuste). Prévoir 12.5 mm de jeu latéral de chaque côté pour les coulisses standard.",
+  'tiroir-dim': "Hauteur caisson tiroir = hauteur façade - 25 mm. Profondeur = profondeur intérieure - 10 mm. Fond en HDF 3 mm rainuré à 8 mm du bas.",
 
   // ===== ASSISTANT IA =====
   'assistant-ia': "L'assistant connaît votre projet en détail (dimensions, matériau, pièces, erreurs). Il s'appuie sur une base de connaissances menuiserie professionnelle (Dunod 2022).",

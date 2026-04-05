@@ -86,23 +86,37 @@ export default function StructureTab({ state, onChange }: Props) {
         if (key === 'width' || key === 'depth') {
           const newWidth = key === 'width' ? (value as number) : b.width;
           const newDepth = key === 'depth' ? (value as number) : b.depth;
+          const oldWidth = b.width;
+          const oldDepth = b.depth;
           const thickness = state.panel.thickness;
           const innerWidth = +(newWidth - 2 * thickness).toFixed(1);
+          const oldInnerWidth = +(oldWidth - 2 * thickness).toFixed(1);
 
           updated.pieces = b.pieces.map((p) => {
+            const piece = { ...p };
             if (p.type === 'joue') {
               // Joues: profondeur = profondeur du corps
-              return { ...p, width: newDepth };
-            }
-            if (p.type === 'tablette-fixe' || p.type === 'tablette-reglable') {
+              piece.width = newDepth;
+            } else if (p.type === 'tablette-fixe' || p.type === 'tablette-reglable') {
               // Tablettes: longueur = largeur intérieure, profondeur = profondeur du corps
-              return { ...p, length: innerWidth, width: newDepth };
-            }
-            if (p.type === 'bandeau') {
+              piece.length = innerWidth;
+              piece.width = newDepth;
+            } else if (p.type === 'bandeau') {
               // Bandeau: longueur = largeur du corps
-              return { ...p, length: newWidth };
+              piece.length = newWidth;
+            } else {
+              // Pièces "autre" : adapter si les dimensions correspondaient au corps
+              if (key === 'depth' && Math.abs(p.width - oldDepth) < 0.5) {
+                piece.width = newDepth;
+              }
+              if (key === 'width' && Math.abs(p.length - oldInnerWidth) < 0.5) {
+                piece.length = innerWidth;
+              }
+              if (key === 'width' && Math.abs(p.length - oldWidth) < 0.5) {
+                piece.length = newWidth;
+              }
             }
-            return p;
+            return piece;
           });
         }
 
@@ -324,12 +338,12 @@ export default function StructureTab({ state, onChange }: Props) {
                     </div>
                   ) : (
                     <div
-                      className="flex-1 flex justify-between cursor-pointer hover:text-amber-300 transition-colors"
+                      className="flex-1 min-w-0 flex justify-between cursor-pointer hover:text-amber-700 transition-colors"
                       onClick={() => setEditingPiece(p.id)}
                     >
                       <span className="truncate">{p.name}</span>
                       <span className="text-stone-500 text-xs font-mono ml-2 flex-shrink-0">
-                        {p.length} x {p.width} x{p.qty}
+                        {p.length}×{p.width} ×{p.qty}
                       </span>
                     </div>
                   )}

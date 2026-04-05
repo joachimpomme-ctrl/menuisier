@@ -82,9 +82,12 @@ export const PIECE_COLORS: Record<PieceType, string> = {
   "tablette-fixe": "#10b981",
   "tablette-reglable": "#f59e0b",
   bandeau: "#8b5cf6",
+  porte: "#f97316",
+  "tiroir-facade": "#06b6d4",
+  fond: "#6b7280",
   autre: "#ec4899",
 };
 
 export const BODY_COLORS = ["#60a5fa", "#34d399", "#fbbf24", "#a78bfa", "#f472b6"];
 
-export const PIECE_TYPES: PieceType[] = ['joue', 'tablette-fixe', 'tablette-reglable', 'bandeau', 'autre'];
+export const PIECE_TYPES: PieceType[] = ['joue', 'tablette-fixe', 'tablette-reglable', 'bandeau', 'porte', 'tiroir-facade', 'fond', 'autre'];

@@ -146,13 +146,13 @@ export default function DebitTab({ state, allPieces, nesting, cost, onPriceChang
           {[...allPieces]
             .sort((a, b) => b.length * b.width * b.qty - a.length * a.width * a.qty)
             .map((p, i) => (
-              <div key={i} className="flex items-center justify-between text-xs py-1.5 px-2 rounded-lg hover:bg-white">
-                <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: PIECE_COLORS[p.type] }} />
-                  <span className="text-stone-400">{p.name}</span>
-                  <span className="text-stone-400">{p.bodyName}</span>
+              <div key={i} className="flex items-center justify-between gap-2 text-xs py-1.5 px-2 rounded-lg hover:bg-stone-50">
+                <span className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: PIECE_COLORS[p.type] }} />
+                  <span className="text-stone-700 truncate">{p.name}</span>
+                  <span className="text-stone-400 hidden sm:inline flex-shrink-0">{p.bodyName}</span>
                 </span>
-                <span className="font-mono text-stone-500">{p.length}×{p.width} ×{p.qty}</span>
+                <span className="font-mono text-stone-500 flex-shrink-0">{p.length}×{p.width} ×{p.qty}</span>
               </div>
             ))}
         </div>

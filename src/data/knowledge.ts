@@ -132,6 +132,70 @@ export const FORMALDEHYDE_CLASSES: FormaldehydeClass[] = [
   { classe: 'E0.5', details: '≤ 4 mg pour particules/OSB, ≤ 5 mg pour MDF.', source: 'dunod_2022:p41_42_fiche_18' },
 ];
 
+// Portes et charnières
+export interface HingeRule {
+  id: string;
+  type: string;
+  ouverture: string;
+  details: string;
+  source: string;
+}
+
+export const HINGE_RULES: HingeRule[] = [
+  { id: 'charniere_encastree', type: 'Charnière à encastrer (35mm)', ouverture: '95-110°', details: 'Standard industriel. Cuvette Ø35 mm fraisée dans la porte, platine vissée sur la joue. Réglable en 3 axes (hauteur, profondeur, latéral). Distance axe cuvette / chant de porte : 21-22 mm. Entraxe recommandé entre charnières : 32 mm (système 32).', source: 'norme_industrielle' },
+  { id: 'charniere_170', type: 'Charnière grand angle (170°)', ouverture: '170°', details: 'Pour portes devant ouvrir à plat contre la joue adjacente. Même cuvette Ø35 mm. Nécessite un déport plus important. Utilisé pour meubles d\'angle.', source: 'norme_industrielle' },
+  { id: 'charniere_piano', type: 'Charnière piano', ouverture: '180°', details: 'Charnière continue sur toute la hauteur de la porte. Fixation par vis tous les 5-8 cm. Aspect visible (décoratif ou industriel). Pas de réglage possible après pose.', source: 'norme_industrielle' },
+  { id: 'charniere_pot', type: 'Charnière invisible (pot)', ouverture: '90-110°', details: 'Entièrement invisible porte fermée. Plus complexe à poser : mortaisage dans le chant de la porte ET dans la joue. Nécessite une défonceuse avec gabarit.', source: 'norme_industrielle' },
+];
+
+export interface DoorRule {
+  id: string;
+  type_pose: string;
+  description: string;
+  jeu: string;
+  details: string;
+  source: string;
+}
+
+export const DOOR_RULES: DoorRule[] = [
+  { id: 'porte_enveloppante', type_pose: 'Enveloppante (recouvrement total)', description: 'La porte recouvre entièrement le chant de la joue', jeu: '2 mm entre portes adjacentes', details: 'Largeur porte = largeur intérieure + 2× épaisseur joue - 2 mm de jeu. Hauteur porte = hauteur ouverture + 2× épaisseur tablettes - 2 mm. Charnière avec coudure 0 mm.', source: 'norme_industrielle' },
+  { id: 'porte_demi_recouvrement', type_pose: 'Demi-recouvrement', description: 'La porte recouvre la moitié du chant de la joue (pour 2 portes sur même joue)', jeu: '2 mm entre portes', details: 'Largeur porte = largeur intérieure / 2 + épaisseur joue / 2 - 1 mm. Charnière avec coudure de demi-épaisseur de la joue.', source: 'norme_industrielle' },
+  { id: 'porte_appliquee', type_pose: 'Appliquée (en applique)', description: 'La porte est posée devant le meuble sans encastrement', jeu: '3-5 mm en périphérie', details: 'Porte plus grande que l\'ouverture de 10-15 mm de chaque côté. Charnières apparentes ou invisibles. Solution simple mais moins de finition.', source: 'norme_industrielle' },
+  { id: 'porte_affleurante', type_pose: 'Affleurante (intérieure)', description: 'La porte affleure le chant de la joue, s\'insère dans le cadre', jeu: '2 mm tout autour', details: 'Largeur porte = largeur intérieure - 4 mm. Hauteur porte = hauteur ouverture - 4 mm. Charnière avec coudure complète (= épaisseur joue). Pose la plus précise, visible au moindre défaut d\'équerrage.', source: 'norme_industrielle' },
+];
+
+export interface DoorSizingRule {
+  id: string;
+  regle: string;
+  formule: string;
+  source: string;
+}
+
+export const DOOR_SIZING_RULES: DoorSizingRule[] = [
+  { id: 'nb_charnieres', regle: 'Nombre de charnières par porte', formule: 'Porte < 60 cm : 2 charnières. 60-120 cm : 3 charnières. 120-180 cm : 4 charnières. > 180 cm : 5 charnières.', source: 'norme_industrielle' },
+  { id: 'poids_max', regle: 'Poids max par charnière Ø35', formule: 'Charnière standard : 5-8 kg. Charnière renforcée : 10-15 kg. Au-delà, prévoir des charnières lourdes spéciales.', source: 'norme_industrielle' },
+  { id: 'position_charnieres', regle: 'Position des charnières', formule: 'Charnière haute : 70-100 mm du bord supérieur. Charnière basse : 70-100 mm du bord inférieur. Charnières intermédiaires : réparties régulièrement.', source: 'norme_industrielle' },
+  { id: 'amortisseur', regle: 'Amortisseur de fermeture', formule: 'Intégré ou rapporté. Freinage en fin de course. Standard sur charnières modernes (clip-on). Peut être ajouté sur anciennes charnières.', source: 'norme_industrielle' },
+  { id: 'percage_cuvette', regle: 'Perçage cuvette Ø35', formule: 'Profondeur : 12-13 mm. Distance centre cuvette / chant porte : 21-22 mm (standard Blum/Hettich/Grass). Fraise à façonner Ø35 mm (mèche Forstner).', source: 'norme_industrielle' },
+  { id: 'porte_max_largeur', regle: 'Largeur max porte battante', formule: 'Panneau 18 mm : 60 cm max (au-delà, risque de voile). Panneau 19 mm : 65 cm. Si > 60 cm, renfort avec traverse intermédiaire ou cadre collé au dos.', source: 'norme_industrielle' },
+];
+
+// Tiroirs
+export interface DrawerRule {
+  id: string;
+  regle: string;
+  details: string;
+  source: string;
+}
+
+export const DRAWER_RULES: DrawerRule[] = [
+  { id: 'coulisses_a_galets', regle: 'Coulisses à galets (économiques)', details: 'Ouverture partielle (~75%). Charge max 15-25 kg. Fixation latérale. Jeu latéral : 12.5 mm de chaque côté. Largeur tiroir = ouverture intérieure - 25 mm.', source: 'norme_industrielle' },
+  { id: 'coulisses_billes', regle: 'Coulisses à billes (sortie totale)', details: 'Ouverture totale (100%). Charge max 30-50 kg. Fixation latérale. Jeu latéral : 12.5 mm de chaque côté. Fermeture douce (soft-close) disponible.', source: 'norme_industrielle' },
+  { id: 'coulisses_invisible', regle: 'Coulisses invisibles (sous tiroir)', details: 'Fixées sous le fond du tiroir. Pas visibles depuis le côté. Ouverture totale. Charge max 30-40 kg. Jeu latéral : 3 mm de chaque côté seulement. Nécessite un fond de tiroir rigide (≥ 16 mm).', source: 'norme_industrielle' },
+  { id: 'facade_tiroir', regle: 'Façade de tiroir', details: 'Hauteur façade = hauteur d\'ouverture - 3 mm (jeu haut/bas). Largeur façade = identique aux portes (recouvrement, demi-recouvrement ou affleurante). Fixation par vis depuis l\'intérieur du tiroir caisson.', source: 'norme_industrielle' },
+  { id: 'dim_caisson_tiroir', regle: 'Caisson de tiroir', details: 'Hauteur caisson = hauteur façade - 25 mm (pour jeu coulisse). Profondeur caisson = profondeur intérieure du meuble - 10 mm (recul arrière). Fond en HDF 3 mm rainuré à 8 mm du bas.', source: 'norme_industrielle' },
+];
+
 // ---------------------------------------------------------------------------
 // Fonction pour générer un résumé condensé pour l'IA
 // ---------------------------------------------------------------------------
@@ -165,7 +229,19 @@ export function buildKnowledgeSummary(): string {
     '--- FORMALDÉHYDE ---',
     ...FORMALDEHYDE_CLASSES.map(f => `${f.classe}: ${f.details}`),
     '',
-    'Calcul flèche étagère: f = (5·q·L⁴)/(384·E·I), I = b·h³/12',
+    '--- PORTES & CHARNIÈRES ---',
+    ...HINGE_RULES.map(r => `• ${r.type} (${r.ouverture}): ${r.details}`),
+    '',
+    '--- TYPES DE POSE PORTES ---',
+    ...DOOR_RULES.map(r => `• ${r.type_pose}: ${r.description}. Jeu: ${r.jeu}. ${r.details}`),
+    '',
+    '--- DIMENSIONNEMENT PORTES ---',
+    ...DOOR_SIZING_RULES.map(r => `• ${r.regle}: ${r.formule}`),
+    '',
+    '--- TIROIRS & COULISSES ---',
+    ...DRAWER_RULES.map(r => `• ${r.regle}: ${r.details}`),
+    '',
+    'Calcul flèche tablette: f = (5·q·L⁴)/(384·E·I), I = b·h³/12',
     'Si f > L/200, risque de flexion visible.',
   ];
   return lines.join('\n');
