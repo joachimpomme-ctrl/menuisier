@@ -221,6 +221,77 @@ export default function MontageTab({ state }: Props) {
         </div>
       </div>
 
+      {/* ===== Quincaillerie summary ===== */}
+      {(() => {
+        const mk = state.materialKey;
+        const bodyCount = state.bodies.length;
+
+        // Vis: 8 per fixed shelf + 3 per body (wall fixation)
+        const totalFixedShelves = state.bodies.reduce(
+          (s, b) => s + b.pieces.filter((p) => p.type === 'tablette-fixe').reduce((acc, p) => acc + p.qty, 0),
+          0,
+        );
+        const visCount = totalFixedShelves * 8 + bodyCount * 3;
+
+        // Taquets: 4 per adjustable shelf (2 per side x 2 sides)
+        const totalAdjustableShelves = state.bodies.reduce(
+          (s, b) => s + b.pieces.filter((p) => p.type === 'tablette-reglable').reduce((acc, p) => acc + p.qty, 0),
+          0,
+        );
+        const taquetCount = totalAdjustableShelves * 4;
+
+        // Hinges
+        const hingesTotal = hingeTotal;
+
+        // Shelf support system
+        const useSysteme32 = mk === 'melamine' || mk === 'osb';
+
+        // Chevilles wall fixation: 2 per body
+        const chevilleCount = bodyCount * 2;
+
+        // Fond agrafes: perimeter of each body / 15cm
+        const agrafeCount = state.bodies.reduce((s, b) => {
+          const perimetre = 2 * (b.width + usableHeight);
+          return s + Math.ceil(perimetre / 15);
+        }, 0);
+
+        const items: { label: string; count: number; unit: string }[] = [
+          { label: 'Vis (assemblage + fixation murale)', count: visCount, unit: 'pcs' },
+          { label: 'Taquets tablettes réglables', count: taquetCount, unit: 'pcs' },
+        ];
+        if (hingesTotal > 0) {
+          items.push({ label: 'Charnières Ø35 + platines', count: hingesTotal, unit: 'pcs' });
+        }
+        if (useSysteme32) {
+          items.push({ label: 'Perçages système 32 (taquets Ø5)', count: taquetCount > 0 ? taquetCount : 0, unit: 'rangées' });
+        } else {
+          const cremoCount = state.bodies.reduce((s, _b, i) => {
+            const sl = i > 0 && (shared[i - 1] ?? false);
+            const sr = i < state.bodies.length - 1 && (shared[i] ?? false);
+            const ownJoues = 2 - (sl ? 1 : 0) - (sr ? 1 : 0);
+            return s + ownJoues * 2;
+          }, 0);
+          items.push({ label: 'Crémaillères', count: cremoCount, unit: 'pcs' });
+        }
+        items.push({ label: 'Chevilles Ø8 (fixation murale)', count: chevilleCount, unit: 'pcs' });
+        items.push({ label: 'Agrafes fond', count: agrafeCount, unit: 'pcs' });
+
+        return (
+          <div className={cardClass}>
+            <h3 className="text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3">Quincaillerie - Liste d'achats</h3>
+            <div className="space-y-1.5">
+              {items.map((item) => (
+                <div key={item.label} className="flex items-center justify-between text-xs py-1.5 px-2 rounded-lg bg-stone-50">
+                  <span className="text-stone-700">{item.label}</span>
+                  <span className="font-mono font-semibold text-amber-700">{item.count} <span className="text-stone-400 font-normal">{item.unit}</span></span>
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] text-stone-400 mt-3">Quantités estimées — prévoir 10-15 % de marge.</p>
+          </div>
+        );
+      })()}
+
       {/* Hinge summary */}
       {hingeTotal > 0 && (
         <div className={cardClass}>

@@ -7,6 +7,7 @@ export function generateSteps(st: AppState): Step[] {
   const { project: pr, panel: pn, bodies: bs, materialKey: mk } = st;
   const mat = MATERIALS[mk];
   const usableHeight = pr.ceilingHeight - pr.plinthHeight;
+  const sharedBounds = st.sharedBoundaries ?? [];
   const steps: Step[] = [];
 
   // Règle d'orientation pour le matériau courant
@@ -49,7 +50,15 @@ export function generateSteps(st: AppState): Step[] {
         mat.routing,
         `Fraise Ø12, prof 8 mm, 2-3 passes de 4 mm`,
         `Guide parallèle obligatoire`,
-        ...bs.map((b) => `${b.name} : 4 rainures à 5 cm et ${b.depth - 5} cm du bord`),
+        ...bs.map((b, bi) => {
+          const sl = bi > 0 && (sharedBounds[bi - 1] ?? false);
+          const sr = bi < bs.length - 1 && (sharedBounds[bi] ?? false);
+          // Joues propres : 2 par défaut, -1 si joue commune à gauche, -1 si joue commune à droite
+          const ownJoues = 2 - (sl ? 1 : 0) - (sr ? 1 : 0);
+          const rainCount = ownJoues * 2; // 2 rainures par joue propre
+          const note = rainCount < 4 ? ` (${4 - rainCount} rainures sur joue commune)` : '';
+          return `${b.name} : ${rainCount} rainures propres à 5 cm et ${b.depth - 5} cm du bord${note}`;
+        }),
         `Marquer haut/bas + int./ext.`,
       ],
     });
@@ -67,7 +76,16 @@ export function generateSteps(st: AppState): Step[] {
         `${diam5?.regle ?? 'Taquets, charnières, coulisses'} : ${diam5?.valeur ?? 'Ø 5 mm'}`,
         `${diam68?.regle ?? 'Tourillons'} : ${diam68?.valeur ?? 'Ø 6 ou 8 mm'}`,
         `Profondeur : 12 mm — gabarit de perçage obligatoire`,
-        ...bs.map((b) => `${b.name} : 2 rangées/joue à 37 mm et ${b.depth * 10 - 37} mm du chant`),
+        ...bs.map((b) => {
+          const depthMm = b.depth * 10;
+          // Distance standard axe/chant = 37 mm (système 32).
+          // Pour les corps peu profonds (< 10 cm), une seule rangée centrée.
+          if (depthMm < 100) {
+            return `${b.name} : 1 rangée/joue centrée à ${Math.round(depthMm / 2)} mm du chant (profondeur < 10 cm)`;
+          }
+          const backPos = depthMm - 37;
+          return `${b.name} : 2 rangées/joue à 37 mm et ${backPos} mm du chant`;
+        }),
       ],
     });
   }
@@ -113,8 +131,6 @@ export function generateSteps(st: AppState): Step[] {
   // Assemblages disponibles selon la base de connaissances
   const assemblyTypes = ASSEMBLAGES.filter((a) => a.famille === 'caisson');
 
-  const sharedBounds = st.sharedBoundaries ?? [];
-
   bs.forEach((b, i) => {
     const fixedCount = b.pieces
       .filter((p) => p.type === "tablette-fixe")
@@ -129,11 +145,15 @@ export function generateSteps(st: AppState): Step[] {
     if (sl) sharingNotes.push(`⚙ Joue gauche = joue commune avec ${bs[i - 1]?.name} (pas de joue gauche propre)`);
     if (sr) sharingNotes.push(`⚙ Joue droite = joue commune avec ${bs[i + 1]?.name} (profondeur adaptée au max des 2 corps)`);
 
+    const joueInstruction = sl
+      ? `Joue droite à plat sur tréteaux (joue gauche commune déjà en place)`
+      : `Joues bas à plat sur tréteaux`;
+
     steps.push({
       title: `5.${i + 1}. Assemblage ${b.name}`,
       items: [
         ...sharingNotes,
-        `Joues bas à plat sur tréteaux`,
+        joueInstruction,
         `Techniques caisson possibles : ${assemblyTypes.map((a) => a.nom).join(', ')} [Dunod 2022]`,
         ...mat.assembly,
         `${fixedCount} tablettes fixes : basse ~${usableHeight - 45} cm / haute 180 cm`,

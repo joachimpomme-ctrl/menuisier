@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import type { AppState, ChatMessage, UploadedPdf, ValidationResult, PieceWithBody } from '../types';
 import { MATERIALS } from '../data/materials';
 import { buildKnowledgeSummary } from '../data/knowledge';
-import { buildUserKnowledgeContext, listKnowledgeDocs } from '../lib/knowledgeStore';
+import { listKnowledgeDocs } from '../lib/knowledgeStore';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 
@@ -110,9 +110,83 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
 
   const kbDocCount = listKnowledgeDocs().length;
 
+  // --- Lot 5.2: Summarize pieces if >20 ---
+  const buildPiecesSummary = (): string => {
+    if (totalPieces <= 20) {
+      // Original detailed format
+      return state.bodies.map(b =>
+        b.pieces.map(p => `${b.name} > ${p.name}: ${p.length}×${p.width} ×${p.qty} [${p.type}]`).join('\n')
+      ).join('\n');
+    }
+    // Grouped summary: group by body, then by type
+    return state.bodies.map(b => {
+      const grouped: Record<string, { dims: string; qty: number }[]> = {};
+      for (const p of b.pieces) {
+        const key = p.type;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push({ dims: `${p.length}×${p.width}cm`, qty: p.qty });
+      }
+      const parts = Object.entries(grouped).map(([type, items]) => {
+        const totalQty = items.reduce((s, i) => s + i.qty, 0);
+        const uniqueDims = [...new Set(items.map(i => i.dims))];
+        return `${totalQty} ${type} (${uniqueDims.join(', ')})`;
+      });
+      return `${b.name}: ${parts.join(', ')}`;
+    }).join('\n');
+  };
+
+  // --- Lot 5.3: Filter knowledge base by current material ---
+  const buildFilteredUserKnowledge = (): string => {
+    const docs = listKnowledgeDocs();
+    if (docs.length === 0) return '';
+
+    // Material keywords for filtering
+    const materialName = mat.name.toLowerCase();
+    const materialShort = mat.short.toLowerCase();
+    const materialKeywords: string[] = [materialName, materialShort];
+
+    // Add common synonyms / related terms
+    if (materialName.includes('contreplaqué') || materialShort.includes('cp')) {
+      materialKeywords.push('contreplaqué', 'contreplaque', 'cp', 'plywood');
+    }
+    if (materialName.includes('mdf') || state.materialKey === 'mdf') {
+      materialKeywords.push('mdf', 'medium', 'fibre');
+    }
+    if (materialName.includes('mélaminé') || materialName.includes('melamine') || state.materialKey === 'melamine') {
+      materialKeywords.push('mélaminé', 'melamine', 'mélam', 'panneau de particules', 'aggloméré', 'agglomere');
+    }
+    if (materialName.includes('osb') || state.materialKey === 'osb') {
+      materialKeywords.push('osb', 'oriented strand');
+    }
+    // General terms always relevant
+    const alwaysRelevant = ['caisson', 'système 32', 'systeme 32', 'assemblage', 'charnière', 'tiroir', 'porte', 'finition', 'flèche', 'flexion', 'vis', 'tourillon', 'colle'];
+
+    const parts = docs.map((d) => {
+      const summaryLower = d.summary.toLowerCase();
+      const nameLower = d.name.toLowerCase();
+
+      // Check if the doc mentions the current material or is generally relevant
+      const mentionsMaterial = materialKeywords.some(kw => summaryLower.includes(kw) || nameLower.includes(kw));
+      const isGenerallyRelevant = alwaysRelevant.some(kw => summaryLower.includes(kw));
+
+      // If the doc is neither material-specific nor generally relevant, skip it
+      // But always include docs that don't seem material-specific at all (generic docs)
+      const mentionsAnyMaterial = ['contreplaqué', 'mdf', 'mélaminé', 'melamine', 'osb', 'aggloméré'].some(m => summaryLower.includes(m));
+      const isMaterialSpecificButWrong = mentionsAnyMaterial && !mentionsMaterial;
+
+      if (isMaterialSpecificButWrong && !isGenerallyRelevant) return null;
+
+      return `=== Document: ${d.name} (${d.entryCount} entrées, ${d.uploadedAt.slice(0, 10)}) ===\n${d.summary}`;
+    }).filter(Boolean);
+
+    if (parts.length === 0) return '';
+    return '\n\n--- CONNAISSANCES UTILISATEUR ---\n' + parts.join('\n\n');
+  };
+
   const buildSystemPrompt = (): string => {
     const knowledgeBase = buildKnowledgeSummary();
-    const userKnowledge = buildUserKnowledgeContext();
+    const userKnowledge = buildFilteredUserKnowledge();
+    const piecesSection = buildPiecesSummary();
 
     return `Tu es un assistant menuiserie expert intégré à un outil de conception de meubles sur mesure (bibliothèques, rangements, dressings, buffets, meubles TV, etc. — toute menuiserie intérieure en panneaux). Réponds en français, concis et technique. Cite tes sources quand tu utilises la base de connaissances (ex: [Dunod 2022]).
 
@@ -126,8 +200,8 @@ MATÉRIAU : ${mat.name} — densité ${mat.density}, flexion ${mat.flexMPa} MPa,
 Assemblage : ${mat.assembly.join(' / ')}
 ${mat.warnings.length ? '⚠ ' + mat.warnings.join(' | ') : ''}
 
-PIÈCES :
-${state.bodies.map(b => b.pieces.map(p => `${b.name} > ${p.name}: ${p.length}×${p.width} ×${p.qty} [${p.type}]`).join('\n')).join('\n')}
+PIÈCES${totalPieces > 20 ? ' (résumé groupé)' : ''} :
+${piecesSection}
 
 VALIDATION : ${validation.errors.length} err, ${validation.warnings.length} warn
 ${validation.errors.map(e => '❌ ' + e).join('\n')}
@@ -138,6 +212,22 @@ ${pdfs.length ? `${pdfs.length} PDF de référence fournis — utilise-les.` : '
 ${knowledgeBase}
 ${userKnowledge}`;
   };
+
+  // --- Lot 5.1: Payload size warning ---
+  const estimateTokens = (): number => {
+    const systemTokens = Math.ceil(buildSystemPrompt().length / 4);
+    const messagesTokens = Math.ceil(
+      messages.reduce((sum, m) => sum + m.content.length, 0) / 4
+    );
+    const inputTokens = Math.ceil(input.length / 4);
+    return systemTokens + messagesTokens + inputTokens;
+  };
+
+  const estimatedTokens = estimateTokens();
+  const tokenWarningLevel: 'none' | 'yellow' | 'red' =
+    estimatedTokens > 15000 ? 'red' :
+    estimatedTokens > 8000 ? 'yellow' :
+    'none';
 
   const send = async () => {
     if (!input.trim() || loading) return;
@@ -343,20 +433,29 @@ ${userKnowledge}`;
         </div>
 
         {/* Input */}
-        <div className="flex gap-2">
-          <input
-            className={inputClass + " flex-1"}
-            placeholder={images.length > 0 ? "Décris ce que tu veux vérifier sur la photo..." : "Ta question..."}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                send();
-              }
-            }}
-            disabled={loading}
-          />
+        <div className="flex gap-2 items-end">
+          <div className="flex-1 flex flex-col gap-1">
+            <input
+              className={inputClass}
+              placeholder={images.length > 0 ? "Décris ce que tu veux vérifier sur la photo..." : "Ta question..."}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  send();
+                }
+              }}
+              disabled={loading}
+            />
+            {tokenWarningLevel !== 'none' && (
+              <span className={`text-[10px] leading-tight ${tokenWarningLevel === 'red' ? 'text-red-500' : 'text-amber-600'}`}>
+                {tokenWarningLevel === 'red'
+                  ? `~${Math.round(estimatedTokens / 1000)}k tokens — Payload trop volumineux, le résumé sera tronqué`
+                  : `~${Math.round(estimatedTokens / 1000)}k tokens`}
+              </span>
+            )}
+          </div>
           <button
             onClick={send}
             disabled={loading || !input.trim()}

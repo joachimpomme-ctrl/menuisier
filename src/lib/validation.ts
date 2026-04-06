@@ -34,7 +34,6 @@ export function validate(st: AppState): ValidationResult {
   const tips: string[] = []; // Conseils issus de la base de connaissances
   const { project: pr, panel: pn, bodies: bs, materialKey: mk } = st;
   const mat = MATERIALS[mk];
-  const usableHeight = pr.ceilingHeight - pr.plinthHeight;
 
   // ===== CONTRÔLES GLOBAUX =====
 
@@ -81,7 +80,7 @@ export function validate(st: AppState): ValidationResult {
   bs.forEach((b, bi) => {
     const sl = isSharedLeft(bi, shared);
     const expectedTabWidth = getBodyInnerWidth(b.width, bi, bs.length, shared, pn.thickness);
-    const minJoues = sl ? 1 : 2; // corps avec joue commune = 1 joue propre minimum
+    // minJoues : sl ? 1 : 2 — corps avec joue commune = 1 joue propre minimum
 
     // Cohérence dimensionnelle du corps
     if (b.width <= 0) errors.push(`${b.name} : largeur invalide (${b.width} cm)`);
@@ -168,7 +167,11 @@ export function validate(st: AppState): ValidationResult {
 
     // --- Calcul de flèche amélioré (base de connaissances) ---
     tablettes.forEach((p) => {
-      const defl = computeDeflection(p.length, p.width, pn.thickness, mat.flexMPa);
+      // Utiliser l'épaisseur du panneau assigné (extraPanel) ou le panneau principal
+      const extraPanel = p.panelId ? (st.extraPanels ?? []).find((ep) => ep.id === p.panelId) : null;
+      const pieceThickness = extraPanel ? extraPanel.thickness : pn.thickness;
+
+      const defl = computeDeflection(p.length, p.width, pieceThickness, mat.flexMPa);
       if (p.length > mat.maxSpan18) {
         errors.push(
           `[${mat.short}] "${p.name}" portée ${p.length} cm > max ${mat.maxSpan18} cm — flèche ${defl.deflectionMm} mm (max ${defl.maxDeflectionMm} mm) [Dunod 2022]`
@@ -185,13 +188,23 @@ export function validate(st: AppState): ValidationResult {
 
     // --- Pièces trop grandes pour le panneau ---
     b.pieces.forEach((p) => {
+      // Determine which panel this piece uses
+      const extraPanel = p.panelId ? (st.extraPanels ?? []).find((ep) => ep.id === p.panelId) : null;
+      // panelId orphelin : le panneau secondaire a été supprimé
+      if (p.panelId && !extraPanel && p.panelId !== 'default') {
+        warnings.push(`${b.name} : "${p.name}" référence un panneau supprimé — sera découpée dans le panneau principal`);
+      }
+      const panW = extraPanel ? extraPanel.width : pn.width;
+      const panH = extraPanel ? extraPanel.height : pn.height;
+      const panLabel = extraPanel ? extraPanel.label : `${pn.width}×${pn.height}`;
+
       const maxDim = Math.max(p.length, p.width);
       const minDim = Math.min(p.length, p.width);
       if (
-        maxDim > Math.max(pn.width, pn.height) ||
-        minDim > Math.min(pn.width, pn.height)
+        maxDim > Math.max(panW, panH) ||
+        minDim > Math.min(panW, panH)
       ) {
-        errors.push(`"${p.name}" (${p.length}×${p.width}) ne rentre pas dans le panneau ${pn.width}×${pn.height}`);
+        errors.push(`"${p.name}" (${p.length}×${p.width}) ne rentre pas dans le panneau ${panLabel} (${panW}×${panH})`);
       }
     });
 

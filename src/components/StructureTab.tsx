@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { AppState, MaterialKey, PieceType, Body, DoorPoseType, DoorConfig } from '../types';
+import type { AppState, MaterialKey, PieceType, Body, DoorPoseType, DoorConfig, PanelDef } from '../types';
 import { MATERIALS, PIECE_COLORS, BODY_COLORS, PIECE_TYPES } from '../data/materials';
 import { uid, parseNumber, clampInt, calculateDoor, getBodyInnerWidth, isSharedLeft } from '../lib/helpers';
 import Tip from './Tip';
@@ -8,7 +8,16 @@ import TIPS from '../data/tips';
 interface Props {
   state: AppState;
   onChange: (state: AppState) => void;
+  allPanelDefs: PanelDef[];
 }
+
+// Presets for common extra panels
+const EXTRA_PANEL_PRESETS: { label: string; def: Omit<PanelDef, 'id'> }[] = [
+  { label: 'Fond CP 6mm', def: { label: 'CP 6mm', width: 250, height: 122, thickness: 0.6, price: 25 } },
+  { label: 'HDF 3mm', def: { label: 'HDF 3mm', width: 244, height: 122, thickness: 0.3, price: 8 } },
+  { label: 'CP Peuplier 10mm', def: { label: 'CP 10mm', width: 250, height: 122, thickness: 1.0, price: 35 } },
+  { label: 'MDF 12mm', def: { label: 'MDF 12mm', width: 244, height: 122, thickness: 1.2, price: 18 } },
+];
 
 const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
 const labelClass = "block text-xs font-medium text-stone-500 mb-1.5";
@@ -245,7 +254,7 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
-export default function StructureTab({ state, onChange }: Props) {
+export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
   const [editingPiece, setEditingPiece] = useState<string | null>(null);
   const [showGlossary, setShowGlossary] = useState(false);
   const mat = MATERIALS[state.materialKey];
@@ -342,20 +351,120 @@ export default function StructureTab({ state, onChange }: Props) {
       ...state,
       bodies: state.bodies.map((b) =>
         b.id === bodyId
-          ? { ...b, pieces: b.pieces.map((p) => (p.id === pieceId ? { ...p, [key]: value } : p)) }
+          ? { ...b, pieces: b.pieces.map((p) => {
+              if (p.id !== pieceId) return p;
+              // panelId: '' or 'default' → undefined (use main panel)
+              if (key === 'panelId') {
+                const v = value === '' || value === 'default' ? undefined : String(value);
+                return { ...p, panelId: v };
+              }
+              const updated = { ...p, [key]: value };
+              // Auto-detect piece type from name (only if current type is 'autre')
+              if (key === 'name' && p.type === 'autre') {
+                const n = String(value).toLowerCase();
+                if (/joue/i.test(n)) updated.type = 'joue';
+                else if (/tablette\s*fixe|tabl\.\s*fixe/i.test(n)) updated.type = 'tablette-fixe';
+                else if (/tablette\s*r[ée]glable|tabl\.\s*r[ée]g/i.test(n)) updated.type = 'tablette-reglable';
+                else if (/bandeau/i.test(n)) updated.type = 'bandeau';
+                else if (/porte/i.test(n)) updated.type = 'porte';
+                else if (/tiroir|fa[çc]ade/i.test(n)) updated.type = 'tiroir-facade';
+                else if (/fond|dos/i.test(n)) updated.type = 'fond';
+              }
+              return updated;
+            }) }
           : b
       ),
     });
   };
 
-  const addPiece = (bodyId: string) => {
-    const body = state.bodies.find((b) => b.id === bodyId);
+  const addPiece = (bodyId: string, pieceType?: PieceType) => {
+    const bi = state.bodies.findIndex((b) => b.id === bodyId);
+    const body = state.bodies[bi];
+    if (!body) return;
+    const iw = innerWidthOf(bi);
+    const usableH = state.project.ceilingHeight - state.project.plinthHeight;
+    const cH = state.project.ceilingHeight;
+    const type: PieceType = pieceType ?? 'autre';
+
+    let name = 'Nouvelle pièce';
+    let length = 50;
+    let width = body.depth;
+    let qty = 1;
+    let panelId: string | undefined;
+
+    switch (type) {
+      case 'joue':
+        name = 'Joue'; length = cH; width = body.depth; break;
+      case 'tablette-fixe':
+        name = 'Tablette fixe'; length = iw; width = body.depth; break;
+      case 'tablette-reglable':
+        name = 'Tablette réglable'; length = iw; width = body.depth; break;
+      case 'bandeau':
+        name = 'Bandeau'; length = body.width; width = 10; break;
+      case 'porte':
+        name = 'Porte'; length = usableH; width = body.width; break;
+      case 'fond': {
+        name = 'Fond'; length = cH; width = body.width;
+        // Auto-assign to first extra panel with thickness < 1cm if available
+        const thinPanel = allPanelDefs.find((pd) => pd.thickness < 1);
+        if (thinPanel) panelId = thinPanel.id;
+        break;
+      }
+      default:
+        name = 'Nouvelle pièce'; length = 50; width = body.depth; break;
+    }
+
+    const piece: Body['pieces'][number] = { id: uid(), name, length, width, qty, type, ...(panelId ? { panelId } : {}) };
     onChange({
       ...state,
       bodies: state.bodies.map((b) =>
         b.id === bodyId
-          ? { ...b, pieces: [...b.pieces, { id: uid(), name: "Nouvelle pièce", length: 50, width: body?.depth ?? 30, qty: 1, type: "autre" as PieceType }] }
+          ? { ...b, pieces: [...b.pieces, piece] }
           : b
+      ),
+    });
+  };
+
+  const autoFillPieces = (bodyId: string) => {
+    const bi = state.bodies.findIndex((b) => b.id === bodyId);
+    const body = state.bodies[bi];
+    if (!body) return;
+    // Only auto-fill if body has no pieces
+    if (body.pieces.length > 0) {
+      if (!confirm('Ce corps contient déjà des pièces. Voulez-vous les remplacer par les pièces standard ?')) return;
+    }
+    const cH = state.project.ceilingHeight;
+    const iw = innerWidthOf(bi);
+    const sl = isSharedLeft(bi, shared);
+    const basHeight = 180;
+    const hautHeight = +(cH - basHeight).toFixed(1);
+    const depth = body.depth;
+
+    const pieces: Body['pieces'] = [];
+
+    // Joues gauche (sauf si joue partagée à gauche)
+    if (!sl) {
+      pieces.push({ id: uid(), name: 'Joue G — bas', length: basHeight, width: depth, qty: 1, type: 'joue' as PieceType });
+      pieces.push({ id: uid(), name: 'Joue G — haut', length: hautHeight, width: depth, qty: 1, type: 'joue' as PieceType });
+    }
+
+    // Joues droite
+    pieces.push({ id: uid(), name: 'Joue D — bas', length: basHeight, width: depth, qty: 1, type: 'joue' as PieceType });
+    pieces.push({ id: uid(), name: 'Joue D — haut', length: hautHeight, width: depth, qty: 1, type: 'joue' as PieceType });
+
+    // Tablettes fixes
+    pieces.push({ id: uid(), name: 'Tablette fixe basse', length: iw, width: depth, qty: 1, type: 'tablette-fixe' as PieceType });
+    pieces.push({ id: uid(), name: 'Tablette fixe haute', length: iw, width: depth, qty: 1, type: 'tablette-fixe' as PieceType });
+
+    // Tablettes réglables
+    pieces.push({ id: uid(), name: 'Tablette réglable 1', length: iw, width: depth, qty: 1, type: 'tablette-reglable' as PieceType });
+    pieces.push({ id: uid(), name: 'Tablette réglable 2', length: iw, width: depth, qty: 1, type: 'tablette-reglable' as PieceType });
+    pieces.push({ id: uid(), name: 'Tablette réglable 3', length: iw, width: depth, qty: 1, type: 'tablette-reglable' as PieceType });
+
+    onChange({
+      ...state,
+      bodies: state.bodies.map((b) =>
+        b.id === bodyId ? { ...b, pieces } : b
       ),
     });
   };
@@ -407,6 +516,33 @@ export default function StructureTab({ state, onChange }: Props) {
       newShared.splice(0, 1);
     }
     onChange({ ...state, bodies: newBodies, sharedBoundaries: newShared });
+  };
+
+  // ---------- EXTRA PANELS ----------
+  const addExtraPanel = (preset?: Omit<PanelDef, 'id'>) => {
+    const base = preset ?? { label: 'Panneau', width: 250, height: 122, thickness: 0.6, price: 0 };
+    const newPanel: PanelDef = { ...base, id: uid() };
+    onChange({ ...state, extraPanels: [...(state.extraPanels ?? []), newPanel] });
+  };
+
+  const updateExtraPanel = (id: string, key: keyof PanelDef, value: string | number) => {
+    onChange({
+      ...state,
+      extraPanels: (state.extraPanels ?? []).map((p) => p.id === id ? { ...p, [key]: value } : p),
+    });
+  };
+
+  const removeExtraPanel = (id: string) => {
+    // Remove panelId references from pieces that used this panel
+    const newBodies = state.bodies.map((b) => ({
+      ...b,
+      pieces: b.pieces.map((p) => p.panelId === id ? { ...p, panelId: undefined } : p),
+    }));
+    onChange({
+      ...state,
+      bodies: newBodies,
+      extraPanels: (state.extraPanels ?? []).filter((p) => p.id !== id),
+    });
   };
 
   // ---------- TOGGLE JOUE COMMUNE ----------
@@ -651,6 +787,94 @@ export default function StructureTab({ state, onChange }: Props) {
         </div>
       </div>
 
+      {/* Extra Panels */}
+      <div className={cardClass}>
+        <div className="flex items-center justify-between mb-2">
+          <Tip text="Panneaux secondaires pour fonds, tiroirs, etc. — épaisseurs différentes du panneau principal.">
+            <h3 className={sectionTitle + " mb-0"}>Panneaux secondaires ({(state.extraPanels ?? []).length})</h3>
+          </Tip>
+        </div>
+        <p className="text-[10px] text-stone-400 mb-3">
+          Ajoutez des panneaux d'épaisseurs différentes (fonds 6mm, HDF 3mm…). Les pièces assignées seront calepinées séparément.
+        </p>
+
+        {(state.extraPanels ?? []).map((ep) => (
+          <div key={ep.id} className="flex items-center gap-2 mb-2 p-2 bg-stone-50 rounded-xl border border-stone-200">
+            <input
+              className={inputClass + " !py-1.5 w-24"}
+              value={ep.label}
+              onChange={(e) => updateExtraPanel(ep.id, 'label', e.target.value)}
+              placeholder="Nom"
+            />
+            <input
+              type="number"
+              step="1"
+              min={10}
+              className={inputClass + " !py-1.5 w-16 text-center"}
+              value={ep.width}
+              onChange={(e) => updateExtraPanel(ep.id, 'width', parseNumber(e.target.value, ep.width, 10))}
+              title="Largeur (cm)"
+            />
+            <span className="text-[10px] text-stone-400">×</span>
+            <input
+              type="number"
+              step="1"
+              min={10}
+              className={inputClass + " !py-1.5 w-16 text-center"}
+              value={ep.height}
+              onChange={(e) => updateExtraPanel(ep.id, 'height', parseNumber(e.target.value, ep.height, 10))}
+              title="Hauteur (cm)"
+            />
+            <span className="text-[10px] text-stone-400">ép.</span>
+            <input
+              type="number"
+              step="0.1"
+              min={0.1}
+              className={inputClass + " !py-1.5 w-14 text-center"}
+              value={ep.thickness}
+              onChange={(e) => updateExtraPanel(ep.id, 'thickness', parseNumber(e.target.value, ep.thickness, 0.1))}
+              title="Épaisseur (cm)"
+            />
+            <span className="text-[10px] text-stone-400">cm</span>
+            <input
+              type="number"
+              step="1"
+              min={0}
+              className={inputClass + " !py-1.5 w-14 text-center"}
+              value={ep.price}
+              onChange={(e) => updateExtraPanel(ep.id, 'price', parseNumber(e.target.value, ep.price, 0))}
+              title="Prix €/panneau"
+            />
+            <span className="text-[10px] text-stone-400">€</span>
+            <button
+              onClick={() => removeExtraPanel(ep.id)}
+              className="text-xs text-stone-400 hover:text-red-500 transition-colors flex-shrink-0 ml-1"
+              title="Supprimer ce panneau"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {EXTRA_PANEL_PRESETS.map((preset, i) => (
+            <button
+              key={i}
+              onClick={() => addExtraPanel(preset.def)}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-amber-700 hover:bg-amber-50 border border-stone-200 hover:border-amber-200 transition-all"
+            >
+              + {preset.label}
+            </button>
+          ))}
+          <button
+            onClick={() => addExtraPanel()}
+            className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:text-stone-600 border border-dashed border-stone-300 hover:border-stone-400 transition-all"
+          >
+            + Personnalisé
+          </button>
+        </div>
+      </div>
+
       {/* Bodies */}
       <div className="flex items-center justify-between mb-2">
         <Tip text={TIPS['corps']}><h3 className={sectionTitle + " mb-0"}>Corps ({state.bodies.length})</h3></Tip>
@@ -800,7 +1024,7 @@ export default function StructureTab({ state, onChange }: Props) {
                           value={p.width}
                           onChange={(e) => updatePiece(b.id, p.id, 'width', parseNumber(e.target.value, p.width, 1))}
                         />
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 flex-wrap">
                           <input
                             type="number"
                             min={1}
@@ -818,6 +1042,18 @@ export default function StructureTab({ state, onChange }: Props) {
                               <option key={t} value={t}>{pieceTypeLabel(t)}</option>
                             ))}
                           </select>
+                          {allPanelDefs.length > 1 && (
+                            <select
+                              className={inputClass + " !py-1 text-[10px]"}
+                              value={p.panelId ?? 'default'}
+                              onChange={(e) => updatePiece(b.id, p.id, 'panelId', e.target.value === 'default' ? '' : e.target.value)}
+                              title="Panneau pour cette pièce"
+                            >
+                              {allPanelDefs.map((pd) => (
+                                <option key={pd.id} value={pd.id}>{pd.label}</option>
+                              ))}
+                            </select>
+                          )}
                         </div>
                       </div>
                     ) : (
@@ -828,6 +1064,11 @@ export default function StructureTab({ state, onChange }: Props) {
                         <span className="truncate">
                           {p.name}
                           <span className="text-[10px] text-stone-400 ml-1.5">{pieceTypeLabel(p.type)}</span>
+                          {p.panelId && p.panelId !== 'default' && (
+                            <span className="text-[9px] bg-sky-50 text-sky-600 border border-sky-200 rounded px-1 py-0 ml-1">
+                              {allPanelDefs.find((pd) => pd.id === p.panelId)?.label ?? p.panelId}
+                            </span>
+                          )}
                         </span>
                         <span className="text-stone-500 text-xs font-mono ml-2 flex-shrink-0">
                           {p.length}×{p.width} ×{p.qty}
@@ -854,12 +1095,20 @@ export default function StructureTab({ state, onChange }: Props) {
                 ))}
               </div>
 
-              <button
-                onClick={() => addPiece(b.id)}
-                className="mt-3 text-xs text-amber-500 hover:text-amber-700 transition-colors"
-              >
-                + Ajouter une pièce
-              </button>
+              <div className="mt-3 flex flex-wrap gap-1 items-center">
+                <button
+                  onClick={() => autoFillPieces(b.id)}
+                  className="text-[11px] px-2 py-1 rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 font-semibold transition-colors"
+                >
+                  ⚡ Remplir auto
+                </button>
+                <button onClick={() => addPiece(b.id, 'joue')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Joue</button>
+                <button onClick={() => addPiece(b.id, 'tablette-fixe')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Tab. fixe</button>
+                <button onClick={() => addPiece(b.id, 'tablette-reglable')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Tab. réglable</button>
+                <button onClick={() => addPiece(b.id, 'bandeau')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Bandeau</button>
+                <button onClick={() => addPiece(b.id, 'fond')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Fond</button>
+                <button onClick={() => addPiece(b.id, 'autre')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Autre</button>
+              </div>
 
               {/* Door Configurator */}
               <DoorConfigurator body={b} bodyIndex={bi} state={state} onChange={onChange} />

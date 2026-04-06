@@ -90,7 +90,6 @@ export default function PlanTab({ state }: Props) {
           const color = BODY_COLORS[bi % BODY_COLORS.length];
           offX += bw + 8;
 
-          const joues = b.pieces.filter(p => p.type === 'joue');
           const fixedTab = b.pieces.filter(p => p.type === 'tablette-fixe');
           const adjustTab = b.pieces.filter(p => p.type === 'tablette-reglable');
           const portes = b.pieces.filter(p => p.type === 'porte');
@@ -144,7 +143,7 @@ export default function PlanTab({ state }: Props) {
               })}
 
               {/* Portes (hatched rectangle) */}
-              {portes.map((p, pi) => {
+              {portes.map((_p, pi) => {
                 const doorW = (bw - 2 * tw) / portes.length;
                 const doorX = bx + tw + pi * doorW;
                 return (

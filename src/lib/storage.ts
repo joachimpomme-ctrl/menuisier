@@ -15,7 +15,7 @@ const CURRENT_VERSION = 2;
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-const uid = (): string => Math.random().toString(36).slice(2, 8);
+const uid = (): string => crypto.randomUUID();
 
 function readIndex(): ProjectMeta[] {
   try {

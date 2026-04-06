@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import type { AppState, MaterialKey, Body } from '../types';
+import type { AppState, MaterialKey, Body, Piece } from '../types';
 import { MATERIALS } from '../data/materials';
 import { TEMPLATES } from '../data/templates';
 import { buildKnowledgeSummary } from '../data/knowledge';
@@ -43,7 +43,7 @@ function autoLayout(
   wallWidth: number,
   ceilingHeight: number,
   plinthHeight: number,
-  plinthDepth: number,
+  _plinthDepth: number,
   depth: number,
   mk: MaterialKey,
 ): { bodies: Body[]; name: string } {
@@ -79,23 +79,23 @@ function autoLayout(
   const bodies: Body[] = [];
   for (let i = 0; i < nbCorps; i++) {
     const name = nbCorps === 1 ? 'Corps' : `Corps ${i + 1}`;
-    const pieces = [
-      { id: uid(), name: `Joue gauche`, length: +meubleHeight.toFixed(1), width: depth, qty: 1, type: 'joue' as const },
-      { id: uid(), name: `Joue droite`, length: +meubleHeight.toFixed(1), width: depth, qty: 1, type: 'joue' as const },
-      { id: uid(), name: `Tablette fixe haut`, length: innerWidth, width: depth, qty: 1, type: 'tablette-fixe' as const },
-      { id: uid(), name: `Tablette fixe bas`, length: innerWidth, width: depth, qty: 1, type: 'tablette-fixe' as const },
+    const pieces: Piece[] = [
+      { id: uid(), name: `Joue gauche`, length: +meubleHeight.toFixed(1), width: depth, qty: 1, type: 'joue' },
+      { id: uid(), name: `Joue droite`, length: +meubleHeight.toFixed(1), width: depth, qty: 1, type: 'joue' },
+      { id: uid(), name: `Tablette fixe haut`, length: innerWidth, width: depth, qty: 1, type: 'tablette-fixe' },
+      { id: uid(), name: `Tablette fixe bas`, length: innerWidth, width: depth, qty: 1, type: 'tablette-fixe' },
     ];
 
     if (nbShelves > 0) {
       pieces.push({
-        id: uid(), name: `Tablette réglable`, length: innerWidth, width: depth, qty: nbShelves, type: 'tablette-reglable' as const,
+        id: uid(), name: `Tablette réglable`, length: innerWidth, width: depth, qty: nbShelves, type: 'tablette-reglable',
       });
     }
 
     // Bandeau si meuble va au plafond
     if (meubleHeight >= usableHeight - 5 && plinthHeight > 0) {
       pieces.push({
-        id: uid(), name: `Bandeau haut`, length: bodyWidth, width: 8, qty: 1, type: 'bandeau' as const,
+        id: uid(), name: `Bandeau haut`, length: bodyWidth, width: 8, qty: 1, type: 'bandeau',
       });
     }
 

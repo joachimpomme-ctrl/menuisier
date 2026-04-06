@@ -1,4 +1,4 @@
-export const uid = (): string => Math.random().toString(36).slice(2, 8);
+export const uid = (): string => crypto.randomUUID();
 
 export function parseNumber(value: string, fallback: number, min?: number, max?: number): number {
   const n = parseFloat(value);
@@ -28,7 +28,7 @@ export function clampInt(value: string, fallback: number, min: number, max: numb
 export function getBodyInnerWidth(
   bodyWidth: number,
   bodyIndex: number,
-  bodyCount: number,
+  _bodyCount: number,
   sharedBoundaries: boolean[],
   thickness: number,
 ): number {
@@ -74,7 +74,16 @@ export function calculateDoor(
   effectiveInnerWidth?: number,
 ): DoorDimensions {
   const innerWidth = effectiveInnerWidth ?? +(bodyWidth - 2 * thickness).toFixed(1);
-  const JEU = 0.2; // 2mm = 0.2cm
+
+  // ---------------------------------------------------------------------------
+  // Jeu (clearance) — espace libre entre la porte et le caisson/porte adjacente
+  // 2 mm est la valeur standard pour charnières Ø35 (Blum, Hettich, Grass).
+  // - Enveloppante : jeu entre la porte et le bord extérieur du caisson
+  // - Demi-recouvrement : jeu entre porte et chant de joue
+  // - Affleurante : jeu entre porte et face intérieure de joue/tablette
+  // Réf. : Dunod 2022, Blum CLIP top technical manual
+  // ---------------------------------------------------------------------------
+  const JEU = 0.2; // 2 mm = 0.2 cm — jeu standard charnières Ø35
 
   let doorWidth: number;
   let doorHeight: number;

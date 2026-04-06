@@ -28,6 +28,15 @@ export interface Material {
   notes: string;
 }
 
+export interface PanelDef {
+  id: string;
+  label: string;
+  width: number;    // cm
+  height: number;   // cm
+  thickness: number; // cm
+  price: number;    // EUR HT par panneau
+}
+
 export interface Piece {
   id: string;
   name: string;
@@ -35,6 +44,7 @@ export interface Piece {
   width: number;
   qty: number;
   type: PieceType;
+  panelId?: string; // undefined = panneau principal (state.panel)
 }
 
 export type DoorPoseType = 'enveloppante' | 'demi-recouvrement' | 'affleurante';
@@ -78,7 +88,8 @@ export interface AppState {
   kerf: number;
   bodies: Body[];
   costConfig: CostConfig;
-  sharedBoundaries?: boolean[]; // length = bodies.length - 1; true = joue commune entre bodies[i] et bodies[i+1]
+  sharedBoundaries?: boolean[];
+  extraPanels?: PanelDef[]; // panneaux secondaires (fond 6mm, HDF 3mm, etc.)
 }
 
 export interface ValidationResult {

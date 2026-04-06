@@ -1,11 +1,63 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+interface ChatMessage {
+  role: string;
+  content: string | Array<Record<string, unknown>>;
+}
+
 interface ChatRequestBody {
-  messages: Array<{ role: string; content: string | Array<Record<string, unknown>> }>;
+  messages: Array<ChatMessage>;
   system: string;
 }
 
+const CORS_HEADERS: Record<string, string> = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+const MAX_MESSAGES = 50;
+const MAX_SYSTEM_LENGTH = 20_000;
+const MAX_BODY_SIZE = 512_000; // ~500KB
+const MAX_CONTENT_ITEMS = 10;
+const FETCH_TIMEOUT_MS = 60_000;
+const VALID_ROLES = new Set(['user', 'assistant']);
+
+function setCors(res: VercelResponse): void {
+  for (const [key, value] of Object.entries(CORS_HEADERS)) {
+    res.setHeader(key, value);
+  }
+}
+
+function validateMessages(messages: unknown): messages is Array<ChatMessage> {
+  if (!Array.isArray(messages) || messages.length === 0) return false;
+  if (messages.length > MAX_MESSAGES) return false;
+
+  for (const msg of messages) {
+    if (typeof msg !== 'object' || msg === null) return false;
+    const { role, content } = msg as Record<string, unknown>;
+
+    if (typeof role !== 'string' || !VALID_ROLES.has(role)) return false;
+
+    if (typeof content === 'string') {
+      if (content.length === 0) return false;
+    } else if (Array.isArray(content)) {
+      if (content.length === 0 || content.length > MAX_CONTENT_ITEMS) return false;
+    } else {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  setCors(res);
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Méthode non autorisée' });
   }
@@ -17,34 +69,62 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    if (!req.body || typeof req.body !== 'object') {
+      return res.status(400).json({ error: 'Corps de requête invalide' });
+    }
+
+    // Body size check
+    const bodySize = JSON.stringify(req.body).length;
+    if (bodySize > MAX_BODY_SIZE) {
+      return res.status(413).json({ error: 'Requête trop volumineuse. Réduisez la taille des messages ou du contexte.' });
+    }
+
     const { messages, system } = req.body as ChatRequestBody;
 
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return res.status(400).json({ error: 'Messages requis' });
+    if (!validateMessages(messages)) {
+      return res.status(400).json({ error: 'Messages invalides : vérifiez le format, les rôles (user/assistant) et la limite de 50 messages.' });
     }
 
     if (!system || typeof system !== 'string') {
       return res.status(400).json({ error: 'Contexte système requis' });
     }
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
-        system,
-        messages,
-      }),
-    });
+    if (system.length > MAX_SYSTEM_LENGTH) {
+      return res.status(400).json({ error: `Contexte système trop long (max ${MAX_SYSTEM_LENGTH} caractères).` });
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+    let response: Response;
+    try {
+      response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 2048,
+          system,
+          messages,
+        }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       const status = response.status;
+
+      console.error('Erreur Anthropic:', status, errorData, {
+        messageCount: messages.length,
+        systemLength: system.length,
+      });
 
       if (status === 401) {
         return res.status(500).json({ error: 'Clé API invalide. Vérifiez ANTHROPIC_API_KEY.' });
@@ -56,7 +136,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(413).json({ error: 'Message trop volumineux. Réduisez la taille des PDF ou du contexte.' });
       }
 
-      console.error('Erreur Anthropic:', status, errorData);
       return res.status(502).json({ error: `Erreur du service IA (${status}). Réessayez.` });
     }
 
@@ -74,6 +153,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ reply });
   } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      console.error('Timeout Anthropic API après 60s');
+      return res.status(504).json({ error: 'Le service IA n\'a pas répondu à temps. Réessayez.' });
+    }
+
     if (error instanceof SyntaxError) {
       return res.status(400).json({ error: 'Corps de requête invalide' });
     }

@@ -216,7 +216,7 @@ export async function importKnowledgeDoc(file: File): Promise<KnowledgeDoc> {
         const { summary, entryCount } = extractSummary(data);
 
         const doc: KnowledgeDoc = {
-          id: Math.random().toString(36).slice(2, 10),
+          id: crypto.randomUUID(),
           name: (data.nom as string) || file.name.replace(/\.json$/, ''),
           uploadedAt: new Date().toISOString(),
           summary,

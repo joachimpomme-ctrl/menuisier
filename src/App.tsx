@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import type { AppState, TabKey, PieceWithBody, ProjectMeta } from './types';
+import type { AppState, TabKey, PieceWithBody, ProjectMeta, PanelDef } from './types';
 import { MATERIALS } from './data/materials';
 import { createInitialState, migrateState } from './lib/state';
 import { optimizeNesting } from './lib/nesting';
@@ -53,7 +53,7 @@ function ensureProject(): { id: string; state: AppState } {
     }
   }
   // Create a fresh project
-  const freshId = Math.random().toString(36).slice(2, 8);
+  const freshId = crypto.randomUUID();
   const freshState = createInitialState('cp_bouleau');
   repo.save(freshId, freshState);
   repo.setCurrentId(freshId);
@@ -75,17 +75,62 @@ export default function App() {
   const importRef = useRef<HTMLInputElement>(null);
 
   const mat = MATERIALS[state.materialKey];
-  const usableHeight = state.project.ceilingHeight - state.project.plinthHeight;
 
   const allPieces: PieceWithBody[] = useMemo(
     () => state.bodies.flatMap((b) => b.pieces.map((p) => ({ ...p, bodyName: b.name, bodyId: b.id }))),
     [state.bodies]
   );
   const totalPieces = useMemo(() => allPieces.reduce((s, p) => s + p.qty, 0), [allPieces]);
-  const nesting = useMemo(() => optimizeNesting(allPieces, state.panel.width, state.panel.height, state.kerf), [allPieces, state.panel, state.kerf]);
+
+  // Multi-panel nesting: group pieces by panelId, run nesting per panel type
+  const defaultPanelDef: PanelDef = useMemo(() => ({
+    id: 'default',
+    label: `${mat.short} ${state.panel.thickness * 10}mm`,
+    width: state.panel.width,
+    height: state.panel.height,
+    thickness: state.panel.thickness,
+    price: state.costConfig.panelPrice,
+  }), [mat.short, state.panel, state.costConfig.panelPrice]);
+
+  const allPanelDefs = useMemo(() => [defaultPanelDef, ...(state.extraPanels ?? [])], [defaultPanelDef, state.extraPanels]);
+
+  const nestingByPanel = useMemo(() => {
+    const groups = new Map<string, PieceWithBody[]>();
+    allPieces.forEach((p) => {
+      const pid = p.panelId ?? 'default';
+      if (!groups.has(pid)) groups.set(pid, []);
+      groups.get(pid)!.push(p);
+    });
+    return allPanelDefs
+      .map((pd) => {
+        const pieces = groups.get(pd.id) ?? [];
+        if (pieces.length === 0) return null;
+        return {
+          panelDef: pd,
+          nesting: optimizeNesting(pieces, pd.width, pd.height, state.kerf),
+          pieces,
+        };
+      })
+      .filter(Boolean) as { panelDef: PanelDef; nesting: ReturnType<typeof optimizeNesting>; pieces: PieceWithBody[] }[];
+  }, [allPieces, allPanelDefs, state.kerf]);
+
+  // Legacy single-nesting for backward compat (default panel)
+  const nesting = useMemo(
+    () => nestingByPanel.find((g) => g.panelDef.id === 'default')?.nesting
+      ?? optimizeNesting([], state.panel.width, state.panel.height, state.kerf),
+    [nestingByPanel, state.panel, state.kerf]
+  );
+
+  const totalPanelCount = useMemo(() => nestingByPanel.reduce((s, g) => s + g.nesting.metrics.panelCount, 0), [nestingByPanel]);
+
   const validation = useMemo(() => validate(state), [state]);
   const steps = useMemo(() => generateSteps(state), [state]);
   const cost = useMemo(() => estimateCost(state, nesting), [state, nesting]);
+
+  // Multi-panel total cost
+  const totalCost = useMemo(() => {
+    return nestingByPanel.reduce((sum, g) => sum + g.panelDef.price * g.nesting.metrics.panelCount, 0);
+  }, [nestingByPanel]);
 
   const refreshProjects = useCallback(() => setProjects(repo.list()), []);
 
@@ -121,7 +166,7 @@ export default function App() {
 
   const handleCreateFromWizard = useCallback((newState: AppState) => {
     repo.save(projectId, state);
-    const newId = Math.random().toString(36).slice(2, 8);
+    const newId = crypto.randomUUID();
     repo.save(newId, newState);
     repo.setCurrentId(newId);
     setProjectId(newId);
@@ -170,7 +215,7 @@ export default function App() {
     try {
       const imported = await importFromJson(file);
       const migrated = migrateState(imported);
-      const newId = Math.random().toString(36).slice(2, 8);
+      const newId = crypto.randomUUID();
       repo.save(newId, migrated);
       repo.setCurrentId(newId);
       setProjectId(newId);
@@ -209,9 +254,9 @@ export default function App() {
               <div className="mt-1.5 flex items-center gap-1.5 text-xs text-stone-500 flex-wrap">
                 <span className="bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2 py-0.5 font-medium">{mat.short} {state.panel.thickness * 10}mm</span>
                 <span className="bg-stone-100 border border-stone-200 rounded-full px-2 py-0.5">{totalPieces} pcs</span>
-                <span className="bg-stone-100 border border-stone-200 rounded-full px-2 py-0.5">{nesting.metrics.panelCount} pan.</span>
-                {cost.configured && (
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2 py-0.5 font-medium">{cost.totalMaterial.toFixed(0)} EUR</span>
+                <span className="bg-stone-100 border border-stone-200 rounded-full px-2 py-0.5">{totalPanelCount} pan.</span>
+                {totalCost > 0 && (
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2 py-0.5 font-medium">{totalCost.toFixed(0)} €</span>
                 )}
                 {validation.errors.length > 0 && (
                   <span className="bg-red-50 text-red-600 border border-red-200 rounded-full px-2 py-0.5 font-medium">{validation.errors.length} err.</span>
@@ -295,13 +340,15 @@ export default function App() {
         </div>
 
         {/* Content */}
-        {tab === 'structure' && <StructureTab state={state} onChange={setState} />}
+        {tab === 'structure' && <StructureTab state={state} onChange={setState} allPanelDefs={allPanelDefs} />}
         {tab === 'plans' && <PlanTab state={state} />}
         {tab === 'debit' && (
           <DebitTab
             state={state}
             allPieces={allPieces}
             nesting={nesting}
+            nestingByPanel={nestingByPanel}
+            allPanelDefs={allPanelDefs}
             cost={cost}
             onPriceChange={handlePriceChange}
           />
