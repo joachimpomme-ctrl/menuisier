@@ -276,6 +276,23 @@ export default function MontageTab({ state }: Props) {
         items.push({ label: 'Chevilles Ø8 (fixation murale)', count: chevilleCount, unit: 'pcs' });
         items.push({ label: 'Agrafes fond', count: agrafeCount, unit: 'pcs' });
 
+        // Filler hardware: detect bodies with filler pieces
+        const bodiesWithFillers = state.bodies.filter((b) =>
+          b.pieces.some((p) => /filler|remplissage|tasseau plafond|bandeau haut/i.test(p.name))
+        );
+        if (bodiesWithFillers.length > 0) {
+          // Vis plafond for tasseaux: 1 every 20cm per tasseau
+          const tasseauVis = bodiesWithFillers.reduce((s, b) => {
+            const tasseaux = b.pieces.filter(p => /tasseau plafond/i.test(p.name));
+            return s + tasseaux.reduce((acc, t) => acc + Math.ceil(t.length / 20) * t.qty, 0);
+          }, 0);
+          const chevillePlafond = tasseauVis; // 1 cheville per vis
+          const pointesSansTete = bodiesWithFillers.length * 12; // ~12 pointes per body for bandeau + plaquettes
+          items.push({ label: 'Vis Ø4×40 (tasseaux plafond)', count: tasseauVis, unit: 'pcs' });
+          items.push({ label: 'Chevilles plafond (Ø6 béton ou Molly placo)', count: chevillePlafond, unit: 'pcs' });
+          items.push({ label: 'Pointes sans tête (bandeaux + plaquettes)', count: pointesSansTete, unit: 'pcs' });
+        }
+
         return (
           <div className={cardClass}>
             <h3 className="text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3">Quincaillerie - Liste d'achats</h3>

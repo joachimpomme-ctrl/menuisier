@@ -66,6 +66,7 @@ export interface Body {
 export interface Project {
   name: string;
   wallWidth: number;
+  wallDepth: number;     // profondeur disponible (cm) — contrainte max pour les corps
   ceilingHeight: number;
   plinthHeight: number;
   plinthDepth: number;

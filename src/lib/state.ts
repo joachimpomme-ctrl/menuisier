@@ -10,6 +10,7 @@ export function createInitialState(mk: MaterialKey = 'cp_bouleau'): AppState {
     project: {
       name: "Mon meuble",
       wallWidth: 250,
+      wallDepth: 60,
       ceilingHeight: 254,
       plinthHeight: 13,
       plinthDepth: 2,
@@ -87,6 +88,13 @@ export function migrateState(state: AppState): AppState {
   // kerf (valeur par défaut si absente — anciens projets)
   if (s.kerf === undefined || s.kerf === null) {
     s = { ...s, kerf: 0.3 };
+  }
+
+  // wallDepth (ajouté pour la profondeur disponible)
+  if (s.project.wallDepth === undefined || s.project.wallDepth === null) {
+    // Default: use max body depth or 60cm
+    const maxDepth = s.bodies.length > 0 ? Math.max(...s.bodies.map(b => b.depth)) : 60;
+    s = { ...s, project: { ...s.project, wallDepth: maxDepth } };
   }
 
   return s;

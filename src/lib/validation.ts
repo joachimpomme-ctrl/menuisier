@@ -50,6 +50,18 @@ export function validate(st: AppState): ValidationResult {
     warnings.push(`Espace résiduel ${(pr.wallWidth - totalWidth).toFixed(1)} cm sur le mur`);
   }
 
+  // Profondeur : vérifier que les corps ne dépassent pas la profondeur disponible
+  const wallDepth = pr.wallDepth ?? 0;
+  if (wallDepth > 0) {
+    bs.forEach((b) => {
+      if (b.depth > wallDepth) {
+        errors.push(`${b.name} : profondeur ${b.depth} cm > profondeur disponible ${wallDepth} cm`);
+      } else if (b.depth > wallDepth - 2 && b.depth < wallDepth) {
+        warnings.push(`${b.name} : profondeur ${b.depth} cm très proche de la limite (${wallDepth} cm) — vérifier sur chantier`);
+      }
+    });
+  }
+
   // Épaisseur de panneau cohérente
   if (pn.thickness < 0.3 || pn.thickness > 5) {
     errors.push(`Épaisseur panneau ${pn.thickness} cm hors limites (0.3–5 cm)`);

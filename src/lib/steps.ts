@@ -212,6 +212,47 @@ export function generateSteps(st: AppState): Step[] {
     });
   }
 
+  // --- Fillers (pièces de remplissage haut/bas) ---
+  const bodiesWithFillers = bs.filter((b) =>
+    b.pieces.some((p) => /filler|remplissage|tasseau plafond|bandeau haut/i.test(p.name))
+  );
+
+  if (bodiesWithFillers.length > 0) {
+    const fillerItems: string[] = [
+      '⚠ Les fillers comblent l\'espace entre le haut du meuble et le plafond',
+      '',
+      '— Étape 1 : Tasseau plafond —',
+      `Repérer la position du tasseau au plafond (aligner avec les joues)`,
+      `Percer le plafond : chevilles Ø6 ou Ø8 selon le support (béton → cheville à frapper, placo → Molly)`,
+      `Visser le tasseau au plafond — vis Ø4×40 espacées de 20 cm`,
+      `Vérifier le niveau : le tasseau doit être parfaitement horizontal`,
+      '',
+      '— Étape 2 : Bandeau de finition (face avant) —',
+      `Découper le bandeau à la largeur exacte du corps (ajuster au compas à pointe sèche si le plafond n'est pas droit)`,
+      `Fixer le bandeau sur le tasseau : colle PVA + pointes sans tête (cloueur pneumatique idéal)`,
+      `Le bandeau doit venir en appui sur le dessus des joues`,
+      '',
+      '— Étape 3 : Plaquettes latérales —',
+      `Découper les plaquettes à la hauteur du gap`,
+      `Coller + pointes sans tête sur les joues`,
+      `Poncer les joints au grain 120 puis 180`,
+    ];
+
+    bodiesWithFillers.forEach((b) => {
+      const fillers = b.pieces.filter((p) => /filler|remplissage|tasseau plafond|bandeau haut/i.test(p.name));
+      fillerItems.push('');
+      fillerItems.push(`${b.name} :`);
+      fillers.forEach((f) => {
+        fillerItems.push(`  → ${f.name} : ${f.length}×${f.width} cm ×${f.qty}`);
+      });
+    });
+
+    steps.push({
+      title: "6c. Pose des fillers (remplissage plafond)",
+      items: fillerItems,
+    });
+  }
+
   // Finitions enrichies avec la base de connaissances
   const kbFinishes = FINISHES.filter((f) =>
     mat.finish.some((mf) => mf.toLowerCase().includes(f.nom.toLowerCase()))
@@ -220,8 +261,9 @@ export function generateSteps(st: AppState): Step[] {
   steps.push({
     title: "7. Finitions",
     items: [
-      `Bandeaux plafond ajustés au compas`,
-      `Tasseau collé-vissé plafond`,
+      ...(bodiesWithFillers.length > 0
+        ? [`Fillers plafond déjà posés (étape 6c)`]
+        : [`Bandeaux plafond ajustés au compas`, `Tasseau collé-vissé plafond`]),
       `Jonction 2 corps : montant L ou biseau`,
       `Tablettes réglables en place`,
       mat.edgeFinish,

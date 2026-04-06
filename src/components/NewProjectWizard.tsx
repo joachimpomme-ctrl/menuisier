@@ -157,6 +157,7 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate }: Props) {
       project: {
         name: autoPreview.name,
         wallWidth: autoWallW,
+        wallDepth: autoDepth + 10, // marge ~10cm autour du meuble
         ceilingHeight: autoCeilH,
         plinthHeight: autoPlinthH,
         plinthDepth: autoPlinthD,
@@ -179,7 +180,7 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate }: Props) {
     const p = m.panels[0];
     onCreate({
       materialKey: selectedMaterial,
-      project: { name: 'Mon meuble', wallWidth: 200, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
+      project: { name: 'Mon meuble', wallWidth: 200, wallDepth: 60, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
       panel: { width: p.w, height: p.h, thickness: m.defaultThickness / 10 },
       kerf: 0.3,
       costConfig: { panelPrice: p.defaultPrice },
@@ -231,7 +232,7 @@ ${userKnowledge}
 Tu DOIS répondre UNIQUEMENT avec un JSON valide, sans aucun texte avant ou après. Le JSON doit suivre exactement cette structure :
 {
   "materialKey": "cp_bouleau",
-  "project": { "name": "Nom du meuble", "wallWidth": 200, "ceilingHeight": 250, "plinthHeight": 0, "plinthDepth": 0 },
+  "project": { "name": "Nom du meuble", "wallWidth": 200, "wallDepth": 60, "ceilingHeight": 250, "plinthHeight": 0, "plinthDepth": 0 },
   "panel": { "width": 250, "height": 125, "thickness": 1.8 },
   "kerf": 0.3,
   "costConfig": { "panelPrice": 75 },

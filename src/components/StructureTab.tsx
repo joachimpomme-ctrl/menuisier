@@ -757,9 +757,12 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
       {/* Project */}
       <div className={cardClass}>
         <h3 className={sectionTitle}>Emplacement</h3>
-        <div className="grid grid-cols-2 gap-3">
-          <NumberInput label="Largeur disponible" suffix="cm" value={state.project.wallWidth} min={10} max={1000} step={0.1} onChange={(v) => updateProject('wallWidth', v)} tip={TIPS['largeur-mur']} />
-          <NumberInput label="Hauteur disponible" suffix="cm" value={state.project.ceilingHeight} min={10} max={500} step={0.1} onChange={(v) => updateProject('ceilingHeight', v)} tip={TIPS['hauteur-plafond']} />
+        <div className="grid grid-cols-3 gap-3">
+          <NumberInput label="Largeur" suffix="cm" value={state.project.wallWidth} min={10} max={1000} step={0.1} onChange={(v) => updateProject('wallWidth', v)} tip={TIPS['largeur-mur']} />
+          <NumberInput label="Profondeur" suffix="cm" value={state.project.wallDepth} min={10} max={200} step={0.1} onChange={(v) => updateProject('wallDepth', v)} tip="Profondeur max disponible pour le meuble (de la face du mur au premier obstacle : radiateur, porte, passage). Les corps ne devraient pas dépasser cette valeur." />
+          <NumberInput label="Hauteur" suffix="cm" value={state.project.ceilingHeight} min={10} max={500} step={0.1} onChange={(v) => updateProject('ceilingHeight', v)} tip={TIPS['hauteur-plafond']} />
+        </div>
+        <div className="grid grid-cols-2 gap-3 mt-3">
           <NumberInput label="Plinthe hauteur" suffix="cm" value={state.project.plinthHeight} min={0} max={50} step={0.1} onChange={(v) => updateProject('plinthHeight', v)} tip={TIPS['hauteur-plinthe']} />
           <NumberInput label="Plinthe profondeur" suffix="cm" value={state.project.plinthDepth} min={0} max={20} step={0.1} onChange={(v) => updateProject('plinthDepth', v)} tip={TIPS['profondeur-plinthe']} />
         </div>
@@ -1252,6 +1255,98 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                   Joues dans ce corps : {b.pieces.filter(p => p.type === 'joue').length} (+ 1 joue commune fournie par {state.bodies[bi - 1]?.name})
                 </div>
               )}
+
+              {/* Filler suggestion */}
+              {(() => {
+                const cH = state.project.ceilingHeight;
+                const plH = state.project.plinthHeight;
+                // Max joue height in this body (sum of haut+bas pairs, or single joue)
+                const joues = b.pieces.filter(p => p.type === 'joue');
+                const maxJoueH = joues.length > 0
+                  ? Math.max(...joues.map(j => j.length))
+                  : 0;
+                // Total joue height: if pairs (haut+bas), sum them. Otherwise use max.
+                const jouePairs = Math.floor(joues.length / 2);
+                let totalJoueH = maxJoueH;
+                if (jouePairs >= 1 && joues.length >= 2) {
+                  // Assume pairs: sort by length desc, take first two as pair
+                  const sorted = [...joues].sort((a, b2) => b2.length - a.length);
+                  // Sum the highest pair (typically haut + bas)
+                  const sums: number[] = [];
+                  for (let k = 0; k < sorted.length - 1; k += 2) {
+                    sums.push(sorted[k].length + sorted[k + 1].length);
+                  }
+                  totalJoueH = Math.max(...sums, maxJoueH);
+                }
+                const usableH = cH - plH;
+                const gapTop = +(cH - totalJoueH).toFixed(1);
+                const hasTopGap = gapTop > 1 && totalJoueH > 0 && totalJoueH < cH;
+                // Only show fillers when joues exist and don't reach the ceiling
+                const hasFiller = b.pieces.some(p => /filler|remplissage|tasseau plafond/i.test(p.name));
+
+                if (!hasTopGap || hasFiller) return null;
+
+                const fillerPieces = () => {
+                  const pieces = [
+                    // Tasseau de fixation au plafond : vissé au plafond, sert d'accroche
+                    { id: uid(), name: `Tasseau plafond ${b.name}`, length: iw, width: 4, qty: 1, type: 'tablette-fixe' as PieceType },
+                    // Bandeau de finition : couvre le gap visible de face
+                    { id: uid(), name: `Bandeau haut ${b.name}`, length: b.width, width: gapTop, qty: 1, type: 'bandeau' as PieceType },
+                    // Plaquettes latérales : comblent le gap sur les côtés
+                  ];
+                  // If the body has depth > 8cm, add side fillers
+                  if (b.depth > 8) {
+                    pieces.push({
+                      id: uid(), name: `Remplissage latéral ${b.name}`, length: gapTop, width: b.depth, qty: sl ? 1 : 2, type: 'autre' as PieceType
+                    });
+                  }
+                  return pieces;
+                };
+
+                const addFillers = () => {
+                  onChange({
+                    ...state,
+                    bodies: state.bodies.map((body) =>
+                      body.id === b.id
+                        ? { ...body, pieces: [...body.pieces, ...fillerPieces()] }
+                        : body
+                    ),
+                  });
+                };
+
+                return (
+                  <div className="mt-3 bg-violet-50 border border-violet-200 rounded-xl p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="text-xs font-semibold text-violet-800 mb-1">
+                          Espace résiduel en haut : {gapTop} cm
+                        </div>
+                        <p className="text-[10px] text-violet-600 leading-relaxed">
+                          Les joues ({totalJoueH} cm) n'atteignent pas le plafond ({cH} cm).
+                          Ajoutez des fillers pour un rendu fini :
+                        </p>
+                        <ul className="text-[10px] text-violet-700 mt-1 space-y-0.5 list-disc list-inside">
+                          <li><b>Tasseau plafond</b> ({iw}×4 cm) — vissé au plafond, sert d'accroche</li>
+                          <li><b>Bandeau haut</b> ({b.width}×{gapTop} cm) — cache le gap de face</li>
+                          {b.depth > 8 && (
+                            <li><b>Plaquettes latérales</b> ({gapTop}×{b.depth} cm ×{sl ? 1 : 2}) — comblent les côtés</li>
+                          )}
+                        </ul>
+                        <p className="text-[10px] text-violet-500 mt-1.5">
+                          Montage : visser le tasseau au plafond → fixer le bandeau sur le tasseau →
+                          ajuster les plaquettes latérales avec colle + pointes.
+                        </p>
+                      </div>
+                      <button
+                        onClick={addFillers}
+                        className="text-[11px] px-3 py-1.5 rounded-lg bg-violet-600 text-white font-semibold hover:bg-violet-700 transition-colors flex-shrink-0 shadow-sm"
+                      >
+                        + Ajouter fillers
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="mt-3 flex flex-wrap gap-1 items-center">
                 <button
