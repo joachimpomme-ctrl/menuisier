@@ -1,11 +1,12 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import type { AppState, TabKey, PieceWithBody, ProjectMeta, PanelDef } from './types';
+import type { AppState, TabKey, ProjectMeta, PanelDef } from './types';
 import { MATERIALS } from './data/materials';
 import { createInitialState, migrateState } from './lib/state';
 import { optimizeNesting } from './lib/nesting';
 import { validate } from './lib/validation';
 import { generateSteps } from './lib/steps';
 import { estimateCost } from './lib/cost';
+import { analyzeProject } from './lib/projectAnalysis';
 // PDF lazy-loaded pour code-split (jsPDF est gros)
 import { LocalProjectRepository, exportToJson, importFromJson } from './lib/storage';
 import { seedBaseKnowledge } from './lib/knowledgeStore';
@@ -76,61 +77,32 @@ export default function App() {
 
   const mat = MATERIALS[state.materialKey];
 
-  const allPieces: PieceWithBody[] = useMemo(
-    () => state.bodies.flatMap((b) => b.pieces.map((p) => ({ ...p, bodyName: b.name, bodyId: b.id }))),
-    [state.bodies]
-  );
-  const totalPieces = useMemo(() => allPieces.reduce((s, p) => s + p.qty, 0), [allPieces]);
+  // Single source of truth for all project metrics
+  const analysis = useMemo(() => analyzeProject(state), [state]);
 
-  // Multi-panel nesting: group pieces by panelId, run nesting per panel type
-  const defaultPanelDef: PanelDef = useMemo(() => ({
-    id: 'default',
-    label: `${mat.short} ${state.panel.thickness * 10}mm`,
-    width: state.panel.width,
-    height: state.panel.height,
-    thickness: state.panel.thickness,
-    price: state.costConfig.panelPrice,
-  }), [mat.short, state.panel, state.costConfig.panelPrice]);
-
-  const allPanelDefs = useMemo(() => [defaultPanelDef, ...(state.extraPanels ?? [])], [defaultPanelDef, state.extraPanels]);
-
-  const nestingByPanel = useMemo(() => {
-    const groups = new Map<string, PieceWithBody[]>();
-    allPieces.forEach((p) => {
-      const pid = p.panelId ?? 'default';
-      if (!groups.has(pid)) groups.set(pid, []);
-      groups.get(pid)!.push(p);
-    });
-    return allPanelDefs
-      .map((pd) => {
-        const pieces = groups.get(pd.id) ?? [];
-        if (pieces.length === 0) return null;
-        return {
-          panelDef: pd,
-          nesting: optimizeNesting(pieces, pd.width, pd.height, state.kerf),
-          pieces,
-        };
-      })
-      .filter(Boolean) as { panelDef: PanelDef; nesting: ReturnType<typeof optimizeNesting>; pieces: PieceWithBody[] }[];
-  }, [allPieces, allPanelDefs, state.kerf]);
-
-  // Legacy single-nesting for backward compat (default panel)
-  const nesting = useMemo(
-    () => nestingByPanel.find((g) => g.panelDef.id === 'default')?.nesting
-      ?? optimizeNesting([], state.panel.width, state.panel.height, state.kerf),
-    [nestingByPanel, state.panel, state.kerf]
-  );
-
-  const totalPanelCount = useMemo(() => nestingByPanel.reduce((s, g) => s + g.nesting.metrics.panelCount, 0), [nestingByPanel]);
+  // Backward-compat aliases used by child components
+  const allPieces = analysis.allPieces;
+  const totalPieces = analysis.totalPieces;
+  const nestingByPanel = analysis.panels.map(p => ({ panelDef: p.panelDef, nesting: p.nesting, pieces: p.pieces }));
+  const allPanelDefs = useMemo(() => {
+    const defaultPanelDef: PanelDef = {
+      id: 'default',
+      label: `${mat.short} ${state.panel.thickness * 10}mm`,
+      width: state.panel.width,
+      height: state.panel.height,
+      thickness: state.panel.thickness,
+      price: state.costConfig.panelPrice,
+    };
+    return [defaultPanelDef, ...(state.extraPanels ?? [])];
+  }, [mat.short, state.panel, state.costConfig.panelPrice, state.extraPanels]);
+  const nesting = analysis.panels.find(p => p.panelDef.id === 'default')?.nesting
+    ?? optimizeNesting([], state.panel.width, state.panel.height, state.kerf);
+  const totalPanelCount = analysis.totalPanelCount;
+  const totalCost = analysis.totalCost;
 
   const validation = useMemo(() => validate(state), [state]);
   const steps = useMemo(() => generateSteps(state), [state]);
   const cost = useMemo(() => estimateCost(state, nesting), [state, nesting]);
-
-  // Multi-panel total cost
-  const totalCost = useMemo(() => {
-    return nestingByPanel.reduce((sum, g) => sum + g.panelDef.price * g.nesting.metrics.panelCount, 0);
-  }, [nestingByPanel]);
 
   const refreshProjects = useCallback(() => setProjects(repo.list()), []);
 
@@ -232,7 +204,7 @@ export default function App() {
     setPdfLoading(true);
     try {
       const { generatePdf } = await import('./lib/pdf');
-      await generatePdf(state, nesting, validation, steps, cost);
+      await generatePdf(state, analysis, validation, steps);
     } catch (err) {
       console.error('Erreur PDF:', err);
     }

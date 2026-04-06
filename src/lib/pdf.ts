@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { AppState, NestingResult, ValidationResult, Step, PackedPiece } from '../types';
-import type { CostEstimate } from './cost';
+import type { AppState, ValidationResult, Step, PackedPiece } from '../types';
+import type { ProjectAnalysis } from './projectAnalysis';
 import { MATERIALS } from '../data/materials';
 
 // ---------------------------------------------------------------------------
@@ -22,6 +22,9 @@ const PIECE_COLORS: Record<string, string> = {
   'tablette-fixe': '#10b981',
   'tablette-reglable': '#f59e0b',
   'bandeau': '#8b5cf6',
+  'porte': '#f97316',
+  'tiroir-facade': '#06b6d4',
+  'fond': '#6b7280',
   'autre': '#ec4899',
 };
 
@@ -31,6 +34,7 @@ const PAGE_H = 297; // A4 height mm
 const CONTENT_W = PAGE_W - 2 * MARGIN; // usable width mm
 const TITLE_COLOR = hexToRgb('#1e3a5f');
 const TEXT_COLOR = hexToRgb('#333333');
+const ROW_ALT_COLOR: [number, number, number] = [245, 245, 250];
 
 function frenchDate(): string {
   const d = new Date();
@@ -98,10 +102,9 @@ function ensureSpace(doc: jsPDF, y: number, needed: number): number {
 
 export async function generatePdf(
   state: AppState,
-  nesting: NestingResult,
+  analysis: ProjectAnalysis,
   validation: ValidationResult,
   steps: Step[],
-  cost: CostEstimate,
 ): Promise<void> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const mat = MATERIALS[state.materialKey];
@@ -146,51 +149,86 @@ export async function generatePdf(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setTextColor(...TEXT_COLOR);
-  doc.text(`Mur : ${state.project.wallWidth} cm`, MARGIN, y);
+  doc.text(`Mur : ${state.project.wallWidth} cm (L) \u00d7 ${state.project.wallDepth} cm (P)`, MARGIN, y);
   y += 5;
   doc.text(`Plafond : ${state.project.ceilingHeight} cm`, MARGIN, y);
   y += 5;
-  doc.text(`Hauteur utile : ${usableHeight} cm`, MARGIN, y);
+  doc.text(`Hauteur utile : ${usableHeight} cm (plinthe ${state.project.plinthHeight} cm)`, MARGIN, y);
   y += 10;
 
-  // Counts
+  // Summary
   y = sectionTitle(doc, y, 'Resume');
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setTextColor(...TEXT_COLOR);
 
-  const totalPieces = state.bodies.reduce(
-    (s, b) => s + b.pieces.reduce((s2, p) => s2 + p.qty, 0),
-    0,
-  );
   doc.text(`Corps : ${state.bodies.length}`, MARGIN, y);
   y += 5;
-  doc.text(`Pieces totales : ${totalPieces}`, MARGIN, y);
+  doc.text(`Pieces totales : ${analysis.totalPieces}`, MARGIN, y);
   y += 5;
-  doc.text(`Panneaux necessaires : ${nesting.metrics.panelCount}`, MARGIN, y);
+  doc.text(`Panneaux necessaires : ${analysis.totalPanelCount}`, MARGIN, y);
   y += 5;
-  doc.text(`Efficacite de calepinage : ${nesting.metrics.efficiency.toFixed(1)} %`, MARGIN, y);
-  y += 10;
+  doc.text(`Efficacite moyenne : ${analysis.avgEfficiency.toFixed(1)} %`, MARGIN, y);
+  y += 5;
+  if (analysis.weightKg > 0) {
+    doc.text(`Poids estime : ${analysis.weightKg.toFixed(1)} kg`, MARGIN, y);
+    y += 5;
+  }
+  y += 5;
 
-  // Cost
-  if (cost.configured) {
+  // Multi-panel breakdown table
+  if (analysis.panels.length > 0) {
+    y = sectionTitle(doc, y, 'Panneaux');
+
+    const panelRows = analysis.panels.map((pu) => [
+      pu.panelDef.label,
+      `${pu.panelDef.width} \u00d7 ${pu.panelDef.height}`,
+      `${pu.panelDef.thickness * 10}`,
+      String(pu.panelCount),
+      `${pu.efficiency.toFixed(1)} %`,
+      pu.panelDef.price > 0 ? `${pu.cost.toFixed(2)} \u20ac` : '-',
+    ]);
+
+    // Grand total row
+    panelRows.push([
+      { content: 'Total', colSpan: 3, styles: { fontStyle: 'bold' } },
+      '', '',
+      String(analysis.totalPanelCount),
+      `${analysis.avgEfficiency.toFixed(1)} %`,
+      analysis.configured ? `${analysis.totalCost.toFixed(2)} \u20ac` : '-',
+    ] as unknown as string[]);
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: MARGIN, right: MARGIN },
+      head: [['Panneau', 'Dim. (cm)', 'Ep. (mm)', 'Qte', 'Efficacite', 'Cout']],
+      body: panelRows,
+      styles: { font: 'helvetica', fontSize: 9, textColor: TEXT_COLOR },
+      headStyles: {
+        fillColor: TITLE_COLOR,
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+      },
+      alternateRowStyles: { fillColor: ROW_ALT_COLOR },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    y = (doc as any).lastAutoTable.finalY + 8;
+  }
+
+  // Cost summary
+  if (analysis.configured) {
+    y = ensureSpace(doc, y, 20);
     y = sectionTitle(doc, y, 'Estimation de cout');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     doc.setTextColor(...TEXT_COLOR);
-    doc.text(`Prix unitaire panneau : ${cost.panelPrice.toFixed(2)} \u20ac`, MARGIN, y);
-    y += 5;
-    doc.text(`Cout matiere total : ${cost.totalMaterial.toFixed(2)} \u20ac`, MARGIN, y);
-    y += 5;
-    doc.text(
-      `Chutes : ${cost.wastePercent.toFixed(1)} % soit ${cost.wasteCost.toFixed(2)} \u20ac`,
-      MARGIN,
-      y,
-    );
+    doc.text(`Cout matiere total : ${analysis.totalCost.toFixed(2)} \u20ac HT`, MARGIN, y);
     y += 10;
   }
 
   // Validation summary
+  y = ensureSpace(doc, y, 15);
   y = sectionTitle(doc, y, 'Validation');
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
@@ -202,47 +240,167 @@ export async function generatePdf(
   );
 
   // =========================================================================
-  // Page 2+ — Cut list table
+  // Page 2+ — Cut list table (grouped by body, sorted by area desc)
   // =========================================================================
   doc.addPage();
 
   y = MARGIN + 5;
-  y = sectionTitle(doc, y, 'Liste de debit');
+  y = sectionTitle(doc, y, 'Liste de decoupe');
 
-  // Build rows: all pieces from all bodies, sorted by area desc
-  type Row = { piece: string; body: string; type: string; l: number; w: number; qty: number };
-  const rows: Row[] = [];
-  for (const b of state.bodies) {
-    for (const p of b.pieces) {
-      rows.push({
-        piece: p.name,
-        body: b.name,
-        type: p.type,
-        l: p.length,
-        w: p.width,
-        qty: p.qty,
-      });
+  // Build a lookup: panelId -> panelDef label & thickness
+  const defaultPanelDef = analysis.panels.find(p => p.panelDef.id === 'default')?.panelDef;
+  const allPanelDefs = analysis.panels.map(p => p.panelDef);
+
+  function getPanelLabel(panelId?: string): string {
+    if (!panelId || panelId === 'default') {
+      return defaultPanelDef?.label ?? `${mat.short} ${state.panel.thickness * 10}mm`;
     }
+    return allPanelDefs.find(d => d.id === panelId)?.label ?? panelId;
   }
-  rows.sort((a, b) => b.l * b.w * b.qty - a.l * a.w * a.qty);
 
-  const totalQty = rows.reduce((s, r) => s + r.qty, 0);
+  function getPanelThicknessMm(panelId?: string): number {
+    if (!panelId || panelId === 'default') {
+      return (defaultPanelDef?.thickness ?? state.panel.thickness) * 10;
+    }
+    const pd = allPanelDefs.find(d => d.id === panelId);
+    return pd ? pd.thickness * 10 : state.panel.thickness * 10;
+  }
+
+  // Group pieces by body, then sort within each group by area desc
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tableBody: any[][] = [];
+  let grandTotalQty = 0;
+
+  for (const b of state.bodies) {
+    const bodyPieces = [...b.pieces].sort((a, bx) => bx.length * bx.width * bx.qty - a.length * a.width * a.qty);
+    let bodyQty = 0;
+
+    for (const p of bodyPieces) {
+      bodyQty += p.qty;
+      tableBody.push([
+        p.name,
+        p.type,
+        String(p.length),
+        String(p.width),
+        String(p.qty),
+        getPanelLabel(p.panelId),
+        String(getPanelThicknessMm(p.panelId)),
+      ]);
+    }
+
+    // Subtotal row for body
+    tableBody.push([
+      { content: `${b.name} — ${bodyQty} pcs`, colSpan: 7, styles: { fontStyle: 'bold', fillColor: [235, 235, 240] } },
+    ]);
+
+    grandTotalQty += bodyQty;
+  }
+
+  // Grand total
+  tableBody.push([
+    { content: `TOTAL : ${grandTotalQty} pieces`, colSpan: 7, styles: { fontStyle: 'bold', fillColor: TITLE_COLOR } },
+  ]);
 
   autoTable(doc, {
     startY: y,
     margin: { left: MARGIN, right: MARGIN },
-    head: [['Piece', 'Corps', 'Type', 'L (cm)', 'l (cm)', 'Qte']],
-    body: [
-      ...rows.map((r) => [r.piece, r.body, r.type, String(r.l), String(r.w), String(r.qty)]),
-      [{ content: 'Total', colSpan: 5, styles: { fontStyle: 'bold' } }, String(totalQty)],
-    ],
-    styles: { font: 'helvetica', fontSize: 9, textColor: TEXT_COLOR },
+    head: [['Piece', 'Type', 'L (cm)', 'l (cm)', 'Qte', 'Panneau', 'Ep. (mm)']],
+    body: tableBody,
+    styles: { font: 'helvetica', fontSize: 8, textColor: TEXT_COLOR, cellPadding: 2 },
     headStyles: {
       fillColor: TITLE_COLOR,
       textColor: [255, 255, 255],
       fontStyle: 'bold',
     },
+    alternateRowStyles: { fillColor: ROW_ALT_COLOR },
+    // Override the grand total row text color to white
+    didParseCell(data) {
+      // Grand total row (last body row)
+      if (data.section === 'body' && data.row.index === tableBody.length - 1) {
+        data.cell.styles.textColor = [255, 255, 255];
+      }
+    },
   });
+
+  // =========================================================================
+  // Nesting diagrams — MULTI-PANEL
+  // =========================================================================
+  for (const panelUsage of analysis.panels) {
+    const pd = panelUsage.panelDef;
+    const panelW = pd.width;  // cm
+    const panelH = pd.height; // cm
+    const scaleW = CONTENT_W; // fit 170mm width
+    const rawScale = scaleW / panelW; // mm per cm
+    const rawDiagramH = panelH * rawScale; // mm height of one diagram
+    const maxDiagramH = (PAGE_H - 2 * MARGIN - 30) / 2; // max height for 2 per page
+    const effectiveScale = rawDiagramH > maxDiagramH ? maxDiagramH / panelH : rawScale;
+    const effectiveDiagramW = panelW * effectiveScale;
+    const effectiveDiagramH = panelH * effectiveScale;
+
+    let diagramsOnPage = 0;
+    doc.addPage();
+    y = MARGIN + 5;
+    y = sectionTitle(doc, y, `Calepinage — ${pd.label} — ${pd.width}\u00d7${pd.height} cm`);
+
+    panelUsage.nesting.bins.forEach((bin, idx) => {
+      // Check if we need a new page (max 2 diagrams per page)
+      if (diagramsOnPage >= 2) {
+        doc.addPage();
+        y = MARGIN + 10;
+        diagramsOnPage = 0;
+      }
+
+      y = ensureSpace(doc, y, effectiveDiagramH + 20);
+
+      // Panel label
+      const binUsed = bin.pl.reduce((s: number, p: PackedPiece) => s + p.pw * p.ph, 0);
+      const binTotal = panelW * panelH;
+      const binEfficiency = binTotal > 0 ? (binUsed / binTotal) * 100 : 0;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(...TEXT_COLOR);
+      doc.text(
+        `Panneau ${idx + 1} / ${panelUsage.nesting.bins.length} — Efficacite ${binEfficiency.toFixed(1)} %`,
+        MARGIN,
+        y,
+      );
+      y += 5;
+
+      // Panel outline
+      doc.setDrawColor(100, 100, 100);
+      doc.setLineWidth(0.5);
+      doc.rect(MARGIN, y, effectiveDiagramW, effectiveDiagramH);
+
+      // Pieces
+      for (const p of bin.pl) {
+        const color = PIECE_COLORS[p.type] ?? PIECE_COLORS['autre'];
+        const [r, g, b] = hexToRgb(color);
+        doc.setFillColor(r, g, b);
+        doc.setDrawColor(255, 255, 255);
+        doc.setLineWidth(0.3);
+
+        const px = MARGIN + p.x * effectiveScale;
+        const py = y + p.y * effectiveScale;
+        const pw = p.pw * effectiveScale;
+        const ph = p.ph * effectiveScale;
+
+        doc.rect(px, py, pw, ph, 'FD');
+
+        // Label (only if big enough)
+        if (pw > 12 && ph > 5) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(6);
+          doc.setTextColor(255, 255, 255);
+          const labelText = `${p.name} ${p.length}\u00d7${p.width}`;
+          doc.text(labelText, px + 1, py + 3.5, { maxWidth: pw - 2 });
+        }
+      }
+
+      y += effectiveDiagramH + 10;
+      diagramsOnPage++;
+    });
+  }
 
   // =========================================================================
   // Validation detail page
@@ -291,83 +449,6 @@ export async function generatePdf(
       }
     }
   }
-
-  // =========================================================================
-  // Nesting diagrams — one diagram per panel, max 2 per page
-  // =========================================================================
-  const panelW = state.panel.width; // cm
-  const panelH = state.panel.height; // cm
-  const scaleW = CONTENT_W; // fit 170mm width
-  const scale = scaleW / panelW; // mm per cm
-  const diagramH = panelH * scale; // mm height of one diagram
-  const maxDiagramH = (PAGE_H - 2 * MARGIN - 30) / 2; // max height for 2 per page
-  const effectiveScale = diagramH > maxDiagramH ? maxDiagramH / panelH : scale;
-  const effectiveDiagramW = panelW * effectiveScale;
-  const effectiveDiagramH = panelH * effectiveScale;
-
-  let diagramsOnPage = 0;
-  doc.addPage();
-  y = MARGIN + 5;
-  y = sectionTitle(doc, y, 'Calepinage — Plans de decoupe');
-
-  nesting.bins.forEach((bin, idx) => {
-    // Check if we need a new page (max 2 diagrams per page)
-    if (diagramsOnPage >= 2) {
-      doc.addPage();
-      y = MARGIN + 10;
-      diagramsOnPage = 0;
-    }
-
-    y = ensureSpace(doc, y, effectiveDiagramH + 20);
-
-    // Panel label
-    const binEfficiency =
-      bin.pl.reduce((s: number, p: PackedPiece) => s + p.pw * p.ph, 0) /
-      (panelW * panelH) *
-      100;
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(...TEXT_COLOR);
-    doc.text(
-      `Panneau ${idx + 1} — Efficacite ${binEfficiency.toFixed(1)} %`,
-      MARGIN,
-      y,
-    );
-    y += 5;
-
-    // Panel outline
-    doc.setDrawColor(100, 100, 100);
-    doc.setLineWidth(0.5);
-    doc.rect(MARGIN, y, effectiveDiagramW, effectiveDiagramH);
-
-    // Pieces
-    for (const p of bin.pl) {
-      const color = PIECE_COLORS[p.type] ?? PIECE_COLORS['autre'];
-      const [r, g, b] = hexToRgb(color);
-      doc.setFillColor(r, g, b);
-      doc.setDrawColor(255, 255, 255);
-      doc.setLineWidth(0.3);
-
-      const px = MARGIN + p.x * effectiveScale;
-      const py = y + p.y * effectiveScale;
-      const pw = p.pw * effectiveScale;
-      const ph = p.ph * effectiveScale;
-
-      doc.rect(px, py, pw, ph, 'FD');
-
-      // Label (only if big enough)
-      if (pw > 12 && ph > 5) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(6);
-        doc.setTextColor(255, 255, 255);
-        doc.text(p.name, px + 1, py + 3.5, { maxWidth: pw - 2 });
-      }
-    }
-
-    y += effectiveDiagramH + 10;
-    diagramsOnPage++;
-  });
 
   // =========================================================================
   // Notice de montage
