@@ -11,7 +11,7 @@ import { analyzeProject } from './lib/projectAnalysis';
 // PDF lazy-loaded pour code-split (jsPDF est gros)
 import { LocalProjectRepository, exportToJson, syncToJson, importFromJson } from './lib/storage';
 import { seedBaseKnowledge } from './lib/knowledgeStore';
-import { isCloudConfigured } from './lib/cloudSync';
+import { isCloudConfigured, getCloudUrl, setCloudUrl } from './lib/cloudSync';
 import StructureTab from './components/StructureTab';
 import DebitTab from './components/DebitTab';
 import MontageTab from './components/MontageTab';
@@ -246,6 +246,26 @@ export default function App() {
               >
                 Projets
               </button>
+              <button
+                onClick={() => {
+                  if (!isCloudConfigured()) {
+                    const url = prompt('Colle l\'URL de ton Google Apps Script :', getCloudUrl() ?? '');
+                    if (url && url.startsWith('https://')) {
+                      setCloudUrl(url);
+                    }
+                    if (!url) return;
+                  }
+                  setShowCloud(true);
+                }}
+                className={`text-xs px-3 py-2 rounded-xl active:scale-95 transition-all shadow-sm ${
+                  isCloudConfigured()
+                    ? 'bg-sky-50 text-sky-600 border border-sky-200 hover:bg-sky-100'
+                    : 'bg-white text-stone-400 border border-stone-200 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-600'
+                }`}
+                title="Sync cloud Google Sheets"
+              >
+                ☁️
+              </button>
               <Tip text={TIPS['export-pdf']} side="bottom">
                 <button
                   onClick={handleExportPdf}
@@ -275,17 +295,6 @@ export default function App() {
                 JSON
               </button>
             </Tip>
-            <button
-              onClick={() => setShowCloud(true)}
-              className={`text-[11px] px-2.5 py-1.5 rounded-lg border whitespace-nowrap transition-colors ${
-                isCloudConfigured()
-                  ? 'bg-sky-50 text-sky-600 border-sky-200 hover:bg-sky-100'
-                  : 'bg-white text-stone-500 hover:text-stone-700 border-stone-200'
-              }`}
-              title="Sync cloud Google Sheets"
-            >
-              ☁️ Cloud
-            </button>
             <button
               onClick={() => syncToJson(state)}
               className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
