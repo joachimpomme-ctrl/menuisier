@@ -49,9 +49,12 @@ export interface Piece {
 
 export type DoorPoseType = 'enveloppante' | 'demi-recouvrement' | 'affleurante';
 
+export type DoorPosition = 'bas' | 'haut';
+
 export interface DoorConfig {
   count: 1 | 2;
   poseType: DoorPoseType;
+  position?: DoorPosition; // défaut: 'bas'
 }
 
 export interface Body {

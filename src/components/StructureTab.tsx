@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { AppState, MaterialKey, PieceType, Body, DoorPoseType, DoorConfig, PanelDef } from '../types';
+import type { AppState, MaterialKey, PieceType, Body, DoorPoseType, DoorConfig, DoorPosition, PanelDef } from '../types';
 import { MATERIALS, PIECE_COLORS, BODY_COLORS, PIECE_TYPES } from '../data/materials';
 import { uid, parseNumber, clampInt, calculateDoor, getBodyInnerWidth, isSharedLeft, getBodyEffectiveHeight, getDoorInfoFromPieces } from '../lib/helpers';
 import { createPiece, detectPieceType } from '../lib/domain/pieces';
@@ -232,6 +232,23 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
             </Tip>
           ))}
         </div>
+      </div>
+
+      {/* Position haut/bas (utile quand la porte ne couvre pas tout le corps) */}
+      <div className="flex gap-2 mb-2">
+        <span className="text-[11px] text-stone-500 self-center mr-1">Position :</span>
+        {([
+          { key: 'bas' as DoorPosition, label: 'En bas' },
+          { key: 'haut' as DoorPosition, label: 'En haut' },
+        ]).map((pos) => (
+          <button
+            key={pos.key}
+            onClick={() => applyDoors({ ...config, position: pos.key })}
+            className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-all ${(config.position ?? 'bas') === pos.key ? 'bg-amber-100 border-amber-300 text-amber-800 font-semibold' : 'bg-white border-stone-200 text-stone-500 hover:border-amber-200'}`}
+          >
+            {pos.label}
+          </button>
+        ))}
       </div>
 
       {doorInfo && (

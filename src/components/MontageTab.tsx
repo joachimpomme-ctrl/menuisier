@@ -149,7 +149,8 @@ export default function MontageTab({ state }: Props) {
                   {/* ===== DOORS ===== */}
                   {doorInfo && (() => {
                     const dh = doorInfo.doorHeight * scale;
-                    const doorTopY = MARGIN + (usableHeight - doorInfo.doorHeight) * scale / 2;
+                    const pos = b.doorConfig?.position ?? 'bas';
+                    const doorTopY = pos === 'haut' ? MARGIN : MARGIN + bh - dh;
                     const DOOR_INSET = 3;
 
                     if (doorInfo.count === 1) {
