@@ -3,6 +3,7 @@ import autoTable from 'jspdf-autotable';
 import type { AppState, ValidationResult, Step, PackedPiece, PanelDef } from '../types';
 import type { ProjectAnalysis } from './projectAnalysis';
 import { MATERIALS } from '../data/materials';
+import { getUsableHeight } from './helpers';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -108,7 +109,7 @@ export async function generatePdf(
 ): Promise<void> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const mat = MATERIALS[state.materialKey];
-  const usableHeight = state.project.ceilingHeight - state.project.plinthHeight;
+  const usableHeight = getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight);
   const date = frenchDate();
 
   // =========================================================================

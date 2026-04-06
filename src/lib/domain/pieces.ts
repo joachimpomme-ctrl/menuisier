@@ -1,5 +1,5 @@
 import type { Piece, PieceType, PanelDef } from '../../types';
-import { uid } from '../helpers';
+import { uid, getUsableHeight } from '../helpers';
 
 // ---------------------------------------------------------------------------
 // Create a new piece with smart defaults based on type
@@ -25,7 +25,7 @@ export function createPiece(
   plinthHeight: number,
   allPanelDefs: PanelDef[],
 ): Piece {
-  const usableHeight = ceilingHeight - plinthHeight;
+  const usableHeight = getUsableHeight(ceilingHeight, plinthHeight);
 
   let name = 'Nouvelle pièce';
   let length = 50;

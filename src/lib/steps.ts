@@ -1,12 +1,12 @@
 import type { AppState, Step } from '../types';
 import { MATERIALS } from '../data/materials';
 import { SYSTEME_32_RULES, ASSEMBLAGES, FINISHES, ORIENTATION_RULES } from '../data/knowledge';
-import { getDoorInfoFromPieces } from './helpers';
+import { getDoorInfoFromPieces, getUsableHeight } from './helpers';
 
 export function generateSteps(st: AppState): Step[] {
   const { project: pr, panel: pn, bodies: bs, materialKey: mk } = st;
   const mat = MATERIALS[mk];
-  const usableHeight = pr.ceilingHeight - pr.plinthHeight;
+  const usableHeight = getUsableHeight(pr.ceilingHeight, pr.plinthHeight);
   const sharedBounds = st.sharedBoundaries ?? [];
   const steps: Step[] = [];
 

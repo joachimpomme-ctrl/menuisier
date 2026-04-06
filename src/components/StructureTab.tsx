@@ -2,8 +2,7 @@ import { useState } from 'react';
 import type { AppState, MaterialKey, PieceType, Body, DoorPoseType, DoorConfig, DoorPosition, PanelDef } from '../types';
 import { MATERIALS, PIECE_COLORS, BODY_COLORS, PIECE_TYPES } from '../data/materials';
 import { uid, parseNumber, clampInt, calculateDoor, getBodyInnerWidth, isSharedLeft, getBodyEffectiveHeight, getDoorInfoFromPieces } from '../lib/helpers';
-import { createPiece, detectPieceType } from '../lib/domain/pieces';
-import { generateStandardPieces } from '../lib/domain/body';
+import { createPiece, detectPieceType, generateStandardPieces, applySharedBoundary, recalcBodyPieces } from '../lib/domain';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 
@@ -94,37 +93,6 @@ function NumberInput({ label, value, onChange, step = 1, min, max, suffix, tip }
       />
     </div>
   );
-}
-
-// ---------------------------------------------------------------------------
-// Helpers joue commune
-// ---------------------------------------------------------------------------
-
-/** Regex: matches "gauche", "G —", "G –", "G -", "G—" etc. Works with default state
- *  names like "Joue G — gauche bas" AND auto-fill names like "Joue G — bas". */
-const LEFT_JOUE_RE = /gauche|\bG\s*[—–-]/i;
-
-/** Regex: matches "droite", "D —", "D –", "D -", "D—" etc. */
-const RIGHT_JOUE_RE = /droite|\bD\s*[—–-]/i;
-
-/** Identifie les joues "gauche" par nom */
-function findLeftJoueIds(pieces: Body['pieces']): string[] {
-  const byName = pieces.filter(p => p.type === 'joue' && LEFT_JOUE_RE.test(p.name)).map(p => p.id);
-  if (byName.length > 0) return byName;
-  // Fallback : pas de nom reconnaissable → prendre la première moitié des joues
-  const joues = pieces.filter(p => p.type === 'joue');
-  if (joues.length <= 1) {
-    // Un seul morceau de joue avec qty >= 2 → on ne supprime pas la pièce, on réduira la qty
-    return [];
-  }
-  return joues.slice(0, Math.ceil(joues.length / 2)).map(p => p.id);
-}
-
-function findRightJoues(pieces: Body['pieces']) {
-  const byName = pieces.filter(p => p.type === 'joue' && RIGHT_JOUE_RE.test(p.name));
-  if (byName.length > 0) return byName;
-  const joues = pieces.filter(p => p.type === 'joue');
-  return joues.slice(Math.floor(joues.length / 2));
 }
 
 // ---------------------------------------------------------------------------
@@ -315,50 +283,11 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
         if (key === 'width' || key === 'depth') {
           const newWidth = key === 'width' ? (value as number) : b.width;
           const newDepth = key === 'depth' ? (value as number) : b.depth;
-          const oldWidth = b.width;
-          const oldDepth = b.depth;
-          const thickness = state.panel.thickness;
-
-          // Sharing-aware inner width
-          const sl = isSharedLeft(i, shared);
-          const leftTh = sl ? 0 : thickness;
-          const innerWidth = +(newWidth - leftTh - thickness).toFixed(1);
-          const oldInnerWidth = +(oldWidth - leftTh - thickness).toFixed(1);
-
-          updated.pieces = b.pieces.map((p) => {
-            const piece = { ...p };
-            if (p.type === 'joue') {
-              piece.width = newDepth;
-            } else if (p.type === 'tablette-fixe' || p.type === 'tablette-reglable') {
-              piece.length = innerWidth;
-              piece.width = newDepth;
-            } else if (p.type === 'bandeau') {
-              piece.length = newWidth;
-            } else if (p.type === 'porte') {
-              // recalculated via door config below
-            } else {
-              if (key === 'depth' && Math.abs(p.width - oldDepth) < 0.5) {
-                piece.width = newDepth;
-              }
-              if (key === 'width' && Math.abs(p.length - oldInnerWidth) < 0.5) {
-                piece.length = innerWidth;
-              }
-              if (key === 'width' && Math.abs(p.length - oldWidth) < 0.5) {
-                piece.length = newWidth;
-              }
-            }
-            return piece;
-          });
-
-          // Recalculate doors
-          if (b.doorConfig) {
-            const bH = getBodyEffectiveHeight({ ...b, width: newWidth, depth: newDepth, pieces: updated.pieces }, state.project.ceilingHeight, state.project.plinthHeight);
-            const dims = calculateDoor(newWidth, bH, thickness, b.doorConfig.count, b.doorConfig.poseType, innerWidth);
-            updated.pieces = updated.pieces.map((p) => {
-              if (p.type === 'porte') return { ...p, length: dims.doorHeight, width: dims.doorWidth };
-              return p;
-            });
-          }
+          return recalcBodyPieces(
+            b, i, b.width, b.depth, newWidth, newDepth,
+            state.panel.thickness, shared,
+            state.project.ceilingHeight, state.project.plinthHeight,
+          );
         }
 
         return updated;
@@ -487,143 +416,11 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
 
   // ---------- TOGGLE JOUE COMMUNE ----------
   const toggleSharing = (boundaryIdx: number, enabled: boolean) => {
-    const wasEnabled = shared[boundaryIdx] ?? false;
-    if (wasEnabled === enabled) return;
-
-    const newShared = [...shared];
-    while (newShared.length < state.bodies.length - 1) newShared.push(false);
-    newShared[boundaryIdx] = enabled;
-
-    const cH = state.project.ceilingHeight;
-    const newBodies = state.bodies.map((b) => ({
-      ...b,
-      pieces: b.pieces.map((p) => ({ ...p })),
-    }));
-
-    const leftBody = newBodies[boundaryIdx];
-    const rightBody = newBodies[boundaryIdx + 1];
-
-    if (enabled) {
-      // ===== ACTIVER LA JOUE COMMUNE =====
-
-      // 1. Width adjustments: compensate for shared joue
-      leftBody.width = +(leftBody.width + th / 2).toFixed(1);
-      rightBody.width = +(rightBody.width + th / 2).toFixed(1);
-
-      // 2. Remove ALL left joues from right body
-      const leftJoueIds = findLeftJoueIds(rightBody.pieces);
-      if (leftJoueIds.length > 0) {
-        rightBody.pieces = rightBody.pieces.filter((p) => !leftJoueIds.includes(p.id));
-      } else {
-        // Fallback: single joue piece with qty >= 2 → reduce qty
-        const joues = rightBody.pieces.filter((p) => p.type === 'joue');
-        if (joues.length === 1 && joues[0].qty >= 2) {
-          joues[0].qty = Math.ceil(joues[0].qty / 2);
-        } else if (joues.length >= 2) {
-          // No name match → remove first half
-          const half = Math.ceil(joues.length / 2);
-          const removeIds = new Set(joues.slice(0, half).map((p) => p.id));
-          rightBody.pieces = rightBody.pieces.filter((p) => !removeIds.has(p.id));
-        }
-      }
-
-      // 3. Mark the commune joues: right joues of left body
-      const maxD = Math.max(leftBody.depth, rightBody.depth);
-      const rightJouesOfLeft = findRightJoues(leftBody.pieces);
-      if (rightJouesOfLeft.length > 0) {
-        rightJouesOfLeft.forEach((j) => {
-          j.width = maxD;
-          if (!j.name.includes('(commune)')) {
-            j.name = j.name + ' (commune)';
-          }
-        });
-      } else {
-        // No identifiable right joues → update ALL joues of left body
-        leftBody.pieces.filter(p => p.type === 'joue').forEach(j => {
-          j.width = maxD;
-        });
-      }
-
-    } else {
-      // ===== DESACTIVER LA JOUE COMMUNE =====
-
-      // 1. Width adjustments
-      leftBody.width = +(leftBody.width - th / 2).toFixed(1);
-      rightBody.width = +(rightBody.width - th / 2).toFixed(1);
-
-      // 2. Re-create left joues for right body
-      //    Source: commune joues in left body, or right body's own right joues
-      const communeJoues = leftBody.pieces.filter(
-        p => p.type === 'joue' && p.name.includes('(commune)')
-      );
-      const sourceJoues = communeJoues.length > 0
-        ? communeJoues
-        : findRightJoues(rightBody.pieces);
-
-      if (sourceJoues.length > 0) {
-        const newLeftJoues = sourceJoues.map((p) => ({
-          ...p,
-          id: uid(),
-          name: p.name
-            .replace(/\s*\(commune\)/g, '')
-            .replace(/droite/gi, 'gauche')
-            .replace(/\bD\s*([—–-])/g, 'G $1'),
-          width: rightBody.depth,
-        }));
-        rightBody.pieces = [...newLeftJoues, ...rightBody.pieces];
-      } else {
-        // Fallback: qty doubling or standard creation
-        const joues = rightBody.pieces.filter((p) => p.type === 'joue');
-        if (joues.length === 1) {
-          joues[0].qty *= 2;
-        } else if (joues.length === 0) {
-          // Edge case: no joues at all → create 2 standard joues
-          const basHeight = 180;
-          const hautHeight = +(cH - basHeight).toFixed(1);
-          rightBody.pieces.unshift(
-            { id: uid(), name: 'Joue G — bas', length: basHeight, width: rightBody.depth, qty: 1, type: 'joue' as PieceType },
-            { id: uid(), name: 'Joue G — haut', length: hautHeight, width: rightBody.depth, qty: 1, type: 'joue' as PieceType },
-          );
-        }
-      }
-
-      // 3. Clean up commune joues in left body: remove "(commune)", reset width
-      leftBody.pieces.forEach((p) => {
-        if (p.type === 'joue' && p.name.includes('(commune)')) {
-          p.name = p.name.replace(/\s*\(commune\)/g, '');
-          p.width = leftBody.depth;
-        }
-      });
-      // Also reset any right joues that were set to max depth
-      findRightJoues(leftBody.pieces).forEach((j) => { j.width = leftBody.depth; });
-    }
-
-    // 4. Recalculate tablettes and doors for ALL bodies
-    const finalBodies = newBodies.map((b, i) => {
-      const sl = isSharedLeft(i, newShared);
-      const leftTh = sl ? 0 : th;
-      const iw = +(b.width - leftTh - th).toFixed(1);
-
-      b.pieces = b.pieces.map((p) => {
-        if (p.type === 'tablette-fixe' || p.type === 'tablette-reglable') {
-          return { ...p, length: iw };
-        }
-        return p;
-      });
-
-      if (b.doorConfig) {
-        const bH = getBodyEffectiveHeight(b, state.project.ceilingHeight, state.project.plinthHeight);
-        const dims = calculateDoor(b.width, bH, th, b.doorConfig.count, b.doorConfig.poseType, iw);
-        b.pieces = b.pieces.map((p) => {
-          if (p.type === 'porte') return { ...p, length: dims.doorHeight, width: dims.doorWidth };
-          return p;
-        });
-      }
-
-      return b;
-    });
-
-    onChange({ ...state, bodies: finalBodies, sharedBoundaries: newShared });
+    const result = applySharedBoundary(
+      state.bodies, boundaryIdx, enabled, shared, th,
+      state.project.ceilingHeight, state.project.plinthHeight,
+    );
+    onChange({ ...state, bodies: result.bodies, sharedBoundaries: result.sharedBoundaries });
   };
 
   // ---------- display helpers ----------

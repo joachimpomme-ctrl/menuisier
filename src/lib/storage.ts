@@ -209,16 +209,16 @@ export function importFromJson(file: File): Promise<AppState> {
           return;
         }
         // Accept both v1 (migrated) and v2
-        const state =
+        const migrated =
           parsed.version === CURRENT_VERSION
             ? parsed.state
             : migrateState(parsed.state);
 
-        if (!state?.materialKey || !state?.project || !Array.isArray(state?.bodies)) {
+        if (!migrated?.materialKey || !migrated?.project || !Array.isArray(migrated?.bodies)) {
           reject(new Error('Données de projet invalides'));
           return;
         }
-        resolve(state);
+        resolve(normalizeProject(migrated));
       } catch {
         reject(new Error('Fichier JSON invalide'));
       }

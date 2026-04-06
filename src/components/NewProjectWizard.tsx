@@ -4,7 +4,7 @@ import { MATERIALS } from '../data/materials';
 import { TEMPLATES } from '../data/templates';
 import { buildKnowledgeSummary } from '../data/knowledge';
 import { buildUserKnowledgeContext } from '../lib/knowledgeStore';
-import { uid } from '../lib/helpers';
+import { uid, getUsableHeight } from '../lib/helpers';
 
 interface Props {
   isOpen: boolean;
@@ -50,7 +50,7 @@ function autoLayout(
   const mat = MATERIALS[mk];
   const th = mat.defaultThickness / 10;
   const maxSpan = mat.maxSpan18;
-  const usableHeight = ceilingHeight - plinthHeight;
+  const usableHeight = getUsableHeight(ceilingHeight, plinthHeight);
   const ft = FURNITURE_TYPES.find(f => f.id === furnitureType)!;
 
   // Déterminer la hauteur du meuble selon le type

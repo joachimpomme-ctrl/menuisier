@@ -1,5 +1,9 @@
 export const uid = (): string => crypto.randomUUID();
 
+export function getUsableHeight(ceilingHeight: number, plinthHeight: number): number {
+  return ceilingHeight - plinthHeight;
+}
+
 export function parseNumber(value: string, fallback: number, min?: number, max?: number): number {
   const n = parseFloat(value);
   if (isNaN(n)) return fallback;
@@ -66,7 +70,7 @@ export function getBodyEffectiveHeight(
   plinthHeight: number,
 ): number {
   const joues = body.pieces.filter((p) => p.type === 'joue');
-  const usableHeight = ceilingHeight - plinthHeight;
+  const usableHeight = getUsableHeight(ceilingHeight, plinthHeight);
 
   if (joues.length === 0) return usableHeight; // fallback
 

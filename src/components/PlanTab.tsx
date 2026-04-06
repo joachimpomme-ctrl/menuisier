@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { AppState } from '../types';
 import { MATERIALS, BODY_COLORS, PIECE_COLORS } from '../data/materials';
-import { getBodyInnerWidth, isSharedLeft } from '../lib/helpers';
+import { getBodyInnerWidth, isSharedLeft, getUsableHeight } from '../lib/helpers';
 import Tip from './Tip';
 
 interface Props {
@@ -60,7 +60,7 @@ export default function PlanTab({ state }: Props) {
   const [selectedBody, setSelectedBody] = useState<string | null>(null);
   const mat = MATERIALS[state.materialKey];
   const th = state.panel.thickness;
-  const usableHeight = state.project.ceilingHeight - state.project.plinthHeight;
+  const usableHeight = getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight);
 
   const SVG_W = 600;
   const M = 60; // margin for dimensions

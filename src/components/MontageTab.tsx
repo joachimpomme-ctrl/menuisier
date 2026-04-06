@@ -1,6 +1,6 @@
 import type { AppState } from '../types';
 import { MATERIALS, BODY_COLORS } from '../data/materials';
-import { isSharedLeft, getDoorInfoFromPieces } from '../lib/helpers';
+import { isSharedLeft, getDoorInfoFromPieces, getUsableHeight } from '../lib/helpers';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 
@@ -12,7 +12,7 @@ const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
 
 export default function MontageTab({ state }: Props) {
   const mat = MATERIALS[state.materialKey];
-  const usableHeight = state.project.ceilingHeight - state.project.plinthHeight;
+  const usableHeight = getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight);
   const thickness = state.panel.thickness;
   const shared = state.sharedBoundaries ?? [];
 
