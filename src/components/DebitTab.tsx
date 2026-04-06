@@ -2,9 +2,18 @@ import type { AppState, PieceWithBody, NestingResult, PanelDef } from '../types'
 import type { CostEstimate } from '../lib/cost';
 import { MATERIALS, PIECE_COLORS } from '../data/materials';
 import { generateCutListCsv, downloadCsv } from '../lib/csv';
+import { uid, parseNumber } from '../lib/helpers';
 import CostPanel from './CostPanel';
 import Tip from './Tip';
 import TIPS from '../data/tips';
+
+// Presets for common extra panels
+const EXTRA_PANEL_PRESETS: { label: string; def: Omit<PanelDef, 'id'> }[] = [
+  { label: 'Fond CP 6mm', def: { label: 'CP 6mm', width: 250, height: 122, thickness: 0.6, price: 25 } },
+  { label: 'HDF 3mm', def: { label: 'HDF 3mm', width: 244, height: 122, thickness: 0.3, price: 8 } },
+  { label: 'CP Peuplier 10mm', def: { label: 'CP 10mm', width: 250, height: 122, thickness: 1.0, price: 35 } },
+  { label: 'MDF 12mm', def: { label: 'MDF 12mm', width: 244, height: 122, thickness: 1.2, price: 18 } },
+];
 
 interface NestingGroup {
   panelDef: PanelDef;
@@ -14,6 +23,7 @@ interface NestingGroup {
 
 interface Props {
   state: AppState;
+  onChange: (state: AppState) => void;
   allPieces: PieceWithBody[];
   nesting: NestingResult;
   nestingByPanel: NestingGroup[];
@@ -88,8 +98,44 @@ function PanelBinDiagram({ bin, binIndex, panelDef, kerf }: {
   );
 }
 
-export default function DebitTab({ state, allPieces, nesting: _nesting, nestingByPanel, allPanelDefs, cost, onPriceChange }: Props) {
+const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
+
+export default function DebitTab({ state, onChange, allPieces, nesting: _nesting, nestingByPanel, allPanelDefs, cost, onPriceChange }: Props) {
   const mat = MATERIALS[state.materialKey];
+
+  // ---------- Panel config helpers ----------
+  const updatePanel = (key: string, value: number) => {
+    onChange({ ...state, panel: { ...state.panel, [key]: value } });
+  };
+
+  const addExtraPanel = (preset?: Omit<PanelDef, 'id'>) => {
+    const base = preset ?? { label: 'Panneau', width: 250, height: 122, thickness: 0.6, price: 0 };
+    const newPanel: PanelDef = { ...base, id: uid() };
+    onChange({ ...state, extraPanels: [...(state.extraPanels ?? []), newPanel] });
+  };
+
+  const updateExtraPanel = (id: string, key: keyof PanelDef, value: string | number) => {
+    onChange({
+      ...state,
+      extraPanels: (state.extraPanels ?? []).map((p) => p.id === id ? { ...p, [key]: value } : p),
+    });
+  };
+
+  const removeExtraPanel = (id: string) => {
+    const newBodies = state.bodies.map((b) => ({
+      ...b,
+      pieces: b.pieces.map((p) => p.panelId === id ? { ...p, panelId: undefined } : p),
+    }));
+    onChange({
+      ...state,
+      bodies: newBodies,
+      extraPanels: (state.extraPanels ?? []).filter((p) => p.id !== id),
+    });
+  };
+
+  const updateKerf = (value: number) => {
+    onChange({ ...state, kerf: value });
+  };
 
   // Aggregate metrics across all panel types
   const totalPanelCount = nestingByPanel.reduce((s, g) => s + g.nesting.metrics.panelCount, 0);
@@ -104,6 +150,167 @@ export default function DebitTab({ state, allPieces, nesting: _nesting, nestingB
 
   return (
     <div>
+      {/* Panneaux config */}
+      <div className={cardClass}>
+        <h4 className="text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3">Panneaux</h4>
+
+        {/* Main panel */}
+        <div className="mb-3">
+          <div className="text-xs font-medium text-stone-600 mb-1.5">Panneau principal : <span className="text-amber-700 font-semibold">{mat.short} {state.panel.thickness * 10}mm</span></div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <label className="text-[10px] text-stone-400">Format :</label>
+            <input
+              type="number"
+              step="1"
+              min={10}
+              className={inputClass + " !py-1.5 w-16 text-center"}
+              value={state.panel.width}
+              onChange={(e) => updatePanel('width', parseNumber(e.target.value, state.panel.width, 10))}
+              title="Largeur (cm)"
+            />
+            <span className="text-[10px] text-stone-400">x</span>
+            <input
+              type="number"
+              step="1"
+              min={10}
+              className={inputClass + " !py-1.5 w-16 text-center"}
+              value={state.panel.height}
+              onChange={(e) => updatePanel('height', parseNumber(e.target.value, state.panel.height, 10))}
+              title="Hauteur (cm)"
+            />
+            <span className="text-[10px] text-stone-400">cm</span>
+            <label className="text-[10px] text-stone-400 ml-2">Prix :</label>
+            <input
+              type="number"
+              step="1"
+              min={0}
+              className={inputClass + " !py-1.5 w-16 text-center"}
+              value={state.costConfig.panelPrice}
+              onChange={(e) => onPriceChange(parseNumber(e.target.value, state.costConfig.panelPrice, 0))}
+              title="Prix par panneau (EUR)"
+            />
+            <span className="text-[10px] text-stone-400">EUR</span>
+          </div>
+          <div className="mt-2 flex gap-1.5 flex-wrap">
+            {mat.panels.map((p, i) => (
+              <button
+                key={i}
+                className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-all ${
+                  state.panel.width === p.w && state.panel.height === p.h
+                    ? 'bg-amber-100 border-amber-300 text-amber-800 font-semibold'
+                    : 'bg-white text-stone-500 hover:text-amber-700 hover:bg-amber-50 border-stone-200 hover:border-amber-200'
+                }`}
+                onClick={() => onChange({
+                  ...state,
+                  panel: { ...state.panel, width: p.w, height: p.h },
+                  costConfig: { panelPrice: p.defaultPrice },
+                })}
+              >
+                {p.w}x{p.h} ({p.defaultPrice} EUR)
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Extra panels */}
+        {(state.extraPanels ?? []).length > 0 && (
+          <div className="border-t border-stone-100 pt-3 mb-3">
+            {(state.extraPanels ?? []).map((ep, i) => (
+              <div key={ep.id} className="flex items-center gap-2 mb-2 p-2 bg-stone-50 rounded-xl border border-stone-200">
+                <span className="text-[10px] text-stone-400 flex-shrink-0">#{i + 1}</span>
+                <input
+                  className={inputClass + " !py-1.5 w-24"}
+                  value={ep.label}
+                  onChange={(e) => updateExtraPanel(ep.id, 'label', e.target.value)}
+                  placeholder="Nom"
+                />
+                <input
+                  type="number"
+                  step="1"
+                  min={10}
+                  className={inputClass + " !py-1.5 w-16 text-center"}
+                  value={ep.width}
+                  onChange={(e) => updateExtraPanel(ep.id, 'width', parseNumber(e.target.value, ep.width, 10))}
+                  title="Largeur (cm)"
+                />
+                <span className="text-[10px] text-stone-400">x</span>
+                <input
+                  type="number"
+                  step="1"
+                  min={10}
+                  className={inputClass + " !py-1.5 w-16 text-center"}
+                  value={ep.height}
+                  onChange={(e) => updateExtraPanel(ep.id, 'height', parseNumber(e.target.value, ep.height, 10))}
+                  title="Hauteur (cm)"
+                />
+                <span className="text-[10px] text-stone-400">ep.</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  min={0.1}
+                  className={inputClass + " !py-1.5 w-14 text-center"}
+                  value={ep.thickness}
+                  onChange={(e) => updateExtraPanel(ep.id, 'thickness', parseNumber(e.target.value, ep.thickness, 0.1))}
+                  title="Epaisseur (cm)"
+                />
+                <span className="text-[10px] text-stone-400">cm</span>
+                <input
+                  type="number"
+                  step="1"
+                  min={0}
+                  className={inputClass + " !py-1.5 w-14 text-center"}
+                  value={ep.price}
+                  onChange={(e) => updateExtraPanel(ep.id, 'price', parseNumber(e.target.value, ep.price, 0))}
+                  title="Prix EUR/panneau"
+                />
+                <span className="text-[10px] text-stone-400">EUR</span>
+                <button
+                  onClick={() => removeExtraPanel(ep.id)}
+                  className="text-xs text-stone-400 hover:text-red-500 transition-colors flex-shrink-0 ml-1"
+                  title="Supprimer ce panneau"
+                >
+                  x
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Add extra panel presets */}
+        <div className="flex flex-wrap gap-1.5">
+          {EXTRA_PANEL_PRESETS.map((preset, i) => (
+            <button
+              key={i}
+              onClick={() => addExtraPanel(preset.def)}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-amber-700 hover:bg-amber-50 border border-stone-200 hover:border-amber-200 transition-all"
+            >
+              + {preset.label}
+            </button>
+          ))}
+          <button
+            onClick={() => addExtraPanel()}
+            className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:text-stone-600 border border-dashed border-stone-300 hover:border-stone-400 transition-all"
+          >
+            + Personnalise
+          </button>
+        </div>
+
+        {/* Kerf */}
+        <div className="mt-3 pt-3 border-t border-stone-100 flex items-center gap-2">
+          <Tip text={TIPS['trait-scie']}><label className="text-xs text-stone-500 whitespace-nowrap">Trait de scie (kerf) :</label></Tip>
+          <input
+            type="number"
+            step="0.1"
+            min={0}
+            max={5}
+            className={inputClass + " !py-1.5 w-16 text-center"}
+            value={state.kerf}
+            onChange={(e) => updateKerf(parseNumber(e.target.value, state.kerf, 0, 5))}
+          />
+          <span className="text-[10px] text-stone-400">mm</span>
+        </div>
+      </div>
+
       {/* Summary metrics */}
       <div className={cardClass}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">

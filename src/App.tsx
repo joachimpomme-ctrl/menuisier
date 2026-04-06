@@ -345,6 +345,7 @@ export default function App() {
         {tab === 'debit' && (
           <DebitTab
             state={state}
+            onChange={setState}
             allPieces={allPieces}
             nesting={nesting}
             nestingByPanel={nestingByPanel}

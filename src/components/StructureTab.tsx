@@ -11,14 +11,6 @@ interface Props {
   allPanelDefs: PanelDef[];
 }
 
-// Presets for common extra panels
-const EXTRA_PANEL_PRESETS: { label: string; def: Omit<PanelDef, 'id'> }[] = [
-  { label: 'Fond CP 6mm', def: { label: 'CP 6mm', width: 250, height: 122, thickness: 0.6, price: 25 } },
-  { label: 'HDF 3mm', def: { label: 'HDF 3mm', width: 244, height: 122, thickness: 0.3, price: 8 } },
-  { label: 'CP Peuplier 10mm', def: { label: 'CP 10mm', width: 250, height: 122, thickness: 1.0, price: 35 } },
-  { label: 'MDF 12mm', def: { label: 'MDF 12mm', width: 244, height: 122, thickness: 1.2, price: 18 } },
-];
-
 const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
 const labelClass = "block text-xs font-medium text-stone-500 mb-1.5";
 const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
@@ -277,8 +269,8 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
     onChange({ ...state, project: { ...state.project, [key]: value } });
   };
 
-  const updatePanel = (key: string, value: number) => {
-    onChange({ ...state, panel: { ...state.panel, [key]: value } });
+  const updateThickness = (value: number) => {
+    onChange({ ...state, panel: { ...state.panel, thickness: value } });
   };
 
   const changeMaterial = (key: MaterialKey) => {
@@ -523,33 +515,6 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
       newShared.splice(0, 1);
     }
     onChange({ ...state, bodies: newBodies, sharedBoundaries: newShared });
-  };
-
-  // ---------- EXTRA PANELS ----------
-  const addExtraPanel = (preset?: Omit<PanelDef, 'id'>) => {
-    const base = preset ?? { label: 'Panneau', width: 250, height: 122, thickness: 0.6, price: 0 };
-    const newPanel: PanelDef = { ...base, id: uid() };
-    onChange({ ...state, extraPanels: [...(state.extraPanels ?? []), newPanel] });
-  };
-
-  const updateExtraPanel = (id: string, key: keyof PanelDef, value: string | number) => {
-    onChange({
-      ...state,
-      extraPanels: (state.extraPanels ?? []).map((p) => p.id === id ? { ...p, [key]: value } : p),
-    });
-  };
-
-  const removeExtraPanel = (id: string) => {
-    // Remove panelId references from pieces that used this panel
-    const newBodies = state.bodies.map((b) => ({
-      ...b,
-      pieces: b.pieces.map((p) => p.panelId === id ? { ...p, panelId: undefined } : p),
-    }));
-    onChange({
-      ...state,
-      bodies: newBodies,
-      extraPanels: (state.extraPanels ?? []).filter((p) => p.id !== id),
-    });
   };
 
   // ---------- TOGGLE JOUE COMMUNE ----------
@@ -801,118 +766,260 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
         <p className="text-[10px] text-stone-400 mt-2">Plinthe = 0 si votre meuble n'est pas contre un mur avec plinthe</p>
       </div>
 
-      {/* Panel */}
+      {/* Epaisseur structure */}
       <div className={cardClass}>
-        <Tip text={TIPS['panneau']}><h3 className={sectionTitle}>Panneau</h3></Tip>
-        <div className="grid grid-cols-3 gap-3">
-          <NumberInput label="Largeur" suffix="cm" value={state.panel.width} min={10} max={500} onChange={(v) => updatePanel('width', v)} tip={TIPS['panneau-largeur']} />
-          <NumberInput label="Hauteur" suffix="cm" value={state.panel.height} min={10} max={500} onChange={(v) => updatePanel('height', v)} tip={TIPS['panneau-hauteur']} />
-          <NumberInput label="Épaisseur" suffix="cm" value={state.panel.thickness} min={0.3} max={5} step={0.1} onChange={(v) => updatePanel('thickness', v)} tip={TIPS['panneau-epaisseur']} />
-        </div>
-        <div className="mt-3 flex gap-2">
-          {mat.panels.map((p, i) => (
-            <button
-              key={i}
-              className="text-xs px-3 py-1.5 rounded-lg bg-white text-stone-400 hover:bg-stone-100 hover:text-amber-700 border border-stone-200 transition-colors"
-              onClick={() => onChange({
-                ...state,
-                panel: { ...state.panel, width: p.w, height: p.h },
-                costConfig: { panelPrice: p.defaultPrice },
-              })}
-            >
-              {p.w}×{p.h} ({p.defaultPrice}€)
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Extra Panels */}
-      <div className={cardClass}>
-        <div className="flex items-center justify-between mb-2">
-          <Tip text="Panneaux secondaires pour fonds, tiroirs, etc. — épaisseurs différentes du panneau principal.">
-            <h3 className={sectionTitle + " mb-0"}>Panneaux secondaires ({(state.extraPanels ?? []).length})</h3>
-          </Tip>
-        </div>
-        <p className="text-[10px] text-stone-400 mb-3">
-          Ajoutez des panneaux d'épaisseurs différentes (fonds 6mm, HDF 3mm…). Les pièces assignées seront calepinées séparément.
-        </p>
-
-        {(state.extraPanels ?? []).map((ep) => (
-          <div key={ep.id} className="flex items-center gap-2 mb-2 p-2 bg-stone-50 rounded-xl border border-stone-200">
-            <input
-              className={inputClass + " !py-1.5 w-24"}
-              value={ep.label}
-              onChange={(e) => updateExtraPanel(ep.id, 'label', e.target.value)}
-              placeholder="Nom"
-            />
-            <input
-              type="number"
-              step="1"
-              min={10}
-              className={inputClass + " !py-1.5 w-16 text-center"}
-              value={ep.width}
-              onChange={(e) => updateExtraPanel(ep.id, 'width', parseNumber(e.target.value, ep.width, 10))}
-              title="Largeur (cm)"
-            />
-            <span className="text-[10px] text-stone-400">×</span>
-            <input
-              type="number"
-              step="1"
-              min={10}
-              className={inputClass + " !py-1.5 w-16 text-center"}
-              value={ep.height}
-              onChange={(e) => updateExtraPanel(ep.id, 'height', parseNumber(e.target.value, ep.height, 10))}
-              title="Hauteur (cm)"
-            />
-            <span className="text-[10px] text-stone-400">ép.</span>
-            <input
-              type="number"
-              step="0.1"
-              min={0.1}
-              className={inputClass + " !py-1.5 w-14 text-center"}
-              value={ep.thickness}
-              onChange={(e) => updateExtraPanel(ep.id, 'thickness', parseNumber(e.target.value, ep.thickness, 0.1))}
-              title="Épaisseur (cm)"
-            />
-            <span className="text-[10px] text-stone-400">cm</span>
-            <input
-              type="number"
-              step="1"
-              min={0}
-              className={inputClass + " !py-1.5 w-14 text-center"}
-              value={ep.price}
-              onChange={(e) => updateExtraPanel(ep.id, 'price', parseNumber(e.target.value, ep.price, 0))}
-              title="Prix €/panneau"
-            />
-            <span className="text-[10px] text-stone-400">€</span>
-            <button
-              onClick={() => removeExtraPanel(ep.id)}
-              className="text-xs text-stone-400 hover:text-red-500 transition-colors flex-shrink-0 ml-1"
-              title="Supprimer ce panneau"
-            >
-              ✕
-            </button>
+        <div className="flex items-center gap-3">
+          <label className="text-xs font-medium text-stone-600 whitespace-nowrap">Épaisseur structure :</label>
+          <div className="w-20">
+            <NumberInput label="" suffix="cm" value={state.panel.thickness} min={0.3} max={5} step={0.1} onChange={updateThickness} tip={TIPS['panneau-epaisseur']} />
           </div>
-        ))}
-
-        <div className="flex flex-wrap gap-1.5 mt-2">
-          {EXTRA_PANEL_PRESETS.map((preset, i) => (
-            <button
-              key={i}
-              onClick={() => addExtraPanel(preset.def)}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-amber-700 hover:bg-amber-50 border border-stone-200 hover:border-amber-200 transition-all"
-            >
-              + {preset.label}
-            </button>
-          ))}
-          <button
-            onClick={() => addExtraPanel()}
-            className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:text-stone-600 border border-dashed border-stone-300 hover:border-stone-400 transition-all"
-          >
-            + Personnalisé
-          </button>
+          <span className="text-[10px] text-stone-400">(affecte les largeurs intérieures et les tablettes)</span>
         </div>
       </div>
+
+      {/* Relevé de cotes — visual survey diagram */}
+      {(() => {
+        const wallW = state.project.wallWidth;
+        const ceilH = state.project.ceilingHeight;
+        const plinthH = state.project.plinthHeight;
+        const bodies = state.bodies;
+
+        // SVG layout constants
+        const SVG_W = 580;
+        const SVG_H = 200;
+        const PAD_L = 48; // left padding for ceiling height label
+        const PAD_R = 16;
+        const PAD_T = 24; // top padding for wall width label
+        const PAD_B = 28; // bottom for plinth height label
+        const drawW = SVG_W - PAD_L - PAD_R;
+        const drawH = SVG_H - PAD_T - PAD_B;
+
+        // Scale: fit wall into draw area
+        const scaleX = drawW / wallW;
+        const scaleY = drawH / ceilH;
+        const sc = Math.min(scaleX, scaleY);
+
+        const wallPx = wallW * sc;
+        const ceilPx = ceilH * sc;
+        const plinthPx = plinthH * sc;
+
+        // Center horizontally
+        const offsetX = PAD_L + (drawW - wallPx) / 2;
+        const offsetY = PAD_T + (drawH - ceilPx) / 2;
+
+        // Bodies placement
+        let bx = 0;
+        const bodyRects: { x: number; w: number; bi: number; name: string }[] = [];
+        bodies.forEach((b, bi) => {
+          const sharedLeft = isSharedLeft(bi, shared);
+          const w = bi === 0 ? b.width : (sharedLeft ? b.width - th / 2 : b.width);
+          bodyRects.push({ x: bx, w, bi, name: b.name });
+          bx += w;
+        });
+        const totalBodyW = bx;
+        const remaining = wallW - totalPhysical;
+
+        // DimLine helper (arrow + label)
+        const DimLine = ({ x1, y1, x2, y2, label, color = '#78716c', fontSize = 8 }: {
+          x1: number; y1: number; x2: number; y2: number; label: string; color?: string; fontSize?: number;
+        }) => {
+          const isH = Math.abs(y2 - y1) < 2;
+          const mx = (x1 + x2) / 2;
+          const my = (y1 + y2) / 2;
+          return (
+            <g>
+              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="0.8" />
+              {isH ? (
+                <>
+                  <line x1={x1} y1={y1 - 3} x2={x1} y2={y1 + 3} stroke={color} strokeWidth="0.8" />
+                  <line x1={x2} y1={y2 - 3} x2={x2} y2={y2 + 3} stroke={color} strokeWidth="0.8" />
+                </>
+              ) : (
+                <>
+                  <line x1={x1 - 3} y1={y1} x2={x1 + 3} y2={y1} stroke={color} strokeWidth="0.8" />
+                  <line x1={x2 - 3} y1={y2} x2={x2 + 3} y2={y2} stroke={color} strokeWidth="0.8" />
+                </>
+              )}
+              <text x={isH ? mx : x1 - 4} y={isH ? my - 4 : my} textAnchor={isH ? 'middle' : 'end'} fill={color} fontSize={fontSize} fontWeight="600" fontFamily="system-ui">
+                {label}
+              </text>
+            </g>
+          );
+        };
+
+        return (
+          <div className={cardClass}>
+            <h3 className={sectionTitle}>Relevé de cotes</h3>
+            <div className="overflow-x-auto">
+              <svg width={SVG_W} height={SVG_H} className="rounded-lg">
+                <rect width={SVG_W} height={SVG_H} fill="#faf8f5" rx="8" />
+
+                {/* Wall outline */}
+                <rect x={offsetX} y={offsetY} width={wallPx} height={ceilPx} fill="none" stroke="#a8a29e" strokeWidth="1.5" strokeDasharray="6,3" rx="2" />
+
+                {/* Floor line */}
+                <line x1={offsetX - 4} y1={offsetY + ceilPx} x2={offsetX + wallPx + 4} y2={offsetY + ceilPx} stroke="#78716c" strokeWidth="1.5" />
+
+                {/* Ceiling line */}
+                <line x1={offsetX - 4} y1={offsetY} x2={offsetX + wallPx + 4} y2={offsetY} stroke="#78716c" strokeWidth="1" strokeDasharray="3,2" />
+
+                {/* Plinth area */}
+                {plinthH > 0 && (
+                  <rect x={offsetX} y={offsetY + ceilPx - plinthPx} width={wallPx} height={plinthPx} fill="#d6cfc7" opacity="0.4" stroke="#a8a29e" strokeWidth="0.5" />
+                )}
+
+                {/* Bodies */}
+                {bodyRects.map((br, i) => {
+                  const bx_px = offsetX + br.x * sc;
+                  const bw_px = br.w * sc;
+                  const bodyH_px = ceilPx - plinthPx;
+                  const color = BODY_COLORS[br.bi % BODY_COLORS.length];
+
+                  return (
+                    <g key={i}>
+                      {/* Body rectangle */}
+                      <rect
+                        x={bx_px + 1}
+                        y={offsetY + 1}
+                        width={Math.max(bw_px - 2, 2)}
+                        height={Math.max(bodyH_px - 2, 2)}
+                        fill={color}
+                        opacity="0.15"
+                        stroke={color}
+                        strokeWidth="1.5"
+                        rx="2"
+                      />
+
+                      {/* Plinth cutout at bottom */}
+                      {plinthH > 0 && (
+                        <rect
+                          x={bx_px + 3}
+                          y={offsetY + bodyH_px}
+                          width={Math.max(bw_px - 6, 2)}
+                          height={plinthPx - 1}
+                          fill="#faf8f5"
+                          stroke={color}
+                          strokeWidth="0.5"
+                          strokeDasharray="2,1"
+                          rx="1"
+                        />
+                      )}
+
+                      {/* Body label */}
+                      {bw_px > 30 && (
+                        <text
+                          x={bx_px + bw_px / 2}
+                          y={offsetY + bodyH_px / 2 - 4}
+                          textAnchor="middle"
+                          fill={color}
+                          fontSize="8"
+                          fontWeight="700"
+                          fontFamily="system-ui"
+                        >
+                          {br.name}
+                        </text>
+                      )}
+
+                      {/* Body width dimension */}
+                      {bw_px > 24 && (
+                        <text
+                          x={bx_px + bw_px / 2}
+                          y={offsetY + bodyH_px / 2 + 8}
+                          textAnchor="middle"
+                          fill={color}
+                          fontSize="7"
+                          fontFamily="system-ui"
+                        >
+                          {bodies[br.bi].width} cm
+                        </text>
+                      )}
+
+                      {/* Shared joue indicator (blue dot between adjacent bodies) */}
+                      {i > 0 && shared[br.bi - 1] && (
+                        <circle
+                          cx={bx_px}
+                          cy={offsetY + bodyH_px / 2}
+                          r={4}
+                          fill="#3b82f6"
+                          stroke="#fff"
+                          strokeWidth="1.5"
+                        />
+                      )}
+                    </g>
+                  );
+                })}
+
+                {/* Remaining space (dashed) */}
+                {remaining > 2 && (
+                  <rect
+                    x={offsetX + totalBodyW * sc + 2}
+                    y={offsetY + 2}
+                    width={Math.max((wallPx - totalBodyW * sc) - 4, 0)}
+                    height={ceilPx - plinthPx - 4}
+                    fill="none"
+                    stroke="#d6cfc7"
+                    strokeWidth="1"
+                    strokeDasharray="4,3"
+                    rx="2"
+                  />
+                )}
+                {remaining > 2 && (wallPx - totalBodyW * sc) > 30 && (
+                  <text
+                    x={offsetX + totalBodyW * sc + (wallPx - totalBodyW * sc) / 2}
+                    y={offsetY + (ceilPx - plinthPx) / 2}
+                    textAnchor="middle"
+                    fill="#a8a29e"
+                    fontSize="7"
+                    fontFamily="system-ui"
+                  >
+                    {remaining.toFixed(1)} cm libre
+                  </text>
+                )}
+
+                {/* Dimension: wall width (top) */}
+                <DimLine
+                  x1={offsetX} y1={offsetY - 8}
+                  x2={offsetX + wallPx} y2={offsetY - 8}
+                  label={`${wallW} cm`} color="#78716c"
+                />
+
+                {/* Dimension: ceiling height (left) */}
+                <DimLine
+                  x1={offsetX - 8} y1={offsetY}
+                  x2={offsetX - 8} y2={offsetY + ceilPx}
+                  label={`${ceilH} cm`} color="#78716c"
+                />
+
+                {/* Dimension: plinth height (right side) */}
+                {plinthH > 0 && (
+                  <DimLine
+                    x1={offsetX + wallPx + 6} y1={offsetY + ceilPx - plinthPx}
+                    x2={offsetX + wallPx + 6} y2={offsetY + ceilPx}
+                    label={`${plinthH}`} color="#a8a29e" fontSize={7}
+                  />
+                )}
+
+                {/* Dimension: total physical width (bottom) */}
+                {bodies.length > 0 && (
+                  <DimLine
+                    x1={offsetX} y1={offsetY + ceilPx + 10}
+                    x2={offsetX + totalPhysical * sc} y2={offsetY + ceilPx + 10}
+                    label={`${totalPhysical.toFixed(1)} cm (meuble)`} color="#92400e" fontSize={7}
+                  />
+                )}
+              </svg>
+            </div>
+            <div className="flex flex-wrap gap-3 mt-2 text-[10px] text-stone-400">
+              <span>Mur : {wallW} cm</span>
+              <span>Hauteur : {ceilH} cm</span>
+              {plinthH > 0 && <span>Plinthe : {plinthH} cm</span>}
+              <span>Meuble : {totalPhysical.toFixed(1)} cm</span>
+              {remaining > 0 && <span className={remaining < 0 ? 'text-red-500 font-semibold' : ''}>Reste : {remaining.toFixed(1)} cm</span>}
+              {shared.some(Boolean) && <span className="text-blue-600">{shared.filter(Boolean).length} joue(s) commune(s)</span>}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Bodies */}
       <div className="flex items-center justify-between mb-2">
