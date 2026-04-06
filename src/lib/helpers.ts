@@ -107,18 +107,48 @@ export interface DoorDimensions {
 }
 
 /**
- * Calcule le nombre et les positions de charnières pour une hauteur de porte donnée.
- * Réutilisable indépendamment de calculateDoor.
+ * Calcule le nombre et les positions de charnières Ø35 selon les règles fabricants.
+ *
+ * Sources : Blum CLIP top 2022, Hettich Sensys, Grass Tiomos
+ * Méthode : max(nombre par hauteur, nombre par poids) + bonus largeur > 60cm
+ *
+ * @param doorHeightCm - Hauteur de la porte (cm)
+ * @param doorWidthCm  - Largeur de la porte (cm), optionnel — si > 60cm, +1 charnière
+ * @param doorWeightKg - Poids de la porte (kg), optionnel — détermine un minimum de charnières
  */
-export function computeHinges(doorHeightCm: number): { count: number; positions: number[] } {
-  let count: number;
-  if (doorHeightCm < 60) count = 2;
-  else if (doorHeightCm < 120) count = 3;
-  else if (doorHeightCm < 180) count = 4;
-  else count = 5;
+export function computeHinges(
+  doorHeightCm: number,
+  doorWidthCm?: number,
+  doorWeightKg?: number,
+): { count: number; positions: number[] } {
+  const hMm = doorHeightCm * 10;
 
-  const TOP_OFFSET = 80; // mm
-  const BOT_OFFSET = 80; // mm
+  // --- Nombre par hauteur (seuils Hettich Sensys) ---
+  let countByHeight: number;
+  if (hMm <= 1000) countByHeight = 2;
+  else if (hMm <= 1500) countByHeight = 3;
+  else if (hMm <= 2000) countByHeight = 4;
+  else if (hMm <= 2400) countByHeight = 5;
+  else if (hMm <= 2600) countByHeight = 6;
+  else countByHeight = 7;
+
+  // --- Nombre par poids (Blum CLIP top / Hettich, ~4 kg/charnière) ---
+  let countByWeight = 2;
+  if (doorWeightKg !== undefined && doorWeightKg > 0) {
+    // Capacité standard ~4 kg par charnière (Blum/Hettich)
+    countByWeight = Math.max(2, Math.ceil(doorWeightKg / 4));
+  }
+
+  let count = Math.max(countByHeight, countByWeight);
+
+  // --- Bonus largeur : porte large > 60cm → +1 charnière (Blum) ---
+  if (doorWidthCm !== undefined && doorWidthCm > 60) {
+    count += 1;
+  }
+
+  // --- Positions (75-100mm du bord, intermédiaires équidistantes) ---
+  const TOP_OFFSET = 80; // mm depuis le bord supérieur
+  const BOT_OFFSET = 80; // mm depuis le bord inférieur
   const totalMm = doorHeightCm * 10;
   const positions: number[] = [BOT_OFFSET, totalMm - TOP_OFFSET];
   if (count > 2) {
@@ -135,10 +165,18 @@ export function computeHinges(doorHeightCm: number): { count: number; positions:
  * Lit les dimensions réelles des pièces porte d'un corps.
  * Retourne null si le corps n'a pas de doorConfig ou pas de pièces porte.
  * Utilise les dimensions des pièces existantes (pas de recalcul).
+ *
+ * @param thicknessCm - Épaisseur du panneau (cm), pour le calcul du poids
+ * @param densityKgM3 - Densité du matériau (kg/m³), pour le calcul du poids
  */
-export function getDoorInfoFromPieces(body: Body): {
+export function getDoorInfoFromPieces(
+  body: Body,
+  thicknessCm?: number,
+  densityKgM3?: number,
+): {
   doorWidth: number;
   doorHeight: number;
+  doorWeightKg: number;
   hingeCount: number;
   hingePositions: number[];
   count: number;
@@ -153,7 +191,13 @@ export function getDoorInfoFromPieces(body: Body): {
   const ref = doorPieces[0];
   const doorHeight = ref.length;
   const doorWidth = ref.width;
-  const hinges = computeHinges(doorHeight);
+
+  // Poids estimé de la porte (longueur × largeur × épaisseur × densité)
+  const th = thicknessCm ?? 1.8; // fallback 18mm
+  const density = densityKgM3 ?? 680; // fallback CP bouleau
+  const doorWeightKg = +(doorHeight * doorWidth * th / 1_000_000 * density).toFixed(1);
+
+  const hinges = computeHinges(doorHeight, doorWidth, doorWeightKg);
 
   const poseLabels: Record<DoorPoseType, string> = {
     enveloppante: 'Enveloppante (recouvrement total)',
@@ -164,6 +208,7 @@ export function getDoorInfoFromPieces(body: Body): {
   return {
     doorWidth,
     doorHeight,
+    doorWeightKg,
     hingeCount: hinges.count,
     hingePositions: hinges.positions,
     count: body.doorConfig.count,

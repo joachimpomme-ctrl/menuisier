@@ -2,8 +2,7 @@ import { useState, useRef } from 'react';
 import type { AppState, MaterialKey, Body, Piece } from '../types';
 import { MATERIALS } from '../data/materials';
 import { TEMPLATES } from '../data/templates';
-import { buildKnowledgeSummary } from '../data/knowledge';
-import { buildUserKnowledgeContext } from '../lib/knowledgeStore';
+// Imports allégés : le wizard n'a pas besoin de la base de connaissances complète
 import { uid, getUsableHeight } from '../lib/helpers';
 
 interface Props {
@@ -189,16 +188,28 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate }: Props) {
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const MAX_DIM = 1024; // Redimensionner les images pour limiter le payload API
     const files = Array.from(e.target.files || []);
     files.forEach(file => {
       if (!file.type.startsWith('image/')) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result as string;
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
         const base64 = dataUrl.split(',')[1];
-        setImages(prev => [...prev, { name: file.name, data: base64, mediaType: file.type as string, preview: dataUrl }]);
+        setImages(prev => [...prev, { name: file.name, data: base64, mediaType: 'image/jpeg', preview: dataUrl }]);
       };
-      reader.readAsDataURL(file);
+      img.src = URL.createObjectURL(file);
     });
     e.target.value = '';
   };
@@ -209,9 +220,7 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate }: Props) {
     setAiError(null);
 
     try {
-      const knowledgeBase = buildKnowledgeSummary();
-      const userKnowledge = buildUserKnowledgeContext();
-
+      // Prompt allégé — seules les règles de dimensionnement, pas les guides de montage
       const systemPrompt = `Tu es un assistant menuiserie expert. L'utilisateur te décrit un meuble qu'il veut fabriquer. Tu dois générer une structure de projet JSON valide.
 
 RÈGLES STRICTES DE VALIDATION :
@@ -224,10 +233,7 @@ RÈGLES STRICTES DE VALIDATION :
 - Tous les chiffres doivent être cohérents et arrondis à 0.1 cm près
 - Prévois au minimum 2 tablettes fixes par corps (haut + bas) pour la rigidité structurelle
 
-MATÉRIAUX DISPONIBLES : ${Object.entries(MATERIALS).map(([k, m]) => `${k}: ${m.name} (portée max ${m.maxSpan18}cm, flex ${m.flexMPa}MPa)`).join(', ')}
-
-${knowledgeBase}
-${userKnowledge}
+MATÉRIAUX DISPONIBLES : ${Object.entries(MATERIALS).map(([k, m]) => `${k}: ${m.name} (portée max ${m.maxSpan18}cm, ép. défaut ${m.defaultThickness}mm)`).join(', ')}
 
 Tu DOIS répondre UNIQUEMENT avec un JSON valide, sans aucun texte avant ou après. Le JSON doit suivre exactement cette structure :
 {

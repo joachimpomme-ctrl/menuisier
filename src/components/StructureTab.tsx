@@ -140,7 +140,8 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
   };
 
   // Lire les dimensions RÉELLES des pièces porte (pas recalculer)
-  const doorInfo = getDoorInfoFromPieces(body);
+  const mat = MATERIALS[state.materialKey];
+  const doorInfo = getDoorInfoFromPieces(body, thickness, mat.density);
 
   if (!config) {
     return (
@@ -222,7 +223,7 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
       {doorInfo && (
         <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 text-xs text-orange-800 space-y-1">
           <div className="font-semibold">{config.count} porte{config.count > 1 ? 's' : ''} — {doorInfo.poseLabel}</div>
-          <div>Dimensions : <span className="font-mono font-semibold">{doorInfo.doorWidth} × {doorInfo.doorHeight}</span> cm</div>
+          <div>Dimensions : <span className="font-mono font-semibold">{doorInfo.doorWidth} × {doorInfo.doorHeight}</span> cm — <span className="font-mono">{doorInfo.doorWeightKg} kg</span>/porte</div>
           <div>
             <span className="font-semibold">{doorInfo.hingeCount} charnières</span> Ø35 par porte
             {config.count === 2 && <span className="text-orange-600"> ({doorInfo.hingeCount * 2} au total)</span>}

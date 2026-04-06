@@ -67,13 +67,13 @@ describe('generateSteps', () => {
     const state = createInitialState();
     state.sharedBoundaries = [false];
 
-    // Add door config to body 0
+    // Add door config to body 0 — small, light door for predictable result
     state.bodies[0].doorConfig = { count: 1, poseType: 'enveloppante' };
     state.bodies[0].pieces.push({
       id: 'door-1',
       name: 'Porte',
-      length: 150,
-      width: 96.4,
+      length: 80,
+      width: 40,
       qty: 1,
       type: 'porte',
     });
@@ -84,10 +84,10 @@ describe('generateSteps', () => {
     const hingeStep = steps.find((s) => s.title.includes('4b'));
     expect(hingeStep).toBeDefined();
 
-    // 150cm door → 4 hinges (120 ≤ h < 180)
-    // Positions: 80mm from bottom, 1420mm from bottom (= 1500-80), plus 2 intermediate
+    // 80cm × 40cm door: ≤1000mm → 2 hinges, narrow + light → no bonus
+    // Positions: 80mm from bottom, 720mm from bottom (= 800-80)
     const positionsText = hingeStep!.items.join(' ');
     expect(positionsText).toContain('80 mm');
-    expect(positionsText).toContain('1420 mm');
+    expect(positionsText).toContain('720 mm');
   });
 });

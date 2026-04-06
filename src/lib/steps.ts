@@ -108,7 +108,7 @@ export function generateSteps(st: AppState): Step[] {
     ];
 
     bodiesWithDoors.forEach((b) => {
-      const dims = getDoorInfoFromPieces(b);
+      const dims = getDoorInfoFromPieces(b, pn.thickness, mat.density);
       if (!dims) return;
       doorItems.push(
         `${b.name} — ${dims.count} porte${dims.count > 1 ? 's' : ''} (${dims.poseLabel}) :`
@@ -179,7 +179,7 @@ export function generateSteps(st: AppState): Step[] {
   // Pose des portes (après mise en place)
   if (bodiesWithDoors.length > 0) {
     const totalHinges = bodiesWithDoors.reduce((sum, b) => {
-      const dims = getDoorInfoFromPieces(b);
+      const dims = getDoorInfoFromPieces(b, pn.thickness, mat.density);
       if (!dims) return sum;
       return sum + dims.hingeCount * dims.count;
     }, 0);
@@ -196,7 +196,7 @@ export function generateSteps(st: AppState): Step[] {
     ];
 
     bodiesWithDoors.forEach((b) => {
-      const dims = getDoorInfoFromPieces(b);
+      const dims = getDoorInfoFromPieces(b, pn.thickness, mat.density);
       if (!dims) return;
       doorPoseItems.push(`${b.name} : ${dims.count}× porte ${dims.doorWidth}×${dims.doorHeight} cm (${dims.poseLabel})`);
     });

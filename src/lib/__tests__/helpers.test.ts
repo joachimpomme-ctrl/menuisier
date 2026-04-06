@@ -152,23 +152,37 @@ describe('calculateDoor', () => {
     });
   });
 
-  describe('hinges', () => {
-    it('2 hinges for short doors (<60cm)', () => {
+  describe('hinges (Hettich Sensys thresholds, height only via calculateDoor)', () => {
+    it('2 hinges for doors ≤100cm', () => {
       const d = calculateDoor(40, 50, th, 1, 'enveloppante');
       expect(d.hingeCount).toBe(2);
       expect(d.hingePositions).toHaveLength(2);
     });
 
-    it('3 hinges for medium doors (60-120cm)', () => {
+    it('2 hinges for 100cm door (boundary)', () => {
       const d = calculateDoor(40, 100, th, 1, 'enveloppante');
-      expect(d.hingeCount).toBe(3);
+      expect(d.hingeCount).toBe(2); // 1000mm ≤ 1000mm → 2
+    });
+
+    it('3 hinges for doors 101-150cm', () => {
+      const d = calculateDoor(40, 120, th, 1, 'enveloppante');
+      expect(d.hingeCount).toBe(3); // 1200mm > 1000mm
       expect(d.hingePositions).toHaveLength(3);
     });
 
-    it('5 hinges for tall doors (≥180cm)', () => {
+    it('4 hinges for doors 151-200cm', () => {
+      const d = calculateDoor(40, 180, th, 1, 'enveloppante');
+      expect(d.hingeCount).toBe(4); // 1800mm > 1500mm
+    });
+
+    it('4 hinges for 200cm door (boundary)', () => {
       const d = calculateDoor(40, 200, th, 1, 'enveloppante');
-      expect(d.hingeCount).toBe(5);
-      expect(d.hingePositions).toHaveLength(5);
+      expect(d.hingeCount).toBe(4); // 2000mm ≤ 2000mm → 4
+    });
+
+    it('5 hinges for doors > 200cm', () => {
+      const d = calculateDoor(40, 220, th, 1, 'enveloppante');
+      expect(d.hingeCount).toBe(5); // 2200mm > 2000mm
     });
 
     it('hinge positions are sorted ascending', () => {
@@ -226,11 +240,12 @@ describe('getBodyEffectiveHeight', () => {
     expect(getBodyEffectiveHeight(body, cH, pH)).toBe(usableH);
   });
 
-  it('100cm body → 3 hinges not 5', () => {
+  it('100cm body → 2 hinges (not 5 like the old bug)', () => {
     const body = makeBody([100, 100]);
     const bH = getBodyEffectiveHeight(body, cH, pH);
+    // 100cm height → calculateDoor gives ~99.8cm door → ≤1000mm → 2 hinges
     const door = calculateDoor(80, bH, 1.8, 1, 'enveloppante');
-    expect(door.hingeCount).toBe(3); // was incorrectly 5 before the fix
+    expect(door.hingeCount).toBe(2); // height-only (no width/weight in calculateDoor)
   });
 });
 
@@ -238,22 +253,56 @@ describe('getBodyEffectiveHeight', () => {
 // computeHinges
 // ---------------------------------------------------------------------------
 describe('computeHinges', () => {
-  it('2 hinges for <60cm', () => {
-    expect(computeHinges(50).count).toBe(2);
-    expect(computeHinges(50).positions).toHaveLength(2);
+  describe('by height (Hettich Sensys thresholds)', () => {
+    it('2 hinges for ≤100cm', () => {
+      expect(computeHinges(50).count).toBe(2);
+      expect(computeHinges(100).count).toBe(2); // 1000mm boundary
+    });
+
+    it('3 hinges for 101-150cm', () => {
+      expect(computeHinges(110).count).toBe(3);
+      expect(computeHinges(150).count).toBe(3);
+    });
+
+    it('4 hinges for 151-200cm', () => {
+      expect(computeHinges(160).count).toBe(4);
+      expect(computeHinges(200).count).toBe(4);
+    });
+
+    it('5 hinges for 201-240cm', () => {
+      expect(computeHinges(220).count).toBe(5);
+    });
+
+    it('6 hinges for 241-260cm', () => {
+      expect(computeHinges(250).count).toBe(6);
+    });
+
+    it('7 hinges for >260cm', () => {
+      expect(computeHinges(270).count).toBe(7);
+    });
   });
 
-  it('3 hinges for 60-119cm', () => {
-    expect(computeHinges(100).count).toBe(3);
-    expect(computeHinges(100).positions).toHaveLength(3);
+  describe('by weight (~4kg/charnière)', () => {
+    it('weight overrides height if heavier', () => {
+      // 50cm door (2 by height) but 12kg (3 by weight) → 3
+      expect(computeHinges(50, undefined, 12).count).toBe(3);
+    });
+
+    it('height overrides weight if taller', () => {
+      // 160cm door (4 by height) but 5kg (2 by weight) → 4
+      expect(computeHinges(160, undefined, 5).count).toBe(4);
+    });
   });
 
-  it('4 hinges for 120-179cm', () => {
-    expect(computeHinges(150).count).toBe(4);
-  });
+  describe('wide door bonus (>60cm)', () => {
+    it('+1 hinge for doors wider than 60cm', () => {
+      // 100cm height → 2 by height, 65cm wide → +1 = 3
+      expect(computeHinges(100, 65).count).toBe(3);
+    });
 
-  it('5 hinges for ≥180cm', () => {
-    expect(computeHinges(200).count).toBe(5);
+    it('no bonus for doors ≤60cm wide', () => {
+      expect(computeHinges(100, 60).count).toBe(2);
+    });
   });
 
   it('positions are sorted ascending', () => {
@@ -287,14 +336,59 @@ describe('getDoorInfoFromPieces', () => {
       id: 'b1', name: 'Test', width: 80, depth: 30,
       doorConfig: { count: 1, poseType: 'enveloppante' },
       pieces: [
-        { id: 'p1', name: 'Porte', length: 100, width: 79.8, qty: 1, type: 'porte' },
+        // 100cm height, 40cm width → 2 by height (≤100cm), narrow → no bonus
+        { id: 'p1', name: 'Porte', length: 100, width: 40, qty: 1, type: 'porte' },
       ],
     };
     const info = getDoorInfoFromPieces(body)!;
     expect(info.doorHeight).toBe(100);
-    expect(info.doorWidth).toBe(79.8);
-    expect(info.hingeCount).toBe(3); // 100cm → 3 hinges, not 5
+    expect(info.doorWidth).toBe(40);
+    expect(info.hingeCount).toBe(2); // 100cm ≤ 1000mm → 2
     expect(info.poseLabel).toContain('Enveloppante');
+  });
+
+  it('wide door gets +1 hinge bonus', () => {
+    const body: Body = {
+      id: 'b1', name: 'Test', width: 80, depth: 30,
+      doorConfig: { count: 1, poseType: 'enveloppante' },
+      pieces: [
+        // 80cm height × 65cm width, 1.8cm thick, 680 density
+        // Weight: 80×65×1.8/1e6 * 680 = 6.4 kg → ceil(6.4/4) = 2 by weight
+        // Height: 800mm ≤ 1000mm → 2 by height
+        // Width > 60cm → +1 = 3
+        { id: 'p1', name: 'Porte', length: 80, width: 65, qty: 1, type: 'porte' },
+      ],
+    };
+    const info = getDoorInfoFromPieces(body, 1.8, 680)!;
+    expect(info.hingeCount).toBe(3); // 2 + wide door bonus
+  });
+
+  it('calculates door weight', () => {
+    const body: Body = {
+      id: 'b1', name: 'Test', width: 80, depth: 30,
+      doorConfig: { count: 1, poseType: 'enveloppante' },
+      pieces: [
+        { id: 'p1', name: 'Porte', length: 100, width: 50, qty: 1, type: 'porte' },
+      ],
+    };
+    // 100 × 50 × 1.8 cm = 9000 cm³ = 0.009 m³ × 680 kg/m³ = 6.12 kg
+    const info = getDoorInfoFromPieces(body, 1.8, 680)!;
+    expect(info.doorWeightKg).toBeCloseTo(6.1, 0);
+  });
+
+  it('heavy door gets more hinges by weight', () => {
+    const body: Body = {
+      id: 'b1', name: 'Test', width: 80, depth: 30,
+      doorConfig: { count: 1, poseType: 'enveloppante' },
+      pieces: [
+        // Small door but very thick/heavy panel
+        { id: 'p1', name: 'Porte', length: 80, width: 50, qty: 1, type: 'porte' },
+      ],
+    };
+    // With 2.5cm thick, 680 density → 80×50×2.5/1e6 * 680 = 6.8 kg → ceil(6.8/4) = 2
+    // But with higher density (1200 kg/m³ — like MDF ): 80×50×2.5/1e6 * 1200 = 12 kg → ceil(12/4) = 3
+    const info = getDoorInfoFromPieces(body, 2.5, 1200)!;
+    expect(info.hingeCount).toBeGreaterThanOrEqual(3);
   });
 
   it('respects manually set small door dimensions', () => {

@@ -35,7 +35,7 @@ export default function MontageTab({ state }: Props) {
 
   // Hinge total — basé sur les pièces porte réelles
   const hingeTotal = state.bodies.reduce((sum, b) => {
-    const info = getDoorInfoFromPieces(b);
+    const info = getDoorInfoFromPieces(b, thickness, mat.density);
     if (!info) return sum;
     return sum + info.hingeCount * info.count;
   }, 0);
@@ -83,7 +83,7 @@ export default function MontageTab({ state }: Props) {
               const fixedPositions = [180, usableHeight - 45].slice(0, fixedCount);
 
               // Door info — lire les pièces porte réelles
-              const doorInfo = getDoorInfoFromPieces(b);
+              const doorInfo = getDoorInfoFromPieces(b, thickness, mat.density);
 
               return (
                 <g key={b.id}>
@@ -313,7 +313,7 @@ export default function MontageTab({ state }: Props) {
           <h3 className="text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3">Quincaillerie portes</h3>
           <div className="space-y-2">
             {state.bodies.filter((b) => b.doorConfig).map((b) => {
-              const dims = getDoorInfoFromPieces(b);
+              const dims = getDoorInfoFromPieces(b, thickness, mat.density);
               if (!dims) return null;
               return (
                 <div key={b.id} className="bg-orange-50 border border-orange-200 rounded-xl p-3 text-xs text-orange-800">
