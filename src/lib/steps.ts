@@ -1,7 +1,7 @@
 import type { AppState, Step } from '../types';
 import { MATERIALS } from '../data/materials';
 import { SYSTEME_32_RULES, ASSEMBLAGES, FINISHES, ORIENTATION_RULES } from '../data/knowledge';
-import { calculateDoor, getBodyInnerWidth, getBodyEffectiveHeight } from './helpers';
+import { getDoorInfoFromPieces } from './helpers';
 
 export function generateSteps(st: AppState): Step[] {
   const { project: pr, panel: pn, bodies: bs, materialKey: mk } = st;
@@ -108,12 +108,10 @@ export function generateSteps(st: AppState): Step[] {
     ];
 
     bodiesWithDoors.forEach((b) => {
-      const bi = bs.indexOf(b);
-      const iw = getBodyInnerWidth(b.width, bi, bs.length, sharedBounds, pn.thickness);
-      const bH = getBodyEffectiveHeight(b, pr.ceilingHeight, pr.plinthHeight);
-      const dims = calculateDoor(b.width, bH, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
+      const dims = getDoorInfoFromPieces(b);
+      if (!dims) return;
       doorItems.push(
-        `${b.name} — ${b.doorConfig!.count} porte${b.doorConfig!.count > 1 ? 's' : ''} (${dims.poseLabel}) :`
+        `${b.name} — ${dims.count} porte${dims.count > 1 ? 's' : ''} (${dims.poseLabel}) :`
       );
       doorItems.push(
         `  → Porte ${dims.doorWidth}×${dims.doorHeight} cm — ${dims.hingeCount} cuvettes/porte`
@@ -181,11 +179,9 @@ export function generateSteps(st: AppState): Step[] {
   // Pose des portes (après mise en place)
   if (bodiesWithDoors.length > 0) {
     const totalHinges = bodiesWithDoors.reduce((sum, b) => {
-      const bi = bs.indexOf(b);
-      const iw = getBodyInnerWidth(b.width, bi, bs.length, sharedBounds, pn.thickness);
-      const bH = getBodyEffectiveHeight(b, pr.ceilingHeight, pr.plinthHeight);
-      const dims = calculateDoor(b.width, bH, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
-      return sum + dims.hingeCount * b.doorConfig!.count;
+      const dims = getDoorInfoFromPieces(b);
+      if (!dims) return sum;
+      return sum + dims.hingeCount * dims.count;
     }, 0);
 
     const doorPoseItems: string[] = [
@@ -200,11 +196,9 @@ export function generateSteps(st: AppState): Step[] {
     ];
 
     bodiesWithDoors.forEach((b) => {
-      const bi = bs.indexOf(b);
-      const iw = getBodyInnerWidth(b.width, bi, bs.length, sharedBounds, pn.thickness);
-      const bH = getBodyEffectiveHeight(b, pr.ceilingHeight, pr.plinthHeight);
-      const dims = calculateDoor(b.width, bH, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
-      doorPoseItems.push(`${b.name} : ${b.doorConfig!.count}× porte ${dims.doorWidth}×${dims.doorHeight} cm (${dims.poseLabel})`);
+      const dims = getDoorInfoFromPieces(b);
+      if (!dims) return;
+      doorPoseItems.push(`${b.name} : ${dims.count}× porte ${dims.doorWidth}×${dims.doorHeight} cm (${dims.poseLabel})`);
     });
 
     doorPoseItems.push('Ajouter amortisseurs soft-close si non intégrés');

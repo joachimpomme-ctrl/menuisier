@@ -1,6 +1,6 @@
 import type { AppState } from '../types';
 import { MATERIALS, BODY_COLORS } from '../data/materials';
-import { calculateDoor, getBodyInnerWidth, isSharedLeft, getBodyEffectiveHeight } from '../lib/helpers';
+import { isSharedLeft, getDoorInfoFromPieces } from '../lib/helpers';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 
@@ -33,13 +33,11 @@ export default function MontageTab({ state }: Props) {
     return x;
   });
 
-  // Hinge total
-  const hingeTotal = state.bodies.reduce((sum, b, i) => {
-    if (!b.doorConfig) return sum;
-    const iw = getBodyInnerWidth(b.width, i, state.bodies.length, shared, thickness);
-    const bH = getBodyEffectiveHeight(b, state.project.ceilingHeight, state.project.plinthHeight);
-    const dims = calculateDoor(b.width, bH, thickness, b.doorConfig.count, b.doorConfig.poseType, iw);
-    return sum + dims.hingeCount * b.doorConfig.count;
+  // Hinge total — basé sur les pièces porte réelles
+  const hingeTotal = state.bodies.reduce((sum, b) => {
+    const info = getDoorInfoFromPieces(b);
+    if (!info) return sum;
+    return sum + info.hingeCount * info.count;
   }, 0);
 
   return (
@@ -84,11 +82,8 @@ export default function MontageTab({ state }: Props) {
                 .reduce((s, p) => s + p.qty, 0);
               const fixedPositions = [180, usableHeight - 45].slice(0, fixedCount);
 
-              // Door info
-              const doorConfig = b.doorConfig;
-              const iw = getBodyInnerWidth(b.width, bi, state.bodies.length, shared, thickness);
-              const bH = getBodyEffectiveHeight(b, state.project.ceilingHeight, state.project.plinthHeight);
-              const doorInfo = doorConfig ? calculateDoor(b.width, bH, thickness, doorConfig.count, doorConfig.poseType, iw) : null;
+              // Door info — lire les pièces porte réelles
+              const doorInfo = getDoorInfoFromPieces(b);
 
               return (
                 <g key={b.id}>
@@ -152,12 +147,12 @@ export default function MontageTab({ state }: Props) {
                   })}
 
                   {/* ===== DOORS ===== */}
-                  {doorInfo && doorConfig && (() => {
+                  {doorInfo && (() => {
                     const dh = doorInfo.doorHeight * scale;
                     const doorTopY = MARGIN + (usableHeight - doorInfo.doorHeight) * scale / 2;
                     const DOOR_INSET = 3;
 
-                    if (doorConfig.count === 1) {
+                    if (doorInfo.count === 1) {
                       const dx = bx + DOOR_INSET;
                       const dw = bw - DOOR_INSET * 2;
                       return (
@@ -316,17 +311,15 @@ export default function MontageTab({ state }: Props) {
         <div className={cardClass}>
           <h3 className="text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3">Quincaillerie portes</h3>
           <div className="space-y-2">
-            {state.bodies.filter((b) => b.doorConfig).map((b, _i) => {
-              const bi = state.bodies.indexOf(b);
-              const iw = getBodyInnerWidth(b.width, bi, state.bodies.length, shared, thickness);
-              const bHH = getBodyEffectiveHeight(b, state.project.ceilingHeight, state.project.plinthHeight);
-              const dims = calculateDoor(b.width, bHH, thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
+            {state.bodies.filter((b) => b.doorConfig).map((b) => {
+              const dims = getDoorInfoFromPieces(b);
+              if (!dims) return null;
               return (
                 <div key={b.id} className="bg-orange-50 border border-orange-200 rounded-xl p-3 text-xs text-orange-800">
-                  <div className="font-semibold">{b.name} — {b.doorConfig!.count} porte{b.doorConfig!.count > 1 ? 's' : ''} ({dims.poseLabel})</div>
+                  <div className="font-semibold">{b.name} — {dims.count} porte{dims.count > 1 ? 's' : ''} ({dims.poseLabel})</div>
                   <div className="mt-1 space-y-0.5 text-[11px]">
                     <div>Porte : {dims.doorWidth} × {dims.doorHeight} cm</div>
-                    <div>{dims.hingeCount} charnières Ø35 par porte — {dims.hingeCount * b.doorConfig!.count} au total</div>
+                    <div>{dims.hingeCount} charnières Ø35 par porte — {dims.hingeCount * dims.count} au total</div>
                     <div>Positions (depuis le bas) : {dims.hingePositions.map((p) => `${p} mm`).join(', ')}</div>
                     <div className="text-orange-600">Perçage cuvette : Ø35 mm, prof. 12-13 mm, centre à 21-22 mm du chant</div>
                     <div className="text-orange-600">Platine sur joue : vis Ø4×16 mm, entraxe sys. 32</div>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { AppState, MaterialKey, PieceType, Body, DoorPoseType, DoorConfig, PanelDef } from '../types';
 import { MATERIALS, PIECE_COLORS, BODY_COLORS, PIECE_TYPES } from '../data/materials';
-import { uid, parseNumber, clampInt, calculateDoor, getBodyInnerWidth, isSharedLeft, getBodyEffectiveHeight } from '../lib/helpers';
+import { uid, parseNumber, clampInt, calculateDoor, getBodyInnerWidth, isSharedLeft, getBodyEffectiveHeight, getDoorInfoFromPieces } from '../lib/helpers';
 import { createPiece, detectPieceType } from '../lib/domain/pieces';
 import { generateStandardPieces } from '../lib/domain/body';
 import Tip from './Tip';
@@ -134,7 +134,6 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
   body: Body; bodyIndex: number; state: AppState; onChange: (state: AppState) => void;
 }) {
   const { ceilingHeight, plinthHeight } = state.project;
-  const bodyH = getBodyEffectiveHeight(body, ceilingHeight, plinthHeight);
   const thickness = state.panel.thickness;
   const shared = state.sharedBoundaries ?? [];
   const innerW = getBodyInnerWidth(body.width, bodyIndex, state.bodies.length, shared, thickness);
@@ -172,7 +171,8 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
     });
   };
 
-  const doorInfo = config ? calculateDoor(body.width, bodyH, thickness, config.count, config.poseType, innerW) : null;
+  // Lire les dimensions RÉELLES des pièces porte (pas recalculer)
+  const doorInfo = getDoorInfoFromPieces(body);
 
   if (!config) {
     return (

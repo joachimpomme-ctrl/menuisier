@@ -8,6 +8,8 @@ import {
   isSharedRight,
   calculateDoor,
   getBodyEffectiveHeight,
+  computeHinges,
+  getDoorInfoFromPieces,
 } from '../helpers';
 import type { Body } from '../../types';
 
@@ -229,5 +231,84 @@ describe('getBodyEffectiveHeight', () => {
     const bH = getBodyEffectiveHeight(body, cH, pH);
     const door = calculateDoor(80, bH, 1.8, 1, 'enveloppante');
     expect(door.hingeCount).toBe(3); // was incorrectly 5 before the fix
+  });
+});
+
+// ---------------------------------------------------------------------------
+// computeHinges
+// ---------------------------------------------------------------------------
+describe('computeHinges', () => {
+  it('2 hinges for <60cm', () => {
+    expect(computeHinges(50).count).toBe(2);
+    expect(computeHinges(50).positions).toHaveLength(2);
+  });
+
+  it('3 hinges for 60-119cm', () => {
+    expect(computeHinges(100).count).toBe(3);
+    expect(computeHinges(100).positions).toHaveLength(3);
+  });
+
+  it('4 hinges for 120-179cm', () => {
+    expect(computeHinges(150).count).toBe(4);
+  });
+
+  it('5 hinges for ≥180cm', () => {
+    expect(computeHinges(200).count).toBe(5);
+  });
+
+  it('positions are sorted ascending', () => {
+    const { positions } = computeHinges(150);
+    for (let i = 1; i < positions.length; i++) {
+      expect(positions[i]).toBeGreaterThan(positions[i - 1]);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getDoorInfoFromPieces
+// ---------------------------------------------------------------------------
+describe('getDoorInfoFromPieces', () => {
+  it('returns null when no doorConfig', () => {
+    const body: Body = { id: 'b1', name: 'Test', width: 80, depth: 30, pieces: [] };
+    expect(getDoorInfoFromPieces(body)).toBeNull();
+  });
+
+  it('returns null when doorConfig but no porte pieces', () => {
+    const body: Body = {
+      id: 'b1', name: 'Test', width: 80, depth: 30,
+      doorConfig: { count: 1, poseType: 'enveloppante' },
+      pieces: [{ id: 'j1', name: 'Joue', length: 100, width: 30, qty: 1, type: 'joue' }],
+    };
+    expect(getDoorInfoFromPieces(body)).toBeNull();
+  });
+
+  it('reads actual door piece dimensions for hinge count', () => {
+    const body: Body = {
+      id: 'b1', name: 'Test', width: 80, depth: 30,
+      doorConfig: { count: 1, poseType: 'enveloppante' },
+      pieces: [
+        { id: 'p1', name: 'Porte', length: 100, width: 79.8, qty: 1, type: 'porte' },
+      ],
+    };
+    const info = getDoorInfoFromPieces(body)!;
+    expect(info.doorHeight).toBe(100);
+    expect(info.doorWidth).toBe(79.8);
+    expect(info.hingeCount).toBe(3); // 100cm → 3 hinges, not 5
+    expect(info.poseLabel).toContain('Enveloppante');
+  });
+
+  it('respects manually set small door dimensions', () => {
+    const body: Body = {
+      id: 'b1', name: 'Test', width: 80, depth: 30,
+      doorConfig: { count: 2, poseType: 'demi-recouvrement' },
+      pieces: [
+        { id: 'p1', name: 'Porte G', length: 50, width: 40, qty: 1, type: 'porte' },
+        { id: 'p2', name: 'Porte D', length: 50, width: 40, qty: 1, type: 'porte' },
+      ],
+    };
+    const info = getDoorInfoFromPieces(body)!;
+    expect(info.doorHeight).toBe(50);
+    expect(info.hingeCount).toBe(2); // 50cm → 2 hinges
+    expect(info.count).toBe(2);
   });
 });

@@ -103,6 +103,72 @@ export interface DoorDimensions {
 }
 
 /**
+ * Calcule le nombre et les positions de charnières pour une hauteur de porte donnée.
+ * Réutilisable indépendamment de calculateDoor.
+ */
+export function computeHinges(doorHeightCm: number): { count: number; positions: number[] } {
+  let count: number;
+  if (doorHeightCm < 60) count = 2;
+  else if (doorHeightCm < 120) count = 3;
+  else if (doorHeightCm < 180) count = 4;
+  else count = 5;
+
+  const TOP_OFFSET = 80; // mm
+  const BOT_OFFSET = 80; // mm
+  const totalMm = doorHeightCm * 10;
+  const positions: number[] = [BOT_OFFSET, totalMm - TOP_OFFSET];
+  if (count > 2) {
+    const span = (totalMm - TOP_OFFSET) - BOT_OFFSET;
+    for (let i = 1; i < count - 1; i++) {
+      positions.push(Math.round(BOT_OFFSET + (span * i) / (count - 1)));
+    }
+  }
+  positions.sort((a, b) => a - b);
+  return { count, positions };
+}
+
+/**
+ * Lit les dimensions réelles des pièces porte d'un corps.
+ * Retourne null si le corps n'a pas de doorConfig ou pas de pièces porte.
+ * Utilise les dimensions des pièces existantes (pas de recalcul).
+ */
+export function getDoorInfoFromPieces(body: Body): {
+  doorWidth: number;
+  doorHeight: number;
+  hingeCount: number;
+  hingePositions: number[];
+  count: number;
+  poseType: DoorPoseType;
+  poseLabel: string;
+} | null {
+  if (!body.doorConfig) return null;
+  const doorPieces = body.pieces.filter((p) => p.type === 'porte');
+  if (doorPieces.length === 0) return null;
+
+  // Prendre la première porte comme référence (toutes ont les mêmes dimensions)
+  const ref = doorPieces[0];
+  const doorHeight = ref.length;
+  const doorWidth = ref.width;
+  const hinges = computeHinges(doorHeight);
+
+  const poseLabels: Record<DoorPoseType, string> = {
+    enveloppante: 'Enveloppante (recouvrement total)',
+    'demi-recouvrement': 'Demi-recouvrement',
+    affleurante: 'Affleurante (intérieure)',
+  };
+
+  return {
+    doorWidth,
+    doorHeight,
+    hingeCount: hinges.count,
+    hingePositions: hinges.positions,
+    count: body.doorConfig.count,
+    poseType: body.doorConfig.poseType,
+    poseLabel: poseLabels[body.doorConfig.poseType],
+  };
+}
+
+/**
  * Calcule les dimensions d'une porte et les positions de charnières.
  * @param effectiveInnerWidth - Si fourni, utilise cette largeur intérieure au lieu de bodyWidth - 2*thickness.
  *   Nécessaire quand le corps a une joue commune (la largeur intérieure est plus grande).
@@ -161,28 +227,7 @@ export function calculateDoor(
       break;
   }
 
-  // Nombre de charnières selon hauteur (en cm)
-  const hCm = doorHeight;
-  let hingeCount: number;
-  if (hCm < 60) hingeCount = 2;
-  else if (hCm < 120) hingeCount = 3;
-  else if (hCm < 180) hingeCount = 4;
-  else hingeCount = 5;
+  const hinges = computeHinges(doorHeight);
 
-  // Positions des charnières (mm depuis le bas de la porte)
-  const TOP_OFFSET = 80; // mm
-  const BOT_OFFSET = 80; // mm
-  const totalMm = hCm * 10;
-  const hingePositions: number[] = [];
-  hingePositions.push(BOT_OFFSET);
-  hingePositions.push(totalMm - TOP_OFFSET);
-  if (hingeCount > 2) {
-    const span = (totalMm - TOP_OFFSET) - BOT_OFFSET;
-    for (let i = 1; i < hingeCount - 1; i++) {
-      hingePositions.push(Math.round(BOT_OFFSET + (span * i) / (hingeCount - 1)));
-    }
-  }
-  hingePositions.sort((a, b) => a - b);
-
-  return { doorWidth, doorHeight, hingeCount, hingePositions, poseLabel };
+  return { doorWidth, doorHeight, hingeCount: hinges.count, hingePositions: hinges.positions, poseLabel };
 }
