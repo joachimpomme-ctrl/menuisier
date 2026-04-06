@@ -1,5 +1,6 @@
 import type { AppState, PieceWithBody, NestingResult, PanelDef } from '../types';
 import type { CostEstimate } from '../lib/cost';
+import type { ProjectAnalysis } from '../lib/projectAnalysis';
 import { MATERIALS, PIECE_COLORS } from '../data/materials';
 import { generateCutListCsv, downloadCsv } from '../lib/csv';
 import { uid, parseNumber } from '../lib/helpers';
@@ -30,6 +31,7 @@ interface Props {
   allPanelDefs: PanelDef[];
   cost: CostEstimate;
   onPriceChange: (price: number) => void;
+  analysis: ProjectAnalysis;
 }
 
 const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
@@ -100,7 +102,7 @@ function PanelBinDiagram({ bin, binIndex, panelDef, kerf }: {
 
 const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
 
-export default function DebitTab({ state, onChange, allPieces, nesting: _nesting, nestingByPanel, allPanelDefs, cost, onPriceChange }: Props) {
+export default function DebitTab({ state, onChange, allPieces, nesting: _nesting, nestingByPanel, allPanelDefs, cost, onPriceChange, analysis }: Props) {
   const mat = MATERIALS[state.materialKey];
 
   // ---------- Panel config helpers ----------
@@ -422,13 +424,25 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
       <div className={cardClass}>
         <div className="flex items-center justify-between mb-3">
           <h4 className="text-amber-700 font-semibold text-xs uppercase tracking-widest">Liste de coupe</h4>
-          <button
-            type="button"
-            className="text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-stone-300 bg-stone-50 text-stone-600 hover:bg-stone-100 transition-colors"
-            onClick={() => downloadCsv(generateCutListCsv(allPieces, allPanelDefs, state), `${state.project.name}-debit.csv`)}
-          >
-            CSV
-          </button>
+          <div className="flex gap-1.5">
+            <button
+              type="button"
+              className="text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"
+              onClick={async () => {
+                const { generateCutListPdf } = await import('../lib/pdf');
+                generateCutListPdf(state, analysis);
+              }}
+            >
+              PDF Atelier
+            </button>
+            <button
+              type="button"
+              className="text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-stone-300 bg-stone-50 text-stone-600 hover:bg-stone-100 transition-colors"
+              onClick={() => downloadCsv(generateCutListCsv(allPieces, allPanelDefs, state), `${state.project.name}-debit.csv`)}
+            >
+              CSV
+            </button>
+          </div>
         </div>
         <div className="space-y-1">
           {[...allPieces]

@@ -325,6 +325,7 @@ export default function App() {
             allPanelDefs={allPanelDefs}
             cost={cost}
             onPriceChange={handlePriceChange}
+            analysis={analysis}
           />
         )}
         {tab === 'montage' && <MontageTab state={state} />}

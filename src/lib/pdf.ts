@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { AppState, ValidationResult, Step, PackedPiece } from '../types';
+import type { AppState, ValidationResult, Step, PackedPiece, PanelDef } from '../types';
 import type { ProjectAnalysis } from './projectAnalysis';
 import { MATERIALS } from '../data/materials';
 
@@ -502,5 +502,174 @@ export async function generatePdf(
   // Save
   // =========================================================================
   const fileName = `${slugify(state.project.name)}-dossier-${isoDate()}.pdf`;
+  doc.save(fileName);
+}
+
+// ---------------------------------------------------------------------------
+// Cut-list PDF — "Fiche de découpe atelier"
+// ---------------------------------------------------------------------------
+
+const CL_PAGE_W = 297; // A4 landscape width mm
+const CL_PAGE_H = 210; // A4 landscape height mm
+const CL_MARGIN = 15;
+
+const CL_HEADER_BG: [number, number, number] = hexToRgb('#78350f'); // amber-900
+const CL_HEADER_TXT: [number, number, number] = [255, 255, 255];
+const CL_ALT_ROW: [number, number, number] = [255, 251, 235]; // amber-50
+const CL_TOTAL_BG: [number, number, number] = hexToRgb('#92400e'); // amber-800
+
+function clFooters(doc: jsPDF, extra: string): void {
+  const total = doc.getNumberOfPages();
+  const date = frenchDate();
+  for (let i = 1; i <= total; i++) {
+    doc.setPage(i);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(...TEXT_COLOR);
+    doc.text('Fiche de d\u00e9coupe atelier', CL_MARGIN, CL_PAGE_H - 8);
+    doc.text(`Page ${i} / ${total}`, CL_PAGE_W / 2, CL_PAGE_H - 8, { align: 'center' });
+    doc.text(date, CL_PAGE_W - CL_MARGIN, CL_PAGE_H - 8, { align: 'right' });
+    if (i === total && extra) {
+      doc.setFontSize(8);
+      doc.text(extra, CL_MARGIN, CL_PAGE_H - 14);
+    }
+  }
+}
+
+function clEnsureSpace(doc: jsPDF, y: number, needed: number): number {
+  if (y + needed > CL_PAGE_H - 20) {
+    doc.addPage('landscape');
+    return CL_MARGIN + 5;
+  }
+  return y;
+}
+
+export function generateCutListPdf(
+  state: AppState,
+  analysis: ProjectAnalysis,
+): void {
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+  const mat = MATERIALS[state.materialKey];
+
+  // ---- Header ----
+  let y = CL_MARGIN + 5;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.setTextColor(...CL_HEADER_BG);
+  doc.text(`Fiche de d\u00e9coupe \u2014 ${state.project.name}`, CL_MARGIN, y);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...TEXT_COLOR);
+  doc.text(`${frenchDate()} \u2014 Mat\u00e9riau : ${mat.name}`, CL_MARGIN, y + 6);
+  y += 14;
+
+  // Build panel definitions lookup
+  const defaultPanelDef: PanelDef = {
+    id: 'default',
+    label: `${mat.short} ${state.panel.thickness * 10}mm`,
+    width: state.panel.width,
+    height: state.panel.height,
+    thickness: state.panel.thickness,
+    price: state.costConfig.panelPrice,
+  };
+  const allPanelDefs = [defaultPanelDef, ...(state.extraPanels ?? [])];
+
+  // Group pieces by panelId
+  const piecesByPanel = new Map<string, typeof analysis.allPieces>();
+  for (const p of analysis.allPieces) {
+    const pid = p.panelId ?? 'default';
+    if (!piecesByPanel.has(pid)) piecesByPanel.set(pid, []);
+    piecesByPanel.get(pid)!.push(p);
+  }
+
+  let grandTotalQty = 0;
+  let grandTotalSurface = 0;
+
+  // ---- One section per panel type ----
+  for (const pd of allPanelDefs) {
+    const pieces = piecesByPanel.get(pd.id);
+    if (!pieces || pieces.length === 0) continue;
+
+    y = clEnsureSpace(doc, y, 30);
+
+    // Panel section title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...CL_HEADER_BG);
+    doc.text(`${pd.label} \u2014 ${pd.width}\u00d7${pd.height} cm, \u00e9p. ${pd.thickness * 10} mm`, CL_MARGIN, y);
+    y += 5;
+
+    // Sort pieces by body then by type
+    const sorted = [...pieces].sort((a, b) => {
+      const cmp = a.bodyName.localeCompare(b.bodyName);
+      if (cmp !== 0) return cmp;
+      return a.type.localeCompare(b.type);
+    });
+
+    // Build table rows
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows: any[][] = [];
+    let sectionQty = 0;
+    let sectionSurface = 0;
+
+    sorted.forEach((p, i) => {
+      const surface = p.length * p.width * p.qty;
+      sectionQty += p.qty;
+      sectionSurface += surface;
+      rows.push([
+        String(i + 1),
+        p.bodyName,
+        p.name,
+        p.type,
+        String(p.length),
+        String(p.width),
+        String(p.qty),
+        surface.toLocaleString('fr-FR'),
+      ]);
+    });
+
+    grandTotalQty += sectionQty;
+    grandTotalSurface += sectionSurface;
+
+    // Total row
+    rows.push([
+      { content: `Total : ${sectionQty} pi\u00e8ces`, colSpan: 7, styles: { fontStyle: 'bold', fillColor: CL_TOTAL_BG, textColor: CL_HEADER_TXT } },
+      { content: sectionSurface.toLocaleString('fr-FR'), styles: { fontStyle: 'bold', fillColor: CL_TOTAL_BG, textColor: CL_HEADER_TXT } },
+    ]);
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: CL_MARGIN, right: CL_MARGIN },
+      head: [['N\u00b0', 'Corps', 'Pi\u00e8ce', 'Type', 'Long. (cm)', 'Larg. (cm)', 'Qt\u00e9', 'Surface (cm\u00b2)']],
+      body: rows,
+      styles: { font: 'helvetica', fontSize: 8, textColor: TEXT_COLOR, cellPadding: 1.8 },
+      headStyles: {
+        fillColor: CL_HEADER_BG,
+        textColor: CL_HEADER_TXT,
+        fontStyle: 'bold',
+        fontSize: 7.5,
+      },
+      alternateRowStyles: { fillColor: CL_ALT_ROW },
+      columnStyles: {
+        0: { cellWidth: 10, halign: 'center' },
+        4: { halign: 'right' },
+        5: { halign: 'right' },
+        6: { halign: 'center' },
+        7: { halign: 'right' },
+      },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    y = (doc as any).lastAutoTable.finalY + 8;
+  }
+
+  // ---- Footer info ----
+  const footerExtra = `Trait de scie : ${state.kerf} mm \u2014 Panneaux n\u00e9cessaires : ${analysis.totalPanelCount} \u2014 Surface totale : ${(grandTotalSurface / 10000).toFixed(2)} m\u00b2 (${grandTotalQty} pi\u00e8ces)`;
+
+  clFooters(doc, footerExtra);
+
+  // ---- Save ----
+  const fileName = `${slugify(state.project.name)}-fiche-decoupe-${isoDate()}.pdf`;
   doc.save(fileName);
 }

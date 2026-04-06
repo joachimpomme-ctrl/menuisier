@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import type { AppState, ChatMessage, UploadedPdf, ValidationResult, PieceWithBody } from '../types';
 import { MATERIALS } from '../data/materials';
-import { buildKnowledgeSummary } from '../data/knowledge';
 import { listKnowledgeDocs } from '../lib/knowledgeStore';
+import { analyzeProject } from '../lib/projectAnalysis';
+import { buildAIContext } from '../lib/ai/buildContext';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 
@@ -24,7 +25,7 @@ interface UploadedImage {
 const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
 const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
 
-export default function AssistantTab({ state, validation, allPieces, totalPieces, panelCount }: Props) {
+export default function AssistantTab({ state, validation, allPieces, totalPieces: _totalPieces, panelCount: _panelCount }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,7 +38,6 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
   const cameraRef = useRef<HTMLInputElement>(null);
 
   const mat = MATERIALS[state.materialKey];
-  const usableHeight = state.project.ceilingHeight - state.project.plinthHeight;
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -110,31 +110,6 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
 
   const kbDocCount = listKnowledgeDocs().length;
 
-  // --- Lot 5.2: Summarize pieces if >20 ---
-  const buildPiecesSummary = (): string => {
-    if (totalPieces <= 20) {
-      // Original detailed format
-      return state.bodies.map(b =>
-        b.pieces.map(p => `${b.name} > ${p.name}: ${p.length}×${p.width} ×${p.qty} [${p.type}]`).join('\n')
-      ).join('\n');
-    }
-    // Grouped summary: group by body, then by type
-    return state.bodies.map(b => {
-      const grouped: Record<string, { dims: string; qty: number }[]> = {};
-      for (const p of b.pieces) {
-        const key = p.type;
-        if (!grouped[key]) grouped[key] = [];
-        grouped[key].push({ dims: `${p.length}×${p.width}cm`, qty: p.qty });
-      }
-      const parts = Object.entries(grouped).map(([type, items]) => {
-        const totalQty = items.reduce((s, i) => s + i.qty, 0);
-        const uniqueDims = [...new Set(items.map(i => i.dims))];
-        return `${totalQty} ${type} (${uniqueDims.join(', ')})`;
-      });
-      return `${b.name}: ${parts.join(', ')}`;
-    }).join('\n');
-  };
-
   // --- Lot 5.3: Filter knowledge base by current material ---
   const buildFilteredUserKnowledge = (): string => {
     const docs = listKnowledgeDocs();
@@ -184,33 +159,30 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
   };
 
   const buildSystemPrompt = (): string => {
-    const knowledgeBase = buildKnowledgeSummary();
+    const analysis = analyzeProject(state);
+    const aiContext = buildAIContext(state, analysis);
     const userKnowledge = buildFilteredUserKnowledge();
-    const piecesSection = buildPiecesSummary();
 
-    return `Tu es un assistant menuiserie expert intégré à un outil de conception de meubles sur mesure (bibliothèques, rangements, dressings, buffets, meubles TV, etc. — toute menuiserie intérieure en panneaux). Réponds en français, concis et technique. Cite tes sources quand tu utilises la base de connaissances (ex: [Dunod 2022]).
+    // Augment the structured prompt with runtime context (validation, images, PDFs, user knowledge)
+    const extras: string[] = [];
 
-${images.length > 0 ? `L'utilisateur a joint ${images.length} photo(s) de son chantier/projet. Analyse-les attentivement : vérifie les dimensions apparentes, la qualité des assemblages, les défauts visibles, la planéité, l'équerrage, l'état du mur, etc. Donne des conseils concrets basés sur ce que tu vois.` : ''}
+    if (images.length > 0) {
+      extras.push(`L'utilisateur a joint ${images.length} photo(s) de son chantier/projet. Analyse-les attentivement : vérifie les dimensions apparentes, la qualité des assemblages, les défauts visibles, la planéité, l'équerrage, l'état du mur, etc. Donne des conseils concrets basés sur ce que tu vois.`);
+    }
 
-PROJET : mur ${state.project.wallWidth}×${state.project.ceilingHeight} cm, plinthe ${state.project.plinthHeight} cm, hauteur utile ${usableHeight} cm
-${state.bodies.length} corps : ${state.bodies.map(b => `${b.name} ${b.width}×${b.depth}cm (${b.pieces.length} pièces)`).join(' / ')}
-Total : ${totalPieces} pièces → ${panelCount} panneaux
-
-MATÉRIAU : ${mat.name} — densité ${mat.density}, flexion ${mat.flexMPa} MPa, portée max ${mat.maxSpan18} cm, vis: ${mat.screwHolding}, tourillons: ${mat.dowels ? 'oui' : 'non'}
-Assemblage : ${mat.assembly.join(' / ')}
-${mat.warnings.length ? '⚠ ' + mat.warnings.join(' | ') : ''}
-
-PIÈCES${totalPieces > 20 ? ' (résumé groupé)' : ''} :
-${piecesSection}
-
-VALIDATION : ${validation.errors.length} err, ${validation.warnings.length} warn
+    extras.push(`VALIDATION : ${validation.errors.length} err, ${validation.warnings.length} warn
 ${validation.errors.map(e => '❌ ' + e).join('\n')}
-${validation.warnings.map(w => '⚠ ' + w).join('\n')}
+${validation.warnings.map(w => '⚠ ' + w).join('\n')}`);
 
-${pdfs.length ? `${pdfs.length} PDF de référence fournis — utilise-les.` : ''}
+    if (pdfs.length > 0) {
+      extras.push(`${pdfs.length} PDF de référence fournis — utilise-les.`);
+    }
 
-${knowledgeBase}
-${userKnowledge}`;
+    if (userKnowledge) {
+      extras.push(userKnowledge);
+    }
+
+    return aiContext.systemPrompt + '\n\n' + extras.join('\n\n');
   };
 
   // --- Lot 5.1: Payload size warning ---
