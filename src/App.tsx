@@ -9,7 +9,7 @@ import { generateSteps } from './lib/steps';
 import { estimateCost } from './lib/cost';
 import { analyzeProject } from './lib/projectAnalysis';
 // PDF lazy-loaded pour code-split (jsPDF est gros)
-import { LocalProjectRepository, exportToJson, importFromJson } from './lib/storage';
+import { LocalProjectRepository, exportToJson, syncToJson, importFromJson } from './lib/storage';
 import { seedBaseKnowledge } from './lib/knowledgeStore';
 import StructureTab from './components/StructureTab';
 import DebitTab from './components/DebitTab';
@@ -272,6 +272,13 @@ export default function App() {
                 JSON
               </button>
             </Tip>
+            <button
+              onClick={() => syncToJson(state)}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
+              title="Télécharge avec un nom fixe pour sync Drive"
+            >
+              Sync
+            </button>
             <button
               onClick={() => importRef.current?.click()}
               className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"

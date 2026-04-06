@@ -183,6 +183,21 @@ export class LocalProjectRepository implements ProjectRepository {
 // ---------------------------------------------------------------------------
 // JSON export / import (standalone helpers)
 // ---------------------------------------------------------------------------
+export function syncToJson(state: AppState): void {
+  const stored: StoredProject = {
+    version: CURRENT_VERSION,
+    state,
+    savedAt: new Date().toISOString(),
+  };
+  const blob = new Blob([JSON.stringify(stored, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `menuisier_${state.project.name.replace(/\s+/g, '_').toLowerCase()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export function exportToJson(state: AppState): void {
   const stored: StoredProject = {
     version: CURRENT_VERSION,

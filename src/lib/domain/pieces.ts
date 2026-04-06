@@ -104,5 +104,9 @@ export function normalizePiece(piece: Piece, allPanelIds: string[]): Piece {
   if (p.panelId && p.panelId !== 'default' && !allPanelIds.includes(p.panelId)) {
     p.panelId = undefined;
   }
+  // Clean invalid thickness override (<=0 → revert to panel default)
+  if (p.thickness !== undefined && p.thickness <= 0) {
+    delete p.thickness;
+  }
   return p;
 }

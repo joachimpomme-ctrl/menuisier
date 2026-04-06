@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { AppState, MaterialKey, PieceType, Body, DoorPoseType, DoorConfig, DoorPosition, PanelDef } from '../types';
 import { MATERIALS, PIECE_COLORS, BODY_COLORS, PIECE_TYPES } from '../data/materials';
 import { uid, parseNumber, clampInt, calculateDoor, getBodyInnerWidth, isSharedLeft, getBodyEffectiveHeight, getDoorInfoFromPieces } from '../lib/helpers';
-import { createPiece, detectPieceType, generateStandardPieces, applySharedBoundary, recalcBodyPieces } from '../lib/domain';
+import { createPiece, detectPieceType, generateStandardPieces, applySharedBoundary, recalcBodyPieces, getPanelForPiece } from '../lib/domain';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 
@@ -307,6 +307,12 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
               if (key === 'panelId') {
                 const v = value === '' || value === 'default' ? undefined : String(value);
                 return { ...p, panelId: v };
+              }
+              // thickness: '' → undefined (revert to panel default)
+              if (key === 'thickness') {
+                const { thickness: _t, ...rest } = p;
+                if (value === '' || value === 0) return rest as typeof p;
+                return { ...p, thickness: Number(value) };
               }
               const updated = { ...p, [key]: value };
               // Auto-detect piece type from name (only if current type is 'autre')
@@ -1060,6 +1066,22 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                             value={p.qty}
                             onChange={(e) => updatePiece(b.id, p.id, 'qty', clampInt(e.target.value, p.qty, 1, 99))}
                           />
+                          <input
+                            type="number"
+                            step="1"
+                            min={1}
+                            className={inputClass + " !py-1 w-16" + (p.thickness !== undefined ? " !border-amber-400 !bg-amber-50" : "")}
+                            value={Math.round((p.thickness ?? getPanelForPiece(p.panelId, state).thickness) * 10)}
+                            onChange={(e) => {
+                              const mm = parseNumber(e.target.value, Math.round((p.thickness ?? getPanelForPiece(p.panelId, state).thickness) * 10), 1);
+                              const cm = mm / 10;
+                              const panelThickness = getPanelForPiece(p.panelId, state).thickness;
+                              // If value matches panel thickness, clear override
+                              updatePiece(b.id, p.id, 'thickness', Math.abs(cm - panelThickness) < 0.001 ? '' : cm);
+                            }}
+                            title="Epaisseur (mm)"
+                            placeholder="ep."
+                          />
                           <select
                             className={inputClass + " !py-1 text-xs"}
                             value={p.type}
@@ -1099,6 +1121,9 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                         </span>
                         <span className="text-stone-500 text-xs font-mono ml-2 flex-shrink-0">
                           {p.length}×{p.width} ×{p.qty}
+                          <span className={`ml-1 ${p.thickness !== undefined ? 'text-amber-600 font-semibold' : 'text-stone-400'}`} title="Epaisseur">
+                            ep.{Math.round((p.thickness ?? getPanelForPiece(p.panelId, state).thickness) * 10)}
+                          </span>
                         </span>
                       </div>
                     )}

@@ -45,6 +45,7 @@ export interface Piece {
   qty: number;
   type: PieceType;
   panelId?: string; // undefined = panneau principal (state.panel)
+  thickness?: number; // cm — override épaisseur panneau (ex. double joue). undefined = épaisseur du panneau assigné
 }
 
 export type DoorPoseType = 'enveloppante' | 'demi-recouvrement' | 'affleurante';
