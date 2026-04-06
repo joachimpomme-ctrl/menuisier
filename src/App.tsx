@@ -11,6 +11,7 @@ import { analyzeProject } from './lib/projectAnalysis';
 // PDF lazy-loaded pour code-split (jsPDF est gros)
 import { LocalProjectRepository, exportToJson, syncToJson, importFromJson } from './lib/storage';
 import { seedBaseKnowledge } from './lib/knowledgeStore';
+import { isCloudConfigured } from './lib/cloudSync';
 import StructureTab from './components/StructureTab';
 import DebitTab from './components/DebitTab';
 import MontageTab from './components/MontageTab';
@@ -20,6 +21,7 @@ import AssistantTab from './components/AssistantTab';
 import PlanTab from './components/PlanTab';
 import ProjectManager from './components/ProjectManager';
 import KnowledgeManager from './components/KnowledgeManager';
+import CloudSync from './components/CloudSync';
 import InstallBanner from './components/InstallBanner';
 import NewProjectWizard from './components/NewProjectWizard';
 import Tip from './components/Tip';
@@ -70,6 +72,7 @@ export default function App() {
   const [projects, setProjects] = useState<ProjectMeta[]>(repo.list());
   const [showProjects, setShowProjects] = useState(false);
   const [showKnowledge, setShowKnowledge] = useState(false);
+  const [showCloud, setShowCloud] = useState(false);
   const [showNewWizard, setShowNewWizard] = useState(false);
   const [, setKnowledgeVersion] = useState(0); // trigger re-render on knowledge update
   const [importError, setImportError] = useState<string | null>(null);
@@ -273,6 +276,17 @@ export default function App() {
               </button>
             </Tip>
             <button
+              onClick={() => setShowCloud(true)}
+              className={`text-[11px] px-2.5 py-1.5 rounded-lg border whitespace-nowrap transition-colors ${
+                isCloudConfigured()
+                  ? 'bg-sky-50 text-sky-600 border-sky-200 hover:bg-sky-100'
+                  : 'bg-white text-stone-500 hover:text-stone-700 border-stone-200'
+              }`}
+              title="Sync cloud Google Sheets"
+            >
+              ☁️ Cloud
+            </button>
+            <button
               onClick={() => syncToJson(state)}
               className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
               title="Télécharge avec un nom fixe pour sync Drive"
@@ -338,7 +352,8 @@ export default function App() {
         {tab === 'montage' && <MontageTab state={state} />}
         {tab === 'notice' && <NoticeTab steps={steps} materialName={mat.name} thickness={state.panel.thickness} />}
         {tab === 'validation' && <ValidationTab validation={validation} onGoToStructure={() => setTab('structure')} />}
-        {tab === 'ia' && (
+        {/* AssistantTab is always mounted (hidden when inactive) to preserve chat history */}
+        <div style={{ display: tab === 'ia' ? 'block' : 'none' }}>
           <AssistantTab
             state={state}
             validation={validation}
@@ -346,7 +361,7 @@ export default function App() {
             totalPieces={totalPieces}
             panelCount={nesting.metrics.panelCount}
           />
-        )}
+        </div>
       </div>
 
       {/* PWA Install Banner */}
@@ -364,6 +379,24 @@ export default function App() {
         isOpen={showKnowledge}
         onClose={() => setShowKnowledge(false)}
         onUpdate={() => setKnowledgeVersion((v) => v + 1)}
+      />
+
+      {/* Cloud Sync Modal */}
+      <CloudSync
+        isOpen={showCloud}
+        onClose={() => setShowCloud(false)}
+        projectId={projectId}
+        state={state}
+        localProjects={projects}
+        loadLocal={(id) => repo.load(id)}
+        onPull={(id, pulled) => {
+          repo.save(id, pulled);
+          setState(pulled);
+          setProjectId(id);
+          repo.setCurrentId(id);
+          refreshProjects();
+          setShowCloud(false);
+        }}
       />
 
       {/* Project Manager Modal */}

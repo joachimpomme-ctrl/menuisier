@@ -92,6 +92,7 @@ export default function PlanTab({ state }: Props) {
 
           const fixedTab = b.pieces.filter(p => p.type === 'tablette-fixe');
           const adjustTab = b.pieces.filter(p => p.type === 'tablette-reglable');
+          const separateurs = b.pieces.filter(p => p.type === 'separateur');
           const portes = b.pieces.filter(p => p.type === 'porte');
           const bandeaux = b.pieces.filter(p => p.type === 'bandeau');
 
@@ -141,6 +142,24 @@ export default function PlanTab({ state }: Props) {
                     stroke={PIECE_COLORS['tablette-reglable']} strokeWidth="1" strokeDasharray="4,3" opacity=".6" />
                 );
               })}
+
+              {/* Séparateurs verticaux */}
+              {(() => {
+                const sepCount = separateurs.reduce((s, p) => s + p.qty, 0);
+                if (sepCount === 0) return null;
+                const innerW = bw - 2 * tw;
+                return Array.from({ length: sepCount }, (_, si) => {
+                  const sx = bx + tw + (si + 1) * innerW / (sepCount + 1) - tw / 2;
+                  // Height based on first separateur piece or 60% of body
+                  const sepH = separateurs[0] ? separateurs[0].length * scale : bh * 0.6;
+                  const sepY = M + (bh - sepH) / 2; // centered vertically
+                  return (
+                    <rect key={`sep${si}`} x={sx} y={sepY} width={tw} height={sepH}
+                      fill={PIECE_COLORS.separateur} opacity=".2"
+                      stroke={PIECE_COLORS.separateur} strokeWidth="0.5" />
+                  );
+                });
+              })()}
 
               {/* Portes (hatched rectangle) */}
               {portes.map((_p, pi) => {
@@ -354,6 +373,7 @@ export default function PlanTab({ state }: Props) {
             { type: 'joue', label: 'Joue (montant)' },
             { type: 'tablette-fixe', label: 'Tablette fixe' },
             { type: 'tablette-reglable', label: 'Tablette réglable' },
+            { type: 'separateur', label: 'Séparateur' },
             { type: 'porte', label: 'Porte' },
             { type: 'bandeau', label: 'Bandeau' },
             { type: 'fond', label: 'Fond/Dos' },

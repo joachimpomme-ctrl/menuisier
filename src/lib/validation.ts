@@ -170,6 +170,21 @@ export function validate(st: AppState): ValidationResult {
       }
     });
 
+    // --- Séparateurs verticaux : contrôle profondeur et hauteur ---
+    const separateurs = b.pieces.filter((p) => p.type === 'separateur');
+    separateurs.forEach((p) => {
+      if (Math.abs(p.width - b.depth) > 0.5) {
+        warnings.push(`${b.name} : "${p.name}" prof. ${p.width} cm ≠ profondeur corps ${b.depth} cm`);
+      }
+      const usableH = pr.ceilingHeight - pr.plinthHeight;
+      if (p.length > usableH + 0.5 && usableH > 0) {
+        errors.push(`${b.name} : "${p.name}" hauteur ${p.length} cm > hauteur utile ${usableH} cm`);
+      }
+      if (p.length < 5) {
+        warnings.push(`${b.name} : "${p.name}" hauteur ${p.length} cm très faible — vérifier`);
+      }
+    });
+
     // --- Bandeaux : contrôle largeur ---
     bandeaux.forEach((p) => {
       if (Math.abs(p.length - b.width) > 0.5) {

@@ -194,7 +194,7 @@ export function recalcBodyPieces(
 
   let pieces = body.pieces.map((p) => {
     const piece = { ...p };
-    if (p.type === 'joue') {
+    if (p.type === 'joue' || p.type === 'separateur') {
       piece.width = newDepth;
     } else if (p.type === 'tablette-fixe' || p.type === 'tablette-reglable') {
       piece.length = innerWidth;

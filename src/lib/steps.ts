@@ -160,6 +160,15 @@ export function generateSteps(st: AppState): Step[] {
         `Équerrage diagonales (tol. 2 mm)`,
         `Fond 6 mm agrafé`,
         ...(mat.edgeBanding ? ["⚠ Chants thermocollants AVANT assemblage"] : []),
+        ...(() => {
+          const seps = b.pieces.filter((p) => p.type === 'separateur');
+          const sepCount = seps.reduce((s, p) => s + p.qty, 0);
+          if (sepCount === 0) return [];
+          return [
+            `${sepCount} séparateur(s) vertical(aux) : poser sur taquets ou coller/visser entre tablettes`,
+            ...seps.map((p) => `  → ${p.name} : ${p.length}×${p.width} cm ×${p.qty}`),
+          ];
+        })(),
         `${adjustableCount} tablettes réglables : ne pas monter`,
       ],
     });

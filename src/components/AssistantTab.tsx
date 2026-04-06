@@ -4,8 +4,12 @@ import { MATERIALS } from '../data/materials';
 import { listKnowledgeDocs } from '../lib/knowledgeStore';
 import { analyzeProject } from '../lib/projectAnalysis';
 import { buildAIContext } from '../lib/ai/buildContext';
+import KnowledgeManager from './KnowledgeManager';
 import Tip from './Tip';
 import TIPS from '../data/tips';
+
+/** Max chars of user knowledge injected into the system prompt */
+const MAX_KNOWLEDGE_CHARS = 3000;
 
 interface Props {
   state: AppState;
@@ -32,6 +36,8 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
   const [error, setError] = useState<string | null>(null);
   const [pdfs, setPdfs] = useState<UploadedPdf[]>([]);
   const [images, setImages] = useState<UploadedImage[]>([]);
+  const [showKnowledge, setShowKnowledge] = useState(false);
+  const [kbVersion, setKbVersion] = useState(0);
   const endRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const photoRef = useRef<HTMLInputElement>(null);
@@ -108,54 +114,43 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
     e.target.value = '';
   };
 
-  const kbDocCount = listKnowledgeDocs().length;
+  // kbVersion in deps ensures re-render when user adds/removes docs
+  const kbDocs = listKnowledgeDocs();
+  const kbDocCount = kbDocs.length + 0 * kbVersion;
 
-  // --- Lot 5.3: Filter knowledge base by current material ---
+  // --- Build filtered user knowledge, capped at MAX_KNOWLEDGE_CHARS ---
   const buildFilteredUserKnowledge = (): string => {
-    const docs = listKnowledgeDocs();
-    if (docs.length === 0) return '';
+    if (kbDocs.length === 0) return '';
 
-    // Material keywords for filtering
     const materialName = mat.name.toLowerCase();
     const materialShort = mat.short.toLowerCase();
     const materialKeywords: string[] = [materialName, materialShort];
+    if (materialName.includes('contreplaqué') || materialShort.includes('cp')) materialKeywords.push('contreplaqué', 'cp');
+    if (state.materialKey === 'mdf') materialKeywords.push('mdf', 'medium');
+    if (state.materialKey === 'melamine') materialKeywords.push('mélaminé', 'melamine', 'aggloméré');
+    if (state.materialKey === 'osb') materialKeywords.push('osb');
 
-    // Add common synonyms / related terms
-    if (materialName.includes('contreplaqué') || materialShort.includes('cp')) {
-      materialKeywords.push('contreplaqué', 'contreplaque', 'cp', 'plywood');
+    const allMats = ['contreplaqué', 'mdf', 'mélaminé', 'melamine', 'osb', 'aggloméré'];
+
+    let totalLen = 0;
+    const parts: string[] = [];
+
+    for (const d of kbDocs) {
+      const lo = (d.summary + d.name).toLowerCase();
+      const mentionsMaterial = materialKeywords.some(kw => lo.includes(kw));
+      const mentionsOther = allMats.some(m => lo.includes(m)) && !mentionsMaterial;
+      if (mentionsOther) continue; // skip docs about other materials
+
+      // Truncate individual doc summary to fit budget
+      const budget = MAX_KNOWLEDGE_CHARS - totalLen;
+      if (budget <= 100) break; // no room left
+      const summary = d.summary.length > budget ? d.summary.slice(0, budget) + '…' : d.summary;
+      parts.push(`[${d.name}] ${summary}`);
+      totalLen += summary.length + d.name.length + 4;
     }
-    if (materialName.includes('mdf') || state.materialKey === 'mdf') {
-      materialKeywords.push('mdf', 'medium', 'fibre');
-    }
-    if (materialName.includes('mélaminé') || materialName.includes('melamine') || state.materialKey === 'melamine') {
-      materialKeywords.push('mélaminé', 'melamine', 'mélam', 'panneau de particules', 'aggloméré', 'agglomere');
-    }
-    if (materialName.includes('osb') || state.materialKey === 'osb') {
-      materialKeywords.push('osb', 'oriented strand');
-    }
-    // General terms always relevant
-    const alwaysRelevant = ['caisson', 'système 32', 'systeme 32', 'assemblage', 'charnière', 'tiroir', 'porte', 'finition', 'flèche', 'flexion', 'vis', 'tourillon', 'colle'];
-
-    const parts = docs.map((d) => {
-      const summaryLower = d.summary.toLowerCase();
-      const nameLower = d.name.toLowerCase();
-
-      // Check if the doc mentions the current material or is generally relevant
-      const mentionsMaterial = materialKeywords.some(kw => summaryLower.includes(kw) || nameLower.includes(kw));
-      const isGenerallyRelevant = alwaysRelevant.some(kw => summaryLower.includes(kw));
-
-      // If the doc is neither material-specific nor generally relevant, skip it
-      // But always include docs that don't seem material-specific at all (generic docs)
-      const mentionsAnyMaterial = ['contreplaqué', 'mdf', 'mélaminé', 'melamine', 'osb', 'aggloméré'].some(m => summaryLower.includes(m));
-      const isMaterialSpecificButWrong = mentionsAnyMaterial && !mentionsMaterial;
-
-      if (isMaterialSpecificButWrong && !isGenerallyRelevant) return null;
-
-      return `=== Document: ${d.name} (${d.entryCount} entrées, ${d.uploadedAt.slice(0, 10)}) ===\n${d.summary}`;
-    }).filter(Boolean);
 
     if (parts.length === 0) return '';
-    return '\n\n--- CONNAISSANCES UTILISATEUR ---\n' + parts.join('\n\n');
+    return '\n\nConnaissances utilisateur:\n' + parts.join('\n');
   };
 
   const buildSystemPrompt = (): string => {
@@ -163,26 +158,30 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
     const aiContext = buildAIContext(state, analysis);
     const userKnowledge = buildFilteredUserKnowledge();
 
-    // Augment the structured prompt with runtime context (validation, images, PDFs, user knowledge)
     const extras: string[] = [];
 
     if (images.length > 0) {
-      extras.push(`L'utilisateur a joint ${images.length} photo(s) de son chantier/projet. Analyse-les attentivement : vérifie les dimensions apparentes, la qualité des assemblages, les défauts visibles, la planéité, l'équerrage, l'état du mur, etc. Donne des conseils concrets basés sur ce que tu vois.`);
+      extras.push(`${images.length} photo(s) jointes — analyse dimensions, assemblages, défauts.`);
     }
 
-    extras.push(`VALIDATION : ${validation.errors.length} err, ${validation.warnings.length} warn
-${validation.errors.map(e => '❌ ' + e).join('\n')}
-${validation.warnings.map(w => '⚠ ' + w).join('\n')}`);
+    // Only include validation summary if there are issues
+    if (validation.errors.length > 0 || validation.warnings.length > 0) {
+      const items = [
+        ...validation.errors.map(e => '❌ ' + e),
+        ...validation.warnings.map(w => '⚠ ' + w),
+      ];
+      extras.push(`Validation: ${items.join(' | ')}`);
+    }
 
     if (pdfs.length > 0) {
-      extras.push(`${pdfs.length} PDF de référence fournis — utilise-les.`);
+      extras.push(`${pdfs.length} PDF fournis.`);
     }
 
     if (userKnowledge) {
       extras.push(userKnowledge);
     }
 
-    return aiContext.systemPrompt + '\n\n' + extras.join('\n\n');
+    return aiContext.systemPrompt + (extras.length > 0 ? '\n\n' + extras.join('\n') : '');
   };
 
   // --- Lot 5.1: Payload size warning ---
@@ -353,11 +352,16 @@ ${validation.warnings.map(w => '⚠ ' + w).join('\n')}`);
           </div>
         )}
 
-        <div className="text-xs text-stone-500 mb-3">
-          Contexte : structure + {mat.name} + validation ({validation.errors.length}e/{validation.warnings.length}w)
-          + base connaissances{kbDocCount > 0 ? ` + ${kbDocCount} doc${kbDocCount > 1 ? 's' : ''} perso` : ''}
-          {images.length > 0 ? ` + ${images.length} photo${images.length > 1 ? 's' : ''}` : ''}
-          {pdfs.length > 0 ? ` + ${pdfs.length} PDF` : ''}
+        <div className="text-xs text-stone-500 mb-3 flex items-center gap-1.5 flex-wrap">
+          <span>Contexte : {mat.short} + validation ({validation.errors.length}e/{validation.warnings.length}w)</span>
+          <button
+            onClick={() => setShowKnowledge(true)}
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-100 hover:bg-amber-100 text-stone-600 hover:text-amber-700 border border-stone-200 transition-colors"
+          >
+            📚 {kbDocCount} doc{kbDocCount > 1 ? 's' : ''}
+          </button>
+          {images.length > 0 && <span>+ {images.length} photo{images.length > 1 ? 's' : ''}</span>}
+          {pdfs.length > 0 && <span>+ {pdfs.length} PDF</span>}
         </div>
 
         {error && (
@@ -437,6 +441,13 @@ ${validation.warnings.map(w => '⚠ ' + w).join('\n')}`);
           </button>
         </div>
       </div>
+
+      {/* Knowledge Manager Modal — accessible directly from assistant */}
+      <KnowledgeManager
+        isOpen={showKnowledge}
+        onClose={() => setShowKnowledge(false)}
+        onUpdate={() => setKbVersion(v => v + 1)}
+      />
     </div>
   );
 }

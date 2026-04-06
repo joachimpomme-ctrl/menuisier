@@ -40,6 +40,8 @@ export function createPiece(
       name = 'Tablette fixe'; length = innerWidth; width = bodyDepth; break;
     case 'tablette-reglable':
       name = 'Tablette réglable'; length = innerWidth; width = bodyDepth; break;
+    case 'separateur':
+      name = 'Séparateur vertical'; length = 30; width = bodyDepth; break;
     case 'bandeau':
       name = 'Bandeau'; length = bodyWidth; width = 10; break;
     case 'porte':
@@ -80,6 +82,7 @@ export function detectPieceType(name: string, currentType: PieceType): PieceType
   if (/joue/i.test(lower)) return 'joue';
   if (/tablette\s*(fixe|tabl[\.\s]*fixe)/i.test(lower)) return 'tablette-fixe';
   if (/tablette\s*(réglable|reglable|tabl[\.\s]*rég)/i.test(lower)) return 'tablette-reglable';
+  if (/s[eé]parateur|cloison|montant\s*vertical/i.test(lower)) return 'separateur';
   if (/bandeau/i.test(lower)) return 'bandeau';
   if (/porte/i.test(lower)) return 'porte';
   if (/tiroir|façade|facade/i.test(lower)) return 'tiroir-facade';

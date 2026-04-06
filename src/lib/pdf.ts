@@ -22,6 +22,7 @@ const PIECE_COLORS: Record<string, string> = {
   'joue': '#3b82f6',
   'tablette-fixe': '#10b981',
   'tablette-reglable': '#f59e0b',
+  'separateur': '#0ea5e9',
   'bandeau': '#8b5cf6',
   'porte': '#f97316',
   'tiroir-facade': '#06b6d4',

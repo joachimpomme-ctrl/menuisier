@@ -572,70 +572,46 @@ export const JOUE_COMMUNE_GUIDE: JoueCommuneGuide = {
 // ---------------------------------------------------------------------------
 // Fonction pour générer un résumé condensé pour l'IA
 // ---------------------------------------------------------------------------
+/**
+ * Version allégée du résumé de connaissances pour le prompt IA.
+ * Ne contient que les règles essentielles — les guides détaillés
+ * ne sont injectés que si le sujet est abordé dans la conversation.
+ */
 export function buildKnowledgeSummary(): string {
   const lines: string[] = [
-    '=== BASE DE CONNAISSANCES MENUISERIE (Dunod 2022, vérifié) ===',
-    '',
+    'Connaissances: Dunod 2022 + normes industrielles.',
+    'Système 32: entraxe 32mm, axe à 37mm du chant, Ø5mm (taquets/charnières), Ø8mm (tourillons).',
+    'Pose portes: enveloppante (coudure 0mm), demi-recouvrement, affleurante (jeu 2mm).',
+    'Charnières Ø35: cuvette 12-13mm prof, axe 21-22mm du chant. Réglage 3 axes.',
+    'Flèche tablette: f = (5·q·L⁴)/(384·E·I), I=b·h³/12. Limite L/200.',
+    'Formaldéhyde: E1 obligatoire France (≤0.1ppm). E0.5 préférable.',
+    'Assemblages caissons: tourillons, vis, lamelles, confirmats (mélaminé), rainure-languette (CP).',
+    'Coulisses tiroir: galets (jeu 12.5mm/côté), billes sortie totale (12.5mm), invisibles (3mm).',
+  ];
+  return lines.join('\n');
+}
+
+/**
+ * Résumé complet (ancienne version) — disponible pour injection contextuelle future.
+ */
+export function buildFullKnowledgeSummary(): string {
+  const lines: string[] = [
     '--- PROPRIÉTÉS MÉCANIQUES (MPa) ---',
     ...MECHANICAL_PROPERTIES.map(p =>
-      `${p.name}: compression ${p.compression_axiale}, traction ${p.traction_axiale}, flexion ${p.flexion_statique}, E=${p.module_elasticite} MPa`
+      `${p.name}: flexion ${p.flexion_statique}, E=${p.module_elasticite} MPa`
     ),
     '',
-    '--- ORIENTATION DÉBIT PANNEAUX ---',
-    ...ORIENTATION_RULES.map(r => `• ${r.materiau}: ${r.regle} (${r.impact})`),
-    '',
-    '--- SYSTÈME 32 (caissons) ---',
+    '--- SYSTÈME 32 ---',
     ...SYSTEME_32_RULES.map(r => `• ${r.regle}: ${r.valeur}`),
     '',
-    '--- ASSEMBLAGES CAISSONS ---',
-    ASSEMBLAGES.map(a => a.nom).join(', '),
+    '--- PORTES & CHARNIÈRES ---',
+    ...DOOR_RULES.map(r => `• ${r.type_pose}: jeu ${r.jeu}. ${r.details}`),
     '',
-    '--- FINITIONS ---',
-    ...FINISHES.map(f => `• ${f.nom}: ${f.notes}`),
-    '',
-    '--- FORMULES RETRAIT/GONFLEMENT ---',
-    ...SHRINKAGE_FORMULAS.map(f => `${f.nom}: ${f.expression} — ${f.description}`),
+    '--- TIROIRS ---',
+    ...DRAWER_RULES.map(r => `• ${r.regle}: ${r.details}`),
     '',
     '--- RÈGLES MÉTIER ---',
     ...TRADE_RULES.map(r => `• ${r.description}`),
-    '',
-    '--- FORMALDÉHYDE ---',
-    ...FORMALDEHYDE_CLASSES.map(f => `${f.classe}: ${f.details}`),
-    '',
-    '--- PORTES & CHARNIÈRES ---',
-    ...HINGE_RULES.map(r => `• ${r.type} (${r.ouverture}): ${r.details}`),
-    '',
-    '--- TYPES DE POSE PORTES ---',
-    ...DOOR_RULES.map(r => `• ${r.type_pose}: ${r.description}. Jeu: ${r.jeu}. ${r.details}`),
-    '',
-    '--- DIMENSIONNEMENT PORTES ---',
-    ...DOOR_SIZING_RULES.map(r => `• ${r.regle}: ${r.formule}`),
-    '',
-    '--- TIROIRS & COULISSES ---',
-    ...DRAWER_RULES.map(r => `• ${r.regle}: ${r.details}`),
-    '',
-    'Calcul flèche tablette: f = (5·q·L⁴)/(384·E·I), I = b·h³/12',
-    'Si f > L/200, risque de flexion visible.',
-    '',
-    '--- GUIDES D\'ASSEMBLAGE DÉTAILLÉS ---',
-    ...ASSEMBLY_GUIDES.map(g =>
-      `• ${g.titre} (${g.materiau}): ${g.etapes.length} étapes. Outils: ${g.outils.join(', ')}. Erreurs courantes: ${g.erreurs_courantes.join(' | ')}`
-    ),
-    '',
-    '--- INSTALLATION CHARNIÈRES Ø35 (7 étapes) ---',
-    ...HINGE_INSTALL_GUIDE.map(s =>
-      `${s.etape}. ${s.titre}: ${s.details.substring(0, 120)}…`
-    ),
-    '',
-    '--- INSTALLATION COULISSES TIROIR (7 étapes) ---',
-    ...DRAWER_INSTALL_GUIDE.map(s =>
-      `${s.etape}. ${s.titre}: ${s.details.substring(0, 120)}…`
-    ),
-    '',
-    '--- JOUE COMMUNE ---',
-    `Principe: ${JOUE_COMMUNE_GUIDE.principe}`,
-    `Règles: ${JOUE_COMMUNE_GUIDE.regles.join(' | ')}`,
-    `Montage: ${JOUE_COMMUNE_GUIDE.etapes_montage.join(' → ')}`,
   ];
   return lines.join('\n');
 }

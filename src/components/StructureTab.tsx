@@ -52,6 +52,11 @@ const GLOSSARY: { type: PieceType; label: string; icon: string; desc: string; il
     illustration: "Le caisson tiroir (invisible derrière) fait ~25 mm de moins en hauteur. Coulisses : 12.5 mm de jeu latéral de chaque côté.",
   },
   {
+    type: 'separateur', label: 'Séparateur', icon: '┃',
+    desc: "Panneau vertical intercalé entre deux tablettes pour diviser un espace en compartiments. Réduit la portée des tablettes longues et donne un rendu bibliothèque sur mesure.",
+    illustration: "Hauteur = distance entre les 2 tablettes qui l'encadrent. Profondeur = profondeur du corps. Posé sur taquets ou collé/vissé aux tablettes fixes.",
+  },
+  {
     type: 'fond', label: 'Fond (dos)', icon: '📦',
     desc: "Panneau fin (3-6 mm) fixé à l'arrière du meuble. Il rigidifie le caisson et empêche le basculement.",
     illustration: "Généralement en HDF ou CP 3-6 mm, rainuré dans les joues ou agrafé. Indispensable pour l'équerrage.",
@@ -1253,6 +1258,7 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                 <button onClick={() => addPiece(b.id, 'joue')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Joue</button>
                 <button onClick={() => addPiece(b.id, 'tablette-fixe')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Tab. fixe</button>
                 <button onClick={() => addPiece(b.id, 'tablette-reglable')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Tab. réglable</button>
+                <button onClick={() => addPiece(b.id, 'separateur')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200 transition-colors">+ Séparateur</button>
                 <button onClick={() => addPiece(b.id, 'bandeau')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Bandeau</button>
                 <button onClick={() => addPiece(b.id, 'fond')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Fond</button>
                 <button onClick={() => addPiece(b.id, 'autre')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Autre</button>
