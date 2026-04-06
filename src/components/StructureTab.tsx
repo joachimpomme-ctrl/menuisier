@@ -106,21 +106,28 @@ function NumberInput({ label, value, onChange, step = 1, min, max, suffix, tip }
 // Helpers joue commune
 // ---------------------------------------------------------------------------
 
+/** Regex: matches "gauche", "G —", "G –", "G -", "G—" etc. Works with default state
+ *  names like "Joue G — gauche bas" AND auto-fill names like "Joue G — bas". */
+const LEFT_JOUE_RE = /gauche|\bG\s*[—–-]/i;
+
+/** Regex: matches "droite", "D —", "D –", "D -", "D—" etc. */
+const RIGHT_JOUE_RE = /droite|\bD\s*[—–-]/i;
+
 /** Identifie les joues "gauche" par nom */
 function findLeftJoueIds(pieces: Body['pieces']): string[] {
-  const byName = pieces.filter(p => p.type === 'joue' && /gauche|\bG\s*[—–-]/i.test(p.name)).map(p => p.id);
+  const byName = pieces.filter(p => p.type === 'joue' && LEFT_JOUE_RE.test(p.name)).map(p => p.id);
   if (byName.length > 0) return byName;
   // Fallback : pas de nom reconnaissable → prendre la première moitié des joues
   const joues = pieces.filter(p => p.type === 'joue');
   if (joues.length <= 1) {
-    // Un seul morceau de joue avec qty ≥ 2 → on ne supprime pas la pièce, on réduira la qty
+    // Un seul morceau de joue avec qty >= 2 → on ne supprime pas la pièce, on réduira la qty
     return [];
   }
   return joues.slice(0, Math.ceil(joues.length / 2)).map(p => p.id);
 }
 
 function findRightJoues(pieces: Body['pieces']) {
-  const byName = pieces.filter(p => p.type === 'joue' && /droite|\bD\s*[—–-]/i.test(p.name));
+  const byName = pieces.filter(p => p.type === 'joue' && RIGHT_JOUE_RE.test(p.name));
   if (byName.length > 0) return byName;
   const joues = pieces.filter(p => p.type === 'joue');
   return joues.slice(Math.floor(joues.length / 2));
@@ -555,6 +562,7 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
     newShared[boundaryIdx] = enabled;
 
     const usableH = state.project.ceilingHeight - state.project.plinthHeight;
+    const cH = state.project.ceilingHeight;
     const newBodies = state.bodies.map((b) => ({
       ...b,
       pieces: b.pieces.map((p) => ({ ...p })),
@@ -565,69 +573,100 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
 
     if (enabled) {
       // ===== ACTIVER LA JOUE COMMUNE =====
-      // 1. Élargir les deux corps pour compenser la joue supprimée (maintenir la largeur totale)
+
+      // 1. Width adjustments: compensate for shared joue
       leftBody.width = +(leftBody.width + th / 2).toFixed(1);
       rightBody.width = +(rightBody.width + th / 2).toFixed(1);
 
-      // 2. Supprimer les joues gauche du corps droit
+      // 2. Remove ALL left joues from right body
       const leftJoueIds = findLeftJoueIds(rightBody.pieces);
       if (leftJoueIds.length > 0) {
         rightBody.pieces = rightBody.pieces.filter((p) => !leftJoueIds.includes(p.id));
       } else {
-        // Fallback : joue unique avec qty ≥ 2 → réduire la qty
+        // Fallback: single joue piece with qty >= 2 → reduce qty
         const joues = rightBody.pieces.filter((p) => p.type === 'joue');
         if (joues.length === 1 && joues[0].qty >= 2) {
           joues[0].qty = Math.ceil(joues[0].qty / 2);
         } else if (joues.length >= 2) {
+          // No name match → remove first half
           const half = Math.ceil(joues.length / 2);
           const removeIds = new Set(joues.slice(0, half).map((p) => p.id));
           rightBody.pieces = rightBody.pieces.filter((p) => !removeIds.has(p.id));
         }
       }
 
-      // 3. Joue commune = joue droite du corps gauche → adapter la profondeur au max
-      if (leftBody.depth !== rightBody.depth) {
-        const maxD = Math.max(leftBody.depth, rightBody.depth);
-        const rightJoues = findRightJoues(leftBody.pieces);
-        rightJoues.forEach((j) => { j.width = maxD; });
-        // Si aucune joue droite identifiable, mettre à jour toutes les joues
-        if (rightJoues.length === 0) {
-          leftBody.pieces.filter(p => p.type === 'joue').forEach(j => { j.width = maxD; });
-        }
+      // 3. Mark the commune joues: right joues of left body
+      const maxD = Math.max(leftBody.depth, rightBody.depth);
+      const rightJouesOfLeft = findRightJoues(leftBody.pieces);
+      if (rightJouesOfLeft.length > 0) {
+        rightJouesOfLeft.forEach((j) => {
+          j.width = maxD;
+          if (!j.name.includes('(commune)')) {
+            j.name = j.name + ' (commune)';
+          }
+        });
+      } else {
+        // No identifiable right joues → update ALL joues of left body
+        leftBody.pieces.filter(p => p.type === 'joue').forEach(j => {
+          j.width = maxD;
+        });
       }
+
     } else {
-      // ===== DÉSACTIVER LA JOUE COMMUNE =====
-      // 1. Réduire les largeurs
+      // ===== DESACTIVER LA JOUE COMMUNE =====
+
+      // 1. Width adjustments
       leftBody.width = +(leftBody.width - th / 2).toFixed(1);
       rightBody.width = +(rightBody.width - th / 2).toFixed(1);
 
-      // 2. Rajouter les joues gauche au corps droit
-      const rightJoues = findRightJoues(rightBody.pieces);
-      if (rightJoues.length > 0) {
-        const newLeftJoues = rightJoues.map((p) => ({
+      // 2. Re-create left joues for right body
+      //    Source: commune joues in left body, or right body's own right joues
+      const communeJoues = leftBody.pieces.filter(
+        p => p.type === 'joue' && p.name.includes('(commune)')
+      );
+      const sourceJoues = communeJoues.length > 0
+        ? communeJoues
+        : findRightJoues(rightBody.pieces);
+
+      if (sourceJoues.length > 0) {
+        const newLeftJoues = sourceJoues.map((p) => ({
           ...p,
           id: uid(),
-          name: p.name.replace(/droite/gi, 'gauche').replace(/D\s*([—–-])/g, 'G $1'),
+          name: p.name
+            .replace(/\s*\(commune\)/g, '')
+            .replace(/droite/gi, 'gauche')
+            .replace(/\bD\s*([—–-])/g, 'G $1'),
           width: rightBody.depth,
         }));
         rightBody.pieces = [...newLeftJoues, ...rightBody.pieces];
       } else {
-        // Fallback : qty doublée ou ajout standard
+        // Fallback: qty doubling or standard creation
         const joues = rightBody.pieces.filter((p) => p.type === 'joue');
         if (joues.length === 1) {
           joues[0].qty *= 2;
         } else if (joues.length === 0) {
-          rightBody.pieces.unshift({
-            id: uid(), name: 'Joue gauche', length: usableH, width: rightBody.depth, qty: 1, type: 'joue' as PieceType,
-          });
+          // Edge case: no joues at all → create 2 standard joues
+          const basHeight = 180;
+          const hautHeight = +(cH - basHeight).toFixed(1);
+          rightBody.pieces.unshift(
+            { id: uid(), name: 'Joue G — bas', length: basHeight, width: rightBody.depth, qty: 1, type: 'joue' as PieceType },
+            { id: uid(), name: 'Joue G — haut', length: hautHeight, width: rightBody.depth, qty: 1, type: 'joue' as PieceType },
+          );
         }
       }
 
-      // 3. Réinitialiser la profondeur des joues droite du corps gauche
+      // 3. Clean up commune joues in left body: remove "(commune)", reset width
+      leftBody.pieces.forEach((p) => {
+        if (p.type === 'joue' && p.name.includes('(commune)')) {
+          p.name = p.name.replace(/\s*\(commune\)/g, '');
+          p.width = leftBody.depth;
+        }
+      });
+      // Also reset any right joues that were set to max depth
       findRightJoues(leftBody.pieces).forEach((j) => { j.width = leftBody.depth; });
     }
 
-    // 4. Recalculer tablettes et portes de TOUS les corps
+    // 4. Recalculate tablettes and doors for ALL bodies
     const finalBodies = newBodies.map((b, i) => {
       const sl = isSharedLeft(i, newShared);
       const leftTh = sl ? 0 : th;
@@ -954,18 +993,24 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
               </div>
 
               {/* Sharing indicators */}
-              {(sl || sr) && (
+              {sl && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-2 text-xs text-blue-800">
+                  <div className="font-semibold mb-1">Joue gauche commune</div>
+                  <p className="text-blue-700 leading-relaxed">
+                    Cette joue est physiquement la joue droite du corps
+                    &laquo;&thinsp;{state.bodies[bi - 1]?.name}&thinsp;&raquo;.
+                    Elle n'apparait pas dans la liste ci-dessous — c'est normal.
+                  </p>
+                  <p className="text-blue-600 mt-1 font-mono text-[10px]">
+                    Profondeur : max({state.bodies[bi - 1]?.depth}, {b.depth}) = {Math.max(state.bodies[bi - 1]?.depth ?? 0, b.depth)} cm
+                  </p>
+                </div>
+              )}
+              {sr && (
                 <div className="flex flex-wrap gap-1.5 mb-2">
-                  {sl && (
-                    <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2 py-0.5 font-medium">
-                      ⚙ Joue G commune avec {state.bodies[bi - 1]?.name}
-                    </span>
-                  )}
-                  {sr && (
-                    <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2 py-0.5 font-medium">
-                      ⚙ Joue D commune avec {state.bodies[bi + 1]?.name}
-                    </span>
-                  )}
+                  <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2 py-0.5 font-medium">
+                    Joue D commune avec {state.bodies[bi + 1]?.name}
+                  </span>
                 </div>
               )}
 
@@ -1094,6 +1139,12 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                   </div>
                 ))}
               </div>
+
+              {sl && (
+                <div className="text-[10px] text-blue-600 mt-1.5 px-1">
+                  Joues dans ce corps : {b.pieces.filter(p => p.type === 'joue').length} (+ 1 joue commune fournie par {state.bodies[bi - 1]?.name})
+                </div>
+              )}
 
               <div className="mt-3 flex flex-wrap gap-1 items-center">
                 <button
