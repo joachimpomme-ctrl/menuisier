@@ -48,9 +48,51 @@ export function isSharedRight(bodyIndex: number, bodyCount: number, sharedBounda
 }
 
 // ---------------------------------------------------------------------------
+// Hauteur effective d'un corps (pour les portes)
+// ---------------------------------------------------------------------------
+import type { Body, DoorPoseType } from '../types';
+
+/**
+ * Détermine la hauteur effective d'un corps pour le dimensionnement des portes.
+ *
+ * - Si les joues atteignent le plafond (floor-to-ceiling), la hauteur utile
+ *   exclut la plinthe (ceilingHeight − plinthHeight).
+ * - Sinon, la hauteur correspond à la plus grande joue (corps court : meuble TV, buffet…).
+ * - Fallback : usableHeight si aucune joue n'est définie.
+ */
+export function getBodyEffectiveHeight(
+  body: Body,
+  ceilingHeight: number,
+  plinthHeight: number,
+): number {
+  const joues = body.pieces.filter((p) => p.type === 'joue');
+  const usableHeight = ceilingHeight - plinthHeight;
+
+  if (joues.length === 0) return usableHeight; // fallback
+
+  const maxJoue = Math.max(...joues.map((p) => p.length));
+
+  // Floor-to-ceiling : single joue ≈ ceilingHeight → door covers usableHeight
+  if (maxJoue >= ceilingHeight - 1) {
+    return usableHeight;
+  }
+
+  // Split joues (haut/bas) : sum of pairs ≈ ceilingHeight → floor-to-ceiling
+  // Joues are stored in order: left-bas, left-haut, right-bas, right-haut
+  for (let i = 0; i < joues.length - 1; i += 2) {
+    const pairSum = joues[i].length + joues[i + 1].length;
+    if (Math.abs(pairSum - ceilingHeight) < 1) {
+      return usableHeight;
+    }
+  }
+
+  // Short body — door height = max joue height
+  return maxJoue;
+}
+
+// ---------------------------------------------------------------------------
 // Calculs portes & charnières
 // ---------------------------------------------------------------------------
-import type { DoorPoseType } from '../types';
 
 export interface DoorDimensions {
   doorWidth: number;   // cm

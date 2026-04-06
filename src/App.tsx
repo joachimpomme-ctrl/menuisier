@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import type { AppState, TabKey, ProjectMeta, PanelDef } from './types';
 import { MATERIALS } from './data/materials';
 import { createInitialState, migrateState } from './lib/state';
+import { normalizeProject } from './lib/normalizeProject';
 import { optimizeNesting } from './lib/nesting';
 import { validate } from './lib/validation';
 import { generateSteps } from './lib/steps';
@@ -41,7 +42,7 @@ function ensureProject(): { id: string; state: AppState } {
   let id = repo.getCurrentId();
   if (id) {
     const state = repo.load(id);
-    if (state) return { id, state: migrateState(state) };
+    if (state) return { id, state: normalizeProject(migrateState(state)) };
   }
   // No current project — check if any exist
   const list = repo.list();
@@ -50,7 +51,7 @@ function ensureProject(): { id: string; state: AppState } {
     const state = repo.load(id);
     if (state) {
       repo.setCurrentId(id);
-      return { id, state: migrateState(state) };
+      return { id, state: normalizeProject(migrateState(state)) };
     }
   }
   // Create a fresh project
@@ -123,7 +124,7 @@ export default function App() {
     repo.save(projectId, state);
     const loaded = repo.load(id);
     if (loaded) {
-      setState(migrateState(loaded));
+      setState(normalizeProject(migrateState(loaded)));
       setProjectId(id);
       repo.setCurrentId(id);
       refreshProjects();
@@ -186,7 +187,7 @@ export default function App() {
     if (!file) return;
     try {
       const imported = await importFromJson(file);
-      const migrated = migrateState(imported);
+      const migrated = normalizeProject(migrateState(imported));
       const newId = crypto.randomUUID();
       repo.save(newId, migrated);
       repo.setCurrentId(newId);

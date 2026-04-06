@@ -1,7 +1,7 @@
 import type { AppState, Step } from '../types';
 import { MATERIALS } from '../data/materials';
 import { SYSTEME_32_RULES, ASSEMBLAGES, FINISHES, ORIENTATION_RULES } from '../data/knowledge';
-import { calculateDoor, getBodyInnerWidth } from './helpers';
+import { calculateDoor, getBodyInnerWidth, getBodyEffectiveHeight } from './helpers';
 
 export function generateSteps(st: AppState): Step[] {
   const { project: pr, panel: pn, bodies: bs, materialKey: mk } = st;
@@ -110,7 +110,8 @@ export function generateSteps(st: AppState): Step[] {
     bodiesWithDoors.forEach((b) => {
       const bi = bs.indexOf(b);
       const iw = getBodyInnerWidth(b.width, bi, bs.length, sharedBounds, pn.thickness);
-      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
+      const bH = getBodyEffectiveHeight(b, pr.ceilingHeight, pr.plinthHeight);
+      const dims = calculateDoor(b.width, bH, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
       doorItems.push(
         `${b.name} — ${b.doorConfig!.count} porte${b.doorConfig!.count > 1 ? 's' : ''} (${dims.poseLabel}) :`
       );
@@ -182,7 +183,8 @@ export function generateSteps(st: AppState): Step[] {
     const totalHinges = bodiesWithDoors.reduce((sum, b) => {
       const bi = bs.indexOf(b);
       const iw = getBodyInnerWidth(b.width, bi, bs.length, sharedBounds, pn.thickness);
-      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
+      const bH = getBodyEffectiveHeight(b, pr.ceilingHeight, pr.plinthHeight);
+      const dims = calculateDoor(b.width, bH, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
       return sum + dims.hingeCount * b.doorConfig!.count;
     }, 0);
 
@@ -200,7 +202,8 @@ export function generateSteps(st: AppState): Step[] {
     bodiesWithDoors.forEach((b) => {
       const bi = bs.indexOf(b);
       const iw = getBodyInnerWidth(b.width, bi, bs.length, sharedBounds, pn.thickness);
-      const dims = calculateDoor(b.width, usableHeight, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
+      const bH = getBodyEffectiveHeight(b, pr.ceilingHeight, pr.plinthHeight);
+      const dims = calculateDoor(b.width, bH, pn.thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
       doorPoseItems.push(`${b.name} : ${b.doorConfig!.count}× porte ${dims.doorWidth}×${dims.doorHeight} cm (${dims.poseLabel})`);
     });
 

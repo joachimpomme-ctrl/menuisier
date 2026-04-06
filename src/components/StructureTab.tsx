@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import type { AppState, MaterialKey, PieceType, Body, DoorPoseType, DoorConfig, PanelDef } from '../types';
 import { MATERIALS, PIECE_COLORS, BODY_COLORS, PIECE_TYPES } from '../data/materials';
-import { uid, parseNumber, clampInt, calculateDoor, getBodyInnerWidth, isSharedLeft } from '../lib/helpers';
+import { uid, parseNumber, clampInt, calculateDoor, getBodyInnerWidth, isSharedLeft, getBodyEffectiveHeight } from '../lib/helpers';
+import { createPiece, detectPieceType } from '../lib/domain/pieces';
+import { generateStandardPieces } from '../lib/domain/body';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 
@@ -131,7 +133,8 @@ function findRightJoues(pieces: Body['pieces']) {
 function DoorConfigurator({ body, bodyIndex, state, onChange }: {
   body: Body; bodyIndex: number; state: AppState; onChange: (state: AppState) => void;
 }) {
-  const usableHeight = state.project.ceilingHeight - state.project.plinthHeight;
+  const { ceilingHeight, plinthHeight } = state.project;
+  const bodyH = getBodyEffectiveHeight(body, ceilingHeight, plinthHeight);
   const thickness = state.panel.thickness;
   const shared = state.sharedBoundaries ?? [];
   const innerW = getBodyInnerWidth(body.width, bodyIndex, state.bodies.length, shared, thickness);
@@ -149,7 +152,8 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
           return { ...b, doorConfig: undefined, pieces: piecesWithoutDoors };
         }
 
-        const dims = calculateDoor(b.width, usableHeight, thickness, newConfig.count, newConfig.poseType, innerW);
+        const bH = getBodyEffectiveHeight(b, ceilingHeight, plinthHeight);
+        const dims = calculateDoor(b.width, bH, thickness, newConfig.count, newConfig.poseType, innerW);
         const doorPieces = Array.from({ length: newConfig.count }, (_, i) => ({
           id: uid(),
           name: newConfig.count === 1 ? `Porte ${b.name}` : `Porte ${i === 0 ? 'G' : 'D'} ${b.name}`,
@@ -168,7 +172,7 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
     });
   };
 
-  const doorInfo = config ? calculateDoor(body.width, usableHeight, thickness, config.count, config.poseType, innerW) : null;
+  const doorInfo = config ? calculateDoor(body.width, bodyH, thickness, config.count, config.poseType, innerW) : null;
 
   if (!config) {
     return (
@@ -331,8 +335,8 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
 
           // Recalculate doors
           if (b.doorConfig) {
-            const usableH = state.project.ceilingHeight - state.project.plinthHeight;
-            const dims = calculateDoor(newWidth, usableH, thickness, b.doorConfig.count, b.doorConfig.poseType, innerWidth);
+            const bH = getBodyEffectiveHeight({ ...b, width: newWidth, depth: newDepth, pieces: updated.pieces }, state.project.ceilingHeight, state.project.plinthHeight);
+            const dims = calculateDoor(newWidth, bH, thickness, b.doorConfig.count, b.doorConfig.poseType, innerWidth);
             updated.pieces = updated.pieces.map((p) => {
               if (p.type === 'porte') return { ...p, length: dims.doorHeight, width: dims.doorWidth };
               return p;
@@ -359,15 +363,8 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
               }
               const updated = { ...p, [key]: value };
               // Auto-detect piece type from name (only if current type is 'autre')
-              if (key === 'name' && p.type === 'autre') {
-                const n = String(value).toLowerCase();
-                if (/joue/i.test(n)) updated.type = 'joue';
-                else if (/tablette\s*fixe|tabl\.\s*fixe/i.test(n)) updated.type = 'tablette-fixe';
-                else if (/tablette\s*r[ée]glable|tabl\.\s*r[ée]g/i.test(n)) updated.type = 'tablette-reglable';
-                else if (/bandeau/i.test(n)) updated.type = 'bandeau';
-                else if (/porte/i.test(n)) updated.type = 'porte';
-                else if (/tiroir|fa[çc]ade/i.test(n)) updated.type = 'tiroir-facade';
-                else if (/fond|dos/i.test(n)) updated.type = 'fond';
+              if (key === 'name') {
+                updated.type = detectPieceType(String(value), p.type);
               }
               return updated;
             }) }
@@ -381,39 +378,18 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
     const body = state.bodies[bi];
     if (!body) return;
     const iw = innerWidthOf(bi);
-    const usableH = state.project.ceilingHeight - state.project.plinthHeight;
-    const cH = state.project.ceilingHeight;
     const type: PieceType = pieceType ?? 'autre';
 
-    let name = 'Nouvelle pièce';
-    let length = 50;
-    let width = body.depth;
-    let qty = 1;
-    let panelId: string | undefined;
+    const piece = createPiece(
+      type,
+      body.width,
+      body.depth,
+      iw,
+      state.project.ceilingHeight,
+      state.project.plinthHeight,
+      allPanelDefs,
+    );
 
-    switch (type) {
-      case 'joue':
-        name = 'Joue'; length = cH; width = body.depth; break;
-      case 'tablette-fixe':
-        name = 'Tablette fixe'; length = iw; width = body.depth; break;
-      case 'tablette-reglable':
-        name = 'Tablette réglable'; length = iw; width = body.depth; break;
-      case 'bandeau':
-        name = 'Bandeau'; length = body.width; width = 10; break;
-      case 'porte':
-        name = 'Porte'; length = usableH; width = body.width; break;
-      case 'fond': {
-        name = 'Fond'; length = cH; width = body.width;
-        // Auto-assign to first extra panel with thickness < 1cm if available
-        const thinPanel = allPanelDefs.find((pd) => pd.thickness < 1);
-        if (thinPanel) panelId = thinPanel.id;
-        break;
-      }
-      default:
-        name = 'Nouvelle pièce'; length = 50; width = body.depth; break;
-    }
-
-    const piece: Body['pieces'][number] = { id: uid(), name, length, width, qty, type, ...(panelId ? { panelId } : {}) };
     onChange({
       ...state,
       bodies: state.bodies.map((b) =>
@@ -432,33 +408,8 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
     if (body.pieces.length > 0) {
       if (!confirm('Ce corps contient déjà des pièces. Voulez-vous les remplacer par les pièces standard ?')) return;
     }
-    const cH = state.project.ceilingHeight;
-    const iw = innerWidthOf(bi);
-    const sl = isSharedLeft(bi, shared);
-    const basHeight = 180;
-    const hautHeight = +(cH - basHeight).toFixed(1);
-    const depth = body.depth;
 
-    const pieces: Body['pieces'] = [];
-
-    // Joues gauche (sauf si joue partagée à gauche)
-    if (!sl) {
-      pieces.push({ id: uid(), name: 'Joue G — bas', length: basHeight, width: depth, qty: 1, type: 'joue' as PieceType });
-      pieces.push({ id: uid(), name: 'Joue G — haut', length: hautHeight, width: depth, qty: 1, type: 'joue' as PieceType });
-    }
-
-    // Joues droite
-    pieces.push({ id: uid(), name: 'Joue D — bas', length: basHeight, width: depth, qty: 1, type: 'joue' as PieceType });
-    pieces.push({ id: uid(), name: 'Joue D — haut', length: hautHeight, width: depth, qty: 1, type: 'joue' as PieceType });
-
-    // Tablettes fixes
-    pieces.push({ id: uid(), name: 'Tablette fixe basse', length: iw, width: depth, qty: 1, type: 'tablette-fixe' as PieceType });
-    pieces.push({ id: uid(), name: 'Tablette fixe haute', length: iw, width: depth, qty: 1, type: 'tablette-fixe' as PieceType });
-
-    // Tablettes réglables
-    pieces.push({ id: uid(), name: 'Tablette réglable 1', length: iw, width: depth, qty: 1, type: 'tablette-reglable' as PieceType });
-    pieces.push({ id: uid(), name: 'Tablette réglable 2', length: iw, width: depth, qty: 1, type: 'tablette-reglable' as PieceType });
-    pieces.push({ id: uid(), name: 'Tablette réglable 3', length: iw, width: depth, qty: 1, type: 'tablette-reglable' as PieceType });
+    const pieces = generateStandardPieces(body, bi, shared, th, state.project.ceilingHeight);
 
     onChange({
       ...state,
@@ -526,7 +477,6 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
     while (newShared.length < state.bodies.length - 1) newShared.push(false);
     newShared[boundaryIdx] = enabled;
 
-    const usableH = state.project.ceilingHeight - state.project.plinthHeight;
     const cH = state.project.ceilingHeight;
     const newBodies = state.bodies.map((b) => ({
       ...b,
@@ -645,7 +595,8 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
       });
 
       if (b.doorConfig) {
-        const dims = calculateDoor(b.width, usableH, th, b.doorConfig.count, b.doorConfig.poseType, iw);
+        const bH = getBodyEffectiveHeight(b, state.project.ceilingHeight, state.project.plinthHeight);
+        const dims = calculateDoor(b.width, bH, th, b.doorConfig.count, b.doorConfig.poseType, iw);
         b.pieces = b.pieces.map((p) => {
           if (p.type === 'porte') return { ...p, length: dims.doorHeight, width: dims.doorWidth };
           return p;
@@ -1365,7 +1316,6 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
               {/* Filler suggestion */}
               {(() => {
                 const cH = state.project.ceilingHeight;
-                const plH = state.project.plinthHeight;
                 // Max joue height in this body (sum of haut+bas pairs, or single joue)
                 const joues = b.pieces.filter(p => p.type === 'joue');
                 const maxJoueH = joues.length > 0
@@ -1384,7 +1334,6 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                   }
                   totalJoueH = Math.max(...sums, maxJoueH);
                 }
-                const usableH = cH - plH;
                 const gapTop = +(cH - totalJoueH).toFixed(1);
                 const hasTopGap = gapTop > 1 && totalJoueH > 0 && totalJoueH < cH;
                 // Only show fillers when joues exist and don't reach the ceiling

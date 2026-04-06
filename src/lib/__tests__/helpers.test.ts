@@ -7,7 +7,9 @@ import {
   isSharedLeft,
   isSharedRight,
   calculateDoor,
+  getBodyEffectiveHeight,
 } from '../helpers';
+import type { Body } from '../../types';
 
 // ---------------------------------------------------------------------------
 // uid
@@ -181,5 +183,51 @@ describe('calculateDoor', () => {
       const d = calculateDoor(bodyW, bodyH, th, 1, 'affleurante', eiw);
       expect(d.doorWidth).toBeCloseTo(eiw - 2 * JEU, 1);
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getBodyEffectiveHeight
+// ---------------------------------------------------------------------------
+describe('getBodyEffectiveHeight', () => {
+  const cH = 254;
+  const pH = 13;
+  const usableH = cH - pH; // 241
+
+  function makeBody(joueHeights: number[]): Body {
+    return {
+      id: 'b1', name: 'Test', width: 100, depth: 30,
+      pieces: joueHeights.map((h, i) => ({
+        id: `j${i}`, name: `Joue ${i}`, length: h, width: 30, qty: 1, type: 'joue' as const,
+      })),
+    };
+  }
+
+  it('returns usableHeight when no joues', () => {
+    const body: Body = { id: 'b1', name: 'Test', width: 100, depth: 30, pieces: [] };
+    expect(getBodyEffectiveHeight(body, cH, pH)).toBe(usableH);
+  });
+
+  it('returns usableHeight for floor-to-ceiling joues', () => {
+    const body = makeBody([254, 254]);
+    expect(getBodyEffectiveHeight(body, cH, pH)).toBe(usableH);
+  });
+
+  it('returns joue height for short body', () => {
+    const body = makeBody([100, 100]);
+    expect(getBodyEffectiveHeight(body, cH, pH)).toBe(100);
+  });
+
+  it('returns usableHeight for split joues (haut+bas = ceilingHeight)', () => {
+    // Split joues: 180 + 74 = 254 = ceilingHeight → floor-to-ceiling
+    const body = makeBody([180, 74, 180, 74]);
+    expect(getBodyEffectiveHeight(body, cH, pH)).toBe(usableH);
+  });
+
+  it('100cm body → 3 hinges not 5', () => {
+    const body = makeBody([100, 100]);
+    const bH = getBodyEffectiveHeight(body, cH, pH);
+    const door = calculateDoor(80, bH, 1.8, 1, 'enveloppante');
+    expect(door.hingeCount).toBe(3); // was incorrectly 5 before the fix
   });
 });

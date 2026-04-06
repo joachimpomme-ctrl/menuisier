@@ -1,6 +1,6 @@
 import type { AppState } from '../types';
 import { MATERIALS, BODY_COLORS } from '../data/materials';
-import { calculateDoor, getBodyInnerWidth, isSharedLeft } from '../lib/helpers';
+import { calculateDoor, getBodyInnerWidth, isSharedLeft, getBodyEffectiveHeight } from '../lib/helpers';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 
@@ -37,7 +37,8 @@ export default function MontageTab({ state }: Props) {
   const hingeTotal = state.bodies.reduce((sum, b, i) => {
     if (!b.doorConfig) return sum;
     const iw = getBodyInnerWidth(b.width, i, state.bodies.length, shared, thickness);
-    const dims = calculateDoor(b.width, usableHeight, thickness, b.doorConfig.count, b.doorConfig.poseType, iw);
+    const bH = getBodyEffectiveHeight(b, state.project.ceilingHeight, state.project.plinthHeight);
+    const dims = calculateDoor(b.width, bH, thickness, b.doorConfig.count, b.doorConfig.poseType, iw);
     return sum + dims.hingeCount * b.doorConfig.count;
   }, 0);
 
@@ -86,7 +87,8 @@ export default function MontageTab({ state }: Props) {
               // Door info
               const doorConfig = b.doorConfig;
               const iw = getBodyInnerWidth(b.width, bi, state.bodies.length, shared, thickness);
-              const doorInfo = doorConfig ? calculateDoor(b.width, usableHeight, thickness, doorConfig.count, doorConfig.poseType, iw) : null;
+              const bH = getBodyEffectiveHeight(b, state.project.ceilingHeight, state.project.plinthHeight);
+              const doorInfo = doorConfig ? calculateDoor(b.width, bH, thickness, doorConfig.count, doorConfig.poseType, iw) : null;
 
               return (
                 <g key={b.id}>
@@ -317,7 +319,8 @@ export default function MontageTab({ state }: Props) {
             {state.bodies.filter((b) => b.doorConfig).map((b, _i) => {
               const bi = state.bodies.indexOf(b);
               const iw = getBodyInnerWidth(b.width, bi, state.bodies.length, shared, thickness);
-              const dims = calculateDoor(b.width, usableHeight, thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
+              const bHH = getBodyEffectiveHeight(b, state.project.ceilingHeight, state.project.plinthHeight);
+              const dims = calculateDoor(b.width, bHH, thickness, b.doorConfig!.count, b.doorConfig!.poseType, iw);
               return (
                 <div key={b.id} className="bg-orange-50 border border-orange-200 rounded-xl p-3 text-xs text-orange-800">
                   <div className="font-semibold">{b.name} — {b.doorConfig!.count} porte{b.doorConfig!.count > 1 ? 's' : ''} ({dims.poseLabel})</div>

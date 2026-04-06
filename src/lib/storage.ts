@@ -1,5 +1,6 @@
 import type { AppState, ProjectMeta, StoredProject, ProjectRepository } from '../types';
 import { migrateState } from './state';
+import { normalizeProject } from './normalizeProject';
 import { MATERIALS } from '../data/materials';
 
 // ---------------------------------------------------------------------------
@@ -103,21 +104,22 @@ export class LocalProjectRepository implements ProjectRepository {
   save(id: string, state: AppState): void {
     try {
       const now = new Date().toISOString();
+      const normalized = normalizeProject(state);
 
       // Persist project data
-      const stored: StoredProject = { version: CURRENT_VERSION, state, savedAt: now };
+      const stored: StoredProject = { version: CURRENT_VERSION, state: normalized, savedAt: now };
       localStorage.setItem(PROJECT_PREFIX + id, JSON.stringify(stored));
 
       // Update index
       const index = readIndex();
       const existing = index.find((m) => m.id === id);
       if (existing) {
-        existing.name = state.project.name;
-        existing.materialShort = MATERIALS[state.materialKey]?.short ?? state.materialKey;
-        existing.bodyCount = state.bodies.length;
+        existing.name = normalized.project.name;
+        existing.materialShort = MATERIALS[normalized.materialKey]?.short ?? normalized.materialKey;
+        existing.bodyCount = normalized.bodies.length;
         existing.updatedAt = now;
       } else {
-        index.push(buildMeta(id, state, now));
+        index.push(buildMeta(id, normalized, now));
       }
       writeIndex(index);
     } catch {

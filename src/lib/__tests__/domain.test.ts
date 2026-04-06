@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createPiece, detectPieceType, normalizePiece } from '../domain/pieces';
 import { generateStandardPieces, recalcBodyPieces } from '../domain/body';
 import { getPanelForPiece } from '../domain/panels';
-import type { Piece, PieceType, Body, PanelDef, AppState } from '../../types';
+import type { Piece, Body, PanelDef, AppState } from '../../types';
 import { createInitialState } from '../state';
 
 // ---------------------------------------------------------------------------

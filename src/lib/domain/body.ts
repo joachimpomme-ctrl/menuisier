@@ -1,5 +1,5 @@
 import type { Body, Piece, PieceType } from '../../types';
-import { uid, getBodyInnerWidth, isSharedLeft, calculateDoor } from '../helpers';
+import { uid, getBodyInnerWidth, isSharedLeft, calculateDoor, getBodyEffectiveHeight } from '../helpers';
 
 // ---------------------------------------------------------------------------
 // Recalculate piece dimensions when body width/depth changes
@@ -54,8 +54,8 @@ export function recalcBodyPieces(
 
   // Recalculate doors if configured
   if (body.doorConfig) {
-    const usableH = ceilingHeight - plinthHeight;
-    const dims = calculateDoor(newWidth, usableH, thickness, body.doorConfig.count, body.doorConfig.poseType, innerWidth);
+    const bH = getBodyEffectiveHeight({ ...body, width: newWidth, depth: newDepth, pieces }, ceilingHeight, plinthHeight);
+    const dims = calculateDoor(newWidth, bH, thickness, body.doorConfig.count, body.doorConfig.poseType, innerWidth);
     pieces = pieces.map((p) => {
       if (p.type === 'porte') return { ...p, length: dims.doorHeight, width: dims.doorWidth };
       return p;

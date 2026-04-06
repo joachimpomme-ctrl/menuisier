@@ -31,7 +31,7 @@ export const TEMPLATES: ProjectTemplate[] = [
       const innerW = +(80 - 2 * th).toFixed(1);
       return {
         materialKey: mk,
-        project: { name: 'Bibliothèque', wallWidth: 200, ceilingHeight: 250, plinthHeight: 10, plinthDepth: 2 },
+        project: { name: 'Bibliothèque', wallWidth: 200, wallDepth: 35, ceilingHeight: 250, plinthHeight: 10, plinthDepth: 2 },
         panel: { width: p.w, height: p.h, thickness: th },
         kerf: 0.3,
         costConfig: { panelPrice: p.defaultPrice },
@@ -59,7 +59,7 @@ export const TEMPLATES: ProjectTemplate[] = [
       const innerW = +(60 - 2 * th).toFixed(1);
       return {
         materialKey: mk,
-        project: { name: 'Étagère murale', wallWidth: 150, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
+        project: { name: 'Étagère murale', wallWidth: 150, wallDepth: 30, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
         panel: { width: p.w, height: p.h, thickness: th },
         kerf: 0.3,
         costConfig: { panelPrice: p.defaultPrice },
@@ -85,7 +85,7 @@ export const TEMPLATES: ProjectTemplate[] = [
       const innerW = +(60 - 2 * th).toFixed(1);
       return {
         materialKey: mk,
-        project: { name: 'Meuble TV', wallWidth: 300, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
+        project: { name: 'Meuble TV', wallWidth: 300, wallDepth: 50, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
         panel: { width: p.w, height: p.h, thickness: th },
         kerf: 0.3,
         costConfig: { panelPrice: p.defaultPrice },
@@ -134,7 +134,7 @@ export const TEMPLATES: ProjectTemplate[] = [
       const innerW = +(90 - 2 * th).toFixed(1);
       return {
         materialKey: mk,
-        project: { name: 'Armoire', wallWidth: 200, ceilingHeight: 250, plinthHeight: 8, plinthDepth: 2 },
+        project: { name: 'Armoire', wallWidth: 200, wallDepth: 65, ceilingHeight: 250, plinthHeight: 8, plinthDepth: 2 },
         panel: { width: p.w, height: p.h, thickness: th },
         kerf: 0.3,
         costConfig: { panelPrice: p.defaultPrice },
@@ -174,7 +174,7 @@ export const TEMPLATES: ProjectTemplate[] = [
       const innerW = +(60 - 2 * th).toFixed(1);
       return {
         materialKey: mk,
-        project: { name: 'Buffet', wallWidth: 250, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
+        project: { name: 'Buffet', wallWidth: 250, wallDepth: 50, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
         panel: { width: p.w, height: p.h, thickness: th },
         kerf: 0.3,
         costConfig: { panelPrice: p.defaultPrice },
@@ -213,7 +213,7 @@ export const TEMPLATES: ProjectTemplate[] = [
       const { p, th } = mat(mk);
       return {
         materialKey: mk,
-        project: { name: 'Bureau', wallWidth: 200, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
+        project: { name: 'Bureau', wallWidth: 200, wallDepth: 70, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
         panel: { width: p.w, height: p.h, thickness: th },
         kerf: 0.3,
         costConfig: { panelPrice: p.defaultPrice },
@@ -252,7 +252,7 @@ export const TEMPLATES: ProjectTemplate[] = [
       const innerW = +(60 - 2 * th).toFixed(1);
       return {
         materialKey: mk,
-        project: { name: 'Caisson cuisine', wallWidth: 300, ceilingHeight: 250, plinthHeight: 15, plinthDepth: 2 },
+        project: { name: 'Caisson cuisine', wallWidth: 300, wallDepth: 65, ceilingHeight: 250, plinthHeight: 15, plinthDepth: 2 },
         panel: { width: p.w, height: p.h, thickness: th },
         kerf: 0.3,
         costConfig: { panelPrice: p.defaultPrice },
@@ -292,7 +292,7 @@ export const TEMPLATES: ProjectTemplate[] = [
       const innerW = +(80 - 2 * th).toFixed(1);
       return {
         materialKey: mk,
-        project: { name: 'Meuble SdB', wallWidth: 150, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
+        project: { name: 'Meuble SdB', wallWidth: 150, wallDepth: 50, ceilingHeight: 250, plinthHeight: 0, plinthDepth: 0 },
         panel: { width: p.w, height: p.h, thickness: th },
         kerf: 0.3,
         costConfig: { panelPrice: p.defaultPrice },
@@ -320,7 +320,7 @@ export const TEMPLATES: ProjectTemplate[] = [
       const innerW = +(80 - 2 * th).toFixed(1);
       return {
         materialKey: mk,
-        project: { name: 'Placard mural', wallWidth: 160, ceilingHeight: 250, plinthHeight: 8, plinthDepth: 2 },
+        project: { name: 'Placard mural', wallWidth: 160, wallDepth: 60, ceilingHeight: 250, plinthHeight: 8, plinthDepth: 2 },
         panel: { width: p.w, height: p.h, thickness: th },
         kerf: 0.3,
         costConfig: { panelPrice: p.defaultPrice },
