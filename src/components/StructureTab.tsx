@@ -769,16 +769,122 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
         <p className="text-[10px] text-stone-400 mt-2">Plinthe = 0 si votre meuble n'est pas contre un mur avec plinthe</p>
       </div>
 
-      {/* Epaisseur structure */}
-      <div className={cardClass}>
-        <div className="flex items-center gap-3">
-          <label className="text-xs font-medium text-stone-600 whitespace-nowrap">Épaisseur structure :</label>
-          <div className="w-20">
-            <NumberInput label="" suffix="cm" value={state.panel.thickness} min={0.3} max={5} step={0.1} onChange={updateThickness} tip={TIPS['panneau-epaisseur']} />
+      {/* Epaisseur & charge */}
+      {(() => {
+        const thicknessMm = state.panel.thickness * 10;
+        const availableThicknesses = mat.thicknesses; // [6, 10, 12, 15, 18, 22, 25] etc.
+
+        // Load classification based on max body depth and span
+        type LoadLevel = 'leger' | 'standard' | 'lourd';
+        const loadLabels: Record<LoadLevel, { label: string; desc: string; icon: string }> = {
+          leger: { label: 'Légère', desc: 'Livres de poche, déco, vaisselle fine', icon: '🪶' },
+          standard: { label: 'Standard', desc: 'Livres, vêtements, dossiers', icon: '📚' },
+          lourd: { label: 'Lourde', desc: 'Outillage, vinyles, collections lourdes', icon: '🏋️' },
+        };
+
+        // Determine current load level from thickness
+        const inferLoad = (): LoadLevel => {
+          if (thicknessMm >= 22) return 'lourd';
+          if (thicknessMm >= 18) return 'standard';
+          return 'leger';
+        };
+
+        // Recommended thickness per load level
+        const recommendedMm = (load: LoadLevel): number => {
+          switch (load) {
+            case 'leger': return availableThicknesses.includes(15) ? 15 : availableThicknesses.includes(12) ? 12 : 18;
+            case 'standard': return availableThicknesses.includes(18) ? 18 : availableThicknesses.includes(19) ? 19 : 16;
+            case 'lourd': return availableThicknesses.includes(22) ? 22 : availableThicknesses.includes(25) ? 25 : 18;
+          }
+        };
+
+        // Max recommended span for given thickness (rule of thumb: span ≤ thickness_mm × 3.5 for standard load)
+        const maxSpanForThickness = (mm: number): number => {
+          // Adjusted by material flex strength
+          const factor = mat.flexMPa >= 35 ? 4.5 : mat.flexMPa >= 25 ? 3.8 : mat.flexMPa >= 18 ? 3.2 : 2.8;
+          return Math.round(mm * factor);
+        };
+
+        const currentLoad = inferLoad();
+        const recMm = recommendedMm(currentLoad);
+        const maxSpan = maxSpanForThickness(thicknessMm);
+        const isUnderThick = thicknessMm < recMm;
+
+        const setLoad = (load: LoadLevel) => {
+          const mm = recommendedMm(load);
+          updateThickness(mm / 10);
+        };
+
+        return (
+          <div className={cardClass}>
+            <h3 className={sectionTitle}>Épaisseur & charge</h3>
+
+            {/* Load selector */}
+            <div className="flex gap-2 mb-3">
+              {(Object.entries(loadLabels) as [LoadLevel, typeof loadLabels[LoadLevel]][]).map(([key, val]) => {
+                const rec = recommendedMm(key);
+                const isActive = thicknessMm === rec || (key === currentLoad && thicknessMm >= rec);
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setLoad(key)}
+                    className={`flex-1 text-left px-3 py-2.5 rounded-xl border transition-all ${
+                      isActive
+                        ? 'bg-amber-50 border-amber-300 shadow-sm'
+                        : 'bg-white border-stone-200 hover:border-amber-200'
+                    }`}
+                  >
+                    <div className="text-sm">{val.icon} <span className={`font-semibold ${isActive ? 'text-amber-800' : 'text-stone-700'}`}>{val.label}</span></div>
+                    <div className="text-[10px] text-stone-400 mt-0.5">{val.desc}</div>
+                    <div className={`text-[10px] mt-1 font-mono ${isActive ? 'text-amber-600 font-semibold' : 'text-stone-400'}`}>{rec} mm</div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Thickness selector — buttons for available thicknesses */}
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs text-stone-500">Épaisseur :</span>
+              <div className="flex gap-1 flex-wrap">
+                {availableThicknesses
+                  .filter(t => t >= 10) // don't show very thin panels as structure
+                  .map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => updateThickness(t / 10)}
+                      className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all font-mono ${
+                        thicknessMm === t
+                          ? 'bg-amber-100 border-amber-400 text-amber-800 font-bold shadow-sm'
+                          : 'bg-white border-stone-200 text-stone-500 hover:border-amber-200 hover:text-amber-700'
+                      }`}
+                    >
+                      {t}mm
+                    </button>
+                  ))}
+              </div>
+            </div>
+
+            {/* Info line */}
+            <div className="text-[10px] text-stone-500 space-y-1 mt-2 bg-stone-50 rounded-lg px-3 py-2">
+              <div>
+                Épaisseur : <span className="font-semibold text-amber-800">{thicknessMm} mm</span>
+                {' · '}Portée max tablette : <span className="font-semibold">~{maxSpan} cm</span>
+                {' · '}Largeur intérieure : corps − {thicknessMm < 18 ? '2' : '2'}×{thicknessMm}mm de joues
+              </div>
+              {isUnderThick && (
+                <div className="text-yellow-700 font-medium">
+                  ⚠ Pour une charge {loadLabels[currentLoad].label.toLowerCase()}, {recMm} mm est recommandé en {mat.short}
+                </div>
+              )}
+              {thicknessMm >= 22 && (
+                <div className="text-stone-400">
+                  Épaisseur renforcée — poids plus élevé, prévoir fixation murale solide
+                </div>
+              )}
+            </div>
           </div>
-          <span className="text-[10px] text-stone-400">(affecte les largeurs intérieures et les tablettes)</span>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* Relevé de cotes — visual survey diagram */}
       {(() => {
