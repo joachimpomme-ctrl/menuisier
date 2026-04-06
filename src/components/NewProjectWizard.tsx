@@ -271,12 +271,23 @@ Tu DOIS répondre UNIQUEMENT avec un JSON valide, sans aucun texte avant ou apr�
         body: JSON.stringify({ messages: [{ role: 'user', content }], system: systemPrompt }),
       });
 
-      if (!response.ok) throw new Error(`Erreur serveur: ${response.status}`);
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Erreur serveur: ${response.status}`);
+      }
       const data = await response.json();
-      const text = data.content?.[0]?.text || data.text || '';
+      const text = data.reply || data.content?.[0]?.text || data.text || '';
+      if (!text) {
+        throw new Error('L\'IA n\'a pas renvoyé de réponse. Réessayez.');
+      }
       const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, text];
       const jsonStr = (jsonMatch[1] || text).trim();
-      const parsed = JSON.parse(jsonStr) as AppState;
+      let parsed: AppState;
+      try {
+        parsed = JSON.parse(jsonStr) as AppState;
+      } catch {
+        throw new Error('L\'IA a renvoyé un JSON incomplet. Simplifiez votre description ou réessayez.');
+      }
 
       if (!parsed.materialKey || !parsed.project || !parsed.bodies || !Array.isArray(parsed.bodies)) {
         throw new Error('Structure JSON invalide');
