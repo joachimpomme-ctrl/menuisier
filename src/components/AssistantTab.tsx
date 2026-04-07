@@ -4,6 +4,7 @@ import { MATERIALS } from '../data/materials';
 import { listKnowledgeDocs } from '../lib/knowledgeStore';
 import { analyzeProject } from '../lib/projectAnalysis';
 import { buildAIContext } from '../lib/ai/buildContext';
+import { extractPatches, stripPatches, applyPatch } from '../lib/ai/aiPatch';
 import KnowledgeManager from './KnowledgeManager';
 import Tip from './Tip';
 import TIPS from '../data/tips';
@@ -18,6 +19,8 @@ interface Props {
   totalPieces: number;
   panelCount: number;
   projectId: string;
+  /** Apply an AI-suggested patch to the current state */
+  onApplyState?: (next: AppState) => void;
 }
 
 const CHAT_KEY_PREFIX = 'menuisier_chat_';
@@ -55,7 +58,7 @@ interface UploadedImage {
 const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
 const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
 
-export default function AssistantTab({ state, validation, allPieces, totalPieces: _totalPieces, panelCount: _panelCount, projectId }: Props) {
+export default function AssistantTab({ state, validation, allPieces, totalPieces: _totalPieces, panelCount: _panelCount, projectId, onApplyState }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>(() => loadChat(projectId));
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -437,17 +440,46 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
               </div>
             </div>
           )}
-          {messages.map((m, i) => (
-            <div key={i} className={`mb-3 ${m.role === 'user' ? 'text-right' : ''}`}>
-              <div className={`inline-block max-w-[85%] rounded-xl px-4 py-2.5 text-sm ${
-                m.role === 'user'
-                  ? 'bg-amber-600 text-white'
-                  : 'bg-white text-stone-700 border border-stone-200'
-              }`}>
-                <div style={{ whiteSpace: 'pre-wrap' }}>{m.content}</div>
+          {messages.map((m, i) => {
+            const patches = m.role === 'assistant' ? extractPatches(m.content) : [];
+            const cleanContent = patches.length > 0 ? stripPatches(m.content) : m.content;
+            return (
+              <div key={i} className={`mb-3 ${m.role === 'user' ? 'text-right' : ''}`}>
+                <div className={`inline-block max-w-[85%] rounded-xl px-4 py-2.5 text-sm ${
+                  m.role === 'user'
+                    ? 'bg-amber-600 text-white'
+                    : 'bg-white text-stone-700 border border-stone-200'
+                }`}>
+                  <div style={{ whiteSpace: 'pre-wrap' }}>{cleanContent}</div>
+                </div>
+                {patches.length > 0 && onApplyState && (
+                  <div className="mt-2 space-y-2 text-left">
+                    {patches.map((pp, pi) => (
+                      <div key={pi} className="inline-block max-w-[85%] rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-xs">
+                        {pp.patch.title && (
+                          <div className="font-semibold text-amber-800 mb-1">⚙ {pp.patch.title}</div>
+                        )}
+                        <ul className="text-stone-700 space-y-0.5 mb-2">
+                          {pp.summary.map((s, si) => (
+                            <li key={si}>• {s}</li>
+                          ))}
+                        </ul>
+                        <button
+                          onClick={() => {
+                            const next = applyPatch(state, pp.patch);
+                            onApplyState(next);
+                          }}
+                          className="text-xs px-3 py-1.5 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 transition-colors"
+                        >
+                          ✓ Appliquer
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
           {loading && (
             <div className="text-stone-500 text-sm flex items-center gap-2">
               <span className="inline-block w-2 h-2 bg-amber-500 rounded-full animate-pulse" />

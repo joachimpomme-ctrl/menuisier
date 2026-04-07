@@ -2,6 +2,7 @@ import type { AppState } from '../../types';
 import type { ProjectAnalysis } from '../projectAnalysis';
 import { MATERIALS } from '../../data/materials';
 import { buildKnowledgeSummary } from '../../data/knowledge';
+import { PATCH_INSTRUCTIONS } from './aiPatch';
 
 export interface AIContext {
   systemPrompt: string;
@@ -56,7 +57,9 @@ export function buildAIContext(state: AppState, analysis: ProjectAnalysis): AICo
 
 ${projectSummary}
 
-${knowledge}`;
+${knowledge}
+
+${PATCH_INSTRUCTIONS}`;
 
   const estimatedTokens = Math.ceil(systemPrompt.length / 4);
 

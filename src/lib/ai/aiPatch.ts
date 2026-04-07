@@ -1,0 +1,190 @@
+import type { AppState, MaterialKey } from '../../types';
+import { MATERIALS } from '../../data/materials';
+
+// ---------------------------------------------------------------------------
+// AI Patch — small structured suggestion the IA can emit, applied with 1 clic
+// ---------------------------------------------------------------------------
+//
+// Format expected from the IA inside an ```apply ... ``` fenced block:
+//
+// ```apply
+// {
+//   "title": "Profondeur 35 cm pour livres lourds",
+//   "project": { "wallDepth": 35 },
+//   "panel":   { "thickness": 1.9 },
+//   "material": "cp_bouleau",
+//   "bodies":  { "all": { "depth": 35 } }
+// }
+// ```
+//
+// Only whitelisted fields are applied — anything else is ignored.
+
+export interface AIPatch {
+  title?: string;
+  project?: Partial<{
+    name: string;
+    wallWidth: number;
+    wallDepth: number;
+    ceilingHeight: number;
+    plinthHeight: number;
+    plinthDepth: number;
+  }>;
+  panel?: Partial<{ thickness: number; width: number; height: number }>;
+  material?: MaterialKey;
+  bodies?: {
+    all?: Partial<{ width: number; depth: number }>;
+    byName?: Array<{ name: string; width?: number; depth?: number }>;
+  };
+}
+
+export interface ParsedPatch {
+  raw: string;
+  patch: AIPatch;
+  /** Human-readable summary of what will change */
+  summary: string[];
+}
+
+const FENCE_RE = /```apply\s*\n([\s\S]*?)```/g;
+
+/** Extract every ```apply``` block from a markdown message */
+export function extractPatches(message: string): ParsedPatch[] {
+  const out: ParsedPatch[] = [];
+  let m: RegExpExecArray | null;
+  FENCE_RE.lastIndex = 0;
+  while ((m = FENCE_RE.exec(message)) !== null) {
+    const raw = m[1].trim();
+    try {
+      const parsed = JSON.parse(raw) as AIPatch;
+      out.push({ raw, patch: parsed, summary: summarizePatch(parsed) });
+    } catch {
+      // skip invalid JSON
+    }
+  }
+  return out;
+}
+
+/** Strip ```apply``` blocks from a message for clean rendering */
+export function stripPatches(message: string): string {
+  return message.replace(FENCE_RE, '').trim();
+}
+
+function summarizePatch(p: AIPatch): string[] {
+  const lines: string[] = [];
+  if (p.project) {
+    const items: string[] = [];
+    if (p.project.name) items.push(`nom → "${p.project.name}"`);
+    if (p.project.wallWidth != null) items.push(`largeur ${p.project.wallWidth} cm`);
+    if (p.project.wallDepth != null) items.push(`profondeur ${p.project.wallDepth} cm`);
+    if (p.project.ceilingHeight != null) items.push(`hauteur ${p.project.ceilingHeight} cm`);
+    if (p.project.plinthHeight != null) items.push(`plinthe h. ${p.project.plinthHeight} cm`);
+    if (p.project.plinthDepth != null) items.push(`plinthe p. ${p.project.plinthDepth} cm`);
+    if (items.length) lines.push('Projet : ' + items.join(', '));
+  }
+  if (p.material) {
+    const mat = MATERIALS[p.material];
+    lines.push('Matériau : ' + (mat?.name ?? p.material));
+  }
+  if (p.panel) {
+    const items: string[] = [];
+    if (p.panel.thickness != null) items.push(`ép. ${p.panel.thickness * 10} mm`);
+    if (p.panel.width != null) items.push(`L ${p.panel.width} cm`);
+    if (p.panel.height != null) items.push(`H ${p.panel.height} cm`);
+    if (items.length) lines.push('Panneau : ' + items.join(', '));
+  }
+  if (p.bodies?.all) {
+    const items: string[] = [];
+    if (p.bodies.all.width != null) items.push(`largeur ${p.bodies.all.width} cm`);
+    if (p.bodies.all.depth != null) items.push(`profondeur ${p.bodies.all.depth} cm`);
+    if (items.length) lines.push('Tous les corps : ' + items.join(', '));
+  }
+  if (p.bodies?.byName?.length) {
+    p.bodies.byName.forEach(b => {
+      const items: string[] = [];
+      if (b.width != null) items.push(`L ${b.width}`);
+      if (b.depth != null) items.push(`P ${b.depth}`);
+      if (items.length) lines.push(`${b.name} : ${items.join(', ')}`);
+    });
+  }
+  return lines;
+}
+
+/** Apply a patch to an AppState (returns new state, never mutates) */
+export function applyPatch(state: AppState, patch: AIPatch): AppState {
+  const next: AppState = {
+    ...state,
+    project: { ...state.project },
+    panel: { ...state.panel },
+    bodies: state.bodies.map(b => ({ ...b })),
+  };
+
+  if (patch.project) {
+    const p = patch.project;
+    if (typeof p.name === 'string') next.project.name = p.name;
+    if (typeof p.wallWidth === 'number') next.project.wallWidth = clamp(p.wallWidth, 10, 2000);
+    if (typeof p.wallDepth === 'number') next.project.wallDepth = clamp(p.wallDepth, 10, 500);
+    if (typeof p.ceilingHeight === 'number') next.project.ceilingHeight = clamp(p.ceilingHeight, 10, 1000);
+    if (typeof p.plinthHeight === 'number') next.project.plinthHeight = clamp(p.plinthHeight, 0, 100);
+    if (typeof p.plinthDepth === 'number') next.project.plinthDepth = clamp(p.plinthDepth, 0, 50);
+  }
+
+  if (patch.material && MATERIALS[patch.material]) {
+    next.materialKey = patch.material;
+  }
+
+  if (patch.panel) {
+    const pa = patch.panel;
+    if (typeof pa.thickness === 'number') next.panel.thickness = clamp(pa.thickness, 0.3, 5);
+    if (typeof pa.width === 'number') next.panel.width = clamp(pa.width, 50, 500);
+    if (typeof pa.height === 'number') next.panel.height = clamp(pa.height, 50, 500);
+  }
+
+  if (patch.bodies?.all) {
+    const a = patch.bodies.all;
+    next.bodies = next.bodies.map(b => ({
+      ...b,
+      width: typeof a.width === 'number' ? clamp(a.width, 10, 500) : b.width,
+      depth: typeof a.depth === 'number' ? clamp(a.depth, 10, 200) : b.depth,
+    }));
+  }
+
+  if (patch.bodies?.byName) {
+    for (const upd of patch.bodies.byName) {
+      next.bodies = next.bodies.map(b => {
+        if (b.name !== upd.name) return b;
+        return {
+          ...b,
+          width: typeof upd.width === 'number' ? clamp(upd.width, 10, 500) : b.width,
+          depth: typeof upd.depth === 'number' ? clamp(upd.depth, 10, 200) : b.depth,
+        };
+      });
+    }
+  }
+
+  return next;
+}
+
+function clamp(v: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, v));
+}
+
+/** Snippet to add to the system prompt so the IA knows about the patch format */
+export const PATCH_INSTRUCTIONS = `
+Si l'utilisateur te demande d'ajuster des paramètres concrets du projet (dimensions, matériau, épaisseur, profondeur des corps...), tu PEUX inclure UN bloc structuré à la fin de ta réponse :
+
+\`\`\`apply
+{
+  "title": "Description courte",
+  "project": { "wallWidth": 280, "wallDepth": 35, "ceilingHeight": 240 },
+  "panel": { "thickness": 1.9 },
+  "material": "cp_bouleau",
+  "bodies": { "all": { "depth": 35 }, "byName": [{"name": "Corps 1", "width": 100}] }
+}
+\`\`\`
+
+Règles :
+- N'inclus QUE les champs que tu veux modifier (les autres restent inchangés).
+- Matériaux valides : cp_bouleau, cp_peuplier, cp_okoume, mdf, melamine, osb.
+- Épaisseurs en cm (ex: 1.9 = 19 mm).
+- Inclus le bloc UNIQUEMENT si l'utilisateur demande explicitement un changement de paramètres. Pour une simple question, n'en mets pas.
+- Le bloc ne remplace pas ton explication : commente d'abord, puis propose le patch.
+`.trim();

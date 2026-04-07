@@ -112,7 +112,7 @@ function autoLayout(
 }
 
 export default function NewProjectWizard({ isOpen, onClose, onCreate }: Props) {
-  const [mode, setMode] = useState<Mode>('auto');
+  const [mode, setMode] = useState<Mode>('ai');
   const [selectedMaterial, setSelectedMaterial] = useState<MaterialKey>('cp_bouleau');
 
   // Auto mode state
@@ -128,6 +128,7 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate }: Props) {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [images, setImages] = useState<UploadedImage[]>([]);
+  const [variants, setVariants] = useState<Array<{ title: string; rationale: string; state: AppState }>>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -214,53 +215,80 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate }: Props) {
     e.target.value = '';
   };
 
+  function normalizeAiState(parsed: AppState): AppState {
+    let idCounter = 0;
+    parsed.bodies = (parsed.bodies || []).map(b => ({
+      ...b, id: b.id || `body_${++idCounter}`,
+      pieces: (b.pieces || []).map(p => ({ ...p, id: p.id || `piece_${++idCounter}` })),
+    }));
+    const pth = parsed.panel?.thickness || 1.8;
+    for (const body of parsed.bodies) {
+      const innerW = +(body.width - 2 * pth).toFixed(1);
+      for (const piece of body.pieces) {
+        if (piece.type === 'joue' && piece.width !== body.depth) piece.width = body.depth;
+        if ((piece.type === 'tablette-fixe' || piece.type === 'tablette-reglable') && Math.abs(piece.length - innerW) > 0.5) piece.length = innerW;
+        if ((piece.type === 'tablette-fixe' || piece.type === 'tablette-reglable') && piece.width !== body.depth) piece.width = body.depth;
+      }
+    }
+    return parsed;
+  }
+
   const handleAiGenerate = async () => {
     if (!aiPrompt.trim()) return;
     setAiLoading(true);
     setAiError(null);
+    setVariants([]);
 
     try {
-      // Prompt allégé — seules les règles de dimensionnement, pas les guides de montage
-      const systemPrompt = `Tu es un assistant menuiserie expert. L'utilisateur te décrit un meuble qu'il veut fabriquer. Tu dois générer une structure de projet JSON valide.
+      const systemPrompt = `Tu es un assistant menuiserie expert. L'utilisateur te décrit un projet client (brief). Tu proposes 2 ou 3 VARIANTES distinctes (différents partis pris : compact/luxe, économique/pro, etc.) sous forme de JSON.
 
 RÈGLES STRICTES DE VALIDATION :
-- Chaque tablette fixe ou réglable doit avoir une longueur = largeur du corps - 2× épaisseur (pour les joues gauche et droite)
-- Chaque joue doit avoir une largeur = profondeur du corps
-- La somme des largeurs des corps ne doit pas dépasser la largeur du mur
-- Aucune pièce ne doit dépasser les dimensions du panneau brut
-- L'épaisseur par défaut est 1.8 cm (18 mm)
-- Les tablettes réglables ne peuvent pas dépasser la portée max du matériau choisi
-- Tous les chiffres doivent être cohérents et arrondis à 0.1 cm près
-- Prévois au minimum 2 tablettes fixes par corps (haut + bas) pour la rigidité structurelle
+- Chaque tablette doit avoir longueur = largeur corps - 2× épaisseur, largeur = profondeur corps
+- Chaque joue doit avoir largeur = profondeur corps
+- Somme des largeurs corps ≤ largeur mur
+- Épaisseur par défaut : 1.8 cm (18 mm)
+- Tablettes réglables ≤ portée max du matériau
+- Min 2 tablettes fixes par corps (haut + bas)
+- Tous les chiffres arrondis à 0.1 cm
 
-MATÉRIAUX DISPONIBLES : ${Object.entries(MATERIALS).map(([k, m]) => `${k}: ${m.name} (portée max ${m.maxSpan18}cm, ép. défaut ${m.defaultThickness}mm)`).join(', ')}
+MATÉRIAUX : ${Object.entries(MATERIALS).map(([k, m]) => `${k} (portée max ${m.maxSpan18}cm)`).join(', ')}
 
-Tu DOIS répondre UNIQUEMENT avec un JSON valide, sans aucun texte avant ou après. Le JSON doit suivre exactement cette structure :
+Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après, structure exacte :
 {
-  "materialKey": "cp_bouleau",
-  "project": { "name": "Nom du meuble", "wallWidth": 200, "wallDepth": 60, "ceilingHeight": 250, "plinthHeight": 0, "plinthDepth": 0 },
-  "panel": { "width": 250, "height": 125, "thickness": 1.8 },
-  "kerf": 0.3,
-  "costConfig": { "panelPrice": 75 },
-  "bodies": [
+  "variants": [
     {
-      "id": "unique_id",
-      "name": "Nom du corps",
-      "width": 80,
-      "depth": 30,
-      "pieces": [
-        { "id": "unique_id", "name": "Nom", "length": 100, "width": 30, "qty": 1, "type": "joue|tablette-fixe|tablette-reglable|bandeau|porte|tiroir-facade|fond|autre" }
-      ]
+      "title": "Compact économique",
+      "rationale": "1 phrase : pourquoi cette variante, ses points forts",
+      "state": {
+        "materialKey": "cp_bouleau",
+        "project": { "name": "...", "wallWidth": 200, "wallDepth": 35, "ceilingHeight": 250, "plinthHeight": 8, "plinthDepth": 2 },
+        "panel": { "width": 250, "height": 125, "thickness": 1.8 },
+        "kerf": 0.3,
+        "costConfig": { "panelPrice": 75 },
+        "bodies": [
+          {
+            "id": "b1",
+            "name": "Corps 1",
+            "width": 80,
+            "depth": 30,
+            "pieces": [
+              { "id": "p1", "name": "Joue G", "length": 240, "width": 30, "qty": 1, "type": "joue" }
+            ]
+          }
+        ]
+      }
     }
   ]
-}`;
+}
+
+Génère 2 ou 3 variantes pertinentes pour ce brief — pas plus.`;
 
       const content: Array<{ type: string; text?: string; source?: { type: string; media_type: string; data: string } }> = [];
       if (images.length > 0) {
         images.forEach(img => {
           content.push({ type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } });
         });
-        content.push({ type: 'text', text: `Voici ${images.length} photo(s) de l'espace/projet. Analyse-les pour déterminer les dimensions approximatives.\n\nDescription : ${aiPrompt}` });
+        content.push({ type: 'text', text: `Voici ${images.length} photo(s). Analyse-les pour déduire les dimensions.\n\nBrief client : ${aiPrompt}` });
       } else {
         content.push({ type: 'text', text: aiPrompt });
       }
@@ -277,44 +305,42 @@ Tu DOIS répondre UNIQUEMENT avec un JSON valide, sans aucun texte avant ou apr�
       }
       const data = await response.json();
       const text = data.reply || data.content?.[0]?.text || data.text || '';
-      if (!text) {
-        throw new Error('L\'IA n\'a pas renvoyé de réponse. Réessayez.');
-      }
+      if (!text) throw new Error('L\'IA n\'a pas renvoyé de réponse. Réessayez.');
+
       const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, text];
       const jsonStr = (jsonMatch[1] || text).trim();
-      let parsed: AppState;
+      let parsed: { variants?: Array<{ title?: string; rationale?: string; state?: AppState }> };
       try {
-        parsed = JSON.parse(jsonStr) as AppState;
+        parsed = JSON.parse(jsonStr);
       } catch {
-        throw new Error('L\'IA a renvoyé un JSON incomplet. Simplifiez votre description ou réessayez.');
+        throw new Error('L\'IA a renvoyé un JSON incomplet. Simplifiez votre brief ou réessayez.');
       }
 
-      if (!parsed.materialKey || !parsed.project || !parsed.bodies || !Array.isArray(parsed.bodies)) {
-        throw new Error('Structure JSON invalide');
+      if (!parsed.variants || !Array.isArray(parsed.variants) || parsed.variants.length === 0) {
+        throw new Error('Aucune variante générée');
       }
 
-      let idCounter = 0;
-      parsed.bodies = parsed.bodies.map(b => ({
-        ...b, id: b.id || `body_${++idCounter}`,
-        pieces: (b.pieces || []).map(p => ({ ...p, id: p.id || `piece_${++idCounter}` })),
-      }));
+      const cleaned = parsed.variants
+        .filter(v => v.state && v.state.materialKey && v.state.project && Array.isArray(v.state.bodies))
+        .map(v => ({
+          title: v.title || 'Variante',
+          rationale: v.rationale || '',
+          state: normalizeAiState(v.state as AppState),
+        }));
 
-      const pth = parsed.panel?.thickness || 1.8;
-      for (const body of parsed.bodies) {
-        const innerW = +(body.width - 2 * pth).toFixed(1);
-        for (const piece of body.pieces) {
-          if (piece.type === 'joue' && piece.width !== body.depth) piece.width = body.depth;
-          if ((piece.type === 'tablette-fixe' || piece.type === 'tablette-reglable') && Math.abs(piece.length - innerW) > 0.5) piece.length = innerW;
-          if ((piece.type === 'tablette-fixe' || piece.type === 'tablette-reglable') && piece.width !== body.depth) piece.width = body.depth;
-        }
-      }
-
-      onCreate(parsed);
+      if (cleaned.length === 0) throw new Error('Variantes invalides');
+      setVariants(cleaned);
     } catch (err) {
       console.error('AI generation error:', err);
       setAiError(err instanceof Error ? err.message : 'Erreur de génération');
     }
     setAiLoading(false);
+  };
+
+  const handlePickVariant = (idx: number) => {
+    const v = variants[idx];
+    if (!v) return;
+    onCreate(v.state);
   };
 
   const inputClass = "w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-800 focus:border-amber-500 focus:outline-none transition-colors";
@@ -334,9 +360,9 @@ Tu DOIS répondre UNIQUEMENT avec un JSON valide, sans aucun texte avant ou apr�
         {/* Mode tabs */}
         <div className="flex gap-1 px-5 pt-4 overflow-x-auto hide-scrollbar">
           {([
+            { key: 'ai' as Mode, label: 'Brief client (IA)', shortLabel: 'Brief IA' },
             { key: 'auto' as Mode, label: 'Mes dimensions', shortLabel: 'Dimensions' },
             { key: 'choose' as Mode, label: 'Modèles', shortLabel: 'Modèles' },
-            { key: 'ai' as Mode, label: 'Description IA', shortLabel: 'IA' },
           ]).map(tab => (
             <button key={tab.key} onClick={() => setMode(tab.key)}
               className={`px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
@@ -488,18 +514,21 @@ Tu DOIS répondre UNIQUEMENT avec un JSON valide, sans aucun texte avant ou apr�
             </div>
           )}
 
-          {/* ===== AI MODE ===== */}
+          {/* ===== AI MODE — Brief client → propositions ===== */}
           {mode === 'ai' && (
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-stone-500 mb-1.5 block">Décrivez votre projet</label>
+                <label className="text-xs font-medium text-stone-500 mb-1.5 block">Brief client</label>
                 <textarea value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)}
-                  placeholder="Ex: Je veux une bibliothèque de 2m de large pour un mur de 2.5m de haut, 3 modules côte à côte avec des tablettes réglables. Le mur a une plinthe de 8cm..."
+                  placeholder="Ex : Bibliothèque salon, mur de 280 cm, 240 cm sous plafond, plinthe 8 cm. Pour livres lourds + objets déco. Style contemporain, façade bois clair. Budget moyen."
                   className={inputClass + " min-h-[120px] resize-y"} />
+                <p className="text-[10px] text-stone-400 mt-1">
+                  Plus c'est précis (usage, volume, contraintes, style), meilleures sont les propositions.
+                </p>
               </div>
 
               <div>
-                <label className="text-xs font-medium text-stone-500 mb-1.5 block">Photos (optionnel)</label>
+                <label className="text-xs font-medium text-stone-500 mb-1.5 block">Photos du lieu (optionnel)</label>
                 <div className="flex items-center gap-2 flex-wrap">
                   {images.map((img, i) => (
                     <div key={i} className="relative group">
@@ -520,12 +549,52 @@ Tu DOIS répondre UNIQUEMENT avec un JSON valide, sans aucun texte avant ou apr�
 
               <button onClick={handleAiGenerate} disabled={aiLoading || !aiPrompt.trim()}
                 className="w-full py-3 rounded-xl bg-amber-600 text-white font-semibold hover:bg-amber-500 disabled:opacity-50 transition-colors">
-                {aiLoading ? 'Génération en cours...' : 'Générer avec l\'IA'}
+                {aiLoading ? '⏳ Génération de variantes...' : variants.length > 0 ? '🔄 Régénérer' : '✨ Générer 2-3 propositions'}
               </button>
 
-              <p className="text-[10px] text-stone-400 text-center">
-                L'IA génère une structure de départ que vous pouvez ensuite modifier librement.
-              </p>
+              {/* Variants */}
+              {variants.length > 0 && (
+                <div className="space-y-3 pt-2">
+                  <div className="text-xs font-semibold text-stone-600">
+                    {variants.length} variante{variants.length > 1 ? 's' : ''} proposée{variants.length > 1 ? 's' : ''} — choisis-en une, tu pourras l'ajuster ensuite
+                  </div>
+                  {variants.map((v, idx) => {
+                    const m = MATERIALS[v.state.materialKey];
+                    const totalPieces = v.state.bodies.reduce((s, b) => s + b.pieces.reduce((s2, p) => s2 + p.qty, 0), 0);
+                    return (
+                      <div key={idx} className="rounded-xl border border-stone-200 bg-stone-50 p-3 hover:border-amber-300 transition-colors">
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-semibold text-amber-700">{v.title}</div>
+                            {v.rationale && <div className="text-xs text-stone-600 mt-0.5">{v.rationale}</div>}
+                          </div>
+                          <button
+                            onClick={() => handlePickVariant(idx)}
+                            className="text-xs px-3 py-1.5 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 transition-colors flex-shrink-0"
+                          >
+                            ✓ Choisir
+                          </button>
+                        </div>
+                        <div className="text-[11px] text-stone-500 grid grid-cols-2 gap-x-3 gap-y-0.5">
+                          <span>📦 {v.state.bodies.length} corps · {totalPieces} pièces</span>
+                          <span>🪵 {m?.short ?? v.state.materialKey} {(v.state.panel.thickness * 10)}mm</span>
+                          <span>📏 {v.state.project.wallWidth}×{v.state.project.ceilingHeight}cm</span>
+                          <span>↕ Prof. {v.state.project.wallDepth}cm</span>
+                        </div>
+                        <div className="mt-2 text-[10px] text-stone-400 truncate">
+                          {v.state.bodies.map(b => `${b.name} ${b.width}×${b.depth}`).join(' · ')}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {variants.length === 0 && (
+                <p className="text-[10px] text-stone-400 text-center">
+                  L'IA propose plusieurs variantes (compact, premium, etc.) — tu choisis, puis tu ajustes en Structure.
+                </p>
+              )}
             </div>
           )}
         </div>

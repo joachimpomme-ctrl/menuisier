@@ -370,6 +370,7 @@ export default function App() {
             totalPieces={totalPieces}
             panelCount={nesting.metrics.panelCount}
             projectId={projectId}
+            onApplyState={(next) => setState(normalizeProject(next))}
           />
         </div>
       </div>
