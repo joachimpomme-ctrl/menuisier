@@ -369,6 +369,7 @@ export default function App() {
             allPieces={allPieces}
             totalPieces={totalPieces}
             panelCount={nesting.metrics.panelCount}
+            projectId={projectId}
           />
         </div>
       </div>

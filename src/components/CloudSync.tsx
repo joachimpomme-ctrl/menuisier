@@ -4,6 +4,7 @@ import {
   getCloudUrl,
   setCloudUrl,
   isCloudConfigured,
+  isCloudUrlFromEnv,
   cloudList,
   cloudSave,
   cloudLoad,
@@ -37,6 +38,7 @@ export default function CloudSync({
 }: Props) {
   const [url, setUrl] = useState(getCloudUrl() ?? '');
   const [configured, setConfigured] = useState(isCloudConfigured());
+  const fromEnv = isCloudUrlFromEnv();
   const [cloudProjects, setCloudProjects] = useState<ProjectMeta[]>([]);
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -172,6 +174,11 @@ export default function CloudSync({
             <p className="text-[10px] text-stone-400 mt-1.5">
               Voir le fichier <code className="bg-stone-100 px-1 rounded">google-apps-script.js</code> pour l'installation
             </p>
+            {fromEnv && (
+              <p className="text-[10px] text-sky-600 mt-1">
+                ☁️ URL par défaut depuis Vercel (<code className="bg-sky-50 px-1 rounded">VITE_CLOUD_URL</code>) — saisis une URL ici pour la surcharger localement
+              </p>
+            )}
           </div>
 
           {/* Messages */}

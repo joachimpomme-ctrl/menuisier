@@ -10,13 +10,36 @@ import { migrateState } from './state';
 const CLOUD_URL_KEY = 'menuisier_cloud_url';
 const CURRENT_VERSION = 2;
 
-/** Get the configured Google Apps Script URL, or null */
-export function getCloudUrl(): string | null {
+/** Default URL from Vercel env var (VITE_CLOUD_URL), if any */
+function getEnvCloudUrl(): string | null {
   try {
-    return localStorage.getItem(CLOUD_URL_KEY);
+    const envUrl = (import.meta.env?.VITE_CLOUD_URL as string | undefined)?.trim();
+    return envUrl && envUrl.startsWith('https://') ? envUrl : null;
   } catch {
     return null;
   }
+}
+
+/** Get the configured Google Apps Script URL (localStorage > env var), or null */
+export function getCloudUrl(): string | null {
+  try {
+    const stored = localStorage.getItem(CLOUD_URL_KEY);
+    if (stored && stored.trim()) return stored;
+  } catch {
+    // ignore
+  }
+  return getEnvCloudUrl();
+}
+
+/** True if the cloud URL comes from the env var (read-only default) */
+export function isCloudUrlFromEnv(): boolean {
+  try {
+    const stored = localStorage.getItem(CLOUD_URL_KEY);
+    if (stored && stored.trim()) return false;
+  } catch {
+    // ignore
+  }
+  return getEnvCloudUrl() !== null;
 }
 
 /** Set the Google Apps Script URL */

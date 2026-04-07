@@ -12,7 +12,7 @@ interface Props {
   allPanelDefs: PanelDef[];
 }
 
-const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
+const inputClass = "block w-full min-w-0 rounded-xl border border-stone-300 bg-white px-2.5 py-2.5 text-base sm:text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors tabular-nums";
 const labelClass = "block text-xs font-medium text-stone-500 mb-1.5";
 const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
 const sectionTitle = "text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3";
@@ -73,7 +73,7 @@ function NumberInput({ label, value, onChange, step = 1, min, max, suffix, tip }
   const displayed = focused ? raw : String(value);
 
   return (
-    <div>
+    <div className="min-w-0">
       <label className={labelClass}>
         {tip ? (
           <Tip text={tip}><span>{label}{suffix ? ` (${suffix})` : ''}</span></Tip>
@@ -83,17 +83,25 @@ function NumberInput({ label, value, onChange, step = 1, min, max, suffix, tip }
       </label>
       <input
         type="number"
+        inputMode="decimal"
+        pattern="[0-9]*[.,]?[0-9]*"
         step={step}
         min={min}
         max={max}
         className={inputClass}
         value={displayed}
         onChange={(e) => {
-          setRaw(e.target.value);
-          const n = parseNumber(e.target.value, value, min, max);
+          const v = e.target.value.replace(',', '.');
+          setRaw(v);
+          const n = parseNumber(v, value, min, max);
           onChange(n);
         }}
-        onFocus={() => { setFocused(true); setRaw(String(value)); }}
+        onFocus={(e) => {
+          setFocused(true);
+          setRaw(String(value));
+          // Select all on focus for easy replacement on mobile
+          setTimeout(() => e.target.select(), 0);
+        }}
         onBlur={() => { setFocused(false); setRaw(String(value)); }}
       />
     </div>
@@ -534,7 +542,7 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
       {/* Project */}
       <div className={cardClass}>
         <h3 className={sectionTitle}>Emplacement</h3>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <NumberInput label="Largeur" suffix="cm" value={state.project.wallWidth} min={10} max={1000} step={0.1} onChange={(v) => updateProject('wallWidth', v)} tip={TIPS['largeur-mur']} />
           <NumberInput label="Profondeur" suffix="cm" value={state.project.wallDepth} min={10} max={200} step={0.1} onChange={(v) => updateProject('wallDepth', v)} tip="Profondeur max disponible pour le meuble (de la face du mur au premier obstacle : radiateur, porte, passage). Les corps ne devraient pas dépasser cette valeur." />
           <NumberInput label="Hauteur" suffix="cm" value={state.project.ceilingHeight} min={10} max={500} step={0.1} onChange={(v) => updateProject('ceilingHeight', v)} tip={TIPS['hauteur-plafond']} />

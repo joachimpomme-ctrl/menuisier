@@ -17,6 +17,32 @@ interface Props {
   allPieces: PieceWithBody[];
   totalPieces: number;
   panelCount: number;
+  projectId: string;
+}
+
+const CHAT_KEY_PREFIX = 'menuisier_chat_';
+
+function loadChat(projectId: string): ChatMessage[] {
+  try {
+    const raw = localStorage.getItem(CHAT_KEY_PREFIX + projectId);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveChat(projectId: string, messages: ChatMessage[]): void {
+  try {
+    if (messages.length === 0) {
+      localStorage.removeItem(CHAT_KEY_PREFIX + projectId);
+    } else {
+      localStorage.setItem(CHAT_KEY_PREFIX + projectId, JSON.stringify(messages));
+    }
+  } catch {
+    // ignore quota errors
+  }
 }
 
 interface UploadedImage {
@@ -29,8 +55,8 @@ interface UploadedImage {
 const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
 const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
 
-export default function AssistantTab({ state, validation, allPieces, totalPieces: _totalPieces, panelCount: _panelCount }: Props) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export default function AssistantTab({ state, validation, allPieces, totalPieces: _totalPieces, panelCount: _panelCount, projectId }: Props) {
+  const [messages, setMessages] = useState<ChatMessage[]>(() => loadChat(projectId));
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +74,16 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Reload chat when switching projects
+  useEffect(() => {
+    setMessages(loadChat(projectId));
+  }, [projectId]);
+
+  // Persist chat per project
+  useEffect(() => {
+    saveChat(projectId, messages);
+  }, [projectId, messages]);
 
   const handlePdf = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -293,6 +329,19 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
           <div className="flex items-center gap-1.5">
             {attachCount > 0 && (
               <span className="text-xs text-stone-500">{attachCount} pj</span>
+            )}
+            {messages.length > 0 && (
+              <button
+                onClick={() => {
+                  if (confirm('Effacer l\'historique de chat de ce projet ?')) {
+                    setMessages([]);
+                  }
+                }}
+                className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:bg-stone-100 hover:text-red-500 border border-stone-200 transition-colors"
+                title="Effacer l'historique"
+              >
+                🗑
+              </button>
             )}
             {/* Camera button — mobile only uses capture */}
             <button
