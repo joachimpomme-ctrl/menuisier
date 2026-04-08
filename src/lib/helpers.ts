@@ -54,7 +54,7 @@ export function isSharedRight(bodyIndex: number, bodyCount: number, sharedBounda
 // ---------------------------------------------------------------------------
 // Hauteur effective d'un corps (pour les portes)
 // ---------------------------------------------------------------------------
-import type { Body, DoorPoseType } from '../types';
+import type { Body, DoorPoseType, Piece } from '../types';
 
 /**
  * Détermine la hauteur effective d'un corps pour le dimensionnement des portes.
@@ -218,9 +218,41 @@ export function getDoorInfoFromPieces(
 }
 
 /**
+ * Sélectionne la tablette fixe la plus pertinente pour servir de plan de séparation
+ * entre la zone basse et la zone haute d'un corps (configurateur de portes).
+ *
+ * Stratégie : la tablette dont la posY est la plus proche du milieu de la hauteur
+ * effective. Ignore les tablettes sans posY définie.
+ *
+ * @returns la tablette fixe choisie, ou null si aucune candidate.
+ */
+export function findSplitterTablette(
+  body: Body,
+  effectiveHeight: number,
+): Piece | null {
+  const tablettes = body.pieces.filter(
+    (p) => p.type === 'tablette-fixe' && typeof p.posY === 'number'
+  );
+  if (tablettes.length === 0) return null;
+  const mid = effectiveHeight / 2;
+  let best: Piece | null = null;
+  let bestDist = Infinity;
+  for (const t of tablettes) {
+    const dist = Math.abs((t.posY ?? 0) - mid);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = t;
+    }
+  }
+  return best;
+}
+
+/**
  * Calcule les dimensions d'une porte et les positions de charnières.
  * @param effectiveInnerWidth - Si fourni, utilise cette largeur intérieure au lieu de bodyWidth - 2*thickness.
  *   Nécessaire quand le corps a une joue commune (la largeur intérieure est plus grande).
+ * @param coverageHeight - Si fourni, hauteur réelle couverte par les portes (au lieu
+ *   de bodyHeight). Utilisé pour les portes partielles ('bas' / 'haut').
  */
 export function calculateDoor(
   bodyWidth: number,
@@ -229,8 +261,12 @@ export function calculateDoor(
   doorCount: 1 | 2,
   poseType: DoorPoseType,
   effectiveInnerWidth?: number,
+  coverageHeight?: number,
 ): DoorDimensions {
   const innerWidth = effectiveInnerWidth ?? +(bodyWidth - 2 * thickness).toFixed(1);
+  // Hauteur effectivement couverte par les portes (peut être inférieure pour les
+  // portes partielles « bas » / « haut »).
+  const coverH = coverageHeight ?? bodyHeight;
 
   // ---------------------------------------------------------------------------
   // Jeu (clearance) — espace libre entre la porte et le caisson/porte adjacente
@@ -249,7 +285,7 @@ export function calculateDoor(
   switch (poseType) {
     case 'enveloppante':
       poseLabel = 'Enveloppante (recouvrement total)';
-      doorHeight = +(bodyHeight - JEU).toFixed(1);
+      doorHeight = +(coverH - JEU).toFixed(1);
       if (doorCount === 1) {
         doorWidth = +(bodyWidth - JEU).toFixed(1);
       } else {
@@ -258,7 +294,7 @@ export function calculateDoor(
       break;
     case 'demi-recouvrement':
       poseLabel = 'Demi-recouvrement';
-      doorHeight = +(bodyHeight - JEU).toFixed(1);
+      doorHeight = +(coverH - JEU).toFixed(1);
       if (doorCount === 1) {
         doorWidth = +(innerWidth + thickness - JEU).toFixed(1);
       } else {
@@ -267,7 +303,7 @@ export function calculateDoor(
       break;
     case 'affleurante':
       poseLabel = 'Affleurante (intérieure)';
-      doorHeight = +(bodyHeight - 2 * thickness - 2 * JEU).toFixed(1);
+      doorHeight = +(coverH - 2 * thickness - 2 * JEU).toFixed(1);
       if (doorCount === 1) {
         doorWidth = +(innerWidth - 2 * JEU).toFixed(1);
       } else {

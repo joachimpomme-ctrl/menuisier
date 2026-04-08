@@ -1,5 +1,40 @@
-import type { Body, Piece, PieceType } from '../../types';
-import { uid, getBodyInnerWidth, isSharedLeft, calculateDoor, getBodyEffectiveHeight } from '../helpers';
+import type { Body, DoorConfig, Piece, PieceType } from '../../types';
+import { uid, getBodyInnerWidth, isSharedLeft, calculateDoor, getBodyEffectiveHeight, findSplitterTablette } from '../helpers';
+
+// ---------------------------------------------------------------------------
+// Door geometry helper — résout (coverageHeight, splitPosY) selon la position
+// ---------------------------------------------------------------------------
+
+/**
+ * Détermine la hauteur effectivement couverte par les portes selon le mode
+ * (pleine / bas / haut). Si la position est partielle, tente de se caler sur
+ * une tablette fixe existante via findSplitterTablette.
+ *
+ * @returns objet contenant coverageHeight (cm) et splitPosY résolu (cm).
+ */
+export function resolveDoorCoverage(
+  body: Body,
+  effectiveHeight: number,
+  thickness: number,
+  config: DoorConfig,
+): { coverageHeight: number; splitPosY: number } {
+  const position = config.position ?? 'pleine';
+  if (position === 'pleine') {
+    return { coverageHeight: effectiveHeight, splitPosY: effectiveHeight };
+  }
+  // Résoudre splitPosY : explicite > tablette détectée > moitié
+  let splitPosY = config.splitPosY;
+  if (typeof splitPosY !== 'number') {
+    const splitter = findSplitterTablette(body, effectiveHeight);
+    splitPosY = splitter?.posY ?? +(effectiveHeight / 2).toFixed(1);
+  }
+  // Clamp dans une plage raisonnable
+  splitPosY = Math.max(thickness * 2, Math.min(effectiveHeight - thickness * 2, splitPosY));
+  const coverageHeight = position === 'bas'
+    ? +(splitPosY).toFixed(1)
+    : +(effectiveHeight - splitPosY).toFixed(1);
+  return { coverageHeight, splitPosY: +splitPosY.toFixed(1) };
+}
 
 // ---------------------------------------------------------------------------
 // Shared-boundary helpers (moved from StructureTab)
@@ -155,7 +190,10 @@ export function applySharedBoundary(
 
     if (b.doorConfig) {
       const bH = getBodyEffectiveHeight(b, ceilingHeight, plinthHeight);
-      const dims = calculateDoor(b.width, bH, th, b.doorConfig.count, b.doorConfig.poseType, iw);
+      const { coverageHeight, splitPosY } = resolveDoorCoverage(b, bH, th, b.doorConfig);
+      const dims = calculateDoor(b.width, bH, th, b.doorConfig.count, b.doorConfig.poseType, iw, coverageHeight);
+      // Sync the splitPosY back into the config (so the UI shows the same value)
+      b.doorConfig = { ...b.doorConfig, splitPosY };
       b.pieces = b.pieces.map((p) => {
         if (p.type === 'porte') return { ...p, length: dims.doorHeight, width: dims.doorWidth };
         return p;
@@ -219,16 +257,20 @@ export function recalcBodyPieces(
   });
 
   // Recalculate doors if configured
-  if (body.doorConfig) {
-    const bH = getBodyEffectiveHeight({ ...body, width: newWidth, depth: newDepth, pieces }, ceilingHeight, plinthHeight);
-    const dims = calculateDoor(newWidth, bH, thickness, body.doorConfig.count, body.doorConfig.poseType, innerWidth);
+  let doorConfig = body.doorConfig;
+  if (doorConfig) {
+    const tmpBody = { ...body, width: newWidth, depth: newDepth, pieces };
+    const bH = getBodyEffectiveHeight(tmpBody, ceilingHeight, plinthHeight);
+    const { coverageHeight, splitPosY } = resolveDoorCoverage(tmpBody, bH, thickness, doorConfig);
+    const dims = calculateDoor(newWidth, bH, thickness, doorConfig.count, doorConfig.poseType, innerWidth, coverageHeight);
+    doorConfig = { ...doorConfig, splitPosY };
     pieces = pieces.map((p) => {
       if (p.type === 'porte') return { ...p, length: dims.doorHeight, width: dims.doorWidth };
       return p;
     });
   }
 
-  return { ...body, width: newWidth, depth: newDepth, pieces };
+  return { ...body, width: newWidth, depth: newDepth, pieces, doorConfig };
 }
 
 // ---------------------------------------------------------------------------
@@ -252,6 +294,10 @@ export function generateStandardPieces(
   const basHeight = 180;
   const hautHeight = +(ceilingHeight - basHeight).toFixed(1);
   const depth = body.depth;
+  // Hauteur intérieure utilisable pour les positions verticales : on prend la
+  // hauteur de la joue principale (= basHeight ici, qui est la zone où on place les
+  // tablettes — la zone haute est indépendante en pratique).
+  const innerH = basHeight;
 
   const pieces: Piece[] = [];
 
@@ -265,14 +311,17 @@ export function generateStandardPieces(
   pieces.push({ id: uid(), name: 'Joue D — bas', length: basHeight, width: depth, qty: 1, type: 'joue' as PieceType });
   pieces.push({ id: uid(), name: 'Joue D — haut', length: hautHeight, width: depth, qty: 1, type: 'joue' as PieceType });
 
-  // Fixed shelves
-  pieces.push({ id: uid(), name: 'Tablette fixe basse', length: iw, width: depth, qty: 1, type: 'tablette-fixe' as PieceType });
-  pieces.push({ id: uid(), name: 'Tablette fixe haute', length: iw, width: depth, qty: 1, type: 'tablette-fixe' as PieceType });
+  // Fixed shelves : basse au sol intérieur, haute en sommet
+  pieces.push({ id: uid(), name: 'Tablette fixe basse', length: iw, width: depth, qty: 1, type: 'tablette-fixe' as PieceType, posY: 0 });
+  pieces.push({ id: uid(), name: 'Tablette fixe haute', length: iw, width: depth, qty: 1, type: 'tablette-fixe' as PieceType, posY: +(innerH - thickness).toFixed(1) });
 
-  // Adjustable shelves
-  pieces.push({ id: uid(), name: 'Tablette réglable 1', length: iw, width: depth, qty: 1, type: 'tablette-reglable' as PieceType });
-  pieces.push({ id: uid(), name: 'Tablette réglable 2', length: iw, width: depth, qty: 1, type: 'tablette-reglable' as PieceType });
-  pieces.push({ id: uid(), name: 'Tablette réglable 3', length: iw, width: depth, qty: 1, type: 'tablette-reglable' as PieceType });
+  // Adjustable shelves : équiréparties entre les deux tablettes fixes
+  // N tablettes → N+1 intervalles entre 0 et innerH
+  const N = 3;
+  for (let i = 1; i <= N; i++) {
+    const posY = +(innerH * i / (N + 1)).toFixed(1);
+    pieces.push({ id: uid(), name: `Tablette réglable ${i}`, length: iw, width: depth, qty: 1, type: 'tablette-reglable' as PieceType, posY });
+  }
 
   return pieces;
 }

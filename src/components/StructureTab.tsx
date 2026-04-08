@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { AppState, MaterialKey, PieceType, Body, DoorPoseType, DoorConfig, DoorPosition, PanelDef } from '../types';
 import { MATERIALS, PIECE_COLORS, BODY_COLORS, PIECE_TYPES } from '../data/materials';
 import { uid, parseNumber, clampInt, calculateDoor, getBodyInnerWidth, isSharedLeft, getBodyEffectiveHeight, getDoorInfoFromPieces } from '../lib/helpers';
-import { createPiece, detectPieceType, generateStandardPieces, applySharedBoundary, recalcBodyPieces, getPanelForPiece } from '../lib/domain';
+import { createPiece, detectPieceType, generateStandardPieces, applySharedBoundary, recalcBodyPieces, getPanelForPiece, resolveDoorCoverage } from '../lib/domain';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 
@@ -118,8 +118,10 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
   const thickness = state.panel.thickness;
   const shared = state.sharedBoundaries ?? [];
   const innerW = getBodyInnerWidth(body.width, bodyIndex, state.bodies.length, shared, thickness);
+  const effectiveH = getBodyEffectiveHeight(body, ceilingHeight, plinthHeight);
 
   const config = body.doorConfig;
+  const [expanded, setExpanded] = useState(false);
 
   const applyDoors = (newConfig: DoorConfig | undefined) => {
     onChange({
@@ -133,10 +135,12 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
         }
 
         const bH = getBodyEffectiveHeight(b, ceilingHeight, plinthHeight);
-        const dims = calculateDoor(b.width, bH, thickness, newConfig.count, newConfig.poseType, innerW);
-        const doorPieces = Array.from({ length: newConfig.count }, (_, i) => ({
+        const { coverageHeight, splitPosY } = resolveDoorCoverage(b, bH, thickness, newConfig);
+        const finalConfig: DoorConfig = { ...newConfig, splitPosY };
+        const dims = calculateDoor(b.width, bH, thickness, finalConfig.count, finalConfig.poseType, innerW, coverageHeight);
+        const doorPieces = Array.from({ length: finalConfig.count }, (_, i) => ({
           id: uid(),
-          name: newConfig.count === 1 ? `Porte ${b.name}` : `Porte ${i === 0 ? 'G' : 'D'} ${b.name}`,
+          name: finalConfig.count === 1 ? `Porte ${b.name}` : `Porte ${i === 0 ? 'G' : 'D'} ${b.name}`,
           length: dims.doorHeight,
           width: dims.doorWidth,
           qty: 1,
@@ -145,7 +149,7 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
 
         return {
           ...b,
-          doorConfig: newConfig,
+          doorConfig: finalConfig,
           pieces: [...piecesWithoutDoors, ...doorPieces],
         };
       }),
@@ -156,11 +160,12 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
   const mat = MATERIALS[state.materialKey];
   const doorInfo = getDoorInfoFromPieces(body, thickness, mat.density);
 
+  // ---- Pas encore de portes : bouton d'ajout simple ----
   if (!config) {
     return (
       <div className="mt-3 pt-3 border-t border-stone-100">
         <button
-          onClick={() => applyDoors({ count: 1, poseType: 'enveloppante' })}
+          onClick={() => { applyDoors({ count: 1, poseType: 'enveloppante', position: 'pleine' }); setExpanded(true); }}
           className="text-xs text-amber-600 hover:text-amber-800 font-medium transition-colors"
         >
           + Ajouter des portes
@@ -169,16 +174,76 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
     );
   }
 
+  const position: DoorPosition = config.position ?? 'pleine';
+  const positionLabel: Record<DoorPosition, string> = {
+    pleine: 'pleine hauteur',
+    bas: 'en bas',
+    haut: 'en haut',
+  };
+
+  // ---- Mode replié : résumé compact ----
+  if (!expanded) {
+    return (
+      <div className="mt-3 pt-3 border-t border-stone-100">
+        <div className="flex items-center justify-between gap-2 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2">
+          <div className="flex items-center gap-2 flex-wrap text-xs text-orange-800 min-w-0">
+            <span className="font-semibold">🚪 {config.count} porte{config.count > 1 ? 's' : ''}</span>
+            <span className="text-orange-700">{positionLabel[position]}</span>
+            {doorInfo && (
+              <span className="font-mono text-orange-700">
+                {doorInfo.doorWidth}×{doorInfo.doorHeight} cm
+              </span>
+            )}
+            {doorInfo && (
+              <span className="text-[10px] text-orange-600">
+                · {doorInfo.hingeCount} charn./porte
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <button
+              onClick={() => setExpanded(true)}
+              className="text-[11px] px-2.5 py-1 rounded-lg bg-white text-orange-700 border border-orange-200 hover:bg-orange-100 transition-colors font-medium"
+            >
+              Modifier
+            </button>
+            <button
+              onClick={() => applyDoors(undefined)}
+              className="text-[10px] text-stone-400 hover:text-red-500 transition-colors px-1"
+              title="Retirer les portes"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ---- Mode déplié : édition complète ----
+  // Tablettes fixes candidates pour caler le plan de séparation
+  const fixedTablettes = body.pieces
+    .filter((p) => p.type === 'tablette-fixe' && typeof p.posY === 'number')
+    .sort((a, b) => (a.posY ?? 0) - (b.posY ?? 0));
+
   return (
     <div className="mt-3 pt-3 border-t border-stone-100">
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Portes</span>
-        <button
-          onClick={() => applyDoors(undefined)}
-          className="text-[10px] text-stone-400 hover:text-red-500 transition-colors"
-        >
-          Retirer les portes
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setExpanded(false)}
+            className="text-[10px] text-stone-500 hover:text-stone-700 transition-colors"
+          >
+            Replier
+          </button>
+          <button
+            onClick={() => applyDoors(undefined)}
+            className="text-[10px] text-stone-400 hover:text-red-500 transition-colors"
+          >
+            Retirer les portes
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-2 mb-2">
@@ -216,26 +281,58 @@ function DoorConfigurator({ body, bodyIndex, state, onChange }: {
         </div>
       </div>
 
-      {/* Position haut/bas (utile quand la porte ne couvre pas tout le corps) */}
-      <div className="flex gap-2 mb-2">
-        <span className="text-[11px] text-stone-500 self-center mr-1">Position :</span>
-        {([
-          { key: 'bas' as DoorPosition, label: 'En bas' },
-          { key: 'haut' as DoorPosition, label: 'En haut' },
-        ]).map((pos) => (
-          <button
-            key={pos.key}
-            onClick={() => applyDoors({ ...config, position: pos.key })}
-            className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-all ${(config.position ?? 'bas') === pos.key ? 'bg-amber-100 border-amber-300 text-amber-800 font-semibold' : 'bg-white border-stone-200 text-stone-500 hover:border-amber-200'}`}
-          >
-            {pos.label}
-          </button>
-        ))}
+      {/* Couverture verticale */}
+      <div className="mb-2">
+        <label className="text-[10px] text-stone-500 mb-1 block">Couverture verticale</label>
+        <div className="flex gap-1.5 flex-wrap">
+          {([
+            { key: 'pleine' as DoorPosition, label: 'Pleine hauteur', hint: 'toute la hauteur du corps' },
+            { key: 'bas' as DoorPosition, label: 'En bas', hint: 'sous une tablette fixe' },
+            { key: 'haut' as DoorPosition, label: 'En haut', hint: 'au-dessus d\'une tablette fixe' },
+          ]).map((pos) => (
+            <Tip key={pos.key} text={`${pos.label} : ${pos.hint}`}>
+              <button
+                onClick={() => applyDoors({ ...config, position: pos.key })}
+                className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-all ${position === pos.key ? 'bg-amber-100 border-amber-300 text-amber-800 font-semibold' : 'bg-white border-stone-200 text-stone-500 hover:border-amber-200'}`}
+              >
+                {pos.label}
+              </button>
+            </Tip>
+          ))}
+        </div>
+        {position !== 'pleine' && (
+          <div className="mt-2 text-[11px] bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-2">
+            {fixedTablettes.length === 0 ? (
+              <div className="text-amber-700">
+                ⚠ Aucune tablette fixe positionnée — la séparation est calée à la moitié ({(effectiveH / 2).toFixed(0)} cm).
+                Ajoute une tablette fixe avec une hauteur (posY) pour caler les portes.
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-stone-500">Plan de séparation :</span>
+                <select
+                  value={config.splitPosY ?? ''}
+                  onChange={(e) => {
+                    const v = parseFloat(e.target.value);
+                    applyDoors({ ...config, splitPosY: isNaN(v) ? undefined : v });
+                  }}
+                  className="text-[11px] px-2 py-1 rounded border border-stone-300 bg-white text-stone-700"
+                >
+                  {fixedTablettes.map((t) => (
+                    <option key={t.id} value={t.posY}>
+                      {t.name} — H = {t.posY} cm
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {doorInfo && (
         <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 text-xs text-orange-800 space-y-1">
-          <div className="font-semibold">{config.count} porte{config.count > 1 ? 's' : ''} — {doorInfo.poseLabel}</div>
+          <div className="font-semibold">{config.count} porte{config.count > 1 ? 's' : ''} — {doorInfo.poseLabel} — {positionLabel[position]}</div>
           <div>Dimensions : <span className="font-mono font-semibold">{doorInfo.doorWidth} × {doorInfo.doorHeight}</span> cm — <span className="font-mono">{doorInfo.doorWeightKg} kg</span>/porte</div>
           <div>
             <span className="font-semibold">{doorInfo.hingeCount} charnières</span> Ø35 par porte
@@ -326,6 +423,17 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                 const { thickness: _t, ...rest } = p;
                 if (value === '' || value === 0) return rest as typeof p;
                 return { ...p, thickness: Number(value) };
+              }
+              // posY/posX: '' → undefined (auto-distribué par le rendu)
+              if (key === 'posY') {
+                const { posY: _y, ...rest } = p;
+                if (value === '') return rest as typeof p;
+                return { ...p, posY: Number(value) };
+              }
+              if (key === 'posX') {
+                const { posX: _x, ...rest } = p;
+                if (value === '') return rest as typeof p;
+                return { ...p, posX: Number(value) };
               }
               const updated = { ...p, [key]: value };
               // Auto-detect piece type from name (only if current type is 'autre')
@@ -1048,7 +1156,8 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                       />
                     </Tip>
                     {editingPiece === p.id ? (
-                      <div className="flex-1 grid grid-cols-5 gap-1.5 items-center">
+                      <div className="flex-1 flex flex-col gap-1.5">
+                        <div className="grid grid-cols-5 gap-1.5 items-center">
                         <input
                           className={inputClass + " col-span-2 !py-1"}
                           value={p.name}
@@ -1117,6 +1226,60 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                             </select>
                           )}
                         </div>
+                        </div>
+                        {/* Position row : displayed only for piece types where it's meaningful */}
+                        {(p.type === 'tablette-fixe' || p.type === 'tablette-reglable' || p.type === 'bandeau' || p.type === 'separateur') && (
+                          <div className="flex items-center gap-2 text-[11px] text-stone-500 px-1">
+                            <Tip text="Hauteur (cm) du dessous de la pièce, mesurée depuis le sol intérieur du corps (haut de la plinthe).">
+                              <span>Hauteur :</span>
+                            </Tip>
+                            <input
+                              type="number"
+                              step="0.5"
+                              min={0}
+                              className={inputClass + " !py-1 !text-[11px] w-20"}
+                              value={p.posY ?? ''}
+                              placeholder="auto"
+                              onChange={(e) => {
+                                const v = e.target.value.replace(',', '.');
+                                if (v === '') {
+                                  updatePiece(b.id, p.id, 'posY', '');
+                                } else {
+                                  const n = parseNumber(v, 0, 0);
+                                  updatePiece(b.id, p.id, 'posY', n);
+                                }
+                              }}
+                              title="Hauteur depuis le sol intérieur (cm)"
+                            />
+                            <span className="text-stone-400">cm</span>
+                            {p.type === 'separateur' && (
+                              <>
+                                <Tip text="Distance horizontale (cm) du bord intérieur gauche du corps au bord gauche du séparateur.">
+                                  <span className="ml-2">Position X :</span>
+                                </Tip>
+                                <input
+                                  type="number"
+                                  step="0.5"
+                                  min={0}
+                                  className={inputClass + " !py-1 !text-[11px] w-20"}
+                                  value={p.posX ?? ''}
+                                  placeholder="auto"
+                                  onChange={(e) => {
+                                    const v = e.target.value.replace(',', '.');
+                                    if (v === '') {
+                                      updatePiece(b.id, p.id, 'posX', '');
+                                    } else {
+                                      const n = parseNumber(v, 0, 0);
+                                      updatePiece(b.id, p.id, 'posX', n);
+                                    }
+                                  }}
+                                  title="Position horizontale depuis l'intérieur gauche (cm)"
+                                />
+                                <span className="text-stone-400">cm</span>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div
@@ -1137,6 +1300,12 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                           <span className={`ml-1 ${p.thickness !== undefined ? 'text-amber-600 font-semibold' : 'text-stone-400'}`} title="Epaisseur">
                             ep.{Math.round((p.thickness ?? getPanelForPiece(p.panelId, state).thickness) * 10)}
                           </span>
+                          {(p.posY !== undefined || p.posX !== undefined) && (
+                            <span className="ml-1 text-sky-600" title="Position depuis le sol intérieur">
+                              {p.posY !== undefined && `H=${p.posY}`}
+                              {p.posX !== undefined && (p.posY !== undefined ? ` X=${p.posX}` : `X=${p.posX}`)}
+                            </span>
+                          )}
                         </span>
                       </div>
                     )}

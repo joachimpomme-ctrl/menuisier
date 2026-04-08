@@ -96,16 +96,31 @@ export default function PlanTab({ state }: Props) {
           const portes = b.pieces.filter(p => p.type === 'porte');
           const bandeaux = b.pieces.filter(p => p.type === 'bandeau');
 
-          const fixedCount = fixedTab.reduce((s, p) => s + p.qty, 0);
-          const adjustCount = adjustTab.reduce((s, p) => s + p.qty, 0);
+          // Expand pieces with quantity into individual entries (so a tablette qty=2
+          // becomes 2 placements). When posY is set, all clones share the same height.
+          const expand = <T extends { qty: number }>(arr: T[]) =>
+            arr.flatMap(p => Array.from({ length: p.qty }, () => p));
 
-          // Fixed shelf positions: top and bottom, then distributed
-          const fixedPositions: number[] = [];
-          if (fixedCount >= 1) fixedPositions.push(maxH - 2); // top
-          if (fixedCount >= 2) fixedPositions.push(2); // bottom
-          for (let i = 2; i < fixedCount; i++) {
-            fixedPositions.push(maxH * (i - 1) / (fixedCount - 1));
-          }
+          const fixedExpanded = expand(fixedTab);
+          const adjustExpanded = expand(adjustTab);
+          const sepExpanded = expand(separateurs);
+          const bandExpanded = expand(bandeaux);
+
+          // Fixed shelf positions (cm depuis sol intérieur). Si posY défini → on l'utilise,
+          // sinon on auto-distribue : haut/bas puis intermédiaires équidistants.
+          const fixedPositions: number[] = fixedExpanded.map((p, i) => {
+            if (typeof p.posY === 'number') return p.posY;
+            // fallback
+            if (fixedExpanded.length === 1) return maxH - 2;
+            if (i === 0) return maxH - 2;
+            if (i === 1) return 2;
+            return (maxH * (i - 1)) / (fixedExpanded.length - 1);
+          });
+          // Adjustable shelf positions
+          const adjustPositions: number[] = adjustExpanded.map((p, ri) => {
+            if (typeof p.posY === 'number') return p.posY;
+            return 20 + (ri + 1) * ((maxH - 40) / (adjustExpanded.length + 1));
+          });
 
           return (
             <g key={b.id}>
@@ -124,39 +139,64 @@ export default function PlanTab({ state }: Props) {
                 <rect x={bx + bw - tw} y={M + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#faf8f5" stroke="#a8a29e" strokeWidth="0.5" strokeDasharray="2,2" />
               </>}
 
-              {/* Fixed shelves */}
+              {/* Fixed shelves — with H labels when posY is set */}
               {fixedPositions.map((h, fi) => (
-                <rect key={`f${fi}`} x={bx + tw} y={M + bh - h * scale - tw / 2}
-                  width={bw - 2 * tw} height={tw}
-                  fill={PIECE_COLORS['tablette-fixe']} opacity=".25"
-                  stroke={PIECE_COLORS['tablette-fixe']} strokeWidth="0.5" />
+                <g key={`f${fi}`}>
+                  <rect x={bx + tw} y={M + bh - h * scale - tw / 2}
+                    width={bw - 2 * tw} height={tw}
+                    fill={PIECE_COLORS['tablette-fixe']} opacity=".35"
+                    stroke={PIECE_COLORS['tablette-fixe']} strokeWidth="0.5" />
+                  {typeof fixedExpanded[fi].posY === 'number' && (
+                    <text x={bx + bw - tw - 4} y={M + bh - h * scale - 1}
+                      textAnchor="end" fill={PIECE_COLORS['tablette-fixe']} fontSize="6" fontFamily="system-ui" fontWeight="600">
+                      H={h}
+                    </text>
+                  )}
+                </g>
               ))}
 
-              {/* Adjustable shelves (dashed) */}
-              {Array.from({ length: adjustCount }, (_, ri) => {
-                const shelfY = 20 + (ri + 1) * ((maxH - 40) / (adjustCount + 1));
-                return (
-                  <line key={`a${ri}`}
+              {/* Adjustable shelves (dashed) — use real posY when set */}
+              {adjustPositions.map((shelfY, ri) => (
+                <g key={`a${ri}`}>
+                  <line
                     x1={bx + tw + 2} y1={M + bh - shelfY * scale}
                     x2={bx + bw - tw - 2} y2={M + bh - shelfY * scale}
                     stroke={PIECE_COLORS['tablette-reglable']} strokeWidth="1" strokeDasharray="4,3" opacity=".6" />
-                );
-              })}
+                  {typeof adjustExpanded[ri].posY === 'number' && (
+                    <text x={bx + bw - tw - 4} y={M + bh - shelfY * scale - 1}
+                      textAnchor="end" fill={PIECE_COLORS['tablette-reglable']} fontSize="6" fontFamily="system-ui" opacity=".8">
+                      H={shelfY}
+                    </text>
+                  )}
+                </g>
+              ))}
 
               {/* Séparateurs verticaux */}
               {(() => {
-                const sepCount = separateurs.reduce((s, p) => s + p.qty, 0);
-                if (sepCount === 0) return null;
-                const innerW = bw - 2 * tw;
-                return Array.from({ length: sepCount }, (_, si) => {
-                  const sx = bx + tw + (si + 1) * innerW / (sepCount + 1) - tw / 2;
-                  // Height based on first separateur piece or 60% of body
-                  const sepH = separateurs[0] ? separateurs[0].length * scale : bh * 0.6;
-                  const sepY = M + (bh - sepH) / 2; // centered vertically
+                if (sepExpanded.length === 0) return null;
+                const innerWcm = b.width - 2 * th;
+                return sepExpanded.map((sep, si) => {
+                  // posX: cm depuis l'intérieur gauche → fallback distribution équirépartie
+                  const sxCm = typeof sep.posX === 'number'
+                    ? sep.posX
+                    : (innerWcm * (si + 1)) / (sepExpanded.length + 1);
+                  const sx = bx + tw + sxCm * scale - tw / 2;
+                  // posY : hauteur du bas du séparateur ; length = hauteur réelle
+                  const sepLen = sep.length * scale;
+                  const sepBaseY = typeof sep.posY === 'number' ? sep.posY : (maxH - sep.length) / 2;
+                  const sepY = M + bh - sepBaseY * scale - sepLen;
                   return (
-                    <rect key={`sep${si}`} x={sx} y={sepY} width={tw} height={sepH}
-                      fill={PIECE_COLORS.separateur} opacity=".2"
-                      stroke={PIECE_COLORS.separateur} strokeWidth="0.5" />
+                    <g key={`sep${si}`}>
+                      <rect x={sx} y={sepY} width={tw} height={sepLen}
+                        fill={PIECE_COLORS.separateur} opacity=".25"
+                        stroke={PIECE_COLORS.separateur} strokeWidth="0.5" />
+                      {(typeof sep.posX === 'number' || typeof sep.posY === 'number') && (
+                        <text x={sx + tw / 2} y={sepY - 2}
+                          textAnchor="middle" fill={PIECE_COLORS.separateur} fontSize="6" fontFamily="system-ui" opacity=".9">
+                          {typeof sep.posX === 'number' ? `X=${sep.posX}` : ''}
+                        </text>
+                      )}
+                    </g>
                   );
                 });
               })()}
@@ -175,12 +215,24 @@ export default function PlanTab({ state }: Props) {
                 );
               })}
 
-              {/* Bandeaux (top) */}
-              {bandeaux.length > 0 && (
-                <rect x={bx} y={M - 8 * scale} width={bw} height={8 * scale}
-                  fill={PIECE_COLORS.bandeau} opacity=".15"
-                  stroke={PIECE_COLORS.bandeau} strokeWidth="0.5" />
-              )}
+              {/* Bandeaux — utilisent posY si défini, sinon affichés en haut hors caisson */}
+              {bandExpanded.map((bd, bi2) => {
+                const bdH = bd.width * scale; // bd.width = hauteur du bandeau
+                if (typeof bd.posY === 'number') {
+                  // posY = hauteur du bas du bandeau
+                  const yTop = M + bh - bd.posY * scale - bdH;
+                  return (
+                    <rect key={`bd${bi2}`} x={bx} y={yTop} width={bw} height={bdH}
+                      fill={PIECE_COLORS.bandeau} opacity=".25"
+                      stroke={PIECE_COLORS.bandeau} strokeWidth="0.5" />
+                  );
+                }
+                return (
+                  <rect key={`bd${bi2}`} x={bx} y={M - bdH} width={bw} height={bdH}
+                    fill={PIECE_COLORS.bandeau} opacity=".15"
+                    stroke={PIECE_COLORS.bandeau} strokeWidth="0.5" />
+                );
+              })}
 
               {/* Dimensions */}
               {/* Width */}
@@ -275,13 +327,14 @@ export default function PlanTab({ state }: Props) {
     const tw = th * scale;
 
     const fixedTab = body.pieces.filter(p => p.type === 'tablette-fixe');
-    const fixedCount = fixedTab.reduce((s, p) => s + p.qty, 0);
-    const fixedPositions: number[] = [];
-    if (fixedCount >= 1) fixedPositions.push(height - 2);
-    if (fixedCount >= 2) fixedPositions.push(2);
-    for (let i = 2; i < fixedCount; i++) {
-      fixedPositions.push(height * (i - 1) / (fixedCount - 1));
-    }
+    const fixedExpanded = fixedTab.flatMap(p => Array.from({ length: p.qty }, () => p));
+    const fixedPositions: number[] = fixedExpanded.map((p, i) => {
+      if (typeof p.posY === 'number') return p.posY;
+      if (fixedExpanded.length === 1) return height - 2;
+      if (i === 0) return height - 2;
+      if (i === 1) return 2;
+      return (height * (i - 1)) / (fixedExpanded.length - 1);
+    });
 
     return (
       <svg width={SVG_W} height={svgH} viewBox={`0 0 ${SVG_W} ${svgH}`} className="rounded-lg">

@@ -46,16 +46,35 @@ export interface Piece {
   type: PieceType;
   panelId?: string; // undefined = panneau principal (state.panel)
   thickness?: number; // cm — override épaisseur panneau (ex. double joue). undefined = épaisseur du panneau assigné
+  // ---- positions spatiales (optionnel) ----
+  // posY : hauteur (cm) du dessous de la pièce horizontale (tablette/bandeau) ou du
+  //        bas de la pièce verticale (séparateur), mesurée depuis le sol intérieur du
+  //        corps (= sommet de la plinthe). Utilisé par : tablette-fixe, tablette-reglable,
+  //        bandeau, separateur. undefined → auto-distribué par le rendu.
+  posY?: number;
+  // posX : distance (cm) du bord intérieur gauche du corps au bord gauche d'un séparateur
+  //        vertical. Utilisé par : separateur. undefined → auto-distribué.
+  posX?: number;
 }
 
 export type DoorPoseType = 'enveloppante' | 'demi-recouvrement' | 'affleurante';
 
-export type DoorPosition = 'bas' | 'haut';
+/**
+ * Couverture verticale des portes :
+ * - 'pleine' : portes sur toute la hauteur effective du corps (défaut)
+ * - 'bas'    : portes uniquement sous une tablette fixe (zone basse)
+ * - 'haut'   : portes uniquement au-dessus d'une tablette fixe (zone haute)
+ */
+export type DoorPosition = 'pleine' | 'bas' | 'haut';
 
 export interface DoorConfig {
   count: 1 | 2;
   poseType: DoorPoseType;
-  position?: DoorPosition; // défaut: 'bas'
+  position?: DoorPosition; // défaut: 'pleine'
+  // splitPosY : hauteur (cm depuis le sol intérieur) du plan de séparation entre la zone
+  // basse et la zone haute. Utilisé quand position = 'bas' ou 'haut'. Auto-calé sur la
+  // tablette fixe la plus pertinente lors du choix de la position.
+  splitPosY?: number;
 }
 
 export interface Body {

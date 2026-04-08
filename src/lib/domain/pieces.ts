@@ -32,18 +32,28 @@ export function createPiece(
   let width = bodyDepth;
   let qty = 1;
   let panelId: string | undefined;
+  let posY: number | undefined;
+  let posX: number | undefined;
+
+  // Default vertical position : milieu de la hauteur utile
+  const midY = +(usableHeight / 2).toFixed(1);
+  const midX = +(innerWidth / 2).toFixed(1);
 
   switch (type) {
     case 'joue':
       name = 'Joue'; length = ceilingHeight; width = bodyDepth; break;
     case 'tablette-fixe':
-      name = 'Tablette fixe'; length = innerWidth; width = bodyDepth; break;
+      name = 'Tablette fixe'; length = innerWidth; width = bodyDepth;
+      posY = midY; break;
     case 'tablette-reglable':
-      name = 'Tablette réglable'; length = innerWidth; width = bodyDepth; break;
+      name = 'Tablette réglable'; length = innerWidth; width = bodyDepth;
+      posY = midY; break;
     case 'separateur':
-      name = 'Séparateur vertical'; length = 30; width = bodyDepth; break;
+      name = 'Séparateur vertical'; length = 30; width = bodyDepth;
+      posY = +(midY - 15).toFixed(1); posX = midX; break;
     case 'bandeau':
-      name = 'Bandeau'; length = bodyWidth; width = 10; break;
+      name = 'Bandeau'; length = bodyWidth; width = 10;
+      posY = +(usableHeight - 10).toFixed(1); break;
     case 'porte':
       name = 'Porte'; length = usableHeight; width = bodyWidth; break;
     case 'fond': {
@@ -65,6 +75,8 @@ export function createPiece(
     qty,
     type,
     ...(panelId ? { panelId } : {}),
+    ...(posY !== undefined ? { posY } : {}),
+    ...(posX !== undefined ? { posX } : {}),
   };
 }
 
@@ -110,6 +122,22 @@ export function normalizePiece(piece: Piece, allPanelIds: string[]): Piece {
   // Clean invalid thickness override (<=0 → revert to panel default)
   if (p.thickness !== undefined && p.thickness <= 0) {
     delete p.thickness;
+  }
+  // Clamp posY/posX to non-negative numbers (we don't know body bounds here, so
+  // upper-bound clamping is left to the rendering layer or the editor).
+  if (p.posY !== undefined) {
+    if (typeof p.posY !== 'number' || isNaN(p.posY)) {
+      delete p.posY;
+    } else if (p.posY < 0) {
+      p.posY = 0;
+    }
+  }
+  if (p.posX !== undefined) {
+    if (typeof p.posX !== 'number' || isNaN(p.posX)) {
+      delete p.posX;
+    } else if (p.posX < 0) {
+      p.posX = 0;
+    }
   }
   return p;
 }
