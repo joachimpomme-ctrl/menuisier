@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import type { AppState, MaterialKey, PieceType, Body, PanelDef } from '../types';
 import { MATERIALS } from '../data/materials';
-import { uid, getBodyInnerWidth } from '../lib/helpers';
-import { createPiece, detectPieceType, generateStandardPieces, applySharedBoundary, recalcBodyPieces } from '../lib/domain';
+import { projectActions, bodyActions, pieceActions } from '../lib/actions';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 import NumberInput from './structure/NumberInput';
@@ -23,196 +22,45 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
   const shared = state.sharedBoundaries ?? [];
   const th = state.panel.thickness;
 
-  // ---------- helpers for sharing-aware inner width ----------
-  const innerWidthOf = (bi: number) =>
-    getBodyInnerWidth(state.bodies[bi].width, bi, state.bodies.length, shared, th);
+  // ---------- thin shells over actions layer ----------
+  const updateProject = (key: string, value: number) =>
+    onChange(projectActions.updateProject(state, key, value));
 
-  // ---------- state updaters ----------
-  const updateProject = (key: string, value: number) => {
-    onChange({ ...state, project: { ...state.project, [key]: value } });
-  };
+  const updateThickness = (value: number) =>
+    onChange(projectActions.updateThickness(state, value));
 
-  const updateThickness = (value: number) => {
-    onChange({ ...state, panel: { ...state.panel, thickness: value } });
-  };
+  const changeMaterial = (key: MaterialKey) =>
+    onChange(projectActions.changeMaterial(state, key));
 
-  const changeMaterial = (key: MaterialKey) => {
-    const m = MATERIALS[key];
-    const p = m.panels[0];
-    onChange({
-      ...state,
-      materialKey: key,
-      panel: { ...state.panel, width: p.w, height: p.h, thickness: m.defaultThickness / 10 },
-      costConfig: { panelPrice: p.defaultPrice },
-    });
-  };
+  const updateBody = (id: string, key: keyof Body, value: string | number) =>
+    onChange(bodyActions.updateBody(state, id, key, value));
 
-  const updateBody = (id: string, key: keyof Body, value: string | number) => {
-    onChange({
-      ...state,
-      bodies: state.bodies.map((b, i) => {
-        if (b.id !== id) return b;
-        const updated = { ...b, [key]: value };
+  const updatePiece = (bodyId: string, pieceId: string, key: string, value: string | number) =>
+    onChange(pieceActions.updatePiece(state, bodyId, pieceId, key, value));
 
-        if (key === 'width' || key === 'depth') {
-          const newWidth = key === 'width' ? (value as number) : b.width;
-          const newDepth = key === 'depth' ? (value as number) : b.depth;
-          return recalcBodyPieces(
-            b, i, b.width, b.depth, newWidth, newDepth,
-            state.panel.thickness, shared,
-            state.project.ceilingHeight, state.project.plinthHeight,
-          );
-        }
-
-        return updated;
-      }),
-    });
-  };
-
-  const updatePiece = (bodyId: string, pieceId: string, key: string, value: string | number) => {
-    onChange({
-      ...state,
-      bodies: state.bodies.map((b) =>
-        b.id === bodyId
-          ? { ...b, pieces: b.pieces.map((p) => {
-              if (p.id !== pieceId) return p;
-              // panelId: '' or 'default' → undefined (use main panel)
-              if (key === 'panelId') {
-                const v = value === '' || value === 'default' ? undefined : String(value);
-                return { ...p, panelId: v };
-              }
-              // thickness: '' → undefined (revert to panel default)
-              if (key === 'thickness') {
-                const { thickness: _t, ...rest } = p;
-                if (value === '' || value === 0) return rest as typeof p;
-                return { ...p, thickness: Number(value) };
-              }
-              // posY/posX: '' → undefined (auto-distribué par le rendu)
-              if (key === 'posY') {
-                const { posY: _y, ...rest } = p;
-                if (value === '') return rest as typeof p;
-                return { ...p, posY: Number(value) };
-              }
-              if (key === 'posX') {
-                const { posX: _x, ...rest } = p;
-                if (value === '') return rest as typeof p;
-                return { ...p, posX: Number(value) };
-              }
-              const updated = { ...p, [key]: value };
-              // Auto-detect piece type from name (only if current type is 'autre')
-              if (key === 'name') {
-                updated.type = detectPieceType(String(value), p.type);
-              }
-              return updated;
-            }) }
-          : b
-      ),
-    });
-  };
-
-  const addPiece = (bodyId: string, pieceType?: PieceType) => {
-    const bi = state.bodies.findIndex((b) => b.id === bodyId);
-    const body = state.bodies[bi];
-    if (!body) return;
-    const iw = innerWidthOf(bi);
-    const type: PieceType = pieceType ?? 'autre';
-
-    const piece = createPiece(
-      type,
-      body.width,
-      body.depth,
-      iw,
-      state.project.ceilingHeight,
-      state.project.plinthHeight,
-      allPanelDefs,
-    );
-
-    onChange({
-      ...state,
-      bodies: state.bodies.map((b) =>
-        b.id === bodyId
-          ? { ...b, pieces: [...b.pieces, piece] }
-          : b
-      ),
-    });
-  };
+  const addPiece = (bodyId: string, pieceType?: PieceType) =>
+    onChange(pieceActions.addPiece(state, bodyId, pieceType, allPanelDefs));
 
   const autoFillPieces = (bodyId: string) => {
-    const bi = state.bodies.findIndex((b) => b.id === bodyId);
-    const body = state.bodies[bi];
+    const body = state.bodies.find((b) => b.id === bodyId);
     if (!body) return;
-    // Only auto-fill if body has no pieces
     if (body.pieces.length > 0) {
       if (!confirm('Ce corps contient déjà des pièces. Voulez-vous les remplacer par les pièces standard ?')) return;
     }
-
-    const pieces = generateStandardPieces(body, bi, shared, th, state.project.ceilingHeight);
-
-    onChange({
-      ...state,
-      bodies: state.bodies.map((b) =>
-        b.id === bodyId ? { ...b, pieces } : b
-      ),
-    });
+    onChange(pieceActions.autoFillPieces(state, bodyId));
   };
 
-  const removePiece = (bodyId: string, pieceId: string) => {
-    onChange({
-      ...state,
-      bodies: state.bodies.map((b) =>
-        b.id === bodyId ? { ...b, pieces: b.pieces.filter((p) => p.id !== pieceId) } : b
-      ),
-    });
-  };
+  const removePiece = (bodyId: string, pieceId: string) =>
+    onChange(pieceActions.removePiece(state, bodyId, pieceId));
 
-  const duplicateBody = (id: string) => {
-    const source = state.bodies.find((b) => b.id === id);
-    if (!source) return;
-    const idx = state.bodies.findIndex((b) => b.id === id);
-    const newBody = {
-      ...source,
-      id: uid(),
-      name: `${source.name} (copie)`,
-      pieces: source.pieces.map((p) => ({ ...p, id: uid() })),
-    };
-    const bodies = [...state.bodies];
-    bodies.splice(idx + 1, 0, newBody);
-    // Insert a false entry in sharedBoundaries at the insertion point
-    const newShared = [...shared];
-    newShared.splice(idx, 0, false);
-    onChange({ ...state, bodies, sharedBoundaries: newShared });
-  };
+  const duplicateBody = (id: string) => onChange(bodyActions.duplicateBody(state, id));
 
-  const addBody = () => {
-    const newShared = [...shared, false];
-    onChange({
-      ...state,
-      bodies: [...state.bodies, { id: uid(), name: `Corps ${state.bodies.length + 1}`, width: 80, depth: 30, pieces: [] }],
-      sharedBoundaries: newShared,
-    });
-  };
+  const addBody = () => onChange(bodyActions.addBody(state));
 
-  const removeBody = (id: string) => {
-    const idx = state.bodies.findIndex((b) => b.id === id);
-    const newBodies = state.bodies.filter((b) => b.id !== id);
-    const newShared = [...shared];
-    // Remove the boundary entry for this body
-    if (idx > 0) {
-      newShared.splice(idx - 1, 1);
-    } else if (newShared.length > 0) {
-      newShared.splice(0, 1);
-    }
-    onChange({ ...state, bodies: newBodies, sharedBoundaries: newShared });
-  };
+  const removeBody = (id: string) => onChange(bodyActions.removeBody(state, id));
 
-  // ---------- TOGGLE JOUE COMMUNE ----------
-  const toggleSharing = (boundaryIdx: number, enabled: boolean) => {
-    const result = applySharedBoundary(
-      state.bodies, boundaryIdx, enabled, shared, th,
-      state.project.ceilingHeight, state.project.plinthHeight,
-    );
-    onChange({ ...state, bodies: result.bodies, sharedBoundaries: result.sharedBoundaries });
-  };
+  const toggleSharing = (boundaryIdx: number, enabled: boolean) =>
+    onChange(bodyActions.toggleSharing(state, boundaryIdx, enabled));
 
   // Compute total physical width (accounting for shared boundaries)
   const totalPhysical = state.bodies.reduce((s, b) => s + b.width, 0) - shared.filter(Boolean).length * th;
