@@ -18,18 +18,63 @@ const CURRENT_VERSION = 2;
 // ---------------------------------------------------------------------------
 const uid = (): string => crypto.randomUUID();
 
+/**
+ * Storage error with a user-facing message. Thrown by write operations so the
+ * UI layer can surface the problem instead of silently losing data.
+ */
+export class StorageError extends Error {
+  readonly code: 'quota' | 'unavailable' | 'unknown';
+  constructor(message: string, code: 'quota' | 'unavailable' | 'unknown', cause?: unknown) {
+    super(message);
+    this.name = 'StorageError';
+    this.code = code;
+    if (cause !== undefined) (this as { cause?: unknown }).cause = cause;
+  }
+}
+
+function isQuotaError(err: unknown): boolean {
+  if (err instanceof DOMException) {
+    // Firefox: NS_ERROR_DOM_QUOTA_REACHED (1014). Others: QuotaExceededError (22).
+    return (
+      err.name === 'QuotaExceededError' ||
+      err.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+      err.code === 22 ||
+      err.code === 1014
+    );
+  }
+  return false;
+}
+
+function wrapStorageError(err: unknown, action: string): StorageError {
+  if (isQuotaError(err)) {
+    return new StorageError(
+      `Espace de stockage saturé pendant ${action}. Supprimez des projets anciens ou exportez-les avant de continuer.`,
+      'quota',
+      err,
+    );
+  }
+  const msg = err instanceof Error ? err.message : String(err);
+  return new StorageError(`Échec ${action} : ${msg}`, 'unknown', err);
+}
+
 function readIndex(): ProjectMeta[] {
   try {
     const raw = localStorage.getItem(INDEX_KEY);
     if (!raw) return [];
-    return JSON.parse(raw) as ProjectMeta[];
-  } catch {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as ProjectMeta[]) : [];
+  } catch (err) {
+    console.error('storage: index illisible, réinitialisation', err);
     return [];
   }
 }
 
 function writeIndex(index: ProjectMeta[]): void {
-  localStorage.setItem(INDEX_KEY, JSON.stringify(index));
+  try {
+    localStorage.setItem(INDEX_KEY, JSON.stringify(index));
+  } catch (err) {
+    throw wrapStorageError(err, "de la mise à jour de l'index des projets");
+  }
 }
 
 function buildMeta(id: string, state: AppState, now: string, createdAt?: string): ProjectMeta {
@@ -81,11 +126,7 @@ export class LocalProjectRepository implements ProjectRepository {
   }
 
   list(): ProjectMeta[] {
-    try {
-      return readIndex();
-    } catch {
-      return [];
-    }
+    return readIndex();
   }
 
   load(id: string): AppState | null {
@@ -95,74 +136,80 @@ export class LocalProjectRepository implements ProjectRepository {
       const parsed = JSON.parse(raw) as StoredProject;
       if (!parsed || parsed.version !== CURRENT_VERSION || !parsed.state) return null;
       return parsed.state;
-    } catch {
-      console.warn(`Impossible de charger le projet ${id}`);
+    } catch (err) {
+      console.error(`storage: projet ${id} illisible`, err);
       return null;
     }
   }
 
+  /**
+   * Persist a project. Throws {@link StorageError} on failure (quota,
+   * unavailable localStorage, etc.). Callers must surface the error to the
+   * user so data loss is not silent.
+   */
   save(id: string, state: AppState): void {
+    const now = new Date().toISOString();
+    const normalized = normalizeProject(state);
+
+    const stored: StoredProject = { version: CURRENT_VERSION, state: normalized, savedAt: now };
     try {
-      const now = new Date().toISOString();
-      const normalized = normalizeProject(state);
-
-      // Persist project data
-      const stored: StoredProject = { version: CURRENT_VERSION, state: normalized, savedAt: now };
       localStorage.setItem(PROJECT_PREFIX + id, JSON.stringify(stored));
-
-      // Update index
-      const index = readIndex();
-      const existing = index.find((m) => m.id === id);
-      if (existing) {
-        existing.name = normalized.project.name;
-        existing.materialShort = MATERIALS[normalized.materialKey]?.short ?? normalized.materialKey;
-        existing.bodyCount = normalized.bodies.length;
-        existing.updatedAt = now;
-      } else {
-        index.push(buildMeta(id, normalized, now));
-      }
-      writeIndex(index);
-    } catch {
-      console.warn('Impossible de sauvegarder le projet');
+    } catch (err) {
+      throw wrapStorageError(err, `de la sauvegarde du projet "${normalized.project.name}"`);
     }
+
+    // Index update is best-effort w.r.t. atomicity but must also throw on quota
+    const index = readIndex();
+    const existing = index.find((m) => m.id === id);
+    if (existing) {
+      existing.name = normalized.project.name;
+      existing.materialShort = MATERIALS[normalized.materialKey]?.short ?? normalized.materialKey;
+      existing.bodyCount = normalized.bodies.length;
+      existing.updatedAt = now;
+    } else {
+      index.push(buildMeta(id, normalized, now));
+    }
+    writeIndex(index);
   }
 
+  /**
+   * Delete a project. Throws {@link StorageError} on failure.
+   */
   delete(id: string): void {
     try {
       localStorage.removeItem(PROJECT_PREFIX + id);
-      const index = readIndex().filter((m) => m.id !== id);
-      writeIndex(index);
+    } catch (err) {
+      throw wrapStorageError(err, `de la suppression du projet ${id}`);
+    }
+    const index = readIndex().filter((m) => m.id !== id);
+    writeIndex(index);
 
-      // Clear current pointer if it matched
-      if (this.getCurrentId() === id) {
-        this.setCurrentId(null);
-      }
-    } catch {
-      console.warn(`Impossible de supprimer le projet ${id}`);
+    if (this.getCurrentId() === id) {
+      this.setCurrentId(null);
     }
   }
 
+  /**
+   * Duplicate a project. Throws {@link StorageError} on failure.
+   * Returns `null` only when the source id does not exist.
+   */
   duplicate(id: string, newName: string): string | null {
-    try {
-      const state = this.load(id);
-      if (!state) return null;
+    const state = this.load(id);
+    if (!state) return null;
 
-      const newId = uid();
-      const cloned: AppState = JSON.parse(JSON.stringify(state));
-      cloned.project = { ...cloned.project, name: newName };
+    const newId = uid();
+    const cloned: AppState = JSON.parse(JSON.stringify(state));
+    cloned.project = { ...cloned.project, name: newName };
 
-      this.save(newId, cloned);
-      return newId;
-    } catch {
-      console.warn(`Impossible de dupliquer le projet ${id}`);
-      return null;
-    }
+    this.save(newId, cloned);
+    return newId;
   }
 
   getCurrentId(): string | null {
     try {
       return localStorage.getItem(CURRENT_KEY);
-    } catch {
+    } catch (err) {
+      console.error('storage: lecture du projet courant impossible', err);
       return null;
     }
   }
@@ -174,8 +221,8 @@ export class LocalProjectRepository implements ProjectRepository {
       } else {
         localStorage.setItem(CURRENT_KEY, id);
       }
-    } catch {
-      console.warn('Impossible de mettre à jour le projet courant');
+    } catch (err) {
+      throw wrapStorageError(err, 'de la mise à jour du projet courant');
     }
   }
 }

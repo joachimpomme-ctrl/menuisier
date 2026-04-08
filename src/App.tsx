@@ -9,7 +9,7 @@ import { generateSteps } from './lib/steps';
 import { estimateCost } from './lib/cost';
 import { analyzeProject } from './lib/projectAnalysis';
 // PDF lazy-loaded pour code-split (jsPDF est gros)
-import { LocalProjectRepository, exportToJson, syncToJson, importFromJson } from './lib/storage';
+import { LocalProjectRepository, StorageError, exportToJson, syncToJson, importFromJson } from './lib/storage';
 import { seedBaseKnowledge } from './lib/knowledgeStore';
 import { isCloudConfigured, getCloudUrl, setCloudUrl } from './lib/cloudSync';
 import StructureTab from './components/StructureTab';
@@ -76,6 +76,25 @@ export default function App() {
   const [showNewWizard, setShowNewWizard] = useState(false);
   const [, setKnowledgeVersion] = useState(0); // trigger re-render on knowledge update
   const [importError, setImportError] = useState<string | null>(null);
+  const [storageError, setStorageError] = useState<string | null>(null);
+
+  // Wrap any repo write so quota/errors surface to the UI instead of silently
+  // being lost.
+  const safeRepoWrite = useCallback(<T,>(action: () => T): T | undefined => {
+    try {
+      const result = action();
+      setStorageError(null);
+      return result;
+    } catch (err) {
+      if (err instanceof StorageError) {
+        setStorageError(err.message);
+      } else {
+        setStorageError(err instanceof Error ? err.message : 'Erreur de stockage inconnue');
+      }
+      console.error('Storage write failed:', err);
+      return undefined;
+    }
+  }, []);
   const [pdfLoading, setPdfLoading] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
 
@@ -116,24 +135,26 @@ export default function App() {
   // Auto-save
   useEffect(() => {
     const timer = setTimeout(() => {
-      repo.save(projectId, state);
-      refreshProjects();
+      safeRepoWrite(() => {
+        repo.save(projectId, state);
+        refreshProjects();
+      });
     }, 500);
     return () => clearTimeout(timer);
-  }, [state, projectId, refreshProjects]);
+  }, [state, projectId, refreshProjects, safeRepoWrite]);
 
   const switchProject = useCallback((id: string) => {
     // Save current first
-    repo.save(projectId, state);
+    if (safeRepoWrite(() => repo.save(projectId, state)) === undefined) return;
     const loaded = repo.load(id);
     if (loaded) {
       setState(normalizeProject(migrateState(loaded)));
       setProjectId(id);
-      repo.setCurrentId(id);
+      safeRepoWrite(() => repo.setCurrentId(id));
       refreshProjects();
       setShowProjects(false);
     }
-  }, [projectId, state, refreshProjects]);
+  }, [projectId, state, refreshProjects, safeRepoWrite]);
 
   const handleNewProject = useCallback(() => {
     setShowProjects(false);
@@ -141,39 +162,41 @@ export default function App() {
   }, []);
 
   const handleCreateFromWizard = useCallback((newState: AppState) => {
-    repo.save(projectId, state);
+    if (safeRepoWrite(() => repo.save(projectId, state)) === undefined) return;
     const newId = crypto.randomUUID();
-    repo.save(newId, newState);
-    repo.setCurrentId(newId);
+    if (safeRepoWrite(() => {
+      repo.save(newId, newState);
+      repo.setCurrentId(newId);
+    }) === undefined) return;
     setProjectId(newId);
     setState(newState);
     refreshProjects();
     setShowNewWizard(false);
-  }, [projectId, state, refreshProjects]);
+  }, [projectId, state, refreshProjects, safeRepoWrite]);
 
   const handleDuplicate = useCallback((id: string) => {
     const source = projects.find((p) => p.id === id);
-    const newId = repo.duplicate(id, `${source?.name ?? 'Projet'} (copie)`);
+    const newId = safeRepoWrite(() => repo.duplicate(id, `${source?.name ?? 'Projet'} (copie)`));
     if (newId) {
       refreshProjects();
       switchProject(newId);
     }
-  }, [projects, refreshProjects, switchProject]);
+  }, [projects, refreshProjects, switchProject, safeRepoWrite]);
 
   const handleRename = useCallback((id: string, newName: string) => {
     const loaded = repo.load(id);
     if (loaded) {
       loaded.project.name = newName;
-      repo.save(id, loaded);
+      if (safeRepoWrite(() => repo.save(id, loaded)) === undefined) return;
       if (id === projectId) {
         setState((s) => ({ ...s, project: { ...s.project, name: newName } }));
       }
       refreshProjects();
     }
-  }, [projectId, refreshProjects]);
+  }, [projectId, refreshProjects, safeRepoWrite]);
 
   const handleDeleteProject = useCallback((id: string) => {
-    repo.delete(id);
+    if (safeRepoWrite(() => repo.delete(id)) === undefined) return;
     if (id === projectId) {
       const remaining = repo.list();
       if (remaining.length > 0) {
@@ -183,7 +206,7 @@ export default function App() {
       }
     }
     refreshProjects();
-  }, [projectId, switchProject, handleNewProject, refreshProjects]);
+  }, [projectId, switchProject, handleNewProject, refreshProjects, safeRepoWrite]);
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -192,8 +215,13 @@ export default function App() {
       const imported = await importFromJson(file);
       const migrated = normalizeProject(migrateState(imported));
       const newId = crypto.randomUUID();
-      repo.save(newId, migrated);
-      repo.setCurrentId(newId);
+      if (safeRepoWrite(() => {
+        repo.save(newId, migrated);
+        repo.setCurrentId(newId);
+      }) === undefined) {
+        e.target.value = '';
+        return;
+      }
       setProjectId(newId);
       setState(migrated);
       refreshProjects();
@@ -314,6 +342,20 @@ export default function App() {
           {importError && (
             <div className="mt-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
               {importError}
+            </div>
+          )}
+
+          {storageError && (
+            <div className="mt-2 text-xs text-red-700 bg-red-50 border border-red-300 rounded-xl px-3 py-2 flex items-start gap-2">
+              <span className="font-semibold shrink-0">⚠ Stockage :</span>
+              <span className="flex-1">{storageError}</span>
+              <button
+                onClick={() => setStorageError(null)}
+                className="shrink-0 text-red-500 hover:text-red-700 font-bold"
+                aria-label="Fermer"
+              >
+                ×
+              </button>
             </div>
           )}
         </div>

@@ -10,23 +10,47 @@ interface ChatRequestBody {
   system: string;
 }
 
-const CORS_HEADERS: Record<string, string> = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
-
 const MAX_MESSAGES = 50;
 const MAX_SYSTEM_LENGTH = 20_000;
 const MAX_BODY_SIZE = 512_000; // ~500KB
 const MAX_CONTENT_ITEMS = 10;
 const FETCH_TIMEOUT_MS = 60_000;
 const VALID_ROLES = new Set(['user', 'assistant']);
+const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-5';
 
-function setCors(res: VercelResponse): void {
-  for (const [key, value] of Object.entries(CORS_HEADERS)) {
-    res.setHeader(key, value);
+/**
+ * Allowed origins for CORS. Configured via ALLOWED_ORIGINS env var
+ * (comma-separated list). When unset, falls back to the Vercel-provided
+ * deployment URL, then to '*' as a last resort for local dev.
+ */
+function getAllowedOrigins(): string[] {
+  const raw = process.env.ALLOWED_ORIGINS;
+  if (raw && raw.trim().length > 0) {
+    return raw.split(',').map((o) => o.trim()).filter(Boolean);
   }
+  const vercelUrl = process.env.VERCEL_URL;
+  if (vercelUrl) return [`https://${vercelUrl}`];
+  return [];
+}
+
+function resolveAllowedOrigin(requestOrigin: string | undefined): string | null {
+  const allowed = getAllowedOrigins();
+  if (allowed.length === 0) return '*'; // dev fallback
+  if (!requestOrigin) return allowed[0];
+  return allowed.includes(requestOrigin) ? requestOrigin : null;
+}
+
+function setCors(req: VercelRequest, res: VercelResponse): boolean {
+  const requestOrigin = (req.headers.origin as string | undefined) ?? undefined;
+  const allowOrigin = resolveAllowedOrigin(requestOrigin);
+  if (allowOrigin === null) {
+    return false;
+  }
+  res.setHeader('Access-Control-Allow-Origin', allowOrigin);
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  return true;
 }
 
 function validateMessages(messages: unknown): messages is Array<ChatMessage> {
@@ -52,7 +76,10 @@ function validateMessages(messages: unknown): messages is Array<ChatMessage> {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  setCors(res);
+  const corsOk = setCors(req, res);
+  if (!corsOk) {
+    return res.status(403).json({ error: 'Origine non autorisée' });
+  }
 
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
@@ -106,7 +133,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: ANTHROPIC_MODEL,
           max_tokens: 4096,
           system,
           messages,
