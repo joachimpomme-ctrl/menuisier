@@ -1,17 +1,11 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import type { AppState, TabKey, ProjectMeta, PanelDef } from './types';
-import { MATERIALS } from './data/materials';
-import { createInitialState, migrateState } from './lib/state';
-import { normalizeProject } from './lib/normalizeProject';
-import { optimizeNesting } from './lib/nesting';
-import { validate } from './lib/validation';
-import { generateSteps } from './lib/steps';
-import { estimateCost } from './lib/cost';
-import { analyzeProject } from './lib/projectAnalysis';
-// PDF lazy-loaded pour code-split (jsPDF est gros)
-import { LocalProjectRepository, StorageError, exportToJson, syncToJson, importFromJson } from './lib/storage';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import type { TabKey } from './types';
+import { exportToJson, syncToJson, LocalProjectRepository } from './lib/storage';
 import { seedBaseKnowledge } from './lib/knowledgeStore';
 import { isCloudConfigured, getCloudUrl, setCloudUrl } from './lib/cloudSync';
+import { normalizeProject } from './lib/normalizeProject';
+import { useProjectRepository } from './hooks/useProjectRepository';
+import { useProjectAnalysis } from './hooks/useProjectAnalysis';
 import StructureTab from './components/StructureTab';
 import DebitTab from './components/DebitTab';
 import MontageTab from './components/MontageTab';
@@ -40,195 +34,74 @@ const TABS: { key: TabKey; label: string; shortLabel: string; icon: string }[] =
 // Singleton repository — shared across renders
 const repo = new LocalProjectRepository();
 
-function ensureProject(): { id: string; state: AppState } {
-  let id = repo.getCurrentId();
-  if (id) {
-    const state = repo.load(id);
-    if (state) return { id, state: normalizeProject(migrateState(state)) };
-  }
-  // No current project — check if any exist
-  const list = repo.list();
-  if (list.length > 0) {
-    id = list[0].id;
-    const state = repo.load(id);
-    if (state) {
-      repo.setCurrentId(id);
-      return { id, state: normalizeProject(migrateState(state)) };
-    }
-  }
-  // Create a fresh project
-  const freshId = crypto.randomUUID();
-  const freshState = createInitialState('cp_bouleau');
-  repo.save(freshId, freshState);
-  repo.setCurrentId(freshId);
-  return { id: freshId, state: freshState };
-}
-
 export default function App() {
-  const initial = useRef(ensureProject());
-  const [projectId, setProjectId] = useState(initial.current.id);
-  const [state, setState] = useState<AppState>(initial.current.state);
+  const {
+    projectId,
+    state,
+    setState,
+    projects,
+    storageError,
+    setStorageError,
+    importError,
+    switchProject,
+    createFromWizard,
+    duplicateProject,
+    renameProject,
+    deleteProject,
+    importProject,
+    pullCloud,
+    loadLocal,
+  } = useProjectRepository(repo);
+
+  const {
+    mat,
+    analysis,
+    allPieces,
+    totalPieces,
+    totalPanelCount,
+    totalCost,
+    allPanelDefs,
+    nesting,
+    nestingByPanel,
+    validation,
+    steps,
+    cost,
+  } = useProjectAnalysis(state);
+
   const [tab, setTab] = useState<TabKey>('structure');
-  const [projects, setProjects] = useState<ProjectMeta[]>(repo.list());
   const [showProjects, setShowProjects] = useState(false);
   const [showKnowledge, setShowKnowledge] = useState(false);
   const [showCloud, setShowCloud] = useState(false);
   const [showNewWizard, setShowNewWizard] = useState(false);
-  const [, setKnowledgeVersion] = useState(0); // trigger re-render on knowledge update
-  const [importError, setImportError] = useState<string | null>(null);
-  const [storageError, setStorageError] = useState<string | null>(null);
-
-  // Wrap any repo write so quota/errors surface to the UI instead of silently
-  // being lost.
-  const safeRepoWrite = useCallback(<T,>(action: () => T): T | undefined => {
-    try {
-      const result = action();
-      setStorageError(null);
-      return result;
-    } catch (err) {
-      if (err instanceof StorageError) {
-        setStorageError(err.message);
-      } else {
-        setStorageError(err instanceof Error ? err.message : 'Erreur de stockage inconnue');
-      }
-      console.error('Storage write failed:', err);
-      return undefined;
-    }
-  }, []);
+  const [, setKnowledgeVersion] = useState(0);
   const [pdfLoading, setPdfLoading] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
 
-  const mat = MATERIALS[state.materialKey];
-
-  // Single source of truth for all project metrics
-  const analysis = useMemo(() => analyzeProject(state), [state]);
-
-  // Backward-compat aliases used by child components
-  const allPieces = analysis.allPieces;
-  const totalPieces = analysis.totalPieces;
-  const nestingByPanel = analysis.panels.map(p => ({ panelDef: p.panelDef, nesting: p.nesting, pieces: p.pieces }));
-  const allPanelDefs = useMemo(() => {
-    const defaultPanelDef: PanelDef = {
-      id: 'default',
-      label: `${mat.short} ${state.panel.thickness * 10}mm`,
-      width: state.panel.width,
-      height: state.panel.height,
-      thickness: state.panel.thickness,
-      price: state.costConfig.panelPrice,
-    };
-    return [defaultPanelDef, ...(state.extraPanels ?? [])];
-  }, [mat.short, state.panel, state.costConfig.panelPrice, state.extraPanels]);
-  const nesting = analysis.panels.find(p => p.panelDef.id === 'default')?.nesting
-    ?? optimizeNesting([], state.panel.width, state.panel.height, state.kerf);
-  const totalPanelCount = analysis.totalPanelCount;
-  const totalCost = analysis.totalCost;
-
-  const validation = useMemo(() => validate(state), [state]);
-  const steps = useMemo(() => generateSteps(state), [state]);
-  const cost = useMemo(() => estimateCost(state, nesting), [state, nesting]);
-
-  const refreshProjects = useCallback(() => setProjects(repo.list()), []);
-
   // Seed base knowledge on first launch
   useEffect(() => { seedBaseKnowledge(); }, []);
-
-  // Auto-save
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      safeRepoWrite(() => {
-        repo.save(projectId, state);
-        refreshProjects();
-      });
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [state, projectId, refreshProjects, safeRepoWrite]);
-
-  const switchProject = useCallback((id: string) => {
-    // Save current first
-    if (safeRepoWrite(() => repo.save(projectId, state)) === undefined) return;
-    const loaded = repo.load(id);
-    if (loaded) {
-      setState(normalizeProject(migrateState(loaded)));
-      setProjectId(id);
-      safeRepoWrite(() => repo.setCurrentId(id));
-      refreshProjects();
-      setShowProjects(false);
-    }
-  }, [projectId, state, refreshProjects, safeRepoWrite]);
 
   const handleNewProject = useCallback(() => {
     setShowProjects(false);
     setShowNewWizard(true);
   }, []);
 
-  const handleCreateFromWizard = useCallback((newState: AppState) => {
-    if (safeRepoWrite(() => repo.save(projectId, state)) === undefined) return;
-    const newId = crypto.randomUUID();
-    if (safeRepoWrite(() => {
-      repo.save(newId, newState);
-      repo.setCurrentId(newId);
-    }) === undefined) return;
-    setProjectId(newId);
-    setState(newState);
-    refreshProjects();
+  const handleCreateFromWizard = useCallback((newState: Parameters<typeof createFromWizard>[0]) => {
+    createFromWizard(newState);
     setShowNewWizard(false);
-  }, [projectId, state, refreshProjects, safeRepoWrite]);
+  }, [createFromWizard]);
 
   const handleDuplicate = useCallback((id: string) => {
-    const source = projects.find((p) => p.id === id);
-    const newId = safeRepoWrite(() => repo.duplicate(id, `${source?.name ?? 'Projet'} (copie)`));
-    if (newId) {
-      refreshProjects();
-      switchProject(newId);
-    }
-  }, [projects, refreshProjects, switchProject, safeRepoWrite]);
-
-  const handleRename = useCallback((id: string, newName: string) => {
-    const loaded = repo.load(id);
-    if (loaded) {
-      loaded.project.name = newName;
-      if (safeRepoWrite(() => repo.save(id, loaded)) === undefined) return;
-      if (id === projectId) {
-        setState((s) => ({ ...s, project: { ...s.project, name: newName } }));
-      }
-      refreshProjects();
-    }
-  }, [projectId, refreshProjects, safeRepoWrite]);
+    duplicateProject(id);
+  }, [duplicateProject]);
 
   const handleDeleteProject = useCallback((id: string) => {
-    if (safeRepoWrite(() => repo.delete(id)) === undefined) return;
-    if (id === projectId) {
-      const remaining = repo.list();
-      if (remaining.length > 0) {
-        switchProject(remaining[0].id);
-      } else {
-        handleNewProject();
-      }
-    }
-    refreshProjects();
-  }, [projectId, switchProject, handleNewProject, refreshProjects, safeRepoWrite]);
+    deleteProject(id, handleNewProject);
+  }, [deleteProject, handleNewProject]);
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    try {
-      const imported = await importFromJson(file);
-      const migrated = normalizeProject(migrateState(imported));
-      const newId = crypto.randomUUID();
-      if (safeRepoWrite(() => {
-        repo.save(newId, migrated);
-        repo.setCurrentId(newId);
-      }) === undefined) {
-        e.target.value = '';
-        return;
-      }
-      setProjectId(newId);
-      setState(migrated);
-      refreshProjects();
-      setImportError(null);
-    } catch (err) {
-      setImportError(err instanceof Error ? err.message : "Erreur d'import");
-    }
+    await importProject(file);
     e.target.value = '';
   };
 
@@ -306,7 +179,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="mt-3 flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
+          <div className="mt-3 flex items-center gap-1.5 overflow-x-auto hide-scrollbar pb-0.5 -mx-1 px-1">
             <Tip text={TIPS['savoirs']} side="bottom">
               <button
                 onClick={() => setShowKnowledge(true)}
@@ -441,13 +314,9 @@ export default function App() {
         projectId={projectId}
         state={state}
         localProjects={projects}
-        loadLocal={(id) => repo.load(id)}
+        loadLocal={loadLocal}
         onPull={(id, pulled) => {
-          repo.save(id, pulled);
-          setState(pulled);
-          setProjectId(id);
-          repo.setCurrentId(id);
-          refreshProjects();
+          pullCloud(id, pulled);
           setShowCloud(false);
         }}
       />
@@ -458,10 +327,10 @@ export default function App() {
         onClose={() => setShowProjects(false)}
         projects={projects}
         currentId={projectId}
-        onLoad={switchProject}
+        onLoad={(id) => { switchProject(id); setShowProjects(false); }}
         onNew={handleNewProject}
         onDuplicate={handleDuplicate}
-        onRename={handleRename}
+        onRename={renameProject}
         onDelete={handleDeleteProject}
       />
     </div>
