@@ -37,7 +37,10 @@ function resolveAllowedOrigin(requestOrigin: string | undefined): string | null 
   const allowed = getAllowedOrigins();
   if (allowed.length === 0) return '*'; // dev fallback
   if (!requestOrigin) return allowed[0];
-  return allowed.includes(requestOrigin) ? requestOrigin : null;
+  if (allowed.includes(requestOrigin)) return requestOrigin;
+  // Accept any Vercel preview/production URL for this project
+  if (requestOrigin.endsWith('.vercel.app')) return requestOrigin;
+  return null;
 }
 
 function setCors(req: VercelRequest, res: VercelResponse): boolean {
