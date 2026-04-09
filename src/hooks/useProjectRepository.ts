@@ -76,13 +76,14 @@ export function useProjectRepository(repo: LocalProjectRepository) {
 
   const createFromWizard = useCallback((newState: AppState) => {
     if (safeRepoWrite(() => repo.save(projectId, state)) === undefined) return;
+    const normalized = normalizeProject(migrateState(newState));
     const newId = crypto.randomUUID();
     if (safeRepoWrite(() => {
-      repo.save(newId, newState);
+      repo.save(newId, normalized);
       repo.setCurrentId(newId);
     }) === undefined) return;
     setProjectId(newId);
-    setState(newState);
+    setState(normalized);
     refreshProjects();
   }, [projectId, state, refreshProjects, safeRepoWrite, repo]);
 

@@ -216,21 +216,50 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate }: Props) {
   };
 
   function normalizeAiState(parsed: AppState): AppState {
+    // Ensure top-level fields that the AI might omit
+    const kerf = parsed.kerf ?? 0.3;
+    const costConfig = parsed.costConfig ?? { panelPrice: 0 };
+    const panel = parsed.panel ?? { width: 250, height: 125, thickness: 1.8 };
+    const project = {
+      ...{
+        name: 'Projet IA',
+        wallWidth: 200,
+        wallDepth: 60,
+        ceilingHeight: 250,
+        plinthHeight: 0,
+        plinthDepth: 0,
+      },
+      ...(parsed.project || {}),
+    };
+
     let idCounter = 0;
-    parsed.bodies = (parsed.bodies || []).map(b => ({
-      ...b, id: b.id || `body_${++idCounter}`,
-      pieces: (b.pieces || []).map(p => ({ ...p, id: p.id || `piece_${++idCounter}` })),
-    }));
-    const pth = parsed.panel?.thickness || 1.8;
-    for (const body of parsed.bodies) {
+    const bodies = (parsed.bodies || []).map(b => {
+      const body = {
+        ...b,
+        id: b.id || `body_${++idCounter}`,
+        pieces: (b.pieces || []).map(p => ({ ...p, id: p.id || `piece_${++idCounter}` })),
+      };
+      const pth = panel.thickness || 1.8;
       const innerW = +(body.width - 2 * pth).toFixed(1);
       for (const piece of body.pieces) {
         if (piece.type === 'joue' && piece.width !== body.depth) piece.width = body.depth;
         if ((piece.type === 'tablette-fixe' || piece.type === 'tablette-reglable') && Math.abs(piece.length - innerW) > 0.5) piece.length = innerW;
         if ((piece.type === 'tablette-fixe' || piece.type === 'tablette-reglable') && piece.width !== body.depth) piece.width = body.depth;
       }
-    }
-    return parsed;
+      return body;
+    });
+
+    const sharedBoundaries = Array(Math.max(0, bodies.length - 1)).fill(false);
+
+    return {
+      materialKey: parsed.materialKey || 'cp_bouleau',
+      project,
+      panel,
+      kerf,
+      costConfig,
+      bodies,
+      sharedBoundaries,
+    };
   }
 
   const handleAiGenerate = async () => {
