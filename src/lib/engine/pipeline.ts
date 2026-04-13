@@ -90,7 +90,7 @@ export function runPipeline(rawIntent: ProjectIntent): PipelineResult {
   const hasBlocking = validation.some((v) => v.blocking);
   const production = hasBlocking
     ? null
-    : generateProduction(intent, parts, hardware, structure, validation);
+    : generateProduction(intent, parts, hardware, structure, validation, layoutResult.layout);
 
   return {
     intent,
@@ -107,6 +107,16 @@ export function runPipeline(rawIntent: ProjectIntent): PipelineResult {
 // Pipeline result → AppState conversion
 // ---------------------------------------------------------------------------
 
+/**
+ * Convert a PipelineResult to a legacy AppState for the classic editor.
+ *
+ * Conserved: pieces (dimensions, positions, types), body dimensions, material,
+ *            panel config, doorConfig (mapped from DoorLayout).
+ * Lost:      hardware (no legacy equivalent), edge_banding, locked state,
+ *            standard_part_id, V3 validation issues.
+ * Approximated: plinthDepth (hardcoded 2 cm), kerf (hardcoded 0.3 cm),
+ *               sharedBoundaries (always false).
+ */
 export function pipelineResultToAppState(
   result: PipelineResult,
   materialKey: MaterialKey,

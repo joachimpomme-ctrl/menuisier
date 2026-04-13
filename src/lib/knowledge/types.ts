@@ -6,7 +6,7 @@
  * boundary is generatedPartsToLegacy() at the bottom of this file.
  */
 
-import type { MaterialKey, AppState, Body, Piece, PieceType } from '../../types';
+import type { MaterialKey, AppState, Body, Piece, PieceType, DoorConfig, DoorPoseType } from '../../types';
 
 // ---------------------------------------------------------------------------
 // Furniture catalogue — 17 types from base_v3_normalized.json "projets"
@@ -432,6 +432,12 @@ export function generatedPartsToLegacy(
   // Collect unique body_ids preserving insertion order from layout
   const bodyIds = layout.bodies.map((bl) => bl.body_id);
 
+  const OVERLAY_TO_POSE: Record<string, DoorPoseType> = {
+    full: 'enveloppante',
+    half: 'demi-recouvrement',
+    inset: 'affleurante',
+  };
+
   const bodies: Body[] = bodyIds.map((bodyId) => {
     const bl = layoutIndex.get(bodyId);
     const bodyParts = parts.filter((p) => p.body_id === bodyId);
@@ -464,12 +470,22 @@ export function generatedPartsToLegacy(
       return piece;
     });
 
+    // Map V3 DoorLayout → legacy DoorConfig
+    let doorConfig: DoorConfig | undefined;
+    if (bl?.doors) {
+      doorConfig = {
+        count: bl.doors.count as 1 | 2,
+        poseType: OVERLAY_TO_POSE[bl.doors.overlay] ?? 'enveloppante',
+      };
+    }
+
     return {
       id: bodyId,
       name: bl ? `Corps ${bodyIds.indexOf(bodyId) + 1}` : bodyId,
       width: bl ? +(bl.width_mm / 10).toFixed(1) : 0,
       depth: bl ? +(bl.depth_mm / 10).toFixed(1) : 0,
       pieces,
+      doorConfig,
     };
   });
 

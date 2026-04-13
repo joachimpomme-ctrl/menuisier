@@ -17,8 +17,11 @@ import type {
   ShoppingList,
   ProjectSummary,
   DifficultyLevel,
+  Layout,
 } from '../knowledge/types';
+import type { PieceWithBody, NestingResult } from '../../types';
 import { MATERIALS } from '../../data/materials';
+import { optimizeNesting } from '../nesting';
 
 // ---------------------------------------------------------------------------
 // 1. Assumptions
@@ -434,6 +437,41 @@ function buildSummary(
 }
 
 // ---------------------------------------------------------------------------
+// 5. Cutting plans (nesting integration)
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert V3 GeneratedPart[] (mm) to legacy PieceWithBody[] (cm)
+ * for the nesting algorithm.
+ */
+function partsToNestingInput(parts: GeneratedPart[], layout: Layout): PieceWithBody[] {
+  return parts.map((gp) => ({
+    id: gp.id,
+    name: gp.name,
+    length: +(gp.length_mm / 10).toFixed(1),
+    width: +(gp.width_mm / 10).toFixed(1),
+    qty: gp.qty,
+    type: 'autre' as const,
+    bodyName: `Corps ${layout.bodies.findIndex((b) => b.body_id === gp.body_id) + 1}`,
+    bodyId: gp.body_id,
+  }));
+}
+
+function buildCuttingPlans(
+  intent: ProjectIntent,
+  parts: GeneratedPart[],
+  layout: Layout,
+): NestingResult | null {
+  const mat = MATERIALS[intent.material_key];
+  const panel = mat?.panels[0];
+  if (!panel || parts.length === 0) return null;
+
+  const piecesForNesting = partsToNestingInput(parts, layout);
+  // panel.w and panel.h are in cm, kerf in cm
+  return optimizeNesting(piecesForNesting, panel.w, panel.h, 0.3);
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -443,12 +481,13 @@ export function generateProduction(
   hardware: HardwareItem[],
   structure: Structure,
   _validation: ValidationIssue[],
+  layout: Layout,
 ): ProductionOutput {
   return {
     assumptions: buildAssumptions(intent, structure),
     shopping_list: buildShoppingList(intent, parts, hardware),
-    cutting_plans: null, // Non implémenté — utiliser l'éditeur classique (onglet Débit)
-    drilling_plans: [], // Non implémenté
+    cutting_plans: buildCuttingPlans(intent, parts, layout),
+    drilling_plans: [], // Non implémenté — pas de coordonnées XYZ dans le modèle V3
     assembly_guide: buildAssemblyGuide(intent, parts, hardware, structure),
     summary: buildSummary(intent, parts, hardware),
   };

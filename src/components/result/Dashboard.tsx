@@ -197,7 +197,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
         </button>
         <button
           onClick={() => {
-            if (confirm('L\'éditeur classique ne conserve pas la quincaillerie, les portes V3 ni les pièces verrouillées. Continuer ?')) {
+            if (confirm('L\'éditeur classique ne conserve pas la quincaillerie ni les pièces verrouillées. Continuer ?')) {
               onClassicEditor(pipelineResultToAppState(result, materialKey));
             }
           }}
