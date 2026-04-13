@@ -1,7 +1,10 @@
 /**
- * Engine pipeline — intent → layout → structure → geometry.
+ * Engine pipeline — intent → layout → structure → geometry → hardware → validation → production.
  *
- * Hardware, enriched validation, and production are placeholders for now.
+ * Limitations actuelles :
+ * - cutting_plans : non intégré (nesting.ts legacy existe mais pas branché)
+ * - drilling_plans : non implémenté (toujours [])
+ * - Portes : calculées par layout.ts selon le type, pas depuis le choix wizard
  */
 
 import type {

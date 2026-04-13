@@ -182,6 +182,11 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
         </Section>
       )}
 
+      {/* Limitations */}
+      <p className="text-xs text-gray-400 italic">
+        Plans de coupe et plans de perçage disponibles via l'éditeur classique (onglets Débit et Montage).
+      </p>
+
       {/* Actions */}
       <div className="flex flex-wrap gap-3 pt-2">
         <button
@@ -191,7 +196,11 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
           ← Modifier
         </button>
         <button
-          onClick={() => onClassicEditor(pipelineResultToAppState(result, materialKey))}
+          onClick={() => {
+            if (confirm('L\'éditeur classique ne conserve pas la quincaillerie, les portes V3 ni les pièces verrouillées. Continuer ?')) {
+              onClassicEditor(pipelineResultToAppState(result, materialKey));
+            }
+          }}
           className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
         >
           ⚙️ Éditeur classique

@@ -6245,12 +6245,12 @@
       "id": "RT_004",
       "regle": "Vérifier la portée de toute tablette sans support intermédiaire",
       "seuils": {
-        "particules_19mm": 60,
-        "mdf_19mm": 70,
-        "cp_18mm": 80,
-        "massif_25mm": 90
+        "particules_19mm": 600,
+        "mdf_19mm": 700,
+        "cp_18mm": 800,
+        "massif_25mm": 900
       },
-      "unite": "cm",
+      "unite": "mm",
       "severite": "importante"
     },
     {

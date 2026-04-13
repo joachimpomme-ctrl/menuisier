@@ -447,8 +447,8 @@ export function generateProduction(
   return {
     assumptions: buildAssumptions(intent, structure),
     shopping_list: buildShoppingList(intent, parts, hardware),
-    cutting_plans: null, // Will integrate nesting.ts later
-    drilling_plans: [], // Phase C
+    cutting_plans: null, // Non implémenté — utiliser l'éditeur classique (onglet Débit)
+    drilling_plans: [], // Non implémenté
     assembly_guide: buildAssemblyGuide(intent, parts, hardware, structure),
     summary: buildSummary(intent, parts, hardware),
   };

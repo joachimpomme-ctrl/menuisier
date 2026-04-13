@@ -5,7 +5,6 @@ import type {
   ProjectIntent,
   ModuleType,
   ZoneConfig,
-  DoorLayout,
   ModuleConfig,
 } from '../../lib/knowledge/types';
 import type { MaterialKey } from '../../types';
@@ -112,7 +111,6 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
     { key: _nextKey++, module_id: 'shelf_adjustable', height_mm: usableHeight, count: 4 },
   ]);
 
-  const [doorCount, setDoorCount] = useState<0 | 1 | 2>(0);
   const [showContentMode, setShowContentMode] = useState(false);
 
   const applyContentZones = (zoneConfigs: ZoneConfig[]) => {
@@ -172,19 +170,12 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
       config: defaultConfigForModule(z.module_id, z.count),
     }));
 
-    const doors: DoorLayout | undefined =
-      doorCount > 0
-        ? { type: 'hinged', count: doorCount, overlay: doorCount >= 2 ? 'half' as const : 'full' as const }
-        : undefined;
-
     const intent: ProjectIntent = {
       furniture_type: furnitureType,
       material_key: materialKey,
       space,
       zones: zoneConfigs,
     };
-
-    void doors; // TODO Phase C: pass door preference through intent
 
     onGenerate(intent);
   };
@@ -316,23 +307,11 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
         + Ajouter une zone
       </button>
 
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Portes</label>
-        <div className="flex gap-4">
-          {([0, 1, 2] as const).map((n) => (
-            <label key={n} className="flex items-center gap-1.5 text-sm cursor-pointer">
-              <input
-                type="radio"
-                name="doors"
-                checked={doorCount === n}
-                onChange={() => setDoorCount(n)}
-                className="accent-blue-500"
-              />
-              {n === 0 ? 'Sans' : `${n} porte${n > 1 ? 's' : ''}`}
-            </label>
-          ))}
-        </div>
-      </div>
+      {['placard', 'armoire', 'cuisine', 'meuble_salle_de_bain'].includes(furnitureType) && (
+        <p className="mb-6 text-xs text-gray-400 italic">
+          Portes calculées automatiquement selon le type de meuble et la largeur.
+        </p>
+      )}
 
       <div className="flex justify-between">
         <button
