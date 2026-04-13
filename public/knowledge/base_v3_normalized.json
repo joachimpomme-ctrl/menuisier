@@ -1,0 +1,6351 @@
+{
+  "metadata": {
+    "name": "menuiserie_knowledge_base",
+    "version": "3.1.0",
+    "language": "fr",
+    "status": "normalized",
+    "description": "Base de connaissances complète pour menuiserie intérieure sur mesure — bricoleurs et plus",
+    "domains": [
+      {
+        "id": "ergonomie",
+        "version": "2.0.0",
+        "size_keys": 15
+      },
+      {
+        "id": "quincaillerie",
+        "version": "2.0.0",
+        "size_keys": 18
+      },
+      {
+        "id": "conception",
+        "version": "2.0.0",
+        "size_keys": 19
+      },
+      {
+        "id": "projets",
+        "version": "2.0.0",
+        "size_keys": 17
+      }
+    ],
+    "sources": [
+      "Pratique professionnelle menuiserie (Dunod 2022)",
+      "Bricozor (guides techniques charnières, coulisses)",
+      "PolyBoard / Atelierbois.net (conception de meubles)",
+      "Hettich, Blum, Salice (documentations techniques)",
+      "Accuride, Hettich, Blum (docs techniques citées)",
+      "Normes NF EN 747 (lits superposés/mezzanines)",
+      "Claude (recherche web + synthèse domaines 1-3)",
+      "Système 32 (norme industrielle)",
+      "Blum (Clip Top, Tandembox, Aventos)",
+      "Hettich (catalogues Sensys, Intermat, KA 1730, KA 290, InnoTech, ArciTech)",
+      "Hafele catalogs (cited by ChatGPT)",
+      "Cross-validation Gemini Pro",
+      "Références métier L'Air du Bois, Mobibam, Kipli, Houzz.fr",
+      "Salice (Silentia+, Logica)",
+      "Normes AFNOR NF X 35-102 (ergonomie postes de travail)",
+      "Cross-validation ChatGPT-4o",
+      "Normes NF EN 527-1 (mobilier de bureau)",
+      "Données fabricants (Lapeyre, Cuisinella, Ixina, Arthur Bonnet, MyDimm, Celio, Raison Home)",
+      "Cross-validation Gemini Pro (avril 2026)",
+      "Retours d'expérience L'Air du Bois",
+      "L'Air du Bois (Bonbonveronbi — Pas à pas Les caissons, forums menuisiers)",
+      "Würth (Tiomos, Nexis)",
+      "Bricozor, Legallais, Leroy Merlin, Manomano",
+      "L'Air du Bois (retours d'expérience menuisiers)",
+      "Cross-validation ChatGPT-4o (avril 2026)",
+      "INRS ED 923 (aménagement postes de travail)"
+    ],
+    "build_date": "2026-04-12",
+    "stats": {
+      "formules_total": 41,
+      "projets_types": 17,
+      "regles_transversales": 15,
+      "types_meubles_ergonomie": 15,
+      "sections_quincaillerie": 16,
+      "sections_conception": 17
+    },
+    "normalization": {
+      "units": "all_mm",
+      "formulas": "executable_format",
+      "keys": "snake_case",
+      "conversion_date": "2026-04-12"
+    }
+  },
+  "ergonomie": {
+    "principes_generaux": {
+      "regle_coude": "La hauteur de plan de travail idéale place le plan à 10-15 cm sous le coude fléchi à 90°",
+      "zone_confort_vertical": {
+        "zone_active": {
+          "min_mm": 400,
+          "max_mm": 1400,
+          "usage": "Accès quotidien, objets fréquents"
+        },
+        "zone_semi_active": {
+          "min_mm": 1400,
+          "max_mm": 1800,
+          "usage": "Penderie, objets réguliers"
+        },
+        "zone_passive_haute": {
+          "min_mm": 1800,
+          "max_mm": 2400,
+          "usage": "Stockage saisonnier, objets rares"
+        },
+        "zone_passive_basse": {
+          "min_mm": 0,
+          "max_mm": 400,
+          "usage": "Tiroirs, rangement lourd, chaussures"
+        }
+      },
+      "circulations": {
+        "passage_minimum_mm": 600,
+        "passage_confortable_mm": 800,
+        "recul_chaise_mm": {
+          "min": 800,
+          "max": 1000
+        },
+        "passage_avec_circulation_mm": {
+          "min": 900,
+          "max": 1200
+        },
+        "espace_devant_tiroir_ouvert_mm": 900,
+        "espace_devant_porte_battante_mm": 1000
+      },
+      "portee_tablette": {
+        "regle": "Portée max sans fléchissement = f(matériau, épaisseur, charge)",
+        "panneau_particules_19mm_max_mm": 600,
+        "mdf_19mm_max_mm": 700,
+        "contreplaque_18mm_max_mm": 800,
+        "bois_massif_25mm_max_mm": 900,
+        "charge_max_tablette_60cm_kg": 30,
+        "charge_max_tablette_80cm_kg": {
+          "bois_massif": 25,
+          "panneau_particules": 15
+        },
+        "note": "Au-delà, ajouter un support intermédiaire (séparateur vertical ou taquet renforcé)"
+      }
+    },
+    "types_meubles": {
+      "bibliotheque": {
+        "description": "Meuble de rangement pour livres, objets déco, médias",
+        "dimensions_globales": {
+          "hauteur_basse_mm": {
+            "min": 800,
+            "max": 1100
+          },
+          "hauteur_mi_haute_mm": {
+            "min": 1200,
+            "max": 1500
+          },
+          "hauteur_standard_mm": {
+            "min": 1800,
+            "max": 2400
+          },
+          "profondeur_standard_mm": {
+            "min": 250,
+            "max": 350
+          },
+          "profondeur_beaux_livres_mm": {
+            "min": 350,
+            "max": 450
+          },
+          "largeur_module_mm": {
+            "min": 300,
+            "max": 1200
+          },
+          "espace_sous_plafond_mm": {
+            "min": 50,
+            "max": 100,
+            "note": "Respiration visuelle"
+          },
+          "epaisseur_tablette_min_mm": 19,
+          "epaisseur_tablette_recommandee_mm": 25
+        },
+        "hauteurs_entre_tablettes": {
+          "livres_poche": {
+            "hauteur_objet_mm": 180,
+            "hauteur_tablette_mm": {
+              "min": 220,
+              "max": 250
+            }
+          },
+          "romans_A5": {
+            "hauteur_objet_mm": 210,
+            "hauteur_tablette_mm": {
+              "min": 250,
+              "max": 280
+            }
+          },
+          "BD_franco_belge": {
+            "hauteur_objet_mm": 320,
+            "hauteur_tablette_mm": {
+              "min": 350,
+              "max": 380
+            }
+          },
+          "BD_comic_book": {
+            "hauteur_objet_mm": 260,
+            "hauteur_tablette_mm": {
+              "min": 290,
+              "max": 320
+            }
+          },
+          "BD_manga": {
+            "hauteur_objet_mm": 210,
+            "hauteur_tablette_mm": {
+              "min": 240,
+              "max": 270
+            }
+          },
+          "beaux_livres_art": {
+            "hauteur_objet_mm": {
+              "min": 300,
+              "max": 400
+            },
+            "hauteur_tablette_mm": {
+              "min": 350,
+              "max": 450
+            }
+          },
+          "classeurs": {
+            "hauteur_objet_mm": 320,
+            "hauteur_tablette_mm": {
+              "min": 350,
+              "max": 380
+            }
+          },
+          "vinyles_33t": {
+            "hauteur_objet_mm": 315,
+            "hauteur_tablette_mm": {
+              "min": 340,
+              "max": 370
+            }
+          },
+          "CD": {
+            "hauteur_objet_mm": 125,
+            "hauteur_tablette_mm": {
+              "min": 150,
+              "max": 180
+            }
+          },
+          "DVD": {
+            "hauteur_objet_mm": 192,
+            "hauteur_tablette_mm": {
+              "min": 220,
+              "max": 250
+            }
+          },
+          "deco_vases": {
+            "hauteur_tablette_mm": {
+              "min": 300,
+              "max": 400
+            }
+          }
+        },
+        "profondeur_par_contenu": {
+          "livres_poche_mm": {
+            "min": 150,
+            "max": 200
+          },
+          "romans_standard_mm": {
+            "min": 220,
+            "max": 280
+          },
+          "BD_mm": {
+            "min": 250,
+            "max": 300
+          },
+          "beaux_livres_mm": {
+            "min": 300,
+            "max": 450
+          },
+          "vinyles_mm": {
+            "min": 320,
+            "max": 350
+          },
+          "deco_mixte_mm": {
+            "min": 250,
+            "max": 350
+          }
+        },
+        "regles_conception": [
+          "Profondeur = largeur du plus grand objet + 2-3 cm de marge",
+          "Hauteur tablette = hauteur du plus grand objet + 5-7 cm",
+          "Grandes tablettes en bas, plus petites en haut (esthétique + stabilité)",
+          "Portée max tablette bois massif 25mm : 90 cm ; particules 19mm : 60 cm",
+          "Fixation anti-basculement obligatoire au-delà de 150 cm de hauteur",
+          "Espacement passage min 90 cm devant, 105 cm si passage fréquent"
+        ]
+      },
+      "bureau": {
+        "description": "Poste de travail pour usage informatique ou administratif",
+        "dimensions_standard": {
+          "hauteur_plateau_mm": {
+            "min": 700,
+            "max": 750,
+            "norme_fixe": 720,
+            "ref": "NF EN 527-1"
+          },
+          "hauteur_assis_debout_mm": {
+            "min": 650,
+            "max": 1250
+          },
+          "profondeur_min_mm": 600,
+          "profondeur_standard_mm": {
+            "min": 700,
+            "max": 800
+          },
+          "profondeur_direction_mm": {
+            "min": 800,
+            "max": 1000
+          },
+          "largeur_poste_simple_mm": {
+            "min": 1200,
+            "max": 1400
+          },
+          "largeur_double_ecran_mm": {
+            "min": 1400,
+            "max": 1600
+          },
+          "largeur_direction_mm": {
+            "min": 1600,
+            "max": 2000
+          },
+          "ecart_assise_plateau_mm": {
+            "min": 200,
+            "max": 260
+          }
+        },
+        "ergonomie": {
+          "distance_ecran_yeux_mm": {
+            "min": 500,
+            "max": 700
+          },
+          "position_clavier_bord_mm": {
+            "min": 100,
+            "max": 150,
+            "note": "Distance du bord du plateau"
+          },
+          "recul_chaise_arriere_mm": {
+            "min": 800,
+            "max": 1000
+          },
+          "passage_lateral_mm": 600,
+          "deboitement_pied_min_mm": 600,
+          "hauteur_libre_sous_plateau_mm": {
+            "min": 650,
+            "norme_PMR": 700
+          },
+          "profondeur_degagement_jambes_mm": 600
+        },
+        "regles_conception": [
+          "Hauteur plateau = distance sol-coude fléchi - 3 cm",
+          "Hauteur fixe 72 cm adaptée à une personne de ~175 cm",
+          "Profondeur min 60 cm pour un écran, 80 cm pour double écran",
+          "Prévoir passe-câbles et goulotte si bureau fermé sur 3 côtés",
+          "Tiroir clavier coulissant : profondeur 45-55 cm, hauteur libre 8-10 cm"
+        ],
+        "variantes": {
+          "bureau_angle_L": {
+            "plateau_principal_mm": "120-140",
+            "retour_mm": "80-120",
+            "profondeur_mm": "60-80"
+          },
+          "bureau_compact": {
+            "largeur_mm": "90-100",
+            "profondeur_mm": "45-55",
+            "usage": "appoint, laptop"
+          },
+          "bureau_mural_rabattable": {
+            "largeur_mm": "90-100",
+            "profondeur_mm": "40-50"
+          }
+        }
+      },
+      "cuisine": {
+        "description": "Meubles de cuisine : bas, hauts, colonnes, îlot",
+        "meubles_bas": {
+          "hauteur_caisson_standard_mm": 720,
+          "hauteur_caisson_XL_mm": 790,
+          "hauteur_caisson_maxi_mm": 860,
+          "hauteur_totale_standard_mm": {
+            "min": 850,
+            "max": 950,
+            "note": "Caisson + plinthe + plan de travail"
+          },
+          "profondeur_standard_mm": 600,
+          "largeurs_modules_mm": [
+            150,
+            300,
+            450,
+            600,
+            900,
+            1200
+          ],
+          "plinthe_hauteur_mm": {
+            "min": 100,
+            "max": 150
+          },
+          "plinthe_retrait_mm": {
+            "min": 30,
+            "max": 50
+          }
+        },
+        "plan_de_travail": {
+          "hauteur_standard_mm": {
+            "min": 900,
+            "max": 950
+          },
+          "hauteur_tendance_mm": 930,
+          "profondeur_standard_mm": 600,
+          "profondeur_ilot_mm": {
+            "min": 700,
+            "max": 800
+          },
+          "epaisseur_mm": {
+            "min": 20,
+            "max": 100
+          },
+          "debord_bar_mm": {
+            "min": 350,
+            "note": "Pour assise confortable"
+          },
+          "regle_ergonomique": "Coude fléchi 90° → plan 10-15 cm en dessous"
+        },
+        "meubles_hauts": {
+          "hauteurs_standard_mm": [
+            360,
+            580,
+            720,
+            940
+          ],
+          "profondeur_mm": {
+            "min": 300,
+            "max": 400,
+            "standard": 350
+          },
+          "distance_plan_travail_mm": {
+            "min": 500,
+            "max": 600
+          },
+          "distance_avec_hotte_mm": {
+            "min": 650,
+            "max": 700
+          },
+          "hauteur_max_accessible_mm": 1500,
+          "note": "Au-delà de 150 cm, usage rare ou marchepied"
+        },
+        "colonnes": {
+          "hauteur_mm": {
+            "min": 2100,
+            "max": 2400
+          },
+          "profondeur_mm": 600
+        },
+        "ilot": {
+          "hauteur_mm": {
+            "min": 900,
+            "max": 950
+          },
+          "distance_meubles_mm": {
+            "min": 900,
+            "ideal": 1200
+          },
+          "hauteur_tabouret_mm": {
+            "min": 600,
+            "max": 650
+          }
+        },
+        "distances_securite": {
+          "evier_plaque_mm": {
+            "min": 600
+          },
+          "plaque_frigo_mm": {
+            "min": 400,
+            "max": 600
+          },
+          "four_mur_mm": {
+            "min": 900,
+            "max": 1000
+          },
+          "triangle_activite_cote_mm": {
+            "min": 1200,
+            "max": 2700
+          },
+          "triangle_activite_total_mm": {
+            "max": 6500
+          },
+          "passage_cuisine_table_mm": {
+            "min": 1000,
+            "max": 1200
+          }
+        },
+        "hotte": {
+          "hauteur_au_dessus_gaz_mm": 650,
+          "hauteur_au_dessus_induction_mm": 500
+        },
+        "four_encastre": {
+          "hauteur_ideale_sol_mm": 1000,
+          "note": "Ergonomie + sécurité enfants"
+        },
+        "PMR": {
+          "hauteur_libre_sous_plan_mm": {
+            "min": 700
+          },
+          "profondeur_degagement_mm": {
+            "min": 600
+          },
+          "rotation_fauteuil_diametre_mm": 1500
+        }
+      },
+      "dressing_armoire": {
+        "description": "Armoire, penderie, dressing, placard à vêtements",
+        "dimensions_globales": {
+          "profondeur_interieure_penderie_mm": {
+            "min": 550,
+            "ideal": 550,
+            "note": "Cintre standard = 44-46 cm"
+          },
+          "profondeur_exterieure_mm": {
+            "min": 550,
+            "max": 600,
+            "note": "Intérieur + portes + fond"
+          },
+          "profondeur_etageres_mm": {
+            "min": 300,
+            "max": 400
+          },
+          "profondeur_tiroirs_mm": 400,
+          "hauteur_standard_mm": {
+            "min": 1800,
+            "max": 2400
+          }
+        },
+        "penderie": {
+          "chemises_vestes": {
+            "hauteur_mm": {
+              "min": 1100,
+              "max": 1300
+            }
+          },
+          "robes_manteaux": {
+            "hauteur_mm": {
+              "min": 1600,
+              "max": 1700
+            }
+          },
+          "double_penderie": {
+            "barre_haute_mm": 2000,
+            "barre_basse_mm": 1000,
+            "note": "Double la capacité pour vêtements courts"
+          },
+          "largeur_module_mm": {
+            "min": 800,
+            "max": 1200
+          }
+        },
+        "etageres": {
+          "espacement_pulls_mm": {
+            "min": 250,
+            "max": 300
+          },
+          "espacement_pulls_hiver_mm": {
+            "min": 350,
+            "max": 400
+          },
+          "largeur_pile_vetements_mm": {
+            "min": 300,
+            "max": 400
+          },
+          "hauteur_pile_max_mm": 500,
+          "note": "Pouvoir passer la main au-dessus pour retirer un vêtement sans tout faire tomber"
+        },
+        "tiroirs": {
+          "hauteur_lingerie_mm": 100,
+          "hauteur_chaussettes_mm": {
+            "min": 100,
+            "max": 150
+          },
+          "hauteur_pulls_accessoires_mm": {
+            "min": 200,
+            "max": 300
+          },
+          "position_ergonomique_mm": {
+            "min": 800,
+            "max": 1200,
+            "note": "Zone médiane, sans se baisser"
+          },
+          "largeur_mm": {
+            "min": 300,
+            "max": 650
+          }
+        },
+        "chaussures": {
+          "paires_par_metre_lineaire": {
+            "min": 4,
+            "max": 5
+          },
+          "hauteur_chaussures_plates_mm": {
+            "min": 150,
+            "max": 200
+          },
+          "hauteur_bottes_mm": {
+            "min": 400,
+            "max": 500
+          },
+          "profondeur_mm": {
+            "min": 300,
+            "max": 350
+          }
+        },
+        "zones_ergonomiques": {
+          "acces_quotidien_mm": {
+            "min": 800,
+            "max": 1800
+          },
+          "stockage_haut_mm": {
+            "min": 1800,
+            "max": 2400,
+            "usage": "Saisonnier, valises, couettes"
+          },
+          "stockage_bas_mm": {
+            "min": 0,
+            "max": 400,
+            "usage": "Chaussures, tiroirs"
+          }
+        },
+        "circulations": {
+          "devant_portes_battantes_mm": {
+            "min": 900,
+            "ideal": 1000
+          },
+          "devant_portes_coulissantes_mm": {
+            "min": 700
+          },
+          "dressing_couloir_largeur_totale_mm": {
+            "min": 1450,
+            "max": 1500,
+            "calcul": "60 profondeur + 90 circulation"
+          },
+          "dressing_face_a_face_mm": {
+            "min": 2100,
+            "max": 2200,
+            "calcul": "60+90+60"
+          }
+        },
+        "regles_conception": [
+          "Profondeur intérieure min 50 cm pour penderie (cintre = 44-46 cm + marge)",
+          "Moins de 50 cm intérieur = vêtements qui frottent contre les portes",
+          "Plus de 60 cm extérieur = rarement justifié, masse visuelle excessive",
+          "Répartition type : 50-60% penderie, 40-50% étagères+tiroirs",
+          "Système 32 mm pour réglage par pas de 32 mm des accessoires"
+        ]
+      },
+      "meuble_tv": {
+        "description": "Meuble bas ou suspendu pour téléviseur et équipements multimédia",
+        "dimensions_standard": {
+          "hauteur_meuble_mm": {
+            "min": 400,
+            "max": 550
+          },
+          "profondeur_mm": {
+            "min": 350,
+            "max": 500
+          },
+          "largeur_mm": {
+            "min": 1200,
+            "max": 2000,
+            "note": "Selon taille TV, dépasser de 15-20 cm de chaque côté"
+          },
+          "hauteur_centre_ecran_sol_mm": {
+            "min": 1000,
+            "max": 1200,
+            "note": "Yeux à hauteur du centre écran en position assise"
+          }
+        },
+        "compartiments": {
+          "hauteur_appareils_mm": {
+            "min": 150,
+            "max": 200,
+            "note": "Lecteur, console, décodeur"
+          },
+          "ventilation_mm": {
+            "min": 50,
+            "note": "Espace arrière et au-dessus des appareils"
+          },
+          "passe_cables": true,
+          "profondeur_utile_min_mm": 350
+        },
+        "regles_conception": [
+          "Largeur meuble ≥ largeur TV pour équilibre visuel",
+          "Prévoir passe-câbles arrière et ventilation",
+          "Distance TV-spectateur = 1.5 à 2.5× la diagonale de l'écran",
+          "Si suspendu : fixation dans montants ou rails, charge max du mur à vérifier"
+        ]
+      },
+      "buffet_vaisselier": {
+        "description": "Buffet bas, vaisselier, enfilade pour salle à manger/salon",
+        "dimensions_standard": {
+          "buffet_bas": {
+            "hauteur_mm": {
+              "min": 800,
+              "max": 1000
+            },
+            "profondeur_mm": {
+              "min": 400,
+              "max": 500
+            },
+            "largeur_mm": {
+              "min": 1200,
+              "max": 2200
+            }
+          },
+          "vaisselier_haut": {
+            "hauteur_totale_mm": {
+              "min": 1800,
+              "max": 2200
+            },
+            "hauteur_partie_basse_mm": {
+              "min": 800,
+              "max": 1000
+            },
+            "profondeur_partie_haute_mm": {
+              "min": 300,
+              "max": 400
+            },
+            "note": "Partie haute moins profonde que la base"
+          }
+        },
+        "espacement_tablettes": {
+          "assiettes_plates_mm": {
+            "min": 150,
+            "max": 200
+          },
+          "assiettes_creuses_empilees_mm": {
+            "min": 200,
+            "max": 250
+          },
+          "verres_mm": {
+            "min": 180,
+            "max": 250
+          },
+          "bouteilles_debout_mm": {
+            "min": 330,
+            "max": 350
+          }
+        },
+        "regles_conception": [
+          "Hauteur de service buffet : entre 85-95 cm (même logique plan de travail)",
+          "Portes vitrées : prévoir épaisseur du vitrage (4 mm) dans la feuillure",
+          "Tiroirs à couverts : hauteur 8-12 cm, diviseurs intérieurs"
+        ]
+      },
+      "meuble_salle_de_bain": {
+        "description": "Meuble vasque, colonne, miroir pour salle de bain",
+        "dimensions_standard": {
+          "meuble_vasque": {
+            "hauteur_standard_mm": {
+              "min": 800,
+              "max": 900,
+              "note": "Dessus de vasque"
+            },
+            "profondeur_mm": {
+              "min": 400,
+              "max": 550
+            },
+            "largeur_simple_vasque_mm": {
+              "min": 600,
+              "max": 900
+            },
+            "largeur_double_vasque_mm": {
+              "min": 1200,
+              "max": 1500
+            },
+            "entre_axes_double_vasque_mm": {
+              "min": 600
+            }
+          },
+          "colonne": {
+            "hauteur_mm": {
+              "min": 1500,
+              "max": 1900
+            },
+            "profondeur_mm": {
+              "min": 250,
+              "max": 350
+            },
+            "largeur_mm": {
+              "min": 250,
+              "max": 400
+            }
+          },
+          "miroir": {
+            "bord_inferieur_sol_mm": {
+              "min": 1000,
+              "max": 1150
+            },
+            "hauteur_mm": {
+              "min": 600,
+              "max": 800
+            }
+          }
+        },
+        "contraintes_specifiques": [
+          "Matériaux résistants à l'humidité obligatoires (contreplaqué marine, MDF hydro, mélaminé P5)",
+          "Ventilation intérieure du caisson recommandée",
+          "Normes électriques zones 0/1/2/3 autour des points d'eau",
+          "Prévoir accès plomberie (fond démontable ou trappe)",
+          "Piètement surélevé ou suspendu pour nettoyage sol"
+        ]
+      },
+      "placard_rangement": {
+        "description": "Placard intégré, sous-escalier, sous-pente, niche murale",
+        "dimensions_standard": {
+          "profondeur_standard_mm": {
+            "min": 500,
+            "max": 600
+          },
+          "profondeur_peu_profond_mm": {
+            "min": 300,
+            "max": 400,
+            "usage": "Couloir, entrée, chaussures"
+          },
+          "hauteur_mm": "s'adapte au plafond ou à la sous-pente",
+          "largeur_module_mm": {
+            "min": 400,
+            "max": 1200
+          }
+        },
+        "sous_pente": {
+          "hauteur_min_utilisable_mm": 600,
+          "note": "En dessous de 60 cm, stockage de type coffre uniquement",
+          "astuce": "Meuble en escalier suivant la pente avec étagères dégressives"
+        },
+        "regles_conception": [
+          "Mesurer le plafond EN PLUSIEURS POINTS (faux aplomb fréquent)",
+          "Prévoir 5 mm de jeu entre meuble et mur/plafond",
+          "Portes coulissantes si recul < 80 cm",
+          "Portes battantes si recul ≥ 90 cm",
+          "Pour sous-pente : relever la pente au niveau du mur et à 30-50 cm du mur"
+        ]
+      },
+      "etagere_murale": {
+        "description": "Étagère fixée au mur, sans joues latérales au sol",
+        "dimensions_standard": {
+          "profondeur_mm": {
+            "min": 150,
+            "max": 300
+          },
+          "longueur_max_sans_support_mm": {
+            "bois_massif_20mm": 600,
+            "bois_massif_30mm": 900,
+            "particules_19mm": 500,
+            "note": "Au-delà, ajouter une équerre ou un support intermédiaire"
+          },
+          "epaisseur_min_mm": 20,
+          "hauteur_entre_etageres_mm": {
+            "min": 250,
+            "max": 350
+          }
+        },
+        "fixation": {
+          "types": [
+            "Équerre visible",
+            "Équerre cachée",
+            "Rail invisible",
+            "Tasseau mural"
+          ],
+          "charge_equerre_standard_kg": {
+            "min": 15,
+            "max": 30
+          },
+          "espacement_fixations_mm": {
+            "min": 400,
+            "max": 600
+          },
+          "note": "Toujours fixer dans les montants (ossature bois) ou avec chevilles adaptées au support (béton, brique, placo)"
+        }
+      },
+      "table_salle_a_manger": {
+        "description": "Table de repas — salle à manger, cuisine, séjour",
+        "hauteur_mm": {
+          "standard": 750,
+          "min": 720,
+          "max": 760
+        },
+        "epaisseur_plateau_mm": {
+          "min": 20,
+          "ideal": 30,
+          "max": 50
+        },
+        "espace_jambes_sous_plateau_mm": {
+          "min": 600,
+          "ideal": 670,
+          "max": 720
+        },
+        "retrait_pied_bord_mm": {
+          "min": 80,
+          "ideal": 120,
+          "max": 200
+        },
+        "largeur_par_convive_mm": {
+          "min": 550,
+          "ideal": 600,
+          "confort": 650
+        },
+        "profondeur_par_convive_mm": {
+          "min": 350,
+          "ideal": 400,
+          "confort": 450
+        },
+        "degagement_chaise_mm": {
+          "chaise_rentree": {
+            "min": 150,
+            "ideal": 200
+          },
+          "chaise_occupee_recul": {
+            "min": 450,
+            "ideal": 550,
+            "confort": 600
+          },
+          "passage_derriere_chaise_occupee": {
+            "min": 750,
+            "ideal": 900,
+            "confort": 1000
+          }
+        },
+        "dimensions_par_capacite": {
+          "rectangulaire": {
+            "4_personnes_mm": {
+              "longueur": {
+                "min": 1200,
+                "ideal": 1400
+              },
+              "largeur": {
+                "min": 800,
+                "ideal": 900
+              }
+            },
+            "6_personnes_mm": {
+              "longueur": {
+                "min": 1600,
+                "ideal": 1800
+              },
+              "largeur": {
+                "min": 900,
+                "ideal": 950
+              }
+            },
+            "8_personnes_mm": {
+              "longueur": {
+                "min": 2000,
+                "ideal": 2200
+              },
+              "largeur": {
+                "min": 950,
+                "ideal": 1000
+              }
+            },
+            "10_personnes_mm": {
+              "longueur": {
+                "min": 2400,
+                "ideal": 2800
+              },
+              "largeur": {
+                "min": 1000,
+                "ideal": 1050
+              }
+            },
+            "12_personnes_mm": {
+              "longueur": {
+                "min": 3000,
+                "ideal": 3200
+              },
+              "largeur": {
+                "min": 1000,
+                "ideal": 1100
+              }
+            }
+          },
+          "ronde_diametre_mm": {
+            "2_personnes": {
+              "min": 700,
+              "ideal": 800
+            },
+            "4_personnes": {
+              "min": 900,
+              "ideal": 1000
+            },
+            "6_personnes": {
+              "min": 1200,
+              "ideal": 1300
+            },
+            "8_personnes": {
+              "min": 1450,
+              "ideal": 1500
+            }
+          },
+          "carree_mm": {
+            "2_personnes": {
+              "cote": {
+                "min": 700,
+                "ideal": 800
+              }
+            },
+            "4_personnes": {
+              "cote": {
+                "min": 900,
+                "ideal": 1000
+              }
+            },
+            "8_personnes": {
+              "cote": {
+                "min": 1400,
+                "ideal": 1500
+              }
+            }
+          }
+        },
+        "regles_conception": [
+          "Prévoir au moins 60 cm de largeur par convive adulte",
+          "Hauteur libre sous plateau ≥ 60 cm pour les genoux",
+          "Éviter ceintures ou traverses descendant sous 62 cm de hauteur libre",
+          "Pour table extensible : même largeur utile sur les allonges que sur le plateau principal",
+          "Piétement central : cercle libre ~45 cm autour de l'axe pour les pieds"
+        ]
+      },
+      "console_entree": {
+        "description": "Console d'entrée, vide-poche, meuble d'appoint étroit",
+        "hauteur_mm": {
+          "min": 750,
+          "ideal": 800,
+          "max": 900
+        },
+        "profondeur_mm": {
+          "ultra_compacte": {
+            "min": 200,
+            "max": 250
+          },
+          "standard": {
+            "min": 260,
+            "ideal": 300,
+            "max": 350
+          },
+          "avec_tiroir": {
+            "min": 300,
+            "ideal": 350,
+            "max": 400
+          }
+        },
+        "largeur_mm": {
+          "mini": {
+            "min": 500,
+            "max": 800
+          },
+          "standard": {
+            "min": 800,
+            "ideal": 1000,
+            "max": 1200
+          }
+        },
+        "tiroir": {
+          "hauteur_facade_mm": {
+            "min": 80,
+            "ideal": 100,
+            "max": 140
+          },
+          "profondeur_utile_mm": {
+            "min": 200,
+            "ideal": 240
+          }
+        },
+        "degagement_devant_mm": {
+          "min": 800,
+          "ideal": 900,
+          "confort": 1000
+        },
+        "regles_conception": [
+          "En entrée étroite, limiter profondeur à 25 cm si circulation < 90 cm",
+          "Anti-basculement dès que rapport hauteur/profondeur > 3:1"
+        ]
+      },
+      "commode": {
+        "description": "Commode à tiroirs, chiffonnier, semainier",
+        "dimensions_mm": {
+          "profondeur": {
+            "min": 450,
+            "ideal": 500,
+            "max": 600
+          },
+          "hauteur": {
+            "min": 750,
+            "ideal": 900,
+            "max": 1250
+          },
+          "largeur": {
+            "min": 800,
+            "ideal": 1000,
+            "max": 1600
+          }
+        },
+        "tiroirs": {
+          "nombre": {
+            "commode_basse": {
+              "min": 3,
+              "max": 6
+            },
+            "chiffonnier": {
+              "min": 5,
+              "max": 8
+            }
+          },
+          "hauteur_facade_mm": {
+            "petit_linge": {
+              "min": 120,
+              "ideal": 150,
+              "max": 180
+            },
+            "linge_plie": {
+              "min": 180,
+              "ideal": 220,
+              "max": 260
+            },
+            "volumineux": {
+              "min": 260,
+              "ideal": 300,
+              "max": 360
+            }
+          },
+          "hauteur_utile_mm": {
+            "petit_linge": {
+              "min": 80,
+              "ideal": 100,
+              "max": 120
+            },
+            "linge_plie": {
+              "min": 130,
+              "ideal": 160,
+              "max": 190
+            },
+            "volumineux": {
+              "min": 200,
+              "ideal": 240,
+              "max": 300
+            }
+          },
+          "profondeur_utile_mm": {
+            "min": 350,
+            "ideal": 400,
+            "max": 480
+          }
+        },
+        "chiffonnier": {
+          "largeur_mm": {
+            "min": 400,
+            "ideal": 600,
+            "max": 800
+          },
+          "hauteur_mm": {
+            "min": 1000,
+            "ideal": 1200,
+            "max": 1400
+          }
+        },
+        "regles_conception": [
+          "Profondeur 45-50 cm couvre la plupart des usages sans sur-encombrement",
+          "Tiroir large > 80 cm : coulisses renforcées et fond plus épais",
+          "Anti-basculement si plusieurs tiroirs ouverts simultanément",
+          "Tiroirs hauts en partie basse pour accessibilité visuelle"
+        ]
+      },
+      "lit_rangement": {
+        "description": "Lit avec rangements intégrés — tiroirs sous lit, coffre, tête de lit",
+        "hauteur_sommier_mm": {
+          "min": 300,
+          "ideal": 350,
+          "max": 450
+        },
+        "hauteur_assise_finie_mm": {
+          "min": 450,
+          "ideal": 500,
+          "max": 600
+        },
+        "tiroirs_sous_lit": {
+          "hauteur_utile_mm": {
+            "basse": {
+              "min": 120,
+              "max": 200
+            },
+            "standard": {
+              "min": 180,
+              "ideal": 220,
+              "max": 280
+            }
+          },
+          "profondeur_utile_mm": {
+            "lit_90": {
+              "min": 500,
+              "ideal": 600
+            },
+            "lit_140_160": {
+              "min": 600,
+              "ideal": 700
+            }
+          },
+          "largeur_utile_mm": {
+            "petit": {
+              "min": 400,
+              "ideal": 500
+            },
+            "grand": {
+              "min": 700,
+              "ideal": 900
+            }
+          },
+          "recul_ouverture_mm": {
+            "min": 600,
+            "ideal": 750,
+            "confort": 900
+          }
+        },
+        "tete_de_lit": {
+          "hauteur_depuis_sol_mm": {
+            "min": 900,
+            "ideal": 1050,
+            "max": 1300
+          },
+          "epaisseur_mm": {
+            "min": 20,
+            "ideal": 40,
+            "max": 100
+          },
+          "niches": {
+            "profondeur_mm": {
+              "min": 120,
+              "ideal": 180
+            },
+            "hauteur_mm": {
+              "min": 120,
+              "ideal": 180
+            }
+          }
+        },
+        "passages_autour_lit_mm": {
+          "min": 750,
+          "ideal": 900
+        },
+        "regles_conception": [
+          "Lit collé au mur d'un côté = tiroirs condamnés de ce côté",
+          "Hauteur finie 45-55 cm pour lever/coucher confortable",
+          "Coffre relevable : débattement vertical suffisant requis",
+          "Poignées non saillantes sur tiroirs sous lit (chocs tibia)"
+        ]
+      },
+      "meuble_sous_escalier": {
+        "description": "Aménagement sur mesure sous escalier droit ou tournant",
+        "hauteur_min_utilisable_mm": {
+          "etagere_ouverte": 200,
+          "tiroir": 250,
+          "placard_portes": 400,
+          "penderie_courte": 1000
+        },
+        "zonage": {
+          "zone_basse_mm": {
+            "min": 200,
+            "max": 600,
+            "usages": [
+              "chaussures",
+              "tiroirs",
+              "rangement saisonnier"
+            ]
+          },
+          "zone_intermediaire_mm": {
+            "min": 600,
+            "max": 1200,
+            "usages": [
+              "tiroirs extractibles",
+              "niches",
+              "aspirateur"
+            ]
+          },
+          "zone_haute_mm": {
+            "min": 1200,
+            "max": 2200,
+            "usages": [
+              "placard",
+              "penderie",
+              "bibliothèque"
+            ]
+          }
+        },
+        "formule_hauteur": "h(x) = h_depart + x × tan(angle_escalier)",
+        "regles_conception": [
+          "Modules indépendants plutôt qu'un seul volume monolithique",
+          "Tiroirs ou coulissants dans les zones basses (porte battante impraticable sous pente)",
+          "Faux aplomb si sous-face irrégulière — façades alignées",
+          "Ne jamais couper limons ou appuis sans validation structurelle",
+          "Prévoir accès technique si réseaux sous escalier",
+          "Push-to-open ou profils intégrés en circulation étroite",
+          "Nez de marche débordant : décaler façades ou cadre de compensation",
+          "Laisser 5 cm de vide sanitaire contre le mur du fond (ventilation)"
+        ]
+      },
+      "banquette_coffre": {
+        "description": "Banquette d'assise avec coffre de rangement intégré",
+        "hauteur_assise_mm": {
+          "min": 420,
+          "ideal": 450,
+          "max": 480
+        },
+        "profondeur_assise_mm": {
+          "min": 400,
+          "ideal": 450,
+          "max": 500
+        },
+        "profondeur_totale_mm": {
+          "sans_dossier": {
+            "min": 400,
+            "max": 500
+          },
+          "avec_dossier": {
+            "min": 500,
+            "max": 650
+          }
+        },
+        "hauteur_dossier_mm": {
+          "min": 300,
+          "ideal": 380,
+          "max": 450
+        },
+        "longueur_par_place_mm": {
+          "min": 500,
+          "ideal": 600
+        },
+        "coffre": {
+          "hauteur_utile_mm": {
+            "min": 200,
+            "ideal": 280,
+            "max": 350
+          },
+          "profondeur_utile_mm": {
+            "min": 250,
+            "ideal": 320,
+            "max": 400
+          },
+          "necessite_aeration": true
+        },
+        "regles_conception": [
+          "Avec ouverture dessus : vérifier recul mur/dossier pour le couvercle",
+          "Profondeur > 50 cm sans coussin ni dossier = confort réduit",
+          "Pour entrée : hauteur ~45 cm pour chausser facilement"
+        ]
+      }
+    },
+    "objets_reference": {
+      "description": "Dimensions de référence des objets courants pour dimensionner les meubles",
+      "livres": {
+        "poche": {
+          "largeur_mm": 110,
+          "hauteur_mm": 180
+        },
+        "roman_A5": {
+          "largeur_mm": 150,
+          "hauteur_mm": 210
+        },
+        "BD_franco_belge": {
+          "largeur_mm": 240,
+          "hauteur_mm": 320
+        },
+        "BD_comic_book": {
+          "largeur_mm": 170,
+          "hauteur_mm": 260
+        },
+        "manga": {
+          "largeur_mm": 130,
+          "hauteur_mm": 180
+        },
+        "beau_livre_art": {
+          "largeur_mm": {
+            "min": 250,
+            "max": 350
+          },
+          "hauteur_mm": {
+            "min": 300,
+            "max": 400
+          }
+        },
+        "encyclopedie": {
+          "largeur_mm": 220,
+          "hauteur_mm": 300
+        },
+        "classeur_A4": {
+          "largeur_mm": 280,
+          "hauteur_mm": 320,
+          "epaisseur_mm": 80
+        }
+      },
+      "medias": {
+        "vinyle_33t": {
+          "cote_mm": 315
+        },
+        "vinyle_45t": {
+          "cote_mm": 187
+        },
+        "CD": {
+          "hauteur_mm": 125,
+          "largeur_mm": 142
+        },
+        "DVD": {
+          "hauteur_mm": 192,
+          "largeur_mm": 136
+        },
+        "bluray": {
+          "hauteur_mm": 171,
+          "largeur_mm": 135
+        }
+      },
+      "vetements": {
+        "cintre_standard_largeur_mm": {
+          "min": 440,
+          "max": 460
+        },
+        "tshirt_plie_hauteur_mm": 30,
+        "pull_plie_hauteur_mm": 120,
+        "manteaux_par_metre_lineaire": 6,
+        "chaussures_par_metre_lineaire": {
+          "min": 4,
+          "max": 5
+        }
+      },
+      "vaisselle": {
+        "assiette_plate_diametre_mm": {
+          "min": 240,
+          "max": 280
+        },
+        "verre_hauteur_mm": {
+          "min": 120,
+          "max": 250
+        },
+        "bouteille_vin_hauteur_mm": 320,
+        "bouteille_vin_diametre_mm": 80
+      },
+      "chaussures": {
+        "sneakers_adulte_mm": {
+          "longueur": {
+            "min": 280,
+            "max": 340
+          },
+          "largeur": {
+            "min": 90,
+            "max": 130
+          },
+          "hauteur": {
+            "min": 100,
+            "max": 140
+          }
+        },
+        "chaussures_ville_mm": {
+          "longueur": {
+            "min": 270,
+            "max": 330
+          },
+          "largeur": {
+            "min": 80,
+            "max": 110
+          },
+          "hauteur": {
+            "min": 80,
+            "max": 120
+          }
+        },
+        "talons_femme_mm": {
+          "longueur": {
+            "min": 240,
+            "max": 300
+          },
+          "largeur": {
+            "min": 80,
+            "max": 100
+          },
+          "hauteur_totale": {
+            "min": 90,
+            "max": 180
+          }
+        },
+        "bottines_mm": {
+          "longueur": {
+            "min": 260,
+            "max": 320
+          },
+          "largeur": {
+            "min": 90,
+            "max": 130
+          },
+          "hauteur": {
+            "min": 150,
+            "max": 250
+          }
+        },
+        "bottes_mollet_mm": {
+          "longueur": {
+            "min": 270,
+            "max": 330
+          },
+          "largeur": {
+            "min": 100,
+            "max": 140
+          },
+          "hauteur": {
+            "min": 320,
+            "max": 450
+          }
+        },
+        "bottes_hautes_cavalieres_mm": {
+          "longueur": {
+            "min": 280,
+            "max": 340
+          },
+          "largeur": {
+            "min": 100,
+            "max": 140
+          },
+          "hauteur": {
+            "min": 400,
+            "max": 520
+          }
+        },
+        "compartiments_rangement_mm": {
+          "etagere_standard": {
+            "hauteur": {
+              "min": 160,
+              "ideal": 200,
+              "max": 220
+            },
+            "profondeur": {
+              "min": 300,
+              "ideal": 350,
+              "max": 380
+            }
+          },
+          "casier_bottes": {
+            "hauteur": {
+              "min": 400,
+              "ideal": 500,
+              "max": 550
+            },
+            "profondeur": {
+              "min": 350,
+              "ideal": 400,
+              "max": 450
+            }
+          },
+          "range_chaussures_incline": {
+            "profondeur": {
+              "min": 200,
+              "ideal": 240,
+              "max": 280
+            }
+          }
+        },
+        "astuce": "Tablettes inclinées 15-20° avec butée = profondeur réduite de 35 à 30 cm"
+      },
+      "jouets_enfant": {
+        "albums_jeunesse_mm": {
+          "portrait": {
+            "largeur": {
+              "min": 180,
+              "max": 260
+            },
+            "hauteur": {
+              "min": 240,
+              "max": 340
+            },
+            "epaisseur": {
+              "min": 8,
+              "max": 30
+            }
+          },
+          "carre": {
+            "cote": {
+              "min": 180,
+              "max": 260
+            },
+            "epaisseur": {
+              "min": 10,
+              "max": 30
+            }
+          }
+        },
+        "bd_romans_jeunesse_mm": {
+          "largeur": {
+            "min": 130,
+            "max": 190
+          },
+          "hauteur": {
+            "min": 180,
+            "max": 310
+          },
+          "epaisseur": {
+            "min": 10,
+            "max": 40
+          }
+        },
+        "boites_jeux_societe_mm": {
+          "petite": {
+            "largeur": 200,
+            "profondeur": 200,
+            "hauteur": 50
+          },
+          "standard": {
+            "largeur": 300,
+            "profondeur": 300,
+            "hauteur": 70
+          },
+          "rectangulaire": {
+            "largeur": 370,
+            "profondeur": 270,
+            "hauteur": 70
+          }
+        },
+        "boites_puzzle_mm": {
+          "petite": {
+            "largeur": 180,
+            "profondeur": 180,
+            "hauteur": 40
+          },
+          "standard": {
+            "largeur": 260,
+            "profondeur": 190,
+            "hauteur": 50
+          },
+          "grande": {
+            "largeur": 370,
+            "profondeur": 270,
+            "hauteur": 60
+          }
+        },
+        "briques_construction_mm": {
+          "petit": {
+            "l": 200,
+            "p": 150,
+            "h": 70
+          },
+          "moyen": {
+            "l": 260,
+            "p": 190,
+            "h": 90
+          },
+          "grand_bac": {
+            "l": 400,
+            "p": 300,
+            "h": 180
+          }
+        },
+        "peluches_mm": {
+          "petite": {
+            "largeur": 150,
+            "profondeur": 120,
+            "hauteur": 200
+          },
+          "moyenne": {
+            "largeur": 250,
+            "profondeur": 200,
+            "hauteur": 350
+          },
+          "grande": {
+            "largeur": 350,
+            "profondeur": 300,
+            "hauteur": 500
+          }
+        },
+        "vehicules_jouets_mm": {
+          "petits": {
+            "l": 80,
+            "p": 40,
+            "h": 40
+          },
+          "moyens": {
+            "l": 180,
+            "p": 90,
+            "h": 100
+          },
+          "grands": {
+            "l": 300,
+            "p": 150,
+            "h": 180
+          }
+        },
+        "bacs_rangement_mm": {
+          "petit": {
+            "l": 200,
+            "p": 300,
+            "h": 150
+          },
+          "standard": {
+            "l": 300,
+            "p": 400,
+            "h": 200
+          },
+          "grand": {
+            "l": 400,
+            "p": 500,
+            "h": 250
+          }
+        },
+        "regles_rangement": [
+          "Albums de face : tablette ou bac avec retenue frontale 4-8 cm",
+          "Niche standard jeux de société : 33×33×30 cm",
+          "Niches basses (0-60 cm) : jouets lourds/volumineux",
+          "Niches intermédiaires : livres fréquemment manipulés"
+        ]
+      }
+    },
+    "formulas": [
+      {
+        "id": "F_ERGO_001",
+        "name": "worktop_height_ideal",
+        "inputs": [
+          "user_height_mm"
+        ],
+        "expression": "user_height_mm * 0.52",
+        "output": "worktop_height_mm"
+      },
+      {
+        "id": "F_ERGO_002",
+        "name": "shelf_depth",
+        "inputs": [
+          "max_object_width_mm"
+        ],
+        "expression": "max_object_width_mm + 30",
+        "output": "shelf_depth_mm"
+      },
+      {
+        "id": "F_ERGO_003",
+        "name": "shelf_spacing",
+        "inputs": [
+          "max_object_height_mm",
+          "margin_mm"
+        ],
+        "expression": "max_object_height_mm + margin_mm",
+        "output": "shelf_spacing_mm",
+        "parameters": {
+          "margin_mm": {
+            "min": 50,
+            "max": 70,
+            "default": 60
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_004",
+        "name": "hanging_rod_height",
+        "inputs": [
+          "longest_garment_mm",
+          "hanger_height_mm",
+          "bottom_margin_mm"
+        ],
+        "expression": "longest_garment_mm + hanger_height_mm + bottom_margin_mm",
+        "output": "rod_zone_height_mm",
+        "parameters": {
+          "hanger_height_mm": {
+            "default": 100
+          },
+          "bottom_margin_mm": {
+            "default": 50
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_005",
+        "name": "tv_unit_width",
+        "inputs": [
+          "tv_width_mm"
+        ],
+        "expression": "tv_width_mm + 300",
+        "output": "unit_min_width_mm"
+      },
+      {
+        "id": "F_ERGO_006",
+        "name": "desk_height",
+        "inputs": [
+          "user_height_mm"
+        ],
+        "expression": "user_height_mm * 0.41",
+        "output": "desk_height_mm"
+      },
+      {
+        "id": "F_ERGO_007",
+        "name": "table_length_rectangular",
+        "inputs": [
+          "seats_per_long_side",
+          "width_per_seat_mm",
+          "end_margin_mm"
+        ],
+        "expression": "seats_per_long_side * width_per_seat_mm + 2 * end_margin_mm",
+        "output": "table_length_mm",
+        "parameters": {
+          "width_per_seat_mm": {
+            "min": 550,
+            "max": 650,
+            "default": 600
+          },
+          "end_margin_mm": {
+            "min": 50,
+            "max": 150,
+            "default": 100
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_008",
+        "name": "table_diameter_round",
+        "inputs": [
+          "num_seats",
+          "width_per_seat_mm"
+        ],
+        "expression": "(num_seats * width_per_seat_mm) / 3.14159",
+        "output": "table_diameter_mm",
+        "parameters": {
+          "width_per_seat_mm": {
+            "min": 550,
+            "max": 600,
+            "default": 580
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_009",
+        "name": "seat_height_for_table",
+        "inputs": [
+          "table_height_mm"
+        ],
+        "expression": "table_height_mm - 285",
+        "output": "seat_height_mm",
+        "parameters": {
+          "offset_mm": {
+            "min": 270,
+            "max": 300
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_010",
+        "name": "min_clearance_under_table",
+        "inputs": [
+          "seat_height_mm"
+        ],
+        "expression": "seat_height_mm + 240",
+        "output": "min_clearance_mm"
+      },
+      {
+        "id": "F_ERGO_011",
+        "name": "tv_viewing_distance",
+        "inputs": [
+          "screen_diagonal_mm",
+          "resolution_factor"
+        ],
+        "expression": "screen_diagonal_mm * resolution_factor",
+        "output": "viewing_distance_mm",
+        "parameters": {
+          "resolution_factor": {
+            "HD": 2.5,
+            "4K": 1.5
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_012",
+        "name": "under_stairs_height",
+        "inputs": [
+          "h_start_mm",
+          "x_offset_mm",
+          "stair_angle_rad"
+        ],
+        "expression": "h_start_mm + x_offset_mm * Math.tan(stair_angle_rad)",
+        "output": "available_height_mm"
+      },
+      {
+        "id": "F_ERGO_013",
+        "name": "bench_length",
+        "inputs": [
+          "num_seats",
+          "width_per_seat_mm"
+        ],
+        "expression": "num_seats * width_per_seat_mm",
+        "output": "bench_length_mm",
+        "parameters": {
+          "width_per_seat_mm": {
+            "min": 500,
+            "max": 600,
+            "default": 550
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_014",
+        "name": "clearance_with_opening",
+        "inputs": [
+          "furniture_depth_mm",
+          "door_swing_mm",
+          "circulation_margin_mm"
+        ],
+        "expression": "furniture_depth_mm + door_swing_mm + circulation_margin_mm",
+        "output": "required_passage_mm",
+        "parameters": {
+          "circulation_margin_mm": {
+            "min": 200,
+            "max": 400,
+            "default": 300
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_015",
+        "name": "drawer_front_height",
+        "inputs": [
+          "useful_height_mm",
+          "structure_mm",
+          "gap_mm"
+        ],
+        "expression": "useful_height_mm + structure_mm + gap_mm",
+        "output": "front_height_mm",
+        "parameters": {
+          "structure_mm": {
+            "min": 30,
+            "max": 50
+          },
+          "gap_mm": {
+            "min": 3,
+            "max": 6
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_016",
+        "name": "daily_access_zone",
+        "inputs": [],
+        "expression": "null",
+        "output": {
+          "zone_bottom_mm": 700,
+          "zone_top_mm": 1400
+        },
+        "note": "Constant — not a calculation"
+      },
+      {
+        "id": "F_ERGO_017",
+        "name": "shoe_niche_depth",
+        "inputs": [
+          "shoe_length_mm",
+          "margin_mm"
+        ],
+        "expression": "shoe_length_mm + margin_mm",
+        "output": "niche_depth_mm",
+        "parameters": {
+          "margin_mm": {
+            "min": 20,
+            "max": 50,
+            "default": 30
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_018",
+        "name": "boot_niche_height",
+        "inputs": [
+          "boot_height_mm",
+          "margin_mm"
+        ],
+        "expression": "boot_height_mm + margin_mm",
+        "output": "niche_height_mm",
+        "parameters": {
+          "margin_mm": {
+            "min": 30,
+            "max": 80,
+            "default": 50
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_019",
+        "name": "drawer_useful_depth",
+        "inputs": [
+          "outer_depth_mm",
+          "back_thickness_mm",
+          "front_thickness_mm",
+          "slide_gap_mm"
+        ],
+        "expression": "outer_depth_mm - back_thickness_mm - front_thickness_mm - slide_gap_mm",
+        "output": "useful_depth_mm",
+        "parameters": {
+          "back_thickness_mm": {
+            "min": 8,
+            "max": 19
+          },
+          "front_thickness_mm": {
+            "min": 18,
+            "max": 22
+          },
+          "slide_gap_mm": {
+            "min": 25,
+            "max": 40
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_020",
+        "name": "drawer_handle_height",
+        "inputs": [
+          "user_elbow_height_mm"
+        ],
+        "expression": "user_elbow_height_mm - 200",
+        "output": "ideal_handle_height_mm",
+        "parameters": {
+          "offset_mm": {
+            "min": 150,
+            "max": 250
+          }
+        }
+      },
+      {
+        "id": "F_ERGO_021",
+        "name": "child_bookshelf_niche",
+        "inputs": [
+          "object_height_mm",
+          "margin_factor"
+        ],
+        "expression": "object_height_mm * margin_factor",
+        "output": "niche_height_mm",
+        "parameters": {
+          "margin_factor": {
+            "min": 1.1,
+            "max": 1.2,
+            "default": 1.15
+          }
+        }
+      }
+    ]
+  },
+  "quincaillerie": {
+    "charnieres_invisibles": {
+      "description": "Charnières à encastrer (cup hinges) — standard de l'industrie du meuble",
+      "principe": "Boîtier cylindrique encastré dans la porte + embase vissée sur le côté du caisson",
+      "boitier": {
+        "diametres_standard_mm": [
+          26,
+          35
+        ],
+        "diametre_courant_mm": 35,
+        "profondeur_encastrement_mm": {
+          "min": 11,
+          "max": 13,
+          "standard": 12
+        },
+        "distance_centre_boitier_chant_porte_mm": {
+          "formule": "centre = 17.5 + K",
+          "K_mm": {
+            "min": 3,
+            "standard": 4,
+            "max": 7
+          },
+          "resultat_mm": {
+            "min": 20.5,
+            "standard": 21.5,
+            "max": 24.5
+          },
+          "note": "K = distance bord perçage Ø35 au chant de porte. Cote variable selon modèle."
+        },
+        "outil_requis": "Fraise Forstner Ø35mm (ou Ø26mm pour ancien standard)",
+        "note": "Profondeur boîtier < épaisseur porte — vérifier impérativement"
+      },
+      "types_pose": {
+        "applique": {
+          "autre_nom": "recouvrement total",
+          "description": "La porte recouvre entièrement le côté du caisson",
+          "coudure_mm": 0,
+          "recouvrement_mm": {
+            "standard": 16,
+            "max": 25
+          },
+          "jeu_mm": 0,
+          "usage": "80% des installations — porte unique sur un côté de caisson"
+        },
+        "demi_recouvrement": {
+          "autre_nom": "semi-applique",
+          "description": "La porte recouvre partiellement le côté (2 portes sur un montant central)",
+          "coudure_mm": 9,
+          "recouvrement_mm": {
+            "standard": 8,
+            "note": "Moitié de l'épaisseur du montant"
+          },
+          "jeu_entre_portes_mm": {
+            "min": 2,
+            "max": 3
+          },
+          "usage": "Deux portes juxtaposées sur un même montant intermédiaire"
+        },
+        "rentrant": {
+          "autre_nom": "encastré / affleurant",
+          "description": "La porte est contenue à l'intérieur du caisson",
+          "coudure_mm": 16,
+          "recouvrement_mm": 0,
+          "jeu_mm": {
+            "min": 2,
+            "max": 3,
+            "note": "Encombrement nécessaire à l'ouverture"
+          },
+          "usage": "Esthétique épurée, portes affleurantes"
+        }
+      },
+      "angles_ouverture": {
+        "standard_deg": 110,
+        "courant_deg": [
+          95,
+          110
+        ],
+        "grand_angle_deg": [
+          135,
+          150,
+          165
+        ],
+        "usage_grand_angle": "Meubles d'angle, accès élargi, portes à angle non droit"
+      },
+      "embase": {
+        "description": "Plaque de fixation sur le côté du caisson",
+        "distance_fixation_chant_avant_mm": 37,
+        "entraxe_fixation_mm": {
+          "systeme_32_pas_vertical_caisson_mm": 32,
+          "schemas_percage_boitier_porte": {
+            "blum_clip_top": "45/9.5 mm",
+            "salice": "48/6 mm",
+            "hettich_sensys": "52/5.5 mm"
+          },
+          "note": "Schémas bidimensionnels (distance horizontale / distance verticale). 32mm = pas vertical du système 32 sur le caisson, PAS un entraxe de boîtier."
+        },
+        "note_entraxe": "L'entraxe désigne la distance entre les vis de fixation du boîtier dans la porte. 52mm = Hettich Sensys. 48mm = Salice. 45mm = ancien standard.",
+        "types_montage": [
+          "à visser",
+          "clip-on (sans outil)",
+          "à expansion (Fix Hettich)"
+        ],
+        "reglages_3D": {
+          "hauteur_mm": {
+            "amplitude": 3
+          },
+          "profondeur_mm": {
+            "amplitude": 3,
+            "outil": "vis sans fin"
+          },
+          "derive_laterale_mm": {
+            "amplitude": 3
+          }
+        }
+      },
+      "nombre_charnieres": {
+        "regle": "Le nombre dépend de la hauteur ET du poids (abaque fabricant). Valeurs pour largeur standard ≤ 600mm.",
+        "details": [
+          {
+            "hauteur_porte_mm": {
+              "max": 900
+            },
+            "poids_max_kg": 8,
+            "nb_charnieres": 2
+          },
+          {
+            "hauteur_porte_mm": {
+              "min": 900,
+              "max": 1600
+            },
+            "poids_max_kg": 13,
+            "nb_charnieres": 3
+          },
+          {
+            "hauteur_porte_mm": {
+              "min": 1600,
+              "max": 2000
+            },
+            "poids_max_kg": 17,
+            "nb_charnieres": 4
+          },
+          {
+            "hauteur_porte_mm": {
+              "min": 2000,
+              "max": 2400
+            },
+            "poids_max_kg": 22,
+            "nb_charnieres": 5
+          }
+        ],
+        "position_premiere_mm": {
+          "min": 60,
+          "max": 100,
+          "note": "Distance du bord haut ou bas de la porte"
+        },
+        "note": "Répartir les charnières intermédiaires de manière régulière"
+      },
+      "epaisseur_porte": {
+        "standard_mm": {
+          "min": 16,
+          "max": 24
+        },
+        "porte_fine_mm": {
+          "min": 10,
+          "max": 15,
+          "charniere": "modèles spéciaux (Tiomos M9, Sensys thin door)"
+        },
+        "porte_epaisse_mm": {
+          "min": 24,
+          "max": 35,
+          "note": "Nécessite embases adaptées"
+        }
+      },
+      "amortissement": {
+        "types": [
+          "intégré à la charnière (Blumotion, Silentia, Sensys)",
+          "amortisseur rapporté (clip séparé)",
+          "sans amortissement"
+        ],
+        "recommandation": "Privilégier l'amortissement intégré pour le bricoleur (plus simple, fiable)"
+      },
+      "marques_reference": {
+        "hettich": {
+          "gammes": [
+            "Sensys (entraxe 52mm)",
+            "Intermat (entraxe 52mm)"
+          ],
+          "note": "Leader allemand"
+        },
+        "blum": {
+          "gammes": [
+            "Clip Top Blumotion (entraxe 45/9.5mm)"
+          ],
+          "note": "Référence cuisine haut de gamme"
+        },
+        "salice": {
+          "gammes": [
+            "Silentia+ (entraxe 48mm)",
+            "Logica"
+          ],
+          "note": "Italien, très courant"
+        },
+        "grass": {
+          "gammes": [
+            "Tiomos"
+          ],
+          "note": "Haut de gamme autrichien"
+        }
+      }
+    },
+    "coulisses_tiroir": {
+      "description": "Systèmes de guidage pour tiroirs — choix critique pour l'usage quotidien",
+      "types": {
+        "a_galets": {
+          "description": "Coulisses économiques à roulettes plastique",
+          "charge_max_kg": {
+            "min": 10,
+            "max": 25
+          },
+          "sortie": "partielle (75-80%)",
+          "bruit": "moyen à élevé",
+          "montage": "latéral ou sous tiroir",
+          "prix": "économique (~5-8€ la paire)",
+          "usage": "Tiroirs légers, budget serré"
+        },
+        "a_billes_sortie_partielle": {
+          "description": "Coulisses à roulement à billes, sortie 75%",
+          "charge_max_kg": {
+            "min": 10,
+            "max": 25
+          },
+          "sortie": "partielle",
+          "bruit": "silencieux",
+          "montage": "latéral ou en rainure (17mm ou 27mm)",
+          "prix": "moyen (~8-15€ la paire)",
+          "usage": "Usage courant, bon rapport qualité/prix"
+        },
+        "a_billes_sortie_totale": {
+          "description": "Coulisses télescopiques à billes, sortie 100%",
+          "charge_max_kg": {
+            "min": 25,
+            "max": 60
+          },
+          "sortie": "totale",
+          "bruit": "silencieux",
+          "montage": "latéral",
+          "prix": "moyen-haut (~12-25€ la paire)",
+          "usage": "Tiroirs profonds, cuisine, rangement lourd"
+        },
+        "a_billes_charge_lourde": {
+          "description": "Coulisses renforcées pour charges importantes",
+          "charge_max_kg": {
+            "min": 45,
+            "max": 100
+          },
+          "sortie": "totale",
+          "montage": "latéral",
+          "prix": "élevé (>20€ la paire)",
+          "usage": "Outillage, classement, tiroirs très chargés"
+        },
+        "systeme_metal": {
+          "description": "Tiroirs métal intégrés (type Tandembox Blum, ArciTech Hettich, InnoTech)",
+          "charge_max_kg": {
+            "min": 30,
+            "max": 70
+          },
+          "sortie": "totale",
+          "amortissement": "intégré",
+          "note": "Tiroir métal complet avec parois — pas un simple guidage",
+          "prix": "élevé (>40€ le tiroir complet)",
+          "usage": "Cuisine équipée, salle de bain, haut de gamme"
+        }
+      },
+      "cotes_implantation": {
+        "jeu_lateral_par_cote_mm": {
+          "coulisses_laterales_a_billes": 12.7,
+          "coulisses_sous_tiroir": "variable selon modèle",
+          "tiroirs_metal_integres": 0,
+          "note": "12.7mm (1/2 pouce) EXCLUSIVEMENT pour coulisses latérales à billes. Tandem/Movento/ArciTech ont des implantations spécifiques."
+        },
+        "jeu_profondeur_mm": {
+          "min": 5,
+          "max": 10
+        },
+        "longueur_tiroir": "profondeur_caisson - 5 à 10 mm de jeu",
+        "position_coulisse_laterale": "bord avant à 2 mm de la face avant du caisson",
+        "hauteur_rainure_mm": {
+          "types": [
+            17,
+            27
+          ],
+          "note": "Pour coulisses en rainure uniquement"
+        }
+      },
+      "construction_tiroir_bois": {
+        "epaisseur_cotes_mm": {
+          "standard": 15,
+          "alternatif": 18
+        },
+        "epaisseur_fond_mm": {
+          "rainure": {
+            "min": 4,
+            "max": 6
+          },
+          "rapporte": {
+            "min": 8,
+            "max": 15
+          }
+        },
+        "fond_rainure_position_mm": {
+          "note": "Rainure à 8-10 mm du bas des côtés, profondeur 5-6 mm"
+        },
+        "facade_rapportee": {
+          "description": "La façade du tiroir est une pièce séparée, fixée sur le caisson du tiroir après montage",
+          "fixation": "Vis depuis l'intérieur du tiroir, ou vis excentriques",
+          "jeu_facade_mm": {
+            "min": 2,
+            "max": 3,
+            "note": "Jeu par côté entre façade et caisson"
+          }
+        }
+      },
+      "longueurs_disponibles_mm": [
+        250,
+        300,
+        350,
+        400,
+        450,
+        500,
+        550,
+        600,
+        650,
+        700
+      ],
+      "note_choix_longueur": "Choisir la longueur = profondeur du caisson - jeu (5-10mm). Ex: caisson 50cm → coulisse 450 ou 500mm"
+    },
+    "taquets_etagere": {
+      "description": "Supports pour tablettes réglables dans un caisson",
+      "types": {
+        "taquet_a_enfoncer": {
+          "description": "Tige métallique ou plastique enfoncée dans un trou borgne",
+          "diametres_mm": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "diametre_courant_mm": 5,
+          "charge_par_taquet_kg": {
+            "min": 15,
+            "max": 60,
+            "note": "Selon diamètre et matériau"
+          },
+          "profondeur_percage_mm": {
+            "min": 8,
+            "max": 12
+          }
+        },
+        "taquet_equerre_a_visser": {
+          "description": "Petite équerre en plastique avec vis de fixation et cache",
+          "vis_diametre_mm": 4,
+          "usage": "Tablettes lourdes, assemblage rapide",
+          "charge_par_taquet_kg": {
+            "min": 20,
+            "max": 75
+          }
+        },
+        "taquet_cremaillere": {
+          "description": "S'insère dans une crémaillère métallique encastrée ou en applique",
+          "espacement_fentes_mm": 32,
+          "usage": "Grande modularité, repositionnement fréquent"
+        },
+        "taquet_ventouse_verre": {
+          "description": "Avec ventouse ou patin caoutchouc pour tablettes en verre",
+          "diametre_tenon_mm": 5,
+          "epaisseur_verre_mm": {
+            "min": 5,
+            "max": 10
+          }
+        }
+      },
+      "percage_systeme_32": {
+        "description": "Rangée de trous espacés de 32mm dans les joues du caisson",
+        "entraxe_mm": 32,
+        "distance_axe_chant_avant_mm": 37,
+        "diametre_percage_mm": 5,
+        "profondeur_percage_mm": {
+          "min": 10,
+          "max": 13
+        },
+        "premiere_ligne_depuis_bord_mm": 37,
+        "note": "Commencer le premier trou à 37mm du chant, puis tous les 32mm. Percer les 4 coins du caisson de manière symétrique."
+      },
+      "nombre_taquets_par_tablette": 4,
+      "regle_placement": "Un taquet à chaque angle de la tablette, dans les trous correspondants des 2 joues"
+    },
+    "assemblage_caisson": {
+      "description": "Quincaillerie pour assembler les pièces du caisson entre elles",
+      "tourillons": {
+        "description": "Chevilles bois pour assemblage collé",
+        "diametres_mm": [
+          6,
+          8,
+          10
+        ],
+        "diametre_courant_mm": 8,
+        "longueur_mm": {
+          "min": 30,
+          "max": 40
+        },
+        "percage_mm": {
+          "diametre": "= diamètre tourillon",
+          "profondeur": "moitié longueur tourillon + 1mm"
+        },
+        "espacement_mm": {
+          "min": 100,
+          "max": 150
+        },
+        "colle": "Colle à bois vinylique (D3 pour pièces humides)",
+        "usage": "Assemblage définitif, invisible, très résistant",
+        "note": "Nécessite un gabarit de perçage pour alignement précis"
+      },
+      "lamelles_biscuits": {
+        "description": "Plaquettes ovales en hêtre compressé (type Lamello)",
+        "tailles": {
+          "0": {
+            "longueur_mm": 47,
+            "largeur_mm": 15,
+            "epaisseur_mm": 4,
+            "epaisseur_bois_min_mm": 10
+          },
+          "10": {
+            "longueur_mm": 53,
+            "largeur_mm": 19,
+            "epaisseur_mm": 4,
+            "epaisseur_bois_min_mm": 12
+          },
+          "20": {
+            "longueur_mm": 56,
+            "largeur_mm": 23,
+            "epaisseur_mm": 4,
+            "epaisseur_bois_min_mm": 15
+          }
+        },
+        "rainure": {
+          "largeur_mm": 4,
+          "profondeur_mm": {
+            "min": 10,
+            "max": 13
+          }
+        },
+        "outil": "Fraiseuse à lamelles (lamelleuse / biscuit jointer)",
+        "espacement_mm": {
+          "min": 100,
+          "max": 200
+        },
+        "colle": "Colle à bois vinylique",
+        "usage": "Assemblage rapide, bon alignement, assez résistant"
+      },
+      "vis_assemblage": {
+        "eurovis": {
+          "description": "Vis spéciale ameublement à tête fraisée",
+          "diametre_mm": 6.3,
+          "longueur_mm": [
+            11,
+            13,
+            16
+          ],
+          "percage_avant_trou_mm": {
+            "diametre": 4,
+            "profondeur": "longueur vis"
+          },
+          "usage": "Fixation embases de charnières, quincaillerie sur panneau"
+        },
+        "vis_confirmation": {
+          "description": "Vis d'assemblage de panneaux (type Confirmat / Euroschraube)",
+          "diametre_mm": {
+            "tete": 7,
+            "filetage": 5
+          },
+          "longueur_mm": [
+            40,
+            50,
+            70
+          ],
+          "percage_panneau_traverse_mm": 7,
+          "percage_panneau_receveur_mm": 5,
+          "profondeur_vis_min_mm": 30,
+          "usage": "Assemblage rapide de caissons en panneaux de particules/MDF"
+        },
+        "vis_bois_classique": {
+          "diametres_courants_mm": [
+            3.5,
+            4,
+            4.5,
+            5
+          ],
+          "regle_percage": "Avant-trou = 60-70% du diamètre de la vis dans le bois dur, 50% dans le résineux",
+          "note": "Toujours pré-percer dans les panneaux dérivés pour éviter l'éclatement"
+        }
+      },
+      "excentriques": {
+        "description": "Système boîtier excentrique + goujon pour assemblage démontable",
+        "diametre_boitier_mm": {
+          "standard": 15,
+          "alternatif": 20
+        },
+        "goujon": {
+          "diametre_mm": {
+            "min": 5,
+            "max": 7
+          },
+          "longueur_mm": {
+            "min": 24,
+            "max": 34
+          }
+        },
+        "percage_boitier": {
+          "diametre_mm": 15,
+          "profondeur_mm": 12.5,
+          "distance_chant_mm": {
+            "min": 34,
+            "note": "Centre du perçage à 34mm du chant d'assemblage"
+          }
+        },
+        "percage_goujon": {
+          "diametre_mm": 5,
+          "profondeur_mm": 13,
+          "note": "Dans le chant du panneau receveur"
+        },
+        "usage": "Meubles en kit, assemblage/démontage possible",
+        "note": "Quart de tour pour verrouiller"
+      }
+    },
+    "fixation_murale": {
+      "description": "Quincaillerie pour fixer meubles et étagères au mur",
+      "chevilles_par_support": {
+        "beton_plein": {
+          "cheville": "Expansion nylon ou métal",
+          "diametre_mm": {
+            "min": 6,
+            "max": 10
+          },
+          "charge_unitaire_kg": {
+            "min": 20,
+            "max": 80
+          }
+        },
+        "brique_creuse": {
+          "cheville": "Cheville à expansion spéciale creux (type Molly, SX Fischer)",
+          "diametre_mm": {
+            "min": 6,
+            "max": 10
+          },
+          "charge_unitaire_kg": {
+            "min": 10,
+            "max": 40
+          },
+          "attention": "Ne jamais utiliser de cheville standard dans du creux"
+        },
+        "placo_BA13": {
+          "cheville": "Cheville Molly métallique ou cheville à bascule",
+          "charge_unitaire_kg": {
+            "min": 5,
+            "max": 25
+          },
+          "charge_meuble_lourd": "Fixer dans les montants de l'ossature (entraxe 40 ou 60cm)",
+          "note": "Pour charges > 30kg : traverser le placo et fixer dans le montant"
+        },
+        "ossature_bois": {
+          "cheville": "Vis à bois directement dans le montant",
+          "vis_diametre_mm": {
+            "min": 5,
+            "max": 8
+          },
+          "longueur_penetration_mm": {
+            "min": 40,
+            "max": 60
+          },
+          "charge_unitaire_kg": {
+            "min": 30,
+            "max": 100
+          },
+          "note": "Détecter les montants avec un détecteur de montants"
+        }
+      },
+      "ferrures_suspente": {
+        "equerre_invisible": {
+          "description": "Équerres cachées derrière le meuble",
+          "charge_paire_kg": {
+            "min": 30,
+            "max": 60
+          }
+        },
+        "rail_de_suspension": {
+          "description": "Rail métallique horizontal fixé au mur, crochets réglables sur le meuble",
+          "charge_m_lineaire_kg": {
+            "min": 40,
+            "max": 80
+          },
+          "reglages": "Hauteur et profondeur via vis de réglage sur le crochet",
+          "usage": "Meubles hauts de cuisine, standard industriel",
+          "marques": [
+            "Hettich",
+            "Camar",
+            "Blum"
+          ]
+        },
+        "taquet_francais": {
+          "description": "Deux liteaux biseautés à 45° qui s'emboîtent (french cleat)",
+          "angle_deg": 45,
+          "epaisseur_liteau_mm": {
+            "min": 16,
+            "max": 22
+          },
+          "charge_m_lineaire_kg": {
+            "min": 30,
+            "max": 50
+          },
+          "usage": "Solution simple et robuste pour meubles lourds, étagères, panneaux d'outils",
+          "note": "Facile à fabriquer soi-même à la scie circulaire"
+        },
+        "equerre_anti_basculement": {
+          "description": "Sangle ou équerre reliant le haut du meuble au mur",
+          "obligatoire": "Tout meuble > 150 cm de hauteur, surtout avec enfants",
+          "types": [
+            "Sangle textile + vis",
+            "Équerre métal L",
+            "Câble acier"
+          ],
+          "norme": "Recommandation IKEA et normes sécurité enfant"
+        }
+      }
+    },
+    "compas_et_verins": {
+      "description": "Systèmes pour portes relevables (meubles hauts, coffres)",
+      "types": {
+        "verin_a_gaz": {
+          "description": "Piston pneumatique pour maintien en position ouverte",
+          "forces_N": [
+            50,
+            80,
+            100,
+            120,
+            150,
+            200,
+            250
+          ],
+          "choix_force": "Force requise = (poids porte en kg × 10) / nombre de vérins",
+          "usage": "Abattants, coffres de rangement, lits coffres"
+        },
+        "compas_a_ressort": {
+          "description": "Bras articulé avec ressort intégré",
+          "types": [
+            "lift (relevable)",
+            "fall (basculant avant)"
+          ],
+          "usage": "Meubles hauts cuisine, portes relevables"
+        },
+        "aventos_blum": {
+          "description": "Système relevable intégré Blum pour meubles hauts",
+          "types": [
+            "HK-XS (petit)",
+            "HF (bi-fold)",
+            "HL (parallèle)",
+            "HS (pivotant)",
+            "HK-TOP (standard)"
+          ],
+          "note": "Solution premium, nécessite calcul de force selon poids et dimensions"
+        }
+      }
+    },
+    "pieds_et_plinthes": {
+      "pieds_reglables": {
+        "description": "Pieds à vis pour réglage de niveau du caisson",
+        "hauteurs_mm": [
+          100,
+          120,
+          150,
+          200
+        ],
+        "reglage_mm": {
+          "min": 10,
+          "max": 30
+        },
+        "charge_par_pied_kg": {
+          "min": 50,
+          "max": 150
+        },
+        "diametre_percage_mm": 10,
+        "position": "Retrait de 30-50mm par rapport aux chants avant et latéraux",
+        "nombre": "4 pieds minimum, ajouter pieds intermédiaires au-delà de 80cm de largeur"
+      },
+      "plinthe": {
+        "hauteur_standard_mm": {
+          "min": 80,
+          "max": 150,
+          "cuisine": 100
+        },
+        "retrait_mm": {
+          "min": 30,
+          "max": 50
+        },
+        "fixation": "Clips à encliqueter sur les pieds réglables"
+      }
+    },
+    "serrures_et_verrous": {
+      "serrure_a_came": {
+        "description": "Serrure batteuse classique, came rotative verrouillant la façade",
+        "diametre_percage_cylindre_mm": {
+          "courants": [
+            16,
+            18,
+            19,
+            22
+          ],
+          "plus_courant": 19
+        },
+        "longueur_fut_mm": [
+          16,
+          20,
+          25,
+          30
+        ],
+        "distance_axe_chant_min_mm": 20,
+        "rotation_deg": [
+          90,
+          180
+        ],
+        "came_types": [
+          "droite",
+          "déportée",
+          "crochet",
+          "tiroir"
+        ],
+        "usage": [
+          "porte battante",
+          "tiroir",
+          "trappe"
+        ]
+      },
+      "serrure_en_applique": {
+        "description": "Boîtier vissé sur la face interne",
+        "diametre_cylindre_mm": [
+          18,
+          22
+        ],
+        "usage": [
+          "meubles traditionnels",
+          "caissons bois massif"
+        ]
+      },
+      "serrure_push_lock": {
+        "description": "Bouton poussoir pour façade sans poignée",
+        "diametre_percage_mm": {
+          "courant": 19,
+          "alternatifs": [
+            20,
+            22,
+            26
+          ]
+        },
+        "epaisseur_panneau_mm": {
+          "min": 12,
+          "max": 27
+        },
+        "usage": [
+          "van",
+          "meuble mobile",
+          "façade sans poignée"
+        ]
+      },
+      "espagnolette_rotative": {
+        "description": "Serrure à tringles pour armoires hautes (verrouillage 3 points)",
+        "diametre_cylindre_mm": 15,
+        "usage": "Obligatoire sur portes > 1500mm pour éviter le voilage"
+      },
+      "verrous_sans_cle": {
+        "loqueteau_a_bille": {
+          "diametre_bille_mm": {
+            "min": 6,
+            "max": 10
+          },
+          "force_N": {
+            "min": 5,
+            "max": 20
+          }
+        },
+        "loqueteau_magnetique": {
+          "force_N": {
+            "min": 10,
+            "max": 40
+          },
+          "jeu_porte_mm": {
+            "min": 1,
+            "max": 3
+          }
+        },
+        "targette": {
+          "longueur_mm": {
+            "min": 40,
+            "max": 80
+          }
+        }
+      }
+    },
+    "poignees_et_boutons": {
+      "entraxes_standard_mm": [
+        32,
+        64,
+        96,
+        128,
+        160,
+        192,
+        224,
+        256,
+        288,
+        320
+      ],
+      "entraxe_note": "Multiples de 32mm (système 32)",
+      "percage_diametre_mm": {
+        "min": 4,
+        "max": 5
+      },
+      "vis_fixation": {
+        "filetage": "M4",
+        "longueur_mm": "épaisseur panneau + 4-5mm (ex: 22mm pour panneau 18mm)"
+      },
+      "boutons_un_trou": {
+        "note": "Prévoir pion anti-rotation si modèle lourd"
+      }
+    },
+    "systemes_push_to_open": {
+      "noms_commerciaux": [
+        "Tip-On (Blum)",
+        "Push to open (Hettich)"
+      ],
+      "principe": "Doigt mécanique à ressort, supprime le besoin de poignée",
+      "variantes": {
+        "courte": {
+          "usage": "Portes < 1300mm",
+          "course_ejection_mm": 17
+        },
+        "longue": {
+          "usage": "Portes > 1300mm",
+          "course_ejection_mm": 38
+        }
+      },
+      "jeu_declenchement_mm": {
+        "min": 1.5,
+        "max": 3,
+        "note": "Espace vital entre façade et caisson au repos"
+      },
+      "types_embouts": {
+        "aimante": "Pour charnières SANS ressort de rappel + plaque métallique sur façade",
+        "tampon": "Pour charnières avec ressort inversé"
+      }
+    },
+    "amortisseurs_rapportes": {
+      "types": [
+        "À percer (cylindre dans le chant)",
+        "À visser (en applique sur platine)"
+      ],
+      "percage_encastrement": {
+        "diametre_mm": 10,
+        "profondeur_mm": 50
+      },
+      "positionnement": "Côté poignée pour levier optimal, au centre ou près des points d'impact",
+      "references": [
+        "Blumotion à percer (Blum)",
+        "Smove (Salice)"
+      ]
+    },
+    "charnieres_speciales": {
+      "pour_verre": {
+        "epaisseur_verre_mm": [
+          4,
+          5,
+          6
+        ],
+        "percage_mm": [
+          26,
+          35
+        ],
+        "note": "Coquille avec cache décoratif. Modèles sans perçage par mâchoire pour petites charges."
+      },
+      "pour_cadre_aluminium": {
+        "epaisseur_cadre_min_mm": 19,
+        "fixation": "Vis de blocage ou équerres dans les rainures du profilé alu"
+      },
+      "pour_angle": {
+        "bi_fold": {
+          "angle_deg": 60,
+          "usage": "Charnière intermédiaire entre 2 portes pliantes"
+        },
+        "grand_angle": {
+          "angle_deg": [
+            155,
+            170
+          ],
+          "usage": "Charnière fixant la première porte pliante au caisson"
+        }
+      },
+      "pour_portes_epaisses": {
+        "epaisseur_mm": {
+          "min": 24,
+          "max": 32
+        }
+      },
+      "pour_portes_fines": {
+        "epaisseur_mm": {
+          "min": 8,
+          "max": 15
+        },
+        "note": "Thin-door spécifique"
+      }
+    },
+    "quincaillerie_lit": {
+      "pieds": {
+        "hauteurs_mm": [
+          50,
+          80,
+          100,
+          120,
+          150,
+          200
+        ],
+        "filetage": [
+          "M8",
+          "M10"
+        ],
+        "charge_par_pied_kg": {
+          "min": 50,
+          "max": 150
+        }
+      },
+      "ferrures_assemblage": {
+        "crochets_encastres": {
+          "description": "Mâle/femelle à crochet, démontage rapide",
+          "hauteur_platine_mm": {
+            "min": 90,
+            "max": 150
+          }
+        },
+        "boulons_de_lit": {
+          "diametre_mm": [
+            6,
+            8
+          ],
+          "longueur_mm": [
+            80,
+            100,
+            120,
+            140
+          ]
+        },
+        "equerres_renfort": {
+          "ailes_mm": [
+            "40x40",
+            "50x50",
+            "60x60"
+          ]
+        }
+      },
+      "lit_coffre": {
+        "poids_cadre_sommier_matelas_kg": [
+          40,
+          50,
+          60,
+          80
+        ],
+        "verins_associes_N": [
+          400,
+          500,
+          600,
+          800
+        ],
+        "regle": "Choix vérin = poids cadre + sommier + matelas (pas seulement le bois)"
+      }
+    },
+    "ferrures_table_extensible": {
+      "coulisses": {
+        "asynchrones": {
+          "description": "Chaque côté tiré séparément"
+        },
+        "synchrones": {
+          "description": "Câble acier lie les deux côtés",
+          "largeur_rallonge_mm": {
+            "standard": 500,
+            "confort": 600
+          }
+        },
+        "mecanisme_papillon": {
+          "description": "Rallonge portefeuille repliée sous le plateau"
+        }
+      },
+      "longueurs_installees_mm": [
+        740,
+        900,
+        1200
+      ],
+      "charge_max_kg": {
+        "min": 40,
+        "max": 60
+      },
+      "alignement": [
+        "tourillons",
+        "loquets de table",
+        "taquets de positionnement"
+      ],
+      "regles": [
+        "Épaisseur rallonge = épaisseur plateau",
+        "500-600mm de rallonge ≈ +2 places",
+        "Verrouillage en position ouverte ET fermée"
+      ]
+    },
+    "chants_adhesifs": {
+      "materiaux": {
+        "melamine_pre_encollee": {
+          "epaisseur_mm": [
+            0.3,
+            0.4
+          ],
+          "pose": "Fer à repasser ~160°C",
+          "usage": "Bricoleur standard"
+        },
+        "ABS_PVC": {
+          "epaisseur_mm": [
+            0.8,
+            1,
+            2
+          ],
+          "pose": "Plaqueuse (pro) ou pré-encollé + fer",
+          "usage": "Résistance chocs, cuisine/SdB"
+        },
+        "placage_bois": {
+          "epaisseur_mm": [
+            0.5,
+            0.6,
+            1.5
+          ],
+          "pose": "Colle contact + ponçage + finition",
+          "usage": "Haut de gamme"
+        }
+      },
+      "choix_largeur_selon_panneau_mm": {
+        "panneau_16": [
+          19,
+          22
+        ],
+        "panneau_18": [
+          22,
+          23
+        ],
+        "panneau_25": [
+          28,
+          30
+        ],
+        "panneau_38": [
+          40,
+          42
+        ]
+      },
+      "regle_surplus": "Largeur chant = épaisseur panneau + 2-4mm (arasé après pose)",
+      "regles": [
+        "ABS 1-2mm sur chants exposés cuisine/SdB",
+        "Mélamine auto-adhésive : retouche uniquement, pas durable sur chant brut sollicité",
+        "Araser au coupe-chant ou cutter après pose"
+      ]
+    },
+    "poids_max_porte": {
+      "source": "Abaques Blum et Hettich",
+      "pour_largeur_max_mm": 600,
+      "configurations": [
+        {
+          "nb_charnieres": 2,
+          "hauteur_max_mm": 900,
+          "poids_max_kg": 8
+        },
+        {
+          "nb_charnieres": 3,
+          "hauteur_max_mm": 1600,
+          "poids_max_kg": 13
+        },
+        {
+          "nb_charnieres": 4,
+          "hauteur_max_mm": 2000,
+          "poids_max_kg": 17
+        },
+        {
+          "nb_charnieres": 5,
+          "hauteur_max_mm": 2400,
+          "poids_max_kg": 22
+        }
+      ],
+      "note": "Porte large (ratio largeur/hauteur inversé) → ajouter 1 charnière supplémentaire"
+    },
+    "regles_de_choix": [
+      {
+        "id": "Q_001",
+        "regle": "Privilégier Ø35mm pour la majorité des portes bois 15-24mm. Ø26mm reste pertinent pour petites portes légères ou applications spécifiques.",
+        "domaine": "charnieres"
+      },
+      {
+        "id": "Q_002",
+        "regle": "Coulisse à billes sortie totale pour tout tiroir de profondeur > 40cm",
+        "domaine": "coulisses"
+      },
+      {
+        "id": "Q_003",
+        "regle": "Amortissement intégré systématique sur charnières et coulisses — confort majeur pour petit surcoût",
+        "domaine": "general"
+      },
+      {
+        "id": "Q_004",
+        "regle": "Pré-percer TOUJOURS dans les panneaux dérivés (particules, MDF, mélaminé) — risque d'éclatement sinon",
+        "domaine": "vis"
+      },
+      {
+        "id": "Q_005",
+        "regle": "Vérifier le type de mur AVANT de choisir les chevilles — un meuble qui tombe est un danger mortel",
+        "domaine": "fixation"
+      },
+      {
+        "id": "Q_006",
+        "regle": "Pour coulisses latérales à billes télescopiques : largeur tiroir = largeur intérieure - 25.4mm. Non valable pour coulisses à galets, sous tiroir ou tiroirs métal.",
+        "domaine": "coulisses"
+      },
+      {
+        "id": "Q_007",
+        "regle": "Embase charnière toujours à 37mm du chant avant du caisson (système 32)",
+        "domaine": "charnieres"
+      },
+      {
+        "id": "Q_008",
+        "regle": "Anti-basculement OBLIGATOIRE pour tout meuble > 150cm non fixé au mur par sa structure",
+        "domaine": "securite"
+      }
+    ],
+    "formulas": [
+      {
+        "id": "F_QUI_001",
+        "name": "hinge_count",
+        "inputs": [
+          "door_height_mm"
+        ],
+        "expression": "Math.max(2, Math.ceil((door_height_mm - 800) / 500) + 2)",
+        "output": "num_hinges",
+        "note": "Check weight against abaque if door > 600mm wide"
+      },
+      {
+        "id": "F_QUI_002",
+        "name": "drawer_width_lateral_slides",
+        "inputs": [
+          "cabinet_inner_width_mm"
+        ],
+        "expression": "cabinet_inner_width_mm - 25.4",
+        "output": "drawer_box_width_mm",
+        "note": "12.7mm per side. ONLY for lateral ball-bearing slides."
+      },
+      {
+        "id": "F_QUI_003",
+        "name": "drawer_length",
+        "inputs": [
+          "cabinet_inner_depth_mm",
+          "rear_gap_mm"
+        ],
+        "expression": "cabinet_inner_depth_mm - rear_gap_mm",
+        "output": "drawer_box_length_mm",
+        "parameters": {
+          "rear_gap_mm": {
+            "min": 5,
+            "max": 10,
+            "default": 8
+          }
+        }
+      },
+      {
+        "id": "F_QUI_004",
+        "name": "gas_strut_force",
+        "inputs": [
+          "lid_weight_kg",
+          "num_struts"
+        ],
+        "expression": "(lid_weight_kg * 9.81) / num_struts",
+        "output": "force_per_strut_N",
+        "note": "Round UP to next available model"
+      },
+      {
+        "id": "F_QUI_005",
+        "name": "system_32_hole_positions",
+        "inputs": [
+          "row_offset_from_edge_mm",
+          "start_y_mm",
+          "hole_index"
+        ],
+        "expression": {
+          "x_mm": "row_offset_from_edge_mm",
+          "y_mm": "start_y_mm + hole_index * 32"
+        },
+        "output": {
+          "x_mm": "horizontal position",
+          "y_mm": "vertical position"
+        },
+        "parameters": {
+          "row_offset_from_edge_mm": {
+            "default": 37
+          }
+        }
+      },
+      {
+        "id": "F_QUI_006",
+        "name": "gap_between_twin_doors",
+        "inputs": [
+          "divider_thickness_mm",
+          "gap_between_doors_mm"
+        ],
+        "expression": "(divider_thickness_mm - gap_between_doors_mm) / 2",
+        "output": "overlay_per_door_mm",
+        "parameters": {
+          "gap_between_doors_mm": {
+            "min": 2,
+            "max": 3,
+            "default": 3
+          }
+        }
+      },
+      {
+        "id": "F_QUI_007",
+        "name": "hinge_cup_center",
+        "inputs": [
+          "K_mm"
+        ],
+        "expression": "17.5 + K_mm",
+        "output": "cup_center_from_edge_mm",
+        "parameters": {
+          "K_mm": {
+            "min": 3,
+            "max": 7,
+            "default": 4
+          }
+        }
+      },
+      {
+        "id": "F_QUI_008",
+        "name": "door_weight",
+        "inputs": [
+          "height_mm",
+          "width_mm",
+          "thickness_mm",
+          "density_kg_m3"
+        ],
+        "expression": "(height_mm * width_mm * thickness_mm * density_kg_m3) / 1000000000",
+        "output": "weight_kg",
+        "parameters": {
+          "density_kg_m3": {
+            "particleboard": 650,
+            "mdf": 750,
+            "plywood": 550,
+            "glass": 2500
+          }
+        }
+      },
+      {
+        "id": "F_QUI_009",
+        "name": "handle_screw_length",
+        "inputs": [
+          "panel_thickness_mm",
+          "handle_base_mm",
+          "thread_engagement_mm"
+        ],
+        "expression": "panel_thickness_mm + handle_base_mm + thread_engagement_mm",
+        "output": "screw_length_mm",
+        "parameters": {
+          "thread_engagement_mm": {
+            "min": 8,
+            "max": 12,
+            "default": 10
+          }
+        }
+      },
+      {
+        "id": "F_QUI_010",
+        "name": "edge_band_width",
+        "inputs": [
+          "panel_thickness_mm",
+          "trimming_surplus_mm"
+        ],
+        "expression": "panel_thickness_mm + trimming_surplus_mm",
+        "output": "band_width_mm",
+        "parameters": {
+          "trimming_surplus_mm": {
+            "min": 2,
+            "max": 4,
+            "default": 3
+          }
+        }
+      }
+    ]
+  },
+  "conception": {
+    "structure_caisson": {
+      "description": "Un caisson est composé de : 2 joues (côtés verticaux), 1 dessus, 1 dessous, 1 fond, + éventuellement séparateurs, tablettes, bandeaux",
+      "formes_assemblage": {
+        "forme_1_dessous_prioritaire": {
+          "description": "Le dessus et le dessous passent ENTRE les joues (joues prioritaires sur les horizontaux)",
+          "avantages": [
+            "Chants des joues cachés en vue de face",
+            "Facilite le perçage système 32 (tous les montants ont la même longueur)"
+          ],
+          "inconvenients": [
+            "Chant du dessous visible en vue latérale → nécessite joue d'habillage ou plaquage de chant"
+          ],
+          "usage": "Forme la plus courante en agencement et cuisine"
+        },
+        "forme_2_joues_entre_horizontaux": {
+          "description": "Les joues sont posées SUR le dessous et SOUS le dessus (horizontaux prioritaires)",
+          "avantages": [
+            "Meilleure reprise de charge sur les pieds",
+            "Pas de chant horizontal visible latéralement"
+          ],
+          "inconvenients": [
+            "Perçage système 32 décalé si montants intermédiaires"
+          ],
+          "usage": "Bibliothèques, meubles visibles des 4 côtés"
+        }
+      },
+      "dimensions_calcul": {
+        "hauteur_interieure": {
+          "joues_prioritaires": "H_int = H_ext - épaisseur_dessus - épaisseur_dessous",
+          "horizontaux_prioritaires": "H_int = H_ext - 0 (les joues sont ENTRE les horizontaux, pas de perte de hauteur interne)",
+          "note": "En forme 1 (joues prioritaires), les horizontaux s'inscrivent entre les joues et n'ajoutent pas à la hauteur extérieure"
+        },
+        "largeur_interieure": "largeur_exterieure - (2 × epaisseur_panneau)",
+        "profondeur_interieure": "profondeur_exterieure - epaisseur_fond (si fond en rainure/feuillure, sinon = profondeur ext.)"
+      },
+      "joue_habillage": {
+        "description": "Panneau décoratif rapporté sur le côté visible du caisson",
+        "epaisseur_mm": {
+          "min": 3,
+          "max": 19
+        },
+        "avantages": [
+          "Cache les chants, vis, usinages",
+          "Permet de visser le caisson sans se soucier de l'esthétique",
+          "Crée un vide sanitaire contre le mur"
+        ],
+        "regle": "La joue d'habillage vient au nu (affleurante) avec la face avant des portes"
+      },
+      "fileur": {
+        "description": "Pièce verticale entre le caisson et un mur, ou entre deux caissons",
+        "largeur_mm": {
+          "min": 20,
+          "max": 50,
+          "standard": 30
+        },
+        "usage": "Compensation des faux équerrages, protection contre les murs irréguliers, facilite le montage"
+      }
+    },
+    "fond_de_caisson": {
+      "description": "Le fond assure le contreventement (équerrage) et la rigidité du caisson",
+      "types": {
+        "rapporte_a_plat_cul": {
+          "description": "Le fond est cloué/vissé directement sur le chant arrière du caisson",
+          "epaisseur_mm": {
+            "min": 3,
+            "standard": 8,
+            "charge_lourde": 12
+          },
+          "avantages": [
+            "Aucun usinage (pas de rainure/feuillure)",
+            "Profondeur intérieure maximale",
+            "Le plus rapide"
+          ],
+          "inconvenients": [
+            "Chant du fond visible latéralement",
+            "Interdit si le dessous est visible (meuble suspendu)"
+          ],
+          "fixation": "Pointes sans tête 1.5×25mm, ou vis 3.5×16mm, espacement 15-20cm",
+          "usage": "Meubles bas posés contre un mur, caissons non visibles de l'arrière"
+        },
+        "en_rainure": {
+          "description": "Le fond s'insère dans une rainure usinée dans les joues et horizontaux",
+          "epaisseur_mm": {
+            "standard": 5,
+            "alternatif": 8
+          },
+          "rainure": {
+            "largeur_mm": "= épaisseur du fond (5 ou 8mm)",
+            "profondeur_mm": {
+              "min": 5,
+              "max": 8
+            },
+            "position_depuis_chant_arriere_mm": {
+              "min": 5,
+              "max": 10,
+              "standard": 8
+            }
+          },
+          "avantages": [
+            "Fond invisible des 4 côtés",
+            "Bon équerrage",
+            "Guide l'assemblage"
+          ],
+          "inconvenients": [
+            "Nécessite rainurage (défonceuse ou scie sur table)",
+            "Réduit la profondeur utile"
+          ],
+          "regles": [
+            "Rainure dans les joues : débouchante (traverse tout le panneau)",
+            "Rainure dans les horizontaux : arrêtée si le chant est visible, sinon débouchante",
+            "En cas de rainure arrêtée, finir à la défonceuse ou au ciseau",
+            "Le fond est assemblé AVANT collage final du caisson (il glisse dans les rainures)"
+          ],
+          "usage": "Meubles visibles des 4 côtés, meubles hauts suspendus"
+        },
+        "en_feuillure": {
+          "description": "Le fond se loge dans une feuillure (entaille en L) usinée dans le chant arrière",
+          "epaisseur_mm": {
+            "standard": 8,
+            "charge_lourde": 12
+          },
+          "feuillure": {
+            "largeur_mm": "= épaisseur du fond + 1mm de jeu",
+            "profondeur_mm": "= épaisseur_panneau / 3 (ex: 6mm pour panneau 18mm)",
+            "note": "Règle du tiers : profondeur feuillure = 1/3 de l'épaisseur du montant"
+          },
+          "avantages": [
+            "Fond vissable donc démontable",
+            "Bon maintien de l'équerrage",
+            "Profondeur utile quasi maximale"
+          ],
+          "inconvenients": [
+            "Chant du fond visible latéralement (fine bande)",
+            "Usinage requis"
+          ],
+          "fixation": "Vis 3.5×25mm dans la feuillure, espacement 20cm",
+          "usage": "Compromis entre 'rapporté' et 'en rainure' — très utilisé en pro"
+        }
+      },
+      "materiaux": {
+        "isorel_HDF_3mm": {
+          "usage": "Meubles très légers, dos de bibliothèque décoratifs",
+          "charge": "très faible"
+        },
+        "contreplaque_5mm": {
+          "usage": "Usage courant, suffisant pour la plupart des caissons < 80cm de large",
+          "charge": "légère"
+        },
+        "contreplaque_8mm": {
+          "usage": "Standard professionnel, bon équilibre rigidité/poids",
+          "charge": "moyenne"
+        },
+        "melamine_8mm": {
+          "usage": "Quand le fond est visible (intérieur d'un placard)",
+          "charge": "moyenne"
+        },
+        "contreplaque_12mm": {
+          "usage": "Charges lourdes, grands caissons > 100cm",
+          "charge": "lourde"
+        }
+      },
+      "regles": [
+        "Le fond ASSURE l'équerrage : un caisson sans fond n'est pas rigide",
+        "Pour fond > 80cm de large : ajouter un montant intermédiaire",
+        "Fond rapporté sans jeu = meilleur équerrage (le fond contraint la géométrie)",
+        "Pour meuble suspendu : fond en rainure ou feuillure (jamais rapporté vu du dessous)",
+        "Meuble haut cuisine : fond décollé de 15mm du mur pour système d'accroche (rail)",
+        "CP 5mm suffisant pour la majorité des usages — 8mm pour la tranquillité d'esprit"
+      ]
+    },
+    "calcul_portes": {
+      "description": "Formules de calcul des dimensions de portes selon le type de pose",
+      "jeux_standard_mm": {
+        "jeu_peripherique": {
+          "min": 1.5,
+          "standard": 2,
+          "max": 3,
+          "note": "Jeu entre la porte et le bord du caisson (haut, bas, côté opposé charnière)"
+        },
+        "jeu_entre_portes": {
+          "min": 2,
+          "standard": 3,
+          "max": 5,
+          "note": "Jeu entre deux portes adjacentes"
+        },
+        "jeu_porte_tiroir": {
+          "min": 2,
+          "standard": 3,
+          "max": 4
+        }
+      },
+      "porte_applique_1_porte": {
+        "description": "1 porte recouvrant tout le caisson",
+        "largeur_porte": "largeur_ext_caisson + (2 × recouvrement) - (2 × jeu_peripherique)",
+        "recouvrement_mm": {
+          "standard": 16,
+          "note": "La porte dépasse de 16mm de chaque côté sur les joues"
+        },
+        "hauteur_porte": "hauteur_ext_caisson + (2 × recouvrement) - (2 × jeu_peripherique)",
+        "exemple": {
+          "caisson_L_mm": 400,
+          "recouvrement_mm": 16,
+          "jeu_mm": 2,
+          "largeur_porte_mm": "400 + 32 - 4 = 428"
+        }
+      },
+      "porte_applique_2_portes": {
+        "description": "2 portes sur un même caisson, chacune sur une joue",
+        "largeur_par_porte": "(largeur_ext_caisson + (2 × recouvrement) - jeu_entre_portes) / 2",
+        "note": "Chaque porte recouvre sa joue de 'recouvrement' mm et il y a 'jeu_entre_portes' mm entre elles",
+        "exemple": {
+          "caisson_L_mm": 800,
+          "recouvrement_mm": 16,
+          "jeu_entre_mm": 3,
+          "largeur_porte_mm": "(800 + 32 - 3) / 2 = 414.5"
+        }
+      },
+      "porte_demi_recouvrement": {
+        "description": "Porte sur un montant central partagé entre 2 caissons adjacents",
+        "recouvrement_par_porte_mm": "(epaisseur_montant - jeu_entre_portes) / 2",
+        "exemple_montant_18mm": "recouvrement = (18 - 3) / 2 = 7.5mm par porte",
+        "charniere": "Coudure 9mm"
+      },
+      "porte_rentrant": {
+        "description": "Porte encastrée dans l'ouverture du caisson",
+        "largeur_porte": "largeur_interieure_caisson - (2 × jeu_peripherique)",
+        "hauteur_porte": "hauteur_interieure_caisson - (2 × jeu_peripherique)",
+        "jeu_mm": {
+          "min": 2,
+          "max": 3
+        },
+        "charniere": "Coudure 16mm"
+      },
+      "position_charnieres_sur_porte_mm": {
+        "distance_bord_sup_et_inf": {
+          "min": 60,
+          "standard": 80,
+          "max": 100
+        },
+        "centre_boitier_depuis_chant": {
+          "formule": "17.5 + K",
+          "K_mm": {
+            "min": 3,
+            "standard": 4,
+            "max": 7
+          },
+          "resultat_mm": {
+            "min": 20.5,
+            "standard": 21.5,
+            "max": 24.5
+          }
+        },
+        "note": "Charnières intermédiaires réparties régulièrement entre la première et la dernière"
+      },
+      "poids_max_porte": {
+        "valeurs_prudentes_avant_projet": [
+          {
+            "nb_charnieres": 2,
+            "hauteur_max_mm": 900,
+            "poids_max_kg": {
+              "prudent": 5,
+              "abaque_fabricant": 8
+            }
+          },
+          {
+            "nb_charnieres": 3,
+            "hauteur_max_mm": 1600,
+            "poids_max_kg": {
+              "prudent": 7,
+              "abaque_fabricant": 13
+            }
+          },
+          {
+            "nb_charnieres": 4,
+            "hauteur_max_mm": 2000,
+            "poids_max_kg": {
+              "prudent": 10,
+              "abaque_fabricant": 17
+            }
+          },
+          {
+            "nb_charnieres": 5,
+            "hauteur_max_mm": 2400,
+            "poids_max_kg": {
+              "prudent": 13,
+              "abaque_fabricant": 22
+            }
+          }
+        ],
+        "note": "Valeurs prudentes = avant-projet bricoleur. Abaque fabricant = Blum/Hettich pour largeur ≤ 600mm. Toujours vérifier la doc."
+      }
+    },
+    "calcul_tiroirs": {
+      "description": "Formules de calcul des dimensions de tiroirs avec coulisses latérales",
+      "facade_tiroir": {
+        "applique": {
+          "largeur": "largeur_ext_caisson + (2 × recouvrement) - (2 × jeu_peripherique)",
+          "hauteur": "hauteur_ouverture_attribuee + recouvrement_haut + recouvrement_bas - jeu_entre_facades",
+          "note": "Même logique que les portes en applique"
+        },
+        "rentrant": {
+          "largeur": "largeur_interieure_caisson - (2 × jeu_peripherique)",
+          "hauteur": "hauteur_ouverture_attribuee - jeu_haut - jeu_bas"
+        },
+        "jeu_entre_facades_mm": {
+          "min": 2,
+          "standard": 3,
+          "max": 4
+        }
+      },
+      "caisson_tiroir": {
+        "largeur": "largeur_interieure_caisson - (2 × encombrement_coulisse)",
+        "encombrement_coulisse_mm": {
+          "coulisses_laterales_billes": 12.7,
+          "coulisses_sous_tiroir_invisibles": "variable (ex: Tandem = intérieur - 42mm pour côtés 16mm)",
+          "tiroirs_metal_integres": 0,
+          "note": "12.7mm UNIQUEMENT pour coulisses latérales à billes. Vérifier la doc fabricant pour tout autre système."
+        },
+        "profondeur": "profondeur_interieure_caisson - jeu_arriere (5-10mm)",
+        "hauteur_cotes_mm": {
+          "min": 60,
+          "max": 200,
+          "note": "Selon hauteur utile souhaitée"
+        }
+      },
+      "fond_tiroir": {
+        "epaisseur_mm": {
+          "leger": 4,
+          "standard": 5,
+          "charge": 8,
+          "lourd": 10
+        },
+        "assemblage": {
+          "en_rainure": {
+            "position_rainure_depuis_bas_mm": {
+              "min": 8,
+              "max": 10
+            },
+            "profondeur_rainure_mm": {
+              "min": 5,
+              "max": 6
+            },
+            "note": "Le fond glisse dans la rainure des côtés et de la façade intérieure"
+          },
+          "rapporte_sous_tiroir": {
+            "description": "Fond vissé ou cloué sous les côtés du tiroir",
+            "avantage": "Pas de rainurage nécessaire",
+            "inconvenient": "Hauteur utile réduite de l'épaisseur du fond"
+          }
+        },
+        "fixation_arriere": "Vis dans trou oblong à l'arrière — permet le mouvement du bois"
+      },
+      "facade_rapportee": {
+        "description": "La façade décorative est une pièce séparée, fixée sur le caisson du tiroir après montage des coulisses",
+        "methode": [
+          "1. Monter le caisson du tiroir avec les coulisses",
+          "2. Positionner la façade avec du scotch double face temporaire",
+          "3. Vérifier les jeux et l'alignement",
+          "4. Visser depuis l'intérieur du tiroir (2 vis min)",
+          "5. Retirer le scotch"
+        ],
+        "avantage": "Permet un ajustement parfait des jeux APRÈS montage"
+      }
+    },
+    "tablettes": {
+      "fixes": {
+        "description": "Assemblées au caisson par tourillons, lamelles, vis ou rainure",
+        "role": "Structure (reprise de charge, anti-flambage des joues), séparation de zones",
+        "dimensions": "largeur = largeur_interieure_caisson (joue à joue), profondeur = profondeur caisson - épaisseur fond",
+        "regles": [
+          "Au moins 1 tablette fixe en haut et 1 en bas du caisson pour la rigidité",
+          "Tablette fixe obligatoire si portée joue > 80cm (anti-flambage)",
+          "Assemblage par tourillons Ø8mm ou lamelles n°20 + colle"
+        ]
+      },
+      "reglables": {
+        "description": "Posées sur taquets, repositionnables",
+        "dimensions": "largeur = largeur_interieure - 2mm de jeu total, profondeur = profondeur intérieure - 2mm",
+        "jeu_mm": 1,
+        "percage_systeme_32": {
+          "entraxe_mm": 32,
+          "distance_chant_avant_mm": 37,
+          "diametre_mm": 5,
+          "profondeur_mm": {
+            "min": 10,
+            "max": 13
+          }
+        }
+      }
+    },
+    "separateurs_verticaux": {
+      "description": "Cloisons verticales divisant un caisson en compartiments",
+      "epaisseur_mm": {
+        "standard": 18,
+        "fin": 12
+      },
+      "assemblage": "Tourillons, lamelles ou vis confirmation dans les tablettes fixes/dessus/dessous",
+      "impact_portes": "Un séparateur crée un montant central → charnières en demi-recouvrement",
+      "largeur_min_montant_mm": 70,
+      "note": "Largeur min 70mm pour pouvoir fixer une embase de charnière (37mm + marge)"
+    },
+    "plinthe_socle": {
+      "description": "Base du meuble posé au sol",
+      "hauteur_standard_mm": {
+        "min": 80,
+        "standard": 100,
+        "cuisine": 100,
+        "max": 150
+      },
+      "retrait_mm": {
+        "min": 30,
+        "standard": 40,
+        "max": 50
+      },
+      "types": {
+        "socle_rapporte": {
+          "description": "Cadre en panneau fixé sous le caisson",
+          "avantage": "Renforce la base, permet de compenser les inégalités du sol"
+        },
+        "pieds_reglables_avec_bandeau": {
+          "description": "Pieds à vérin + bandeau clipsé en façade",
+          "avantage": "Réglage de niveau, accès sous le meuble pour nettoyage",
+          "usage": "Standard cuisine et salle de bain"
+        },
+        "plinthe_integree": {
+          "description": "Les joues descendent jusqu'au sol avec un retrait en façade",
+          "avantage": "Esthétique épurée",
+          "inconvenient": "Pas de réglage, nécessite sol parfaitement plan"
+        }
+      }
+    },
+    "chants": {
+      "description": "Finition des tranches visibles des panneaux dérivés",
+      "types": {
+        "chant_thermocollant": {
+          "description": "Bande pré-encollée, application au fer à repasser",
+          "epaisseurs_mm": [
+            0.4,
+            0.8
+          ],
+          "largeurs_mm": [
+            19,
+            22,
+            23,
+            28,
+            33,
+            43
+          ],
+          "note": "Largeur = épaisseur panneau + 3-4mm (arasé après pose)",
+          "application": "Fer à repasser domestique à ~160°C, pression ferme, arasage au coupe-chant",
+          "usage": "Bricoleur — solution la plus simple et accessible"
+        },
+        "chant_ABS_PVC": {
+          "description": "Bande plastique collée (colle contact ou plaqueuse)",
+          "epaisseurs_mm": [
+            0.4,
+            1,
+            2
+          ],
+          "note": "1mm et 2mm = finition pro, nécessite plaqueuse de chant",
+          "usage": "Professionnel"
+        },
+        "placage_bois": {
+          "description": "Fine feuille de bois véritable (0.5mm) collée",
+          "epaisseur_mm": 0.5,
+          "usage": "Meubles en contreplaqué — harmoniser le chant avec le parement"
+        }
+      },
+      "regles_application": [
+        "Plaquer les chants AVANT l'assemblage du caisson",
+        "Chants visibles en priorité : façade du meuble (chant avant des joues, dessus, dessous)",
+        "Chants intérieurs : nécessaires sur tablettes réglables (toutes les faces visibles)",
+        "Pas besoin de plaquer le chant arrière si contre un mur",
+        "Pas besoin de plaquer les chants cachés par une porte"
+      ],
+      "ordre_plaquage": [
+        "1. Chants transversaux (petits côtés) en premier",
+        "2. Chants longitudinaux (grands côtés) ensuite — ils recouvrent les bouts des transversaux",
+        "→ Résultat : les chants longitudinaux (les plus visibles) sont continus"
+      ]
+    },
+    "tiroirs_multiples_empiles": {
+      "description": "Règles pour plusieurs tiroirs superposés dans une même travée",
+      "jeux_mm": {
+        "entre_facades": {
+          "min": 2,
+          "standard": 3,
+          "max": 4
+        },
+        "peripherie_haut_bas": {
+          "min": 2,
+          "standard": 3,
+          "max": 4
+        }
+      },
+      "formules": {
+        "somme_hauteurs_facades": "H_zone - J_haut - J_bas - ((N-1) × J_entre)",
+        "hauteur_facade_egale": "(H_zone - J_haut - J_bas - ((N-1) × J_entre)) / N",
+        "hauteur_derniere_par_reste": "H_zone - J_haut - J_bas - ((N-1) × J_entre) - somme_autres"
+      },
+      "repartition": {
+        "egales": "Esthétique régulière, commodes minimalistes",
+        "progressive": {
+          "regle": "Augmenter du haut vers le bas",
+          "pas_mm": {
+            "min": 20,
+            "standard": 32,
+            "max": 64
+          },
+          "usage": "Bas plus volumineux (linge, dossiers, casseroles)"
+        },
+        "fonctionnelle": {
+          "hauteurs_utiles_mm": {
+            "petit_objet": {
+              "min": 60,
+              "standard": 80,
+              "max": 120
+            },
+            "linge_plie": {
+              "min": 120,
+              "standard": 160,
+              "max": 220
+            },
+            "casserolier_dossiers": {
+              "min": 180,
+              "standard": 250,
+              "max": 320
+            }
+          }
+        }
+      },
+      "regles": [
+        "Répartir les jeux AVANT de figer les hauteurs de façade",
+        "Façade la plus haute en bas",
+        "Ne pas compenser un défaut de coupe en variant les jeux — corriger la géométrie",
+        "Avec façade rapportée : poser et régler les caissons tiroirs AVANT de fixer les façades"
+      ],
+      "exemple_mm": {
+        "zone_totale": 716,
+        "nb_facades": 4,
+        "J_haut": 2,
+        "J_bas": 2,
+        "J_entre": 3,
+        "somme_facades": 703,
+        "repartition_progressive": [
+          131,
+          163,
+          195,
+          214
+        ]
+      }
+    },
+    "portes_traverses_intermediaires": {
+      "description": "Deux portes superposées séparées par une tablette fixe",
+      "cas": {
+        "traverse_visible": {
+          "description": "La traverse apparaît entre les deux portes (style traditionnel)",
+          "H_porte_haute": "H_ouverture_haute - J_haut - J_bas",
+          "H_porte_basse": "H_ouverture_basse - J_haut - J_bas"
+        },
+        "traverse_cachee_applique": {
+          "description": "Les portes recouvrent les chants de la traverse (style moderne)",
+          "H_porte_haute": "H_zone_haute + R_haut + R_bas - J_haut - J_entre",
+          "H_porte_basse": "H_zone_basse + R_haut + R_bas - J_entre - J_bas",
+          "recouvrement_sur_tablette_18mm": "7.5mm par porte (moitié épaisseur - demi-jeu)"
+        }
+      },
+      "jeu_entre_portes_mm": {
+        "min": 2,
+        "standard": 3,
+        "max": 4
+      },
+      "regles": [
+        "Chaque porte est traitée indépendamment pour le nombre de charnières",
+        "Traverse structurelle obligatoire si largeur > 600-800mm",
+        "Même logique de jeux sur toute la façade pour cohérence visuelle"
+      ]
+    },
+    "charge_max_assemblage": {
+      "description": "Ordres de grandeur prudents pour panneaux 16-19mm correctement usinés",
+      "par_liaison": {
+        "tourillons_colles": {
+          "charge_kg": {
+            "min": 15,
+            "max": 30
+          },
+          "note": "Très résistant au cisaillement. Assemblage définitif."
+        },
+        "lamelles_collees": {
+          "charge_kg": {
+            "min": 10,
+            "max": 25
+          },
+          "note": "Excellent alignement, moins bon en traction directe"
+        },
+        "vis_confirmation": {
+          "charge_kg": {
+            "min": 20,
+            "max": 40
+          },
+          "note": "Idéal panneaux dérivés, pré-perçage étagé obligatoire"
+        },
+        "excentriques_goujon": {
+          "charge_kg": {
+            "min": 10,
+            "max": 20
+          },
+          "note": "Démontable. Toujours coupler avec tourillons pour alignement"
+        },
+        "vis_bois_directe": {
+          "charge_kg": {
+            "min": 8,
+            "max": 18
+          },
+          "note": "Dépannage ou petites charges"
+        }
+      },
+      "classement": "tourillons collés ≈ vis confirmation > lamelles > excentriques > vis directes",
+      "note": "La rigidité globale dépend plus du fond et du contreventement que du type d'assemblage seul"
+    },
+    "meubles_angle": {
+      "description": "Contraintes spécifiques aux caissons d'angle",
+      "types": {
+        "caisson_en_L": {
+          "portes": "Grand angle (155-170°) + bi-fold (60°) pour portes pliantes",
+          "regles": [
+            "Point de reprise rigide à l'angle intérieur",
+            "Ferrure d'accès pour volumes profonds"
+          ]
+        },
+        "caisson_biaise_45": {
+          "regles": [
+            "Coupe précise obligatoire",
+            "Gabarits de montage pour maintenir l'angle"
+          ]
+        },
+        "jonction_deux_caissons": {
+          "fileur_angle_mm": {
+            "min": 50,
+            "standard": 65
+          },
+          "justification_fileur": "Empêche les poignées du meuble adjacent de bloquer l'ouverture",
+          "liaison": "Vis de liaison Ø6-7mm, L30-50mm entre caissons"
+        }
+      },
+      "regles": [
+        "Faux équerrage du local se cumule avec celui du meuble → prévoir fileurs et jeux de pose",
+        "Volume arrière inaccessible sans ferrure → scinder le meuble ou ajouter panier tournant",
+        "Ne pas placer les assemblages les plus faibles au sommet de l'angle (zone de torsion)"
+      ]
+    },
+    "contreventement": {
+      "description": "Rigidité quand le fond seul ne suffit pas",
+      "seuils_surveillance_mm": {
+        "largeur": {
+          "surveillance": 800,
+          "renfort": 1000
+        },
+        "hauteur": {
+          "surveillance": 1200,
+          "renfort": 1800
+        },
+        "rapport_H_L": {
+          "surveillance": 2,
+          "renfort": 3
+        }
+      },
+      "solutions": [
+        "Fond plus épais (8, 10, 12mm)",
+        "Fond en rainure sur 4 côtés",
+        "Tablette fixe collée/vissée",
+        "Séparateur vertical",
+        "Traverse arrière (H min 60mm, standard 80-120mm)",
+        "Équerres métal intérieures",
+        "Cadre arrière (meuble sans fond)"
+      ],
+      "regles": [
+        "HDF 3mm = petit meuble uniquement. Grand caisson chargé = insuffisant",
+        "Meuble sans fond = traverses arrière obligatoires (min 1, idéalement 2)",
+        "Tablette fixe bien liée > tablette réglable pour la rigidité",
+        "Penser voilement ET flambage des longues joues"
+      ]
+    },
+    "tolerances_bricoleur": {
+      "coupe_panneaux_mm": {
+        "outils_manuels_guide": "±1.5 à ±2",
+        "electroportatif_guide_fiable": "±0.5 à ±1",
+        "atelier_bien_regle": "±0.2 à ±0.5"
+      },
+      "percage_mm": {
+        "charnieres_coulisses": "±0.5 (compensable par réglage 3D)",
+        "systeme_32": "±0.5"
+      },
+      "equerrage_diagonales_mm": {
+        "petit_caisson": {
+          "max": 1
+        },
+        "caisson_courant": {
+          "max": 2
+        },
+        "grand_caisson": {
+          "max": 3
+        }
+      },
+      "jeux_recommandes_mm": {
+        "precision_moyenne": 3,
+        "precision_elevee": 2
+      },
+      "regles": [
+        "Plus l'outillage est simple → jeux visibles plus généreux",
+        "3mm de jeu souvent plus propre que 2mm si la coupe n'est pas excellente",
+        "Ne pas viser 1.5mm de jeu sans process de coupe très répétable"
+      ]
+    },
+    "meuble_suspendu": {
+      "charges": {
+        "formule": "charge_totale = (poids_vide + contenu + portes_tiroirs) × coefficient_securite",
+        "coefficient_securite": {
+          "min": 2,
+          "standard": 2.5,
+          "max": 3
+        }
+      },
+      "fixations": {
+        "position": "Au plus haut possible, zone supérieure arrière",
+        "ecartement_lateral_mm": {
+          "min": 50,
+          "standard": 80,
+          "max": 120
+        },
+        "nombre_min": 2,
+        "ajout_3e_point_largeur_mm": 800,
+        "charge_par_fixation_kg": {
+          "maconnerie_pleine": {
+            "min": 20,
+            "standard": 30,
+            "max": 50
+          },
+          "support_creux": "valider selon cheville et notice fabricant"
+        }
+      },
+      "boitiers_suspension": {
+        "charge_max_par_boitier_kg": 65,
+        "positionnement": "Dans les joues latérales supérieures, JAMAIS dans la tablette du dessus"
+      },
+      "construction": {
+        "fond": [
+          "rainure",
+          "feuillure",
+          "panneau épais",
+          "traverse arrière haute"
+        ],
+        "contreventement_obligatoire": true
+      },
+      "regles": [
+        "Fond mince décoratif ≠ support de fixation",
+        "Reporter les efforts dans les joues et le dessus via ferrures/traverses",
+        "Installer ferrures et renforts arrière AVANT la pose au mur"
+      ]
+    },
+    "debord_plan_de_travail": {
+      "cuisine": {
+        "avant_mm": {
+          "min": 15,
+          "standard": 20,
+          "max": 30
+        },
+        "lateral_joue_visible_mm": {
+          "min": 10,
+          "standard": 20,
+          "max": 30
+        },
+        "arriere_mm": {
+          "standard": 0,
+          "vide_sanitaire": 50
+        }
+      },
+      "bureau": {
+        "avant_mm": {
+          "min": 20,
+          "standard": 30,
+          "confort": 40,
+          "max": 60
+        },
+        "lateral_mm": {
+          "min": 10,
+          "standard": 20,
+          "max": 40
+        }
+      },
+      "regles": [
+        "Débord avant protège les façades des coulures d'eau/liquides",
+        "Débord trop important sans renfort = fléchissement ou arrachement",
+        "En bureau, léger débord avant améliore la prise de main"
+      ]
+    },
+    "sequence_assemblage": {
+      "description": "Ordre recommandé pour assembler un caisson complet",
+      "etapes": [
+        {
+          "ordre": 1,
+          "action": "Contrôler toutes les pièces",
+          "details": "Cotes, équerrage, faces vues, chants à plaquer"
+        },
+        {
+          "ordre": 2,
+          "action": "Usiner avant montage",
+          "details": "Rainures fond, perçages sys32, perçages charnières, pré-perçages assemblage"
+        },
+        {
+          "ordre": 3,
+          "action": "Plaquer les chants",
+          "details": "AVANT assemblage. Petits chants d'abord, grands chants ensuite"
+        },
+        {
+          "ordre": 4,
+          "action": "Montage à blanc",
+          "details": "Vérifier diagonales, jeux, fond et tablettes fixes"
+        },
+        {
+          "ordre": 5,
+          "action": "Assembler la structure",
+          "details": "Joues + dessus + dessous + séparateurs/tablettes fixes"
+        },
+        {
+          "ordre": 6,
+          "action": "Poser le fond",
+          "details": "Équerrer sur le fond. Contrôler diagonales AVANT fixation définitive"
+        },
+        {
+          "ordre": 7,
+          "action": "Socle, traverses, renforts"
+        },
+        {
+          "ordre": 8,
+          "action": "Quincaillerie intérieure",
+          "details": "Coulisses, embases charnières, taquets, ferrures de suspension"
+        },
+        {
+          "ordre": 9,
+          "action": "Mise de niveau et fixation",
+          "details": "Réglage pieds, fixation murale, liaison entre caissons"
+        },
+        {
+          "ordre": 10,
+          "action": "Monter portes et tiroirs",
+          "details": "Régler jeux et alignement"
+        },
+        {
+          "ordre": 11,
+          "action": "Fixer façades rapportées tiroirs",
+          "details": "Scotch double-face temporaire → ajuster → visser depuis l'intérieur"
+        },
+        {
+          "ordre": 12,
+          "action": "Contrôle final",
+          "details": "Ouverture/fermeture, affleurements, serrage final, anti-basculement"
+        }
+      ],
+      "regles_cles": [
+        "Ne JAMAIS fixer les façades tiroirs avant que le meuble soit de niveau et les coulisses réglées",
+        "Le fond sert d'outil d'équerrage → le poser avant de considérer le caisson comme figé",
+        "Meuble suspendu : installer ferrures arrière AVANT la pose au mur"
+      ]
+    },
+    "regles_conception": [
+      {
+        "id": "RC_001",
+        "regle": "Toujours dessiner la FAÇADE d'abord (portes/tiroirs), puis implanter les montants/joues derrière",
+        "source": "Bonbonveronbi — L'Air du Bois",
+        "impact": "Évite les erreurs de recouvrement et de jeux"
+      },
+      {
+        "id": "RC_002",
+        "regle": "Jeu standard = 2-3 mm partout (autour des portes, entre portes, entre tiroirs)",
+        "source": "Pratique courante menuisiers"
+      },
+      {
+        "id": "RC_003",
+        "regle": "Régler le meuble de niveau AVANT de monter les portes",
+        "source": "L'Air du Bois",
+        "impact": "Sinon les réglages de charnières ne suffisent pas"
+      },
+      {
+        "id": "RC_004",
+        "regle": "Un caisson sans fond n'est pas un meuble — le fond assure l'équerrage",
+        "source": "Principe fondamental de menuiserie"
+      },
+      {
+        "id": "RC_005",
+        "regle": "Pour un montant intermédiaire recevant des charnières : largeur min 70 mm",
+        "source": "Système 32 (37mm embase + 32mm entraxe + marge)"
+      },
+      {
+        "id": "RC_006",
+        "regle": "Portée max d'une tablette sans fléchissement = fonction du matériau (60cm particules 19mm, 80cm CP 18mm, 90cm massif 25mm)",
+        "source": "Domaine 1 — Ergonomie"
+      },
+      {
+        "id": "RC_007",
+        "regle": "Privilégier la façade de tiroir rapportée (vis depuis l'intérieur) pour un ajustement parfait des jeux",
+        "source": "Pratique professionnelle"
+      },
+      {
+        "id": "RC_008",
+        "regle": "En cas de doute sur l'épaisseur du fond : 8mm CP = le standard pro qui marche pour tout",
+        "source": "Consensus L'Air du Bois"
+      }
+    ],
+    "formulas": [
+      {
+        "id": "F_CON_001",
+        "name": "door_width_full_overlay_single",
+        "inputs": [
+          "cabinet_outer_width_mm",
+          "overlay_mm",
+          "peripheral_gap_mm"
+        ],
+        "expression": "cabinet_outer_width_mm + 2 * overlay_mm - 2 * peripheral_gap_mm",
+        "output": "door_width_mm",
+        "parameters": {
+          "overlay_mm": {
+            "default": 16
+          },
+          "peripheral_gap_mm": {
+            "default": 2
+          }
+        }
+      },
+      {
+        "id": "F_CON_002",
+        "name": "door_width_full_overlay_double",
+        "inputs": [
+          "cabinet_outer_width_mm",
+          "overlay_mm",
+          "gap_between_doors_mm"
+        ],
+        "expression": "(cabinet_outer_width_mm + 2 * overlay_mm - gap_between_doors_mm) / 2",
+        "output": "door_width_mm",
+        "parameters": {
+          "overlay_mm": {
+            "default": 16
+          },
+          "gap_between_doors_mm": {
+            "default": 3
+          }
+        }
+      },
+      {
+        "id": "F_CON_003",
+        "name": "door_width_inset",
+        "inputs": [
+          "cabinet_inner_width_mm",
+          "gap_mm"
+        ],
+        "expression": "cabinet_inner_width_mm - 2 * gap_mm",
+        "output": "door_width_mm",
+        "parameters": {
+          "gap_mm": {
+            "min": 2,
+            "max": 3,
+            "default": 2
+          }
+        }
+      },
+      {
+        "id": "F_CON_004",
+        "name": "drawer_box_width",
+        "inputs": [
+          "cabinet_inner_width_mm",
+          "slide_clearance_mm"
+        ],
+        "expression": "cabinet_inner_width_mm - 2 * slide_clearance_mm",
+        "output": "drawer_box_width_mm",
+        "parameters": {
+          "slide_clearance_mm": {
+            "default": 12.7
+          }
+        }
+      },
+      {
+        "id": "F_CON_005",
+        "name": "drawer_box_depth",
+        "inputs": [
+          "cabinet_inner_depth_mm",
+          "rear_gap_mm"
+        ],
+        "expression": "cabinet_inner_depth_mm - rear_gap_mm",
+        "output": "drawer_box_depth_mm",
+        "parameters": {
+          "rear_gap_mm": {
+            "min": 5,
+            "max": 10,
+            "default": 8
+          }
+        }
+      },
+      {
+        "id": "F_CON_006",
+        "name": "rebate_depth_for_back",
+        "inputs": [
+          "panel_thickness_mm"
+        ],
+        "expression": "Math.round(panel_thickness_mm / 3)",
+        "output": "rebate_depth_mm"
+      },
+      {
+        "id": "F_CON_007",
+        "name": "half_overlay_per_door",
+        "inputs": [
+          "divider_thickness_mm",
+          "gap_between_doors_mm"
+        ],
+        "expression": "(divider_thickness_mm - gap_between_doors_mm) / 2",
+        "output": "overlay_per_door_mm"
+      },
+      {
+        "id": "F_CON_008",
+        "name": "door_height_by_zone",
+        "inputs": [
+          "zone_height_mm",
+          "overlay_top_mm",
+          "overlay_bottom_mm",
+          "gap_top_mm",
+          "gap_bottom_mm"
+        ],
+        "expression": "zone_height_mm + overlay_top_mm + overlay_bottom_mm - gap_top_mm - gap_bottom_mm",
+        "output": "door_height_mm",
+        "parameters": {
+          "overlay_top_mm": {
+            "default": 16
+          },
+          "overlay_bottom_mm": {
+            "default": 16
+          },
+          "gap_top_mm": {
+            "default": 2
+          },
+          "gap_bottom_mm": {
+            "default": 2
+          }
+        }
+      },
+      {
+        "id": "F_CON_009",
+        "name": "adjustable_shelf_count",
+        "inputs": [
+          "available_height_mm",
+          "fixed_shelf_height_mm",
+          "spacing_mm"
+        ],
+        "expression": "Math.floor((available_height_mm - fixed_shelf_height_mm) / spacing_mm) - 1",
+        "output": "num_adjustable_shelves"
+      },
+      {
+        "id": "F_CON_010",
+        "name": "system_32_first_hole",
+        "inputs": [],
+        "expression": "37",
+        "output": "first_hole_x_from_front_edge_mm",
+        "note": "Horizontal distance of the drilling row from front edge. Vertical positions follow F_QUI_005."
+      }
+    ]
+  },
+  "projets": {
+    "bibliotheque": {
+      "id": "bibliotheque",
+      "nom": "Bibliothèque",
+      "icone": "📚",
+      "description": "Meuble de rangement ouvert pour livres, objets déco, médias",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "dessus",
+        "dessous",
+        "fond"
+      ],
+      "composants_optionnels": [
+        "tablette_fixe",
+        "tablette_reglable",
+        "separateur",
+        "porte",
+        "tiroir",
+        "bandeau",
+        "plinthe"
+      ],
+      "dimensions_defaut": {
+        "hauteur_mm": 2000,
+        "largeur_mm": 800,
+        "profondeur_mm": 300,
+        "epaisseur_panneau_mm": 18,
+        "nb_tablettes_reglables": 4
+      },
+      "generation": {
+        "joues": {
+          "longueur": "hauteur_meuble - (si plinthe : hauteur_plinthe)",
+          "largeur": "profondeur_meuble"
+        },
+        "dessus_dessous": {
+          "longueur": "largeur_meuble - (2 × epaisseur_panneau)",
+          "largeur": "profondeur_meuble",
+          "note": "Si joues prioritaires (forme 1)"
+        },
+        "tablettes_fixes": {
+          "longueur": "largeur_interieure",
+          "largeur": "profondeur - epaisseur_fond",
+          "position": "Une en haut (sous le dessus) et une en bas (sur le dessous) minimum"
+        },
+        "tablettes_reglables": {
+          "longueur": "largeur_interieure - 2mm",
+          "largeur": "profondeur - epaisseur_fond - 2mm",
+          "espacement_defaut": "réparti régulièrement entre tablettes fixes"
+        },
+        "fond": {
+          "longueur": "hauteur_meuble - (si rainure : 2 × profondeur_rainure)",
+          "largeur": "largeur_meuble - (si rainure : 2 × profondeur_rainure)",
+          "epaisseur_mm": 5,
+          "type": "rainure"
+        }
+      },
+      "quincaillerie_associee": {
+        "sans_porte": [
+          "taquets Ø5mm (4 par tablette réglable)",
+          "vis assemblage ou tourillons Ø8mm"
+        ],
+        "avec_portes": [
+          "+ charnières Ø35mm applique 110°",
+          "+ poignées (entraxe selon choix)"
+        ],
+        "fixation_murale": "Anti-basculement obligatoire si H > 150cm"
+      },
+      "contraintes": [
+        {
+          "regle": "Portée tablette ≤ 80cm (CP 18mm) ou 60cm (particules 19mm)",
+          "action": "Proposer séparateur vertical"
+        },
+        {
+          "regle": "Hauteur > 150cm",
+          "action": "Alerter anti-basculement obligatoire"
+        },
+        {
+          "regle": "Profondeur < 20cm",
+          "action": "Alerter stabilité insuffisante sans fixation murale"
+        },
+        {
+          "regle": "Largeur > 120cm",
+          "action": "Proposer séparateur central pour éviter fléchissement"
+        },
+        {
+          "regle": "Profondeur > 35 cm sur meuble haut non fixé",
+          "action": "Alerter poids et risque basculement avec tiroirs/portes"
+        },
+        {
+          "regle": "Présence de bacs enfants en partie basse",
+          "action": "Alerter sur pincement doigts et stabilité"
+        }
+      ],
+      "variantes": [
+        {
+          "nom": "Bibliothèque ouverte",
+          "portes": false,
+          "tiroirs": false
+        },
+        {
+          "nom": "Bibliothèque avec portes basses",
+          "portes_position": "bas",
+          "tablette_separation": true
+        },
+        {
+          "nom": "Bibliothèque vitrée",
+          "portes": true,
+          "vitrage": true
+        },
+        {
+          "nom": "Bibliothèque asymétrique",
+          "separateur": true,
+          "largeurs_differentes": true
+        },
+        {
+          "nom": "Bibliothèque enfant",
+          "hauteur_mm": 1200,
+          "profondeur_mm": 280,
+          "niches_bacs": true
+        },
+        {
+          "nom": "Bibliothèque pont",
+          "modules_lateraux": true,
+          "module_haut_pont": true
+        },
+        {
+          "nom": "Bibliothèque suspendue",
+          "fixation_murale": true
+        }
+      ],
+      "pieges_courants": [
+        "Sous-estimer le poids des livres → vérifier portée tablettes",
+        "Oublier l'anti-basculement → danger mortel avec enfants",
+        "Fond trop fin (3mm) sur grande largeur → meuble qui se déforme",
+        "Ne pas prévoir assez de trous système 32 → tablettes non repositionnables",
+        "Ne pas vérifier la hauteur sous plafond avec corniche ou surmeuble",
+        "Tablettes réglables seules sur grande largeur : manque de rigidité globale"
+      ]
+    },
+    "placard": {
+      "id": "placard",
+      "nom": "Placard / Dressing",
+      "icone": "🚪",
+      "description": "Rangement fermé intégré, dressing, penderie",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "dessus",
+        "dessous",
+        "fond"
+      ],
+      "composants_optionnels": [
+        "tablette_fixe",
+        "tablette_reglable",
+        "separateur",
+        "porte",
+        "tiroir",
+        "tringle_penderie",
+        "bandeau",
+        "plinthe",
+        "joue_habillage",
+        "fileur"
+      ],
+      "dimensions_defaut": {
+        "hauteur_mm": 2400,
+        "largeur_mm": 1200,
+        "profondeur_mm": 600,
+        "epaisseur_panneau_mm": 18,
+        "plinthe_mm": 80
+      },
+      "generation": {
+        "joues": {
+          "longueur": "hauteur - plinthe",
+          "largeur": "profondeur"
+        },
+        "dessus_dessous": {
+          "longueur": "largeur - (2 × épaisseur)",
+          "largeur": "profondeur"
+        },
+        "portes": {
+          "type_defaut": "applique",
+          "calcul": "Formules F_CON_001 ou F_CON_002 selon nb portes",
+          "hauteur": "Formule F_CON_008 (zone couverte + recouvrements - jeux)"
+        },
+        "tringle": {
+          "longueur": "largeur_interieure - 10mm",
+          "position_haut": "50mm sous le dessus ou tablette fixe",
+          "hauteur_libre_sous_tringle": {
+            "chemises_vestes_mm": 1100,
+            "robes_manteaux_mm": 1600
+          }
+        },
+        "tiroirs": {
+          "position": "Zone basse (80-120cm du sol) pour accès ergonomique",
+          "calcul_largeur": "F_QUI_002 (intérieur - 25.4mm)",
+          "calcul_facade": "Tiroirs multiples empilés (domaine 3)"
+        }
+      },
+      "quincaillerie_associee": {
+        "portes_battantes": [
+          "Charnières Ø35mm applique 110°",
+          "Poignées entraxe 128 ou 160mm"
+        ],
+        "portes_coulissantes": [
+          "Rails haut/bas",
+          "Roulettes",
+          "Guide bas"
+        ],
+        "tiroirs": [
+          "Coulisses à billes sortie totale",
+          "Façade rapportée"
+        ],
+        "penderie": [
+          "Supports de tringle Ø25mm",
+          "Tringle chromée"
+        ],
+        "taquets": "Ø5mm système 32"
+      },
+      "contraintes": [
+        {
+          "regle": "Profondeur penderie ≥ 55cm intérieur",
+          "action": "Alerter si profondeur < 55cm"
+        },
+        {
+          "regle": "Porte coulissante → perte de 50% d'accès simultané",
+          "action": "Informer l'utilisateur"
+        },
+        {
+          "regle": "Porte battante → recul min 90cm devant",
+          "action": "Vérifier espace disponible"
+        },
+        {
+          "regle": "Hauteur > 240cm",
+          "action": "Proposer caisson haut séparé + corniche"
+        },
+        {
+          "regle": "Largeur module tiroirs ≤ 80cm",
+          "action": "Au-delà : coulisses renforcées"
+        },
+        {
+          "regle": "Module large > 100 cm avec une seule porte battante",
+          "action": "Alerter poids et prise au vent, proposer 2 portes"
+        },
+        {
+          "regle": "Dressing ouvert sans fond ni fixation",
+          "action": "Imposer contreventement ou fixation murale"
+        }
+      ],
+      "variantes": [
+        {
+          "nom": "Penderie simple",
+          "tringle": true,
+          "tablettes": 1,
+          "tiroirs": 0
+        },
+        {
+          "nom": "Dressing complet",
+          "tringle_haute": true,
+          "tringle_basse": true,
+          "tiroirs": 3,
+          "tablettes": 4
+        },
+        {
+          "nom": "Placard d'entrée",
+          "profondeur_mm": 400,
+          "pateres": true,
+          "etagere_chaussures": true
+        },
+        {
+          "nom": "Sous-pente",
+          "hauteur_variable": true,
+          "modules_degressifs": true
+        },
+        {
+          "nom": "Dressing pont de lit",
+          "caisson_haut": true,
+          "modules_lateraux": true
+        },
+        {
+          "nom": "Dressing ouvert sans porte",
+          "portes": false
+        }
+      ],
+      "pieges_courants": [
+        "Profondeur 50cm = cintres qui frottent contre les portes",
+        "Oublier le fileur contre le mur (faux équerrage → portes qui coincent)",
+        "Portes coulissantes : penser au recouvrement entre les panneaux (50-70mm)",
+        "Tiroirs derrière portes coulissantes → vérifier qu'ils ne butent pas sur le rail",
+        "Ne pas vérifier la hauteur de cintres avec vêtements volumineux",
+        "Oublier les plinthes ou prises murales qui empêchent le meuble de se plaquer"
+      ]
+    },
+    "cuisine": {
+      "id": "cuisine",
+      "nom": "Cuisine",
+      "icone": "🍳",
+      "description": "Meubles bas, hauts et colonnes de cuisine",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "dessus",
+        "dessous",
+        "fond",
+        "plinthe"
+      ],
+      "composants_optionnels": [
+        "tablette_fixe",
+        "tablette_reglable",
+        "porte",
+        "tiroir",
+        "fileur",
+        "joue_habillage",
+        "corniche",
+        "bandeau"
+      ],
+      "dimensions_defaut": {
+        "meuble_bas": {
+          "hauteur_caisson_mm": 720,
+          "profondeur_mm": 560,
+          "largeurs_modules_mm": [
+            300,
+            400,
+            450,
+            600,
+            800,
+            900,
+            1200
+          ],
+          "plinthe_mm": 100,
+          "plan_de_travail_mm": {
+            "hauteur_totale": 900,
+            "epaisseur": 30,
+            "profondeur": 600,
+            "debord_avant_mm": 200
+          }
+        },
+        "meuble_haut": {
+          "hauteur_caisson_mm": 720,
+          "profondeur_mm": 330,
+          "largeurs_modules_mm": [
+            300,
+            400,
+            450,
+            600,
+            800,
+            900
+          ],
+          "distance_plan_travail_mm": 550
+        },
+        "colonne": {
+          "hauteur_mm": 2200,
+          "profondeur_mm": 560,
+          "largeurs_mm": [
+            600
+          ]
+        }
+      },
+      "generation": {
+        "meuble_bas": {
+          "joues": {
+            "longueur_mm": 720,
+            "largeur": "profondeur caisson"
+          },
+          "dessus_dessous": {
+            "longueur": "largeur - 2×épaisseur",
+            "largeur": "profondeur"
+          },
+          "fond": {
+            "retrait_mm": 15,
+            "note": "Décollé du mur pour rail de suspension"
+          },
+          "portes_ou_tiroirs": "Selon choix utilisateur, calcul F_CON_001/002"
+        },
+        "meuble_haut": {
+          "fond": {
+            "retrait_mm": 15,
+            "note": "Espace pour rail de suspension"
+          },
+          "suspension": "Boîtiers dans joues supérieures + rail mural"
+        }
+      },
+      "quincaillerie_associee": {
+        "meuble_bas": [
+          "Pieds réglables H100mm",
+          "Clips plinthe",
+          "Charnières 110° avec amortisseur",
+          "Coulisses sortie totale 45kg"
+        ],
+        "meuble_haut": [
+          "Rail de suspension",
+          "Boîtiers de suspension (65kg/pièce)",
+          "Charnières 110° amortisseur"
+        ],
+        "generale": [
+          "Vis de liaison inter-caissons Ø7mm",
+          "Fileurs d'angle",
+          "Joints plan de travail"
+        ]
+      },
+      "contraintes": [
+        {
+          "regle": "Plan de travail hauteur 90-95cm",
+          "action": "Ajuster plinthe + caisson pour atteindre la cible"
+        },
+        {
+          "regle": "Triangle d'activité (évier-plaque-frigo) : chaque côté 120-270cm, total ≤ 650cm",
+          "action": "Informer"
+        },
+        {
+          "regle": "Distance meubles hauts ↔ plan de travail ≥ 50cm",
+          "action": "Alerter"
+        },
+        {
+          "regle": "Hotte : 65cm au-dessus gaz, 50cm au-dessus induction",
+          "action": "Alerter"
+        },
+        {
+          "regle": "Meuble haut : charge par boîtier ≤ 65kg",
+          "action": "Calculer poids total estimé"
+        },
+        {
+          "regle": "Lave-vaisselle ou four intégré adjacent",
+          "action": "Vérifier fileurs, ventilation et jeux de pose"
+        },
+        {
+          "regle": "Plan de travail avec débord ou retombée atypique",
+          "action": "Vérifier ouverture des portes/tiroirs"
+        },
+        {
+          "regle": "Meuble évier",
+          "action": "Imposer protection contre humidité et accès plomberie"
+        }
+      ],
+      "variantes": [
+        {
+          "nom": "Casserolier (tiroirs uniquement)",
+          "portes": false,
+          "tiroirs": [
+            {
+              "h_facade_mm": 140
+            },
+            {
+              "h_facade_mm": 140
+            },
+            {
+              "h_facade_mm": 400
+            }
+          ]
+        },
+        {
+          "nom": "Meuble évier",
+          "fond_decoupe": true,
+          "plomberie_accessible": true
+        },
+        {
+          "nom": "Meuble d'angle",
+          "type": "angle_droit_borgne",
+          "fileur_mm": 65
+        },
+        {
+          "nom": "Caisson avec casserolier",
+          "tiroirs_profonds": true
+        },
+        {
+          "nom": "Colonne four + micro-ondes",
+          "niches_techniques": true
+        },
+        {
+          "nom": "Îlot central",
+          "double_face": true
+        }
+      ],
+      "pieges_courants": [
+        "Oublier le retrait du fond pour le rail de suspension (15mm)",
+        "Ne pas vérifier le poids total du meuble haut chargé vs capacité rail",
+        "Portes qui tapent contre le mur en angle → fileur obligatoire",
+        "Plan de travail : mesurer EN DERNIER, après pose des caissons de niveau",
+        "Oublier l'épaisseur réelle des façades et poignées dans les angles",
+        "Niveau du sol négligé, puis plan de travail impossible à aligner"
+      ]
+    },
+    "bureau": {
+      "id": "bureau",
+      "nom": "Bureau",
+      "icone": "💻",
+      "description": "Poste de travail avec plateau, rangements, passage de câbles",
+      "composants_obligatoires": [
+        "plateau",
+        "joue_gauche",
+        "joue_droite"
+      ],
+      "composants_optionnels": [
+        "fond",
+        "tablette_fixe",
+        "tiroir",
+        "porte",
+        "passe_cables",
+        "tablette_clavier",
+        "separateur",
+        "bandeau_pudeur"
+      ],
+      "dimensions_defaut": {
+        "hauteur_plateau_mm": 750,
+        "largeur_mm": 1400,
+        "profondeur_mm": 700,
+        "epaisseur_plateau_mm": 25,
+        "epaisseur_panneau_mm": 18
+      },
+      "generation": {
+        "plateau": {
+          "longueur": "largeur_bureau",
+          "largeur": "profondeur_bureau"
+        },
+        "joues": {
+          "longueur": "hauteur_plateau - epaisseur_plateau",
+          "largeur": "profondeur - debord_avant (30mm)",
+          "note": "Joues en retrait par rapport au plateau pour le confort des jambes"
+        },
+        "bandeau_pudeur": {
+          "longueur": "largeur_interieure",
+          "hauteur_mm": {
+            "min": 300,
+            "max": 400
+          },
+          "position": "Arrière du bureau, fixé entre les joues",
+          "note": "Cache les câbles et les jambes côté visiteur"
+        },
+        "caisson_tiroirs": {
+          "position": "Un côté (gauche ou droite), sous le plateau",
+          "largeur_mm": {
+            "min": 400,
+            "max": 500
+          },
+          "hauteur_libre_jambes_mm": {
+            "min": 650,
+            "note": "Espace libre sous plateau côté sans caisson"
+          },
+          "tiroirs": [
+            {
+              "type": "petit",
+              "h_facade_mm": 120,
+              "usage": "fournitures"
+            },
+            {
+              "type": "moyen",
+              "h_facade_mm": 180,
+              "usage": "dossiers A4"
+            },
+            {
+              "type": "grand",
+              "h_facade_mm": 300,
+              "usage": "dossiers suspendus"
+            }
+          ]
+        }
+      },
+      "quincaillerie_associee": {
+        "structure": [
+          "Excentriques ou vis confirmation pour assemblage plateau/joues",
+          "Tourillons Ø8mm pour alignement"
+        ],
+        "tiroirs": [
+          "Coulisses à billes sortie totale"
+        ],
+        "plateau": [
+          "Passe-câbles Ø60 ou Ø80mm (perçage scie cloche)"
+        ],
+        "fixation": "Anti-basculement si caisson haut ajouté"
+      },
+      "contraintes": [
+        {
+          "regle": "Hauteur libre sous plateau ≥ 65cm (PMR : ≥ 70cm)",
+          "action": "Alerter"
+        },
+        {
+          "regle": "Profondeur ≥ 60cm pour usage écran",
+          "action": "Alerter si < 60cm"
+        },
+        {
+          "regle": "Débord plateau avant ≥ 20mm",
+          "action": "Suggérer 30mm pour confort"
+        },
+        {
+          "regle": "Largeur ≥ 140cm pour double écran",
+          "action": "Informer"
+        },
+        {
+          "regle": "Portée plateau > 140 cm sans ceinture ni piètement central",
+          "action": "Alerter fléchissement"
+        },
+        {
+          "regle": "Bureau enfant",
+          "action": "Proposer angles adoucis et hauteur adaptée"
+        }
+      ],
+      "variantes": [
+        {
+          "nom": "Bureau simple (plateau sur tréteaux)",
+          "caisson": false,
+          "fond": false
+        },
+        {
+          "nom": "Bureau avec caisson tiroirs",
+          "caisson": "droite",
+          "tiroirs": 3
+        },
+        {
+          "nom": "Bureau en L",
+          "retour": true,
+          "largeur_retour_mm": 1000
+        },
+        {
+          "nom": "Bureau mural rabattable",
+          "fixation": "charnière piano + compas",
+          "profondeur_mm": 450
+        },
+        {
+          "nom": "Bureau assis-debout",
+          "hauteur_mm": {
+            "min": 650,
+            "max": 1250
+          }
+        },
+        {
+          "nom": "Bureau caisson suspendu",
+          "caisson_suspendu": true
+        },
+        {
+          "nom": "Bureau niche imprimante",
+          "niche_technique": true
+        }
+      ],
+      "pieges_courants": [
+        "Oublier le passe-câbles → percer après montage est risqué",
+        "Plateau trop fin (18mm sur 140cm) → fléchissement garanti sans traverse de renfort",
+        "Caisson tiroirs des deux côtés = aucune place pour les jambes",
+        "Hauteur standard 72cm inadaptée si utilisateur < 165cm ou > 185cm → prévoir réglable",
+        "Plateau trop profond ou trop peu profond selon l'usage écran/clavier",
+        "Passe-câbles oubliés sur un bureau adossé au mur"
+      ]
+    },
+    "meuble_tv": {
+      "id": "meuble_tv",
+      "nom": "Meuble TV",
+      "icone": "📺",
+      "description": "Meuble bas pour téléviseur, équipements multimédia et rangement",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "dessus",
+        "dessous",
+        "fond"
+      ],
+      "composants_optionnels": [
+        "tablette_fixe",
+        "separateur",
+        "porte",
+        "tiroir",
+        "niche_ouverte",
+        "passe_cables"
+      ],
+      "dimensions_defaut": {
+        "hauteur_mm": 450,
+        "largeur_mm": 1600,
+        "profondeur_mm": 450,
+        "epaisseur_panneau_mm": 18
+      },
+      "generation": {
+        "structure_type": "3 compartiments (gauche fermé, centre ouvert, droit fermé)",
+        "separateurs": 2,
+        "compartiment_central": {
+          "usage": "Niche ouverte pour décodeur, console, barre de son",
+          "largeur_mm": {
+            "min": 500,
+            "max": 700
+          },
+          "hauteur_niche_mm": {
+            "min": 150,
+            "max": 200
+          },
+          "ventilation": "Fond ajouré ou absent dans la niche centrale"
+        },
+        "compartiments_lateraux": {
+          "portes": "applique",
+          "tablette_reglable": 1
+        }
+      },
+      "quincaillerie_associee": {
+        "portes": [
+          "Charnières Ø35mm 110° avec amortisseur"
+        ],
+        "tiroirs": [
+          "Coulisses sortie totale"
+        ],
+        "passe_cables": [
+          "Perçage Ø60mm dans le fond"
+        ],
+        "fixation": "Si suspendu : rail de suspension ou french cleat"
+      },
+      "contraintes": [
+        {
+          "regle": "Largeur meuble ≥ largeur TV + 30cm",
+          "action": "Alerter"
+        },
+        {
+          "regle": "Ventilation obligatoire pour appareils électroniques",
+          "action": "Proposer fond ajouré"
+        },
+        {
+          "regle": "Poids TV + appareils → vérifier portée dessus",
+          "action": "Renforcer si > 40kg"
+        },
+        {
+          "regle": "Si suspendu : charge max au mur à vérifier",
+          "action": "Calculer poids total"
+        },
+        {
+          "regle": "Barre de son prévue",
+          "action": "Vérifier niche centrale et débord du plateau"
+        },
+        {
+          "regle": "Porte fermée devant appareil télécommandé",
+          "action": "Proposer porte tissu, verre ou report infrarouge"
+        }
+      ],
+      "variantes": [
+        {
+          "nom": "Meuble TV bas posé",
+          "hauteur_mm": 450,
+          "pieds": true
+        },
+        {
+          "nom": "Meuble TV suspendu",
+          "hauteur_mm": 350,
+          "fixation": "rail"
+        },
+        {
+          "nom": "Meuble TV avec colonne latérale",
+          "colonne_hauteur_mm": 1800
+        },
+        {
+          "nom": "Meuble TV avec claustra de ventilation",
+          "ventilation_renforcee": true
+        }
+      ],
+      "pieges_courants": [
+        "Oublier la ventilation → surchauffe des appareils",
+        "Fond plein sans passe-câbles → câbles qui sortent par le dessus (laid)",
+        "Meuble trop étroit → TV instable visuellement",
+        "Suspendu sur placo sans montants → chute garantie",
+        "Fond ajouré mais sans gestion propre des câbles",
+        "Réception télécommande bloquée par une façade opaque"
+      ]
+    },
+    "armoire": {
+      "id": "armoire",
+      "nom": "Armoire",
+      "icone": "🗄️",
+      "description": "Meuble fermé de grande hauteur, rangement mixte",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "dessus",
+        "dessous",
+        "fond",
+        "porte"
+      ],
+      "composants_optionnels": [
+        "tablette_fixe",
+        "tablette_reglable",
+        "separateur",
+        "tiroir",
+        "tringle",
+        "plinthe"
+      ],
+      "dimensions_defaut": {
+        "hauteur_mm": 2000,
+        "largeur_mm": 1000,
+        "profondeur_mm": 550,
+        "epaisseur_panneau_mm": 18,
+        "nb_portes": 2
+      },
+      "generation": {
+        "portes_2": {
+          "type": "applique",
+          "largeur": "F_CON_002",
+          "hauteur": "F_CON_008",
+          "charniere": "demi-recouvrement si séparateur central, applique sinon"
+        },
+        "interieur_type": {
+          "zone_haute": {
+            "tringle": true,
+            "hauteur_mm": 1100
+          },
+          "zone_basse": {
+            "tablettes": 2,
+            "ou_tiroirs": 2
+          }
+        }
+      },
+      "contraintes": [
+        {
+          "regle": "Hauteur > 200cm → transport difficile",
+          "action": "Proposer caisson haut séparé"
+        },
+        {
+          "regle": "Poids porte > limite charnières",
+          "action": "Calculer poids, ajuster nb charnières"
+        },
+        {
+          "regle": "Anti-basculement obligatoire",
+          "action": "Toujours alerter"
+        },
+        {
+          "regle": "Porte MDF 18mm, H200cm, L50cm ≈ 13kg",
+          "action": "Vérifier abaque charnières"
+        },
+        {
+          "regle": "Hauteur > 210 cm en monobloc",
+          "action": "Alerter transport et montage"
+        }
+      ],
+      "pieges_courants": [
+        "Armoire non fixée au mur = danger basculement (surtout enfants)",
+        "Portes lourdes → 4-5 charnières obligatoires",
+        "Transport en un seul bloc quasi impossible au-delà de 210cm → prévoir démontable",
+        "Porte pleine sur toute la hauteur sans espagnolette → voilage garanti",
+        "Large porte unique trop lourde et qui voile",
+        "Meuble haut monté loin du mur puis impossible à redresser au plafond"
+      ],
+      "variantes": [
+        {
+          "nom": "Armoire lingère",
+          "tablettes": true,
+          "tringle": false
+        },
+        {
+          "nom": "Armoire bonnetière",
+          "porte_unique": true,
+          "largeur_etroite": true
+        }
+      ]
+    },
+    "buffet": {
+      "id": "buffet",
+      "nom": "Buffet / Enfilade",
+      "icone": "🍽️",
+      "description": "Meuble bas long pour salle à manger, vaisselle, rangement",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "dessus",
+        "dessous",
+        "fond"
+      ],
+      "composants_optionnels": [
+        "separateur",
+        "tablette_fixe",
+        "tablette_reglable",
+        "porte",
+        "tiroir",
+        "plinthe"
+      ],
+      "dimensions_defaut": {
+        "hauteur_mm": 850,
+        "largeur_mm": 1800,
+        "profondeur_mm": 450,
+        "epaisseur_panneau_mm": 18,
+        "nb_compartiments": 3
+      },
+      "generation": {
+        "structure": "2 séparateurs → 3 compartiments égaux",
+        "par_compartiment": {
+          "porte": "applique",
+          "tablette_reglable": 1
+        },
+        "tiroir_option": "1 tiroir haut sur toute la largeur (couverts, nappes)"
+      },
+      "contraintes": [
+        {
+          "regle": "Largeur > 120cm sans séparateur → dessus fléchit",
+          "action": "Imposer séparateur"
+        },
+        {
+          "regle": "Largeur totale > 200cm → transport",
+          "action": "Proposer 2 caissons juxtaposés"
+        },
+        {
+          "regle": "Charge dessus (TV, déco) → épaisseur plateau",
+          "action": "Recommander 25mm si charge > 30kg"
+        },
+        {
+          "regle": "Largeur > 180 cm",
+          "action": "Proposer deux caissons juxtaposés"
+        },
+        {
+          "regle": "Dessus utilisé comme plan de service très chargé",
+          "action": "Proposer plateau 25 mm ou renfort"
+        }
+      ],
+      "pieges_courants": [
+        "Dessus trop fin sur grande longueur → fléchit sous son propre poids",
+        "Oublier les séparateurs → meuble instable latéralement",
+        "Profondeur 45cm avec portes épaisses (22mm) → profondeur utile réduite à 35cm",
+        "Long meuble assemblé sans vrai fond : il vrille à la manutention"
+      ],
+      "variantes": [
+        {
+          "nom": "Enfilade portes + tiroirs hauts",
+          "tiroirs_hauts": true
+        },
+        {
+          "nom": "Buffet vitré haut/bas",
+          "partie_haute_vitree": true
+        }
+      ]
+    },
+    "etagere_murale": {
+      "id": "etagere_murale",
+      "nom": "Étagère murale",
+      "icone": "🪵",
+      "description": "Étagère fixée au mur, avec ou sans joues",
+      "composants_obligatoires": [
+        "tablette"
+      ],
+      "composants_optionnels": [
+        "joue_gauche",
+        "joue_droite",
+        "fond",
+        "tablette_supplementaire"
+      ],
+      "dimensions_defaut": {
+        "largeur_mm": 800,
+        "profondeur_mm": 220,
+        "nb_tablettes": 3,
+        "espacement_mm": 300,
+        "epaisseur_mm": 18
+      },
+      "generation": {
+        "avec_joues": {
+          "tablettes": "largeur_interieure - 2mm",
+          "joues": "hauteur_totale",
+          "fond": "optionnel (rigidité)"
+        },
+        "sans_joues": {
+          "tablettes": "indépendantes, fixées individuellement au mur",
+          "fixation": "Équerres cachées, rails invisibles, ou tasseau (french cleat)"
+        }
+      },
+      "contraintes": [
+        {
+          "regle": "Portée sans support intermédiaire = f(matériau, épaisseur)",
+          "action": "Vérifier domaine 1"
+        },
+        {
+          "regle": "Type de mur → type de cheville",
+          "action": "Alerter et guider le choix"
+        },
+        {
+          "regle": "Charge totale estimée vs capacité fixation",
+          "action": "Calculer"
+        },
+        {
+          "regle": "Étagère au-dessus d'un lit, bureau ou zone de passage",
+          "action": "Alerter sécurité fixation critique"
+        }
+      ],
+      "pieges_courants": [
+        "Visser dans du placo sans trouver le montant → chute assurée",
+        "Étagère trop profonde par rapport aux équerres → basculement",
+        "Ne pas vérifier l'horizontalité au niveau → livres qui glissent",
+        "Poids des livres mal évalué sur fixation invisible"
+      ],
+      "variantes": [
+        {
+          "nom": "Étagère en U",
+          "joues": true,
+          "forme_en_U": true
+        },
+        {
+          "nom": "Étagère invisible",
+          "fixation_invisible": true
+        }
+      ]
+    },
+    "meuble_salle_de_bain": {
+      "id": "sdb",
+      "nom": "Meuble salle de bain",
+      "icone": "🚿",
+      "description": "Meuble vasque, colonne, rangement pour salle de bain",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "dessus",
+        "dessous",
+        "fond"
+      ],
+      "composants_optionnels": [
+        "tiroir",
+        "porte",
+        "tablette_reglable",
+        "plinthe"
+      ],
+      "dimensions_defaut": {
+        "hauteur_mm": 850,
+        "largeur_mm": 800,
+        "profondeur_mm": 450,
+        "epaisseur_panneau_mm": 18
+      },
+      "generation": {
+        "meuble_vasque": {
+          "dessus": "Découpe pour vasque (dimensions selon modèle)",
+          "fond": "Découpe pour évacuation et arrivées d'eau",
+          "tiroirs_ou_portes": "2 portes si vasque encastrée, tiroirs échancrés si vasque posée"
+        }
+      },
+      "contraintes": [
+        {
+          "regle": "Matériau résistant à l'humidité obligatoire",
+          "action": "Forcer CP marine, MDF hydro ou mélaminé P5"
+        },
+        {
+          "regle": "Piètement surélevé ou suspendu",
+          "action": "Recommander (nettoyage sol + protection eau)"
+        },
+        {
+          "regle": "Accès plomberie",
+          "action": "Fond démontable ou trappe d'accès"
+        },
+        {
+          "regle": "Normes électriques zones 0/1/2/3",
+          "action": "Informer (pas de prise ni interrupteur en zone 1)"
+        },
+        {
+          "regle": "Meuble suspendu avec vasque lourde",
+          "action": "Calculer charge murale renforcée"
+        },
+        {
+          "regle": "Plan vasque mince en panneau dérivé",
+          "action": "Alerter risque gonflement si chant exposé"
+        }
+      ],
+      "pieges_courants": [
+        "Utiliser du MDF standard → gonfle à la première éclaboussure",
+        "Fond fixe sans accès plomberie → galère en cas de fuite",
+        "Oublier la ventilation intérieure → moisissures",
+        "Tiroirs qui butent contre le siphon → prévoir tiroir échancré",
+        "Chants non protégés autour des découpes de plomberie et vasque",
+        "Tiroirs non échancrés au bon endroit pour siphon déporté"
+      ],
+      "variantes": [
+        {
+          "nom": "Colonne salle de bain",
+          "colonne_haute": true
+        },
+        {
+          "nom": "Double vasque",
+          "double_decoupe": true
+        }
+      ]
+    },
+    "commode": {
+      "id": "commode",
+      "nom": "Commode / Chiffonnier",
+      "icone": "🗃️",
+      "description": "Meuble à tiroirs pour chambre, rangement linge",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "dessus",
+        "dessous",
+        "fond",
+        "tiroir"
+      ],
+      "composants_optionnels": [
+        "separateur",
+        "tablette_fixe",
+        "plinthe"
+      ],
+      "dimensions_defaut": {
+        "hauteur_mm": 900,
+        "largeur_mm": 1000,
+        "profondeur_mm": 500,
+        "nb_tiroirs": 4,
+        "epaisseur_mm": 18
+      },
+      "generation": {
+        "tiroirs": {
+          "repartition": "Tiroirs multiples empilés (domaine 3)",
+          "type_defaut": "progressive (plus hauts en bas)",
+          "facades": "rapportées",
+          "pas_progression_mm": 32
+        }
+      },
+      "contraintes": [
+        {
+          "regle": "Anti-basculement obligatoire (plusieurs tiroirs ouverts = levier)",
+          "action": "Toujours alerter"
+        },
+        {
+          "regle": "Largeur tiroir > 80cm → coulisses renforcées",
+          "action": "Alerter"
+        },
+        {
+          "regle": "Poids total tiroirs pleins",
+          "action": "Vérifier charge coulisses"
+        },
+        {
+          "regle": "Plus de 4 tiroirs hauts et étroits",
+          "action": "Renforcer contrainte anti-basculement"
+        }
+      ],
+      "pieges_courants": [
+        "Commode non fixée au mur + enfant qui grimpe = basculement mortel",
+        "Tiroirs tous ouverts simultanément → centre de gravité bascule",
+        "Fond de tiroir trop fin → claque au rangement, effet cheap",
+        "Jeux de façades mal répartis, aspect irrégulier très visible",
+        "Fond rapporté trop fin sur grand meuble à tiroirs"
+      ],
+      "variantes": [
+        {
+          "nom": "Chiffonnier étroit",
+          "largeur_mm": 600,
+          "nb_tiroirs": 6
+        },
+        {
+          "nom": "Commode mixte tiroirs + porte",
+          "zone_porte": true
+        }
+      ]
+    },
+    "table": {
+      "id": "table",
+      "nom": "Table sur mesure",
+      "icone": "🪵",
+      "description": "Table de repas, table basse, console à fabriquer soi-même",
+      "composants_obligatoires": [
+        "plateau"
+      ],
+      "composants_optionnels": [
+        "pieds",
+        "ceinture",
+        "traverse",
+        "rallonge",
+        "tiroir"
+      ],
+      "dimensions_defaut": {
+        "type": "repas_6_personnes",
+        "longueur_mm": 1800,
+        "largeur_mm": 900,
+        "hauteur_mm": 750,
+        "epaisseur_plateau_mm": 30
+      },
+      "generation": {
+        "plateau": {
+          "longueur": "selon nb convives × 60cm",
+          "largeur": "90-100cm"
+        },
+        "ceinture": {
+          "hauteur_mm": {
+            "min": 60,
+            "max": 100
+          },
+          "retrait_bord_mm": {
+            "min": 20,
+            "max": 40
+          },
+          "note": "Hauteur libre sous ceinture ≥ 62cm pour les genoux"
+        },
+        "pieds": {
+          "section_mm": {
+            "min": "60×60",
+            "max": "80×80"
+          },
+          "retrait_bord_mm": {
+            "min": 80,
+            "ideal": 120
+          }
+        }
+      },
+      "contraintes": [
+        {
+          "regle": "Hauteur sous ceinture ≥ 62cm",
+          "action": "Alerter"
+        },
+        {
+          "regle": "Épaisseur plateau vs portée sans ceinture",
+          "action": "Calculer fléchissement"
+        },
+        {
+          "regle": "Stabilité latérale si pieds sans ceinture",
+          "action": "Recommander entretoises"
+        },
+        {
+          "regle": "Table extensible",
+          "action": "Vérifier alignement rallonges, épaisseur et verrouillage"
+        },
+        {
+          "regle": "Table enfant ou usage intensif familial",
+          "action": "Proposer angles adoucis"
+        }
+      ],
+      "variantes": [
+        {
+          "nom": "Table de repas",
+          "hauteur_mm": 750
+        },
+        {
+          "nom": "Table basse",
+          "hauteur_mm": 400,
+          "profondeur_mm": 600
+        },
+        {
+          "nom": "Table haute / bar",
+          "hauteur_mm": 1100,
+          "tabouret_mm": 800
+        },
+        {
+          "nom": "Table extensible",
+          "rallonge": true,
+          "ferrure": "coulisses synchrones"
+        },
+        {
+          "nom": "Console extensible",
+          "profondeur_fermee_mm": 350,
+          "rallonges": true
+        },
+        {
+          "nom": "Tablette murale rabattable",
+          "fixation_murale": true,
+          "compas": true
+        }
+      ],
+      "pieges_courants": [
+        "Plateau massif sans ceinture ni traverse → fléchissement au centre",
+        "Pieds trop près du bord → basculement quand quelqu'un s'appuie",
+        "Table extensible : épaisseur rallonge ≠ épaisseur plateau → décalage disgracieux",
+        "Oublier de traiter les mouvements du bois massif (jeu longitudinal, fixation par trou oblong)",
+        "Ceinture qui gêne les genoux alors que la hauteur totale semble correcte",
+        "Piètement esthétique mais trop étroit pour la stabilité"
+      ]
+    },
+    "sous_escalier": {
+      "id": "sous_escalier",
+      "nom": "Meuble sous-escalier",
+      "icone": "🪜",
+      "description": "Aménagement sur mesure exploitant l'espace sous un escalier",
+      "composants_obligatoires": [
+        "joue_exterieure",
+        "dessus_ou_rampant"
+      ],
+      "composants_optionnels": [
+        "porte",
+        "tiroir_extractible",
+        "tablette",
+        "separateur",
+        "fond",
+        "plinthe"
+      ],
+      "dimensions_defaut": {
+        "hauteur_max_mm": 2200,
+        "hauteur_min_mm": 300,
+        "profondeur_mm": 800,
+        "angle_pente_deg": {
+          "min": 30,
+          "max": 40,
+          "standard": 35
+        }
+      },
+      "generation": {
+        "parametrique": {
+          "formule_hauteur": "h(x) = h_depart + x × tan(angle_pente)",
+          "modules_independants": true,
+          "decoupage": "Diviser en modules de 40-60cm de large, du plus bas au plus haut"
+        },
+        "zonage_par_hauteur": {
+          "zone_basse_0_60cm": {
+            "solutions": [
+              "Tiroirs extractibles sur coulisses charge lourde",
+              "Coffre à chaussures"
+            ],
+            "note": "Porte battante impraticable sous pente basse"
+          },
+          "zone_intermediaire_60_120cm": {
+            "solutions": [
+              "Placards avec portes",
+              "Tiroirs pleine extraction",
+              "Niches ouvertes"
+            ],
+            "note": "Zone la plus polyvalente"
+          },
+          "zone_haute_120_plus": {
+            "solutions": [
+              "Placard pleine hauteur",
+              "Penderie courte",
+              "Bibliothèque"
+            ],
+            "note": "Exploiter au maximum la hauteur disponible"
+          }
+        }
+      },
+      "contraintes": [
+        {
+          "regle": "Ne jamais couper limons, contremarches ou appuis structurels",
+          "action": "Alerter — validation structurelle requise",
+          "severite": "critique"
+        },
+        {
+          "regle": "Mesurer la pente EN PLUSIEURS POINTS",
+          "action": "Demander h_min, h_max et longueur au sol"
+        },
+        {
+          "regle": "Déduire 2-3cm de la hauteur dispo pour panneaux de finition et jeu",
+          "action": "Appliquer automatiquement"
+        },
+        {
+          "regle": "Vide sanitaire 5cm contre le mur du fond",
+          "action": "Soustraire de la profondeur utile"
+        },
+        {
+          "regle": "Nez de marche débordant",
+          "action": "Alerter — décaler les façades ou cadre de compensation"
+        }
+      ],
+      "variantes": [
+        {
+          "nom": "Tiroirs extractibles (zone basse)",
+          "type": "tiroirs_profonds"
+        },
+        {
+          "nom": "Placard multizone",
+          "type": "mixte_portes_tiroirs"
+        },
+        {
+          "nom": "Bureau sous escalier",
+          "hauteur_min_mm": 750,
+          "note": "Uniquement dans la zone haute"
+        },
+        {
+          "nom": "Cave à vin",
+          "note": "Si température et humidité compatibles"
+        },
+        {
+          "nom": "Vestiaire d'entrée",
+          "pateres": true,
+          "banc": true
+        }
+      ],
+      "pieges_courants": [
+        "Mesurer en un seul point → la pente n'est jamais parfaitement régulière",
+        "Module monolithique → transport et installation impossibles, préférer modules indépendants",
+        "Profondeur > 60cm sans extractible → le fond est inaccessible et inutile",
+        "Réseau (électricité, plomberie) sous l'escalier → prévoir trappe d'accès",
+        "Push-to-open recommandé en circulation étroite (pas de poignée qui dépasse)"
+      ]
+    },
+    "banquette_coffre": {
+      "id": "banquette_coffre",
+      "nom": "Banquette / Coffre d'entrée",
+      "icone": "🪑",
+      "description": "Assise avec rangement intégré pour l'entrée ou le pied de lit",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "assise",
+        "dessous",
+        "fond"
+      ],
+      "composants_optionnels": [
+        "dossier",
+        "accoudoir",
+        "separateur",
+        "coussin",
+        "tiroir",
+        "porte"
+      ],
+      "dimensions_defaut": {
+        "hauteur_assise_mm": 450,
+        "largeur_mm": 1200,
+        "profondeur_mm": 450,
+        "epaisseur_mm": 18,
+        "coffre_hauteur_utile_mm": 280
+      },
+      "generation": {
+        "coffre_ouverture_dessus": {
+          "assise": "Plateau articulé par charnière piano ou compas",
+          "verin": "Vérin à gaz pour maintien en position ouverte",
+          "force_verin_N": "poids_assise_kg × 10 / nb_verins"
+        },
+        "coffre_ouverture_frontale": {
+          "type": "tiroirs ou porte en façade",
+          "note": "Conserver traverse basse reculée pour les pieds"
+        }
+      },
+      "contraintes": [
+        {
+          "regle": "Hauteur assise 42-48cm finie (avec coussin)",
+          "action": "Ajuster structure"
+        },
+        {
+          "regle": "Profondeur > 50cm sans dossier → inconfortable",
+          "action": "Alerter"
+        },
+        {
+          "regle": "Ouverture dessus : vérifier recul mur/dossier pour débattement",
+          "action": "Calculer"
+        },
+        {
+          "regle": "Aération coffre si rangement textile",
+          "action": "Proposer trous ventilation"
+        }
+      ],
+      "pieges_courants": [
+        "Oublier les vérins → le couvercle retombe sur les doigts",
+        "Assise trop profonde sans dossier → on glisse",
+        "Pas d'aération → odeur de renfermé dans le coffre"
+      ]
+    },
+    "meuble_chaussures": {
+      "id": "meuble_chaussures",
+      "nom": "Meuble à chaussures",
+      "icone": "👟",
+      "description": "Rangement dédié aux chaussures, compact et fonctionnel",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "dessus",
+        "dessous"
+      ],
+      "composants_optionnels": [
+        "porte",
+        "abattant_incline",
+        "tablette",
+        "tiroir",
+        "fond",
+        "plinthe"
+      ],
+      "dimensions_defaut": {
+        "hauteur_mm": 1200,
+        "largeur_mm": 800,
+        "profondeur_mm": 300,
+        "epaisseur_mm": 18
+      },
+      "generation": {
+        "tablettes_inclinees": {
+          "angle_deg": {
+            "min": 15,
+            "max": 20
+          },
+          "butee_avant_mm": 15,
+          "espacement_mm": 200,
+          "profondeur_reduite_mm": {
+            "min": 250,
+            "max": 300
+          },
+          "note": "Réduit la profondeur nécessaire vs tablettes horizontales"
+        },
+        "tablettes_horizontales": {
+          "espacement_chaussures_plates_mm": 180,
+          "espacement_bottines_mm": 250,
+          "espacement_bottes_mm": 450,
+          "profondeur_mm": 350
+        },
+        "abattants": {
+          "description": "Portes à bascule avec rangement intégré (style IKEA TRONES)",
+          "profondeur_fermee_mm": 180,
+          "capacite": "2-3 paires par abattant"
+        }
+      },
+      "contraintes": [
+        {
+          "regle": "Profondeur ≥ 30cm pour chaussures adulte (longueur 28-34cm)",
+          "action": "Alerter si < 28cm"
+        },
+        {
+          "regle": "Ventilation obligatoire",
+          "action": "Proposer fond ajouré ou trous"
+        },
+        {
+          "regle": "En entrée étroite : profondeur max 25cm avec tablettes inclinées",
+          "action": "Suggérer inclinaison"
+        }
+      ],
+      "variantes": [
+        {
+          "nom": "Meuble fermé avec portes",
+          "profondeur_mm": 350,
+          "portes": true
+        },
+        {
+          "nom": "Tablettes inclinées ouvertes",
+          "profondeur_mm": 250,
+          "portes": false
+        },
+        {
+          "nom": "Abattants basculants",
+          "profondeur_mm": 180,
+          "compact": true
+        },
+        {
+          "nom": "Banc à chaussures",
+          "assise": true,
+          "hauteur_mm": 500
+        }
+      ],
+      "pieges_courants": [
+        "Pas de ventilation → odeurs et moisissures",
+        "Profondeur 25cm avec tablettes horizontales → chaussures qui dépassent",
+        "Oublier les bottes → prévoir au moins un compartiment haut (45cm)"
+      ]
+    },
+    "lit_cabane_mezzanine": {
+      "id": "lit_cabane_mezzanine",
+      "nom": "Lit cabane / Mezzanine enfant",
+      "icone": "🏠",
+      "description": "Lit surélevé ou cabane pour enfant, avec espace de jeu ou bureau dessous",
+      "composants_obligatoires": [
+        "montants",
+        "cadre_sommier",
+        "garde_corps",
+        "echelle"
+      ],
+      "composants_optionnels": [
+        "toit_cabane",
+        "barriere_decorative",
+        "bureau_dessous",
+        "etagere",
+        "tiroir_sous_lit",
+        "rideau"
+      ],
+      "dimensions_defaut": {
+        "couchage_mm": {
+          "longueur": 1900,
+          "largeur": 900
+        },
+        "hauteur_mezzanine_mm": 1800,
+        "hauteur_cabane_mm": 1300,
+        "section_montants_mm": {
+          "min": "70×70",
+          "standard": "90×90"
+        }
+      },
+      "generation": {
+        "mezzanine": {
+          "hauteur_sous_plancher_mm": {
+            "min": 1200,
+            "note": "Pour bureau enfant dessous"
+          },
+          "hauteur_au_dessus_matelas_mm": {
+            "min": 600,
+            "note": "Pour s'asseoir dans le lit"
+          },
+          "hauteur_totale_max_mm": 2200,
+          "note": "Hauteur sous plafond - hauteur_mezzanine ≥ 60cm (s'asseoir)"
+        },
+        "cabane_mi_hauteur": {
+          "hauteur_plancher_mm": {
+            "min": 600,
+            "max": 900
+          },
+          "espace_dessous": "Rangement, coin lecture, cabane de jeu"
+        }
+      },
+      "securite": {
+        "garde_corps": {
+          "hauteur_min_au_dessus_matelas_mm": 300,
+          "espacement_barreaux_max_mm": 65,
+          "ouverture_acces_largeur_mm": {
+            "min": 400,
+            "max": 500
+          },
+          "note": "Norme NF EN 747 : espacement max 7.5cm entre barreaux (75mm)"
+        },
+        "echelle": {
+          "largeur_min_mm": 300,
+          "espacement_barreaux_mm": {
+            "min": 200,
+            "max": 300
+          },
+          "inclinaison_deg": {
+            "min": 70,
+            "max": 80
+          },
+          "fixation": "Solidaire de la structure, pas simplement posée"
+        },
+        "structure": {
+          "section_montants_min_mm": "70×70",
+          "assemblage": "Boulons traversants ou ferrures métalliques — JAMAIS vis seules",
+          "visserie_min": "Boulons M8 ou M10 avec écrou + rondelle"
+        },
+        "age_minimum_recommande": {
+          "mezzanine_haute": "6 ans",
+          "cabane_mi_hauteur": "3 ans"
+        }
+      },
+      "contraintes": [
+        {
+          "regle": "Garde-corps obligatoire sur tous les côtés sauf accès échelle",
+          "action": "Imposer",
+          "severite": "critique"
+        },
+        {
+          "regle": "Espacement barreaux ≤ 6.5cm (norme enfant)",
+          "action": "Vérifier",
+          "severite": "critique"
+        },
+        {
+          "regle": "Hauteur sous plafond - hauteur mezzanine ≥ 60cm",
+          "action": "Alerter si insuffisant"
+        },
+        {
+          "regle": "Section montants ≥ 70×70mm",
+          "action": "Alerter si inférieur",
+          "severite": "critique"
+        },
+        {
+          "regle": "Assemblage par boulons traversants, pas de vis seules",
+          "action": "Alerter",
+          "severite": "critique"
+        },
+        {
+          "regle": "Matelas max 15-18cm d'épaisseur pour que le garde-corps reste efficace",
+          "action": "Informer"
+        }
+      ],
+      "pieges_courants": [
+        "Vis seules pour la structure → danger d'effondrement",
+        "Garde-corps trop bas avec matelas épais → enfant qui tombe",
+        "Barreaux trop espacés → tête d'enfant coincée",
+        "Échelle non fixée → bascule",
+        "Bois brut non poncé → échardes",
+        "Pas de plafond suffisant au-dessus du matelas → enfant qui se cogne en s'asseyant"
+      ]
+    },
+    "vestiaire_entree": {
+      "id": "vestiaire_entree",
+      "nom": "Vestiaire d'entrée",
+      "icone": "🧥",
+      "description": "Meuble d'entrée combinant patères, miroir, rangement chaussures et banc",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "fond"
+      ],
+      "composants_optionnels": [
+        "banc",
+        "pateres",
+        "miroir",
+        "etagere_chapeau",
+        "rangement_chaussures",
+        "tiroir",
+        "porte",
+        "tablette"
+      ],
+      "dimensions_defaut": {
+        "hauteur_mm": 1900,
+        "largeur_mm": 1000,
+        "profondeur_mm": 350,
+        "hauteur_banc_mm": 450
+      },
+      "generation": {
+        "zones": {
+          "zone_banc_0_45cm": {
+            "banc": true,
+            "coffre": true,
+            "chaussures_dessous": true
+          },
+          "zone_pateres_120_170cm": {
+            "pateres": true,
+            "espacement_mm": 150,
+            "hauteur_patere_mm": 1500
+          },
+          "zone_etagere_haute_170_190cm": {
+            "etagere": true,
+            "usage": "Bonnets, gants, sacs"
+          }
+        },
+        "miroir": {
+          "position": "Porte intérieure ou panneau latéral",
+          "hauteur_mm": {
+            "min": 1000,
+            "max": 1400
+          }
+        }
+      },
+      "contraintes": [
+        {
+          "regle": "Profondeur ≤ 35-40cm en entrée (circulation)",
+          "action": "Alerter si > 40cm"
+        },
+        {
+          "regle": "Patères à hauteur enfant (90-100cm) si famille",
+          "action": "Suggérer double rangée"
+        },
+        {
+          "regle": "Fixation murale obligatoire (meuble étroit et haut)",
+          "action": "Imposer"
+        }
+      ],
+      "pieges_courants": [
+        "Profondeur insuffisante pour cintres → utiliser patères, pas tringle",
+        "Miroir non sécurisé → risque de chute et bris",
+        "Oublier la rangée de patères basse pour les enfants",
+        "Étagère haute inaccessible sans tabouret → la rendre moins profonde"
+      ]
+    },
+    "cave_vin": {
+      "id": "cave_vin",
+      "nom": "Cave à vin / Casier bouteilles",
+      "icone": "🍷",
+      "description": "Rangement pour bouteilles de vin, horizontal ou incliné",
+      "composants_obligatoires": [
+        "joue_gauche",
+        "joue_droite",
+        "dessus",
+        "dessous"
+      ],
+      "composants_optionnels": [
+        "separateur",
+        "tablette",
+        "croisillons",
+        "fond",
+        "porte_vitree"
+      ],
+      "dimensions_defaut": {
+        "hauteur_mm": 1200,
+        "largeur_mm": 600,
+        "profondeur_mm": 350,
+        "type": "casier_losange"
+      },
+      "generation": {
+        "dimensions_bouteille_standard": {
+          "bordeaux": {
+            "diametre_mm": 75,
+            "longueur_mm": 300
+          },
+          "bourgogne": {
+            "diametre_mm": 80,
+            "longueur_mm": 310
+          },
+          "champagne_magnum": {
+            "diametre_mm": 90,
+            "longueur_mm": 330
+          }
+        },
+        "alvéole_unitaire_mm": {
+          "largeur": {
+            "min": 85,
+            "standard": 100
+          },
+          "hauteur": {
+            "min": 85,
+            "standard": 100
+          },
+          "profondeur": {
+            "min": 320,
+            "standard": 340
+          }
+        },
+        "types_casier": {
+          "losange_croisillon": {
+            "description": "Grille en X formant des losanges — le plus classique",
+            "materiau_croisillon_mm": {
+              "largeur": 18,
+              "epaisseur": 10
+            },
+            "assemblage": "Mi-bois au centre, collé"
+          },
+          "etageres_horizontales": {
+            "espacement_mm": 100,
+            "profondeur_mm": 340,
+            "note": "Plus simple à fabriquer, accès facile aux bouteilles"
+          },
+          "tubes_ou_cylindres": {
+            "diametre_interieur_mm": 90,
+            "note": "Tubes PVC, terre cuite ou béton — achetés, pas fabriqués"
+          }
+        },
+        "inclinaison": {
+          "horizontale_pure": "Bouchon liège en contact avec le vin — position idéale",
+          "legere_inclinaison_deg": {
+            "min": 3,
+            "max": 5
+          },
+          "note": "Légère pente bouchon vers le bas pour maintenir le contact liège/vin"
+        }
+      },
+      "contraintes": [
+        {
+          "regle": "Profondeur ≥ 32cm (bouteille standard 30cm + marge)",
+          "action": "Alerter"
+        },
+        {
+          "regle": "Stockage horizontal obligatoire pour vins à bouchon liège",
+          "action": "Informer"
+        },
+        {
+          "regle": "Poids : 1 bouteille ≈ 1.3kg → 50 bouteilles ≈ 65kg",
+          "action": "Vérifier structure"
+        },
+        {
+          "regle": "Vibrations à éviter (pas contre machine à laver)",
+          "action": "Informer"
+        },
+        {
+          "regle": "Si meuble haut chargé de bouteilles → fixation murale obligatoire",
+          "action": "Imposer"
+        }
+      ],
+      "pieges_courants": [
+        "Alvéoles trop étroites pour bouteilles de Bourgogne (plus larges que Bordeaux)",
+        "Profondeur insuffisante → bouteilles qui dépassent",
+        "Matériau qui transmet les odeurs (certains résineux) → CP bouleau ou chêne préféré",
+        "Poids total sous-estimé → effondrement de la structure"
+      ]
+    }
+  },
+  "regles_transversales": [
+    {
+      "id": "RT_001",
+      "regle": "Tout meuble > 150cm de hauteur non intégré = anti-basculement obligatoire",
+      "types_concernes": [
+        "bibliotheque",
+        "armoire",
+        "placard",
+        "chiffonnier"
+      ],
+      "severite": "critique"
+    },
+    {
+      "id": "RT_002",
+      "regle": "Matériaux résistants à l'humidité obligatoires en pièce humide",
+      "types_concernes": [
+        "sdb",
+        "cuisine"
+      ],
+      "materiaux_autorises": [
+        "CP marine",
+        "MDF hydrofuge",
+        "Mélaminé P5"
+      ],
+      "severite": "critique"
+    },
+    {
+      "id": "RT_003",
+      "regle": "Ventilation obligatoire pour appareils électroniques",
+      "types_concernes": [
+        "meuble_tv"
+      ],
+      "severite": "importante"
+    },
+    {
+      "id": "RT_004",
+      "regle": "Vérifier la portée de toute tablette sans support intermédiaire",
+      "seuils": {
+        "particules_19mm": 60,
+        "mdf_19mm": 70,
+        "cp_18mm": 80,
+        "massif_25mm": 90
+      },
+      "unite": "cm",
+      "severite": "importante"
+    },
+    {
+      "id": "RT_005",
+      "regle": "Toujours proposer une façade de tiroir rapportée (ajustement post-montage)",
+      "severite": "recommandation"
+    },
+    {
+      "id": "RT_006",
+      "regle": "Meuble suspendu : fond en rainure/feuillure + contreventement obligatoire",
+      "severite": "critique"
+    },
+    {
+      "id": "RT_007",
+      "regle": "Sécurité enfant : espacement max entre barreaux 6.5cm (norme NF EN 747)",
+      "types_concernes": [
+        "lit_cabane_mezzanine",
+        "garde_corps"
+      ],
+      "severite": "critique"
+    },
+    {
+      "id": "RT_008",
+      "regle": "Lit mezzanine : assemblage par boulons traversants M8/M10, jamais vis seules",
+      "types_concernes": [
+        "lit_cabane_mezzanine"
+      ],
+      "severite": "critique"
+    },
+    {
+      "id": "RT_009",
+      "regle": "Meuble en entrée : profondeur ≤ 35-40cm pour conserver la circulation (80cm min)",
+      "types_concernes": [
+        "vestiaire_entree",
+        "meuble_chaussures",
+        "banquette_coffre",
+        "console_entree"
+      ],
+      "severite": "importante"
+    },
+    {
+      "id": "RT_010",
+      "regle": "Ventilation obligatoire pour stockage chaussures ou textiles en milieu fermé",
+      "types_concernes": [
+        "meuble_chaussures",
+        "banquette_coffre",
+        "placard"
+      ],
+      "severite": "importante"
+    },
+    {
+      "id": "RT_011",
+      "regle": "Sous-escalier : ne jamais modifier la structure porteuse sans validation",
+      "types_concernes": [
+        "sous_escalier"
+      ],
+      "severite": "critique"
+    },
+    {
+      "id": "RT_012",
+      "regle": "PMR : hauteur libre sous plan de travail ≥ 70cm, espace rotation Ø150cm",
+      "types_concernes": [
+        "cuisine",
+        "bureau",
+        "sdb"
+      ],
+      "severite": "importante"
+    },
+    {
+      "id": "RT_013",
+      "regle": "Meuble contenant des bouteilles : vérifier charge totale (1 bouteille ≈ 1.3kg)",
+      "types_concernes": [
+        "cave_vin",
+        "buffet"
+      ],
+      "severite": "importante"
+    },
+    {
+      "id": "RT_014",
+      "regle": "Tiroir enfant : amortisseur obligatoire + anti-pincement",
+      "types_concernes": [
+        "commode",
+        "lit_cabane_mezzanine"
+      ],
+      "severite": "importante"
+    },
+    {
+      "id": "RT_015",
+      "regle": "Tout meuble à tiroirs multiples : anti-basculement + système anti-ouverture simultanée recommandé",
+      "types_concernes": [
+        "commode",
+        "chiffonnier",
+        "buffet"
+      ],
+      "severite": "critique"
+    }
+  ]
+}
