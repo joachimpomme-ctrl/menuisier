@@ -162,15 +162,15 @@ export default function App() {
             <div className="flex items-center gap-1.5 flex-shrink-0">
               <button
                 onClick={() => { setV3Mode(true); setWizardStep(1); setV3Result(null); }}
-                className="text-xs px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 active:scale-95 transition-all shadow-sm font-semibold"
+                className="text-xs px-3.5 py-2 rounded-xl bg-amber-600 text-white hover:bg-amber-700 active:scale-95 transition-all shadow-md shadow-amber-200 font-semibold"
               >
-                v3
+                + Nouveau projet
               </button>
               <button
                 onClick={() => setShowProjects(true)}
                 className="text-xs px-3 py-2 rounded-xl bg-white text-stone-600 hover:text-stone-900 border border-stone-200 hover:border-amber-300 hover:bg-amber-50 active:scale-95 transition-all shadow-sm"
               >
-                Projets
+                Mes projets
               </button>
               <button
                 onClick={() => {
