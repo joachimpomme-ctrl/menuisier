@@ -144,8 +144,8 @@ export default function App() {
       <div className="max-w-3xl mx-auto px-4 pt-4 pb-24 sm:py-6">
         {/* Header */}
         <div className="mb-5">
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0 flex-1">
+          <div className="flex flex-col gap-3">
+            <div className="min-w-0">
               <h1 className="text-base sm:text-xl font-bold text-amber-800 truncate">{state.project.name}</h1>
               <div className="mt-1.5 flex items-center gap-1.5 text-xs text-stone-500 flex-wrap">
                 <span className="bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2 py-0.5 font-medium">{mat.short} {state.panel.thickness * 10}mm</span>
@@ -159,16 +159,16 @@ export default function App() {
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
+            <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
               <button
                 onClick={() => { setV3Mode(true); setWizardStep(1); setV3Result(null); }}
-                className="text-xs px-3.5 py-2 rounded-xl bg-amber-600 text-white hover:bg-amber-700 active:scale-95 transition-all shadow-md shadow-amber-200 font-semibold"
+                className="text-xs px-3.5 py-2 rounded-xl bg-amber-600 text-white hover:bg-amber-700 active:scale-95 transition-all shadow-md shadow-amber-200 font-semibold whitespace-nowrap flex-shrink-0"
               >
                 + Nouveau projet
               </button>
               <button
                 onClick={() => setShowProjects(true)}
-                className="text-xs px-3 py-2 rounded-xl bg-white text-stone-600 hover:text-stone-900 border border-stone-200 hover:border-amber-300 hover:bg-amber-50 active:scale-95 transition-all shadow-sm"
+                className="text-xs px-3 py-2 rounded-xl bg-white text-stone-600 hover:text-stone-900 border border-stone-200 hover:border-amber-300 hover:bg-amber-50 active:scale-95 transition-all shadow-sm whitespace-nowrap flex-shrink-0"
               >
                 Mes projets
               </button>
