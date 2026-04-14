@@ -29,7 +29,10 @@ export default function DrillingPlanView({ parts }: Props) {
               <td className="py-1 pr-3 text-gray-600">
                 {part.groups.map((group) => `${group.count}× ${group.label}`).join(', ')}
               </td>
-              <td className="py-1 text-right tabular-nums text-gray-500">{part.totalOps}</td>
+              <td className="py-1 text-right tabular-nums text-gray-500">
+                {part.totalOps}
+                <span className="ml-1 text-xs text-gray-400">({part.totalOpsPerUnit} / pièce)</span>
+              </td>
             </tr>
           ))}
         </tbody>

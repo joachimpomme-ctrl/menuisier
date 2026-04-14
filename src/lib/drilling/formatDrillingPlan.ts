@@ -5,6 +5,7 @@ export interface DrillingPartSummary {
   partName: string;
   qty: number;
   groups: { label: string; count: number; diameter_mm: number; depth_mm: number }[];
+  totalOpsPerUnit: number;
   totalOps: number;
 }
 
@@ -39,13 +40,15 @@ export function formatDrillingPlan(parts: GeneratedPart[]): DrillingPartSummary[
       }
 
       const groups = Array.from(groupsMap.values());
-      const totalOps = groups.reduce((sum, group) => sum + group.count, 0);
+      const totalOpsPerUnit = part.drilling?.length ?? 0;
+      const totalOps = totalOpsPerUnit * part.qty;
 
       return {
         partId: part.id,
         partName: part.name,
         qty: part.qty,
         groups,
+        totalOpsPerUnit,
         totalOps,
       };
     })

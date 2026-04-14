@@ -51,6 +51,7 @@ describe('formatDrillingPlan', () => {
           { label: 'Système 32 (taquets)', count: 20, diameter_mm: 5, depth_mm: 10 },
           { label: 'Confirmat', count: 4, diameter_mm: 7, depth_mm: 0 },
         ],
+        totalOpsPerUnit: 24,
         totalOps: 24,
       },
     ]);
@@ -110,5 +111,32 @@ describe('formatDrillingPlan', () => {
     });
 
     expect(formatDrillingPlan([part])[0].qty).toBe(2);
+  });
+
+  it('keeps totalOps equal to totalOpsPerUnit when qty is 1', () => {
+    const part = makePart({
+      drilling: [makeOp(), makeOp({ y_mm: 132 }), makeOp({ y_mm: 164 })],
+    });
+
+    const summary = formatDrillingPlan([part])[0];
+
+    expect(summary.totalOpsPerUnit).toBe(3);
+    expect(summary.totalOps).toBe(3);
+  });
+
+  it('multiplies total drilling operations by qty', () => {
+    const part = makePart({
+      name: 'Porte (×2)',
+      qty: 2,
+      drilling: [
+        makeOp({ type: 'hinge_cup_35', diameter_mm: 35, depth_mm: 12 }),
+        makeOp({ type: 'hinge_cup_35', diameter_mm: 35, depth_mm: 12, y_mm: 900 }),
+      ],
+    });
+
+    const summary = formatDrillingPlan([part])[0];
+
+    expect(summary.totalOpsPerUnit).toBe(2);
+    expect(summary.totalOps).toBe(4);
   });
 });
