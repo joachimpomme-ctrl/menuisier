@@ -60,6 +60,7 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   const [suspendedOverride, setSuspendedOverride] = useState<boolean | undefined>(undefined);
 
   const applyContentZones = (zoneConfigs: ZoneConfig[]) => {
+    clearVariantOverrides();
     const rows: ZoneRow[] = zoneConfigs.map((z) => ({
       key: _nextKey++,
       module_id: z.module_id,
