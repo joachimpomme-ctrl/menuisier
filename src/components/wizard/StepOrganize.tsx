@@ -7,30 +7,12 @@ import type {
   ZoneConfig,
   ModuleConfig,
 } from '../../lib/knowledge/types';
+import { variantToResult, type PresetVariant, type ZoneRow } from '../../lib/wizard/variantToResult';
 import type { MaterialKey } from '../../types';
 import { getAllModules } from '../../lib/knowledge/modules';
 import { getProjectPreset } from '../../lib/knowledge/index';
 import ContentMode from './ContentMode';
 
-interface Props {
-  furnitureType: FurnitureType;
-  space: SpaceDimensions;
-  materialKey: MaterialKey;
-  onBack: () => void;
-  onGenerate: (intent: ProjectIntent) => void;
-}
-
-interface ZoneRow {
-  key: number;
-  module_id: ModuleType;
-  height_mm: number;
-  count: number;
-}
-
-interface PresetVariant {
-  nom: string;
-  [key: string]: unknown;
-}
 
 const ALL_MODULES = getAllModules();
 
@@ -55,133 +37,12 @@ function defaultConfigForModule(moduleId: ModuleType, count: number): ModuleConf
   }
 }
 
-interface VariantResult {
-  zones: ZoneRow[];
-  door_override?: boolean;
-  suspended_override?: boolean;
-}
-
-/**
- * Convert a preset variant into zones + pipeline overrides.
- *
- * Variant data from the JSON uses heterogeneous schemas per furniture type.
- * This function interprets known fields and builds a sensible zone layout.
- * Door and suspension overrides are extracted and passed to the pipeline intent.
- */
-function variantToResult(variant: PresetVariant, usableHeight: number): VariantResult {
-  const rows: ZoneRow[] = [];
-  let key = Date.now();
-  let remaining = usableHeight;
-
-  // --- Override total height if variant specifies one ---
-  const varH = typeof variant.hauteur_mm === 'number' ? variant.hauteur_mm : null;
-  if (varH && varH < remaining) {
-    remaining = varH;
-  }
-
-  // --- Hanging rods ---
-  if (variant.tringle || variant.tringle_haute) {
-    const h = Math.round(remaining * 0.6);
-    rows.push({ key: key++, module_id: 'hanging_rod_short', height_mm: h, count: 1 });
-    remaining -= h;
-  }
-  if (variant.tringle_basse) {
-    const h = Math.round(remaining * 0.4);
-    rows.push({ key: key++, module_id: 'hanging_rod_short', height_mm: h, count: 1 });
-    remaining -= h;
-  }
-
-  // --- Drawers (accept number or boolean or array) ---
-  const drawerCount = typeof variant.tiroirs === 'number'
-    ? variant.tiroirs
-    : Array.isArray(variant.tiroirs)
-      ? (variant.tiroirs as unknown[]).length
-      : (variant.tiroirs === true || variant.tiroirs_profonds || variant.tiroirs_hauts)
-        ? 3
-        : typeof variant.nb_tiroirs === 'number'
-          ? variant.nb_tiroirs
-          : 0;
-
-  if (drawerCount > 0) {
-    const drawerH = Math.min(remaining, Math.round(remaining * 0.4));
-    rows.push({ key: key++, module_id: 'drawer_stack', height_mm: drawerH, count: drawerCount });
-    remaining -= drawerH;
-  }
-
-  // --- Shoe rack ---
-  if (variant.etagere_chaussures) {
-    const h = Math.min(remaining, 500);
-    rows.push({ key: key++, module_id: 'shoe_rack_inclined', height_mm: h, count: 4 });
-    remaining -= h;
-  }
-
-  // --- TV niche ---
-  if (variant.niche_technique || variant.niches_techniques) {
-    const h = Math.min(remaining, 500);
-    rows.push({ key: key++, module_id: 'tv_niche', height_mm: h, count: 1 });
-    remaining -= h;
-  }
-
-  // --- Wine rack ---
-  if (variant.nom?.toLowerCase().includes('cave à vin') || variant.nom?.toLowerCase().includes('vin')) {
-    rows.push({ key: key++, module_id: 'wine_rack', height_mm: remaining, count: 4 });
-    remaining = 0;
-  }
-
-  // --- Bench / seat ---
-  if (variant.assise || variant.banc) {
-    const h = Math.min(remaining, 500);
-    rows.push({ key: key++, module_id: 'bench_storage', height_mm: h, count: 1 });
-    remaining -= h;
-  }
-
-  // --- Shelves (explicit count, or boolean, or via tablette_separation) ---
-  const shelfCount = typeof variant.tablettes === 'number'
-    ? variant.tablettes
-    : variant.tablettes === true
-      ? 4
-      : variant.tablette_separation
-        ? 3
-        : typeof variant.nb_tablettes === 'number'
-          ? variant.nb_tablettes
-          : 0;
-
-  if (shelfCount > 0 && remaining > 0) {
-    rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: remaining, count: shelfCount });
-    remaining = 0;
-  }
-
-  // --- Niches / cubbies (e.g. bibliothèque enfant) ---
-  if (variant.niches_bacs && remaining > 0) {
-    rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: remaining, count: 3 });
-    remaining = 0;
-  }
-
-  // --- Deep drawers (e.g. sous-escalier tiroirs extractibles) ---
-  if (variant.type === 'tiroirs_profonds' && remaining > 0) {
-    rows.push({ key: key++, module_id: 'drawer_stack', height_mm: remaining, count: 3 });
-    remaining = 0;
-  }
-
-  // --- Fallback: if nothing matched, fill with default shelves ---
-  if (rows.length === 0) {
-    rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: remaining, count: 4 });
-  } else if (remaining > 100) {
-    rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: remaining, count: 2 });
-  }
-
-  // --- Extract pipeline overrides ---
-  let door_override: boolean | undefined;
-  if (variant.portes === false) door_override = false;
-  else if (variant.portes === true) door_override = true;
-  if (variant.portes_position) door_override = true;
-
-  let suspended_override: boolean | undefined;
-  if (variant.fixation_murale === true || variant.fixation === 'rail') {
-    suspended_override = true;
-  }
-
-  return { zones: rows, door_override, suspended_override };
+interface Props {
+  furnitureType: FurnitureType;
+  space: SpaceDimensions;
+  materialKey: MaterialKey;
+  onBack: () => void;
+  onGenerate: (intent: ProjectIntent) => void;
 }
 
 let _nextKey = 1;
@@ -258,7 +119,7 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
     setZones(result.zones);
     setDoorOverride(result.door_override);
     setSuspendedOverride(result.suspended_override);
-    setSelectedVariantName(variant.nom);
+    setSelectedVariantName(variant.nom ?? null);
   };
 
   const handleGenerate = () => {
