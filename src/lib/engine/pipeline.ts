@@ -115,7 +115,8 @@ export function runPipeline(rawIntent: ProjectIntent): PipelineResult {
  * Conserved in AppState: pieces, body dimensions, doorConfig, material, panel.
  * Conserved in V3 extension: intent, hardware, validation issues, assumptions.
  * Approximated: plinthDepth (2 cm), kerf (0.3 cm), sharedBoundaries (false).
- * Not preserved: edge_banding, drilling ops, locked state, standard_part_id.
+ * Preserved in pieces: edge_banding sides, drilling count.
+ * Not preserved: drilling ops detail, locked state, standard_part_id.
  */
 export function pipelineResultToAppState(
   result: PipelineResult,

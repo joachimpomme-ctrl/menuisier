@@ -46,6 +46,8 @@ export interface Piece {
   type: PieceType;
   panelId?: string; // undefined = panneau principal (state.panel)
   thickness?: number; // cm — override épaisseur panneau (ex. double joue). undefined = épaisseur du panneau assigné
+  edge_banding?: ('front' | 'back' | 'left' | 'right')[];
+  drilling_count?: number;
   // ---- positions spatiales (optionnel) ----
   // posY : hauteur (cm) du dessous de la pièce horizontale (tablette/bandeau) ou du
   //        bas de la pièce verticale (séparateur), mesurée depuis le sol intérieur du

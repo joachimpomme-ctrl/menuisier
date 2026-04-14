@@ -471,6 +471,16 @@ export function generatedPartsToLegacy(
         }
       }
 
+      // Preserve edge banding info for display in legacy tabs
+      if (gp.edge_banding && gp.edge_banding.length > 0) {
+        piece.edge_banding = gp.edge_banding;
+      }
+
+      // Preserve drilling count for display
+      if (gp.drilling && gp.drilling.length > 0) {
+        piece.drilling_count = gp.drilling.length;
+      }
+
       return piece;
     });
 
