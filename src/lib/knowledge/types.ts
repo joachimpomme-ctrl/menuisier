@@ -70,6 +70,10 @@ export interface ProjectIntent {
   /** "configurateur" mode — manual zone composition */
   zones?: ZoneConfig[];
   site_constraints?: SiteConstraint[];
+  /** Override automatic door generation: true = force doors, false = suppress doors */
+  door_override?: boolean;
+  /** Override suspended detection: true = force rail mounting */
+  suspended_override?: boolean;
 }
 
 // ---------------------------------------------------------------------------

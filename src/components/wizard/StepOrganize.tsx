@@ -55,16 +55,20 @@ function defaultConfigForModule(moduleId: ModuleType, count: number): ModuleConf
   }
 }
 
+interface VariantResult {
+  zones: ZoneRow[];
+  door_override?: boolean;
+  suspended_override?: boolean;
+}
+
 /**
- * Convert a preset variant into zones.
+ * Convert a preset variant into zones + pipeline overrides.
  *
  * Variant data from the JSON uses heterogeneous schemas per furniture type.
  * This function interprets known fields and builds a sensible zone layout.
- * Fields that describe features we can't map to a module (portes, vitrage,
- * fixation_murale, etc.) are silently skipped — the engine handles those
- * automatically via layout.ts and structure.ts.
+ * Door and suspension overrides are extracted and passed to the pipeline intent.
  */
-function variantToZones(variant: PresetVariant, usableHeight: number): ZoneRow[] {
+function variantToResult(variant: PresetVariant, usableHeight: number): VariantResult {
   const rows: ZoneRow[] = [];
   let key = Date.now();
   let remaining = usableHeight;
@@ -147,6 +151,18 @@ function variantToZones(variant: PresetVariant, usableHeight: number): ZoneRow[]
     remaining = 0;
   }
 
+  // --- Niches / cubbies (e.g. bibliothèque enfant) ---
+  if (variant.niches_bacs && remaining > 0) {
+    rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: remaining, count: 3 });
+    remaining = 0;
+  }
+
+  // --- Deep drawers (e.g. sous-escalier tiroirs extractibles) ---
+  if (variant.type === 'tiroirs_profonds' && remaining > 0) {
+    rows.push({ key: key++, module_id: 'drawer_stack', height_mm: remaining, count: 3 });
+    remaining = 0;
+  }
+
   // --- Fallback: if nothing matched, fill with default shelves ---
   if (rows.length === 0) {
     rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: remaining, count: 4 });
@@ -154,7 +170,18 @@ function variantToZones(variant: PresetVariant, usableHeight: number): ZoneRow[]
     rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: remaining, count: 2 });
   }
 
-  return rows;
+  // --- Extract pipeline overrides ---
+  let door_override: boolean | undefined;
+  if (variant.portes === false) door_override = false;
+  else if (variant.portes === true) door_override = true;
+  if (variant.portes_position) door_override = true;
+
+  let suspended_override: boolean | undefined;
+  if (variant.fixation_murale === true || variant.fixation === 'rail') {
+    suspended_override = true;
+  }
+
+  return { zones: rows, door_override, suspended_override };
 }
 
 let _nextKey = 1;
@@ -168,6 +195,8 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
 
   const [showContentMode, setShowContentMode] = useState(false);
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(null);
+  const [doorOverride, setDoorOverride] = useState<boolean | undefined>(undefined);
+  const [suspendedOverride, setSuspendedOverride] = useState<boolean | undefined>(undefined);
 
   const applyContentZones = (zoneConfigs: ZoneConfig[]) => {
     const rows: ZoneRow[] = zoneConfigs.map((z) => ({
@@ -198,8 +227,14 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   const totalZoneHeight = zones.reduce((s, z) => s + z.height_mm, 0);
   const heightDelta = usableHeight - totalZoneHeight;
 
-  const addZone = () => {
+  const clearVariantOverrides = () => {
     setSelectedVariantName(null);
+    setDoorOverride(undefined);
+    setSuspendedOverride(undefined);
+  };
+
+  const addZone = () => {
+    clearVariantOverrides();
     setZones((prev) => [
       ...prev,
       { key: _nextKey++, module_id: 'shelf_adjustable', height_mm: 500, count: 3 },
@@ -207,19 +242,22 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   };
 
   const updateZone = (key: number, field: keyof ZoneRow, value: string | number) => {
-    setSelectedVariantName(null);
+    clearVariantOverrides();
     setZones((prev) =>
       prev.map((z) => (z.key === key ? { ...z, [field]: value } : z)),
     );
   };
 
   const removeZone = (key: number) => {
-    setSelectedVariantName(null);
+    clearVariantOverrides();
     setZones((prev) => prev.filter((z) => z.key !== key));
   };
 
   const applyVariant = (variant: PresetVariant) => {
-    setZones(variantToZones(variant, usableHeight));
+    const result = variantToResult(variant, usableHeight);
+    setZones(result.zones);
+    setDoorOverride(result.door_override);
+    setSuspendedOverride(result.suspended_override);
     setSelectedVariantName(variant.nom);
   };
 
@@ -235,6 +273,8 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
       material_key: materialKey,
       space,
       zones: zoneConfigs,
+      ...(doorOverride !== undefined && { door_override: doorOverride }),
+      ...(suspendedOverride !== undefined && { suspended_override: suspendedOverride }),
     };
 
     onGenerate(intent);

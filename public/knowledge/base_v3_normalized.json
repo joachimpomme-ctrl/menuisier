@@ -4500,20 +4500,10 @@
           "vitrage": true
         },
         {
-          "nom": "Bibliothèque asymétrique",
-          "separateur": true,
-          "largeurs_differentes": true
-        },
-        {
           "nom": "Bibliothèque enfant",
           "hauteur_mm": 1200,
           "profondeur_mm": 280,
           "niches_bacs": true
-        },
-        {
-          "nom": "Bibliothèque pont",
-          "modules_lateraux": true,
-          "module_haut_pont": true
         },
         {
           "nom": "Bibliothèque suspendue",
@@ -4657,16 +4647,6 @@
           "profondeur_mm": 400,
           "pateres": true,
           "etagere_chaussures": true
-        },
-        {
-          "nom": "Sous-pente",
-          "hauteur_variable": true,
-          "modules_degressifs": true
-        },
-        {
-          "nom": "Dressing pont de lit",
-          "caisson_haut": true,
-          "modules_lateraux": true
         },
         {
           "nom": "Dressing ouvert sans porte",
@@ -4840,26 +4820,12 @@
           ]
         },
         {
-          "nom": "Meuble évier",
-          "fond_decoupe": true,
-          "plomberie_accessible": true
-        },
-        {
-          "nom": "Meuble d'angle",
-          "type": "angle_droit_borgne",
-          "fileur_mm": 65
-        },
-        {
           "nom": "Caisson avec casserolier",
           "tiroirs_profonds": true
         },
         {
           "nom": "Colonne four + micro-ondes",
           "niches_techniques": true
-        },
-        {
-          "nom": "Îlot central",
-          "double_face": true
         }
       ],
       "pieges_courants": [
@@ -4987,35 +4953,9 @@
       ],
       "variantes": [
         {
-          "nom": "Bureau simple (plateau sur tréteaux)",
-          "caisson": false,
-          "fond": false
-        },
-        {
           "nom": "Bureau avec caisson tiroirs",
           "caisson": "droite",
           "tiroirs": 3
-        },
-        {
-          "nom": "Bureau en L",
-          "retour": true,
-          "largeur_retour_mm": 1000
-        },
-        {
-          "nom": "Bureau mural rabattable",
-          "fixation": "charnière piano + compas",
-          "profondeur_mm": 450
-        },
-        {
-          "nom": "Bureau assis-debout",
-          "hauteur_mm": {
-            "min": 650,
-            "max": 1250
-          }
-        },
-        {
-          "nom": "Bureau caisson suspendu",
-          "caisson_suspendu": true
         },
         {
           "nom": "Bureau niche imprimante",
@@ -5125,14 +5065,6 @@
           "nom": "Meuble TV suspendu",
           "hauteur_mm": 350,
           "fixation": "rail"
-        },
-        {
-          "nom": "Meuble TV avec colonne latérale",
-          "colonne_hauteur_mm": 1800
-        },
-        {
-          "nom": "Meuble TV avec claustra de ventilation",
-          "ventilation_renforcee": true
         }
       ],
       "pieges_courants": [
@@ -5300,10 +5232,6 @@
         {
           "nom": "Enfilade portes + tiroirs hauts",
           "tiroirs_hauts": true
-        },
-        {
-          "nom": "Buffet vitré haut/bas",
-          "partie_haute_vitree": true
         }
       ]
     },
@@ -5363,17 +5291,7 @@
         "Ne pas vérifier l'horizontalité au niveau → livres qui glissent",
         "Poids des livres mal évalué sur fixation invisible"
       ],
-      "variantes": [
-        {
-          "nom": "Étagère en U",
-          "joues": true,
-          "forme_en_U": true
-        },
-        {
-          "nom": "Étagère invisible",
-          "fixation_invisible": true
-        }
-      ]
+      "variantes": []
     },
     "meuble_salle_de_bain": {
       "id": "sdb",
@@ -5440,16 +5358,7 @@
         "Chants non protégés autour des découpes de plomberie et vasque",
         "Tiroirs non échancrés au bon endroit pour siphon déporté"
       ],
-      "variantes": [
-        {
-          "nom": "Colonne salle de bain",
-          "colonne_haute": true
-        },
-        {
-          "nom": "Double vasque",
-          "double_decoupe": true
-        }
-      ]
+      "variantes": []
     },
     "commode": {
       "id": "commode",
@@ -5514,10 +5423,6 @@
           "nom": "Chiffonnier étroit",
           "largeur_mm": 600,
           "nb_tiroirs": 6
-        },
-        {
-          "nom": "Commode mixte tiroirs + porte",
-          "zone_porte": true
         }
       ]
     },
@@ -5606,21 +5511,6 @@
           "nom": "Table haute / bar",
           "hauteur_mm": 1100,
           "tabouret_mm": 800
-        },
-        {
-          "nom": "Table extensible",
-          "rallonge": true,
-          "ferrure": "coulisses synchrones"
-        },
-        {
-          "nom": "Console extensible",
-          "profondeur_fermee_mm": 350,
-          "rallonges": true
-        },
-        {
-          "nom": "Tablette murale rabattable",
-          "fixation_murale": true,
-          "compas": true
         }
       ],
       "pieges_courants": [
@@ -5718,19 +5608,6 @@
         {
           "nom": "Tiroirs extractibles (zone basse)",
           "type": "tiroirs_profonds"
-        },
-        {
-          "nom": "Placard multizone",
-          "type": "mixte_portes_tiroirs"
-        },
-        {
-          "nom": "Bureau sous escalier",
-          "hauteur_min_mm": 750,
-          "note": "Uniquement dans la zone haute"
-        },
-        {
-          "nom": "Cave à vin",
-          "note": "Si température et humidité compatibles"
         },
         {
           "nom": "Vestiaire d'entrée",

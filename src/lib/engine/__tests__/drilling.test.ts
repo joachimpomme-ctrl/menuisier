@@ -7,7 +7,7 @@ import {
   generateSlideHoles,
   generateDrillingForPart,
 } from '../drilling';
-import type { DrillingOp, GeneratedPart, BodyLayout, BodyStructure } from '../../knowledge/types';
+import type { GeneratedPart, BodyLayout, BodyStructure } from '../../knowledge/types';
 
 // ---------------------------------------------------------------------------
 // Unit tests — individual drilling generators
@@ -107,7 +107,6 @@ describe('generateSlideHoles', () => {
 describe('generateDrillingForPart', () => {
   const body: BodyLayout = {
     body_id: 'B1',
-    x_mm: 0,
     width_mm: 800,
     height_mm: 2000,
     depth_mm: 600,
@@ -124,6 +123,7 @@ describe('generateDrillingForPart', () => {
       { y_mm: 2000, role: 'top' },
     ],
     back_panel: { type: 'groove', thickness_mm: 5 },
+    bracing: 'none',
     plinth: { type: 'legs', height_mm: 100 },
   };
 

@@ -157,7 +157,7 @@ function resolveWallMounting(
 // ---------------------------------------------------------------------------
 
 export function generateStructure(layout: Layout, intent: ProjectIntent): Structure {
-  const suspended = isSuspended(intent.furniture_type);
+  const suspended = intent.suspended_override ?? isSuspended(intent.furniture_type);
   const plinthHeight = intent.space.plinth_mm || 0;
 
   const bodies: BodyStructure[] = layout.bodies.map((body) => ({
