@@ -41,6 +41,11 @@ describe('selectHardware', () => {
     const screws = hw.find((h) => h.reference === 'confirmat_7x50');
     expect(screws).toBeDefined();
     expect(screws!.quantity).toBeGreaterThan(0);
+
+    const edgeBand = hw.find((h) => h.reference === 'bande_chant');
+    expect(edgeBand).toBeDefined();
+    expect(edgeBand!.category).toBe('edge_band');
+    expect(edgeBand!.quantity).toBeGreaterThan(0);
   });
 
   it('placard with doors gets hinges and handles', () => {
