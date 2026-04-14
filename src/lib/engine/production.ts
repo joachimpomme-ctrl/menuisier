@@ -17,6 +17,7 @@ import type {
   ShoppingList,
   ProjectSummary,
   DifficultyLevel,
+  DrillingOp,
   Layout,
 } from '../knowledge/types';
 import type { PieceWithBody, NestingResult } from '../../types';
@@ -472,6 +473,27 @@ function buildCuttingPlans(
 }
 
 // ---------------------------------------------------------------------------
+// 6. Drilling plans
+// ---------------------------------------------------------------------------
+
+/**
+ * Collect drilling ops from all parts into per-part arrays.
+ * Only includes parts that have drilling operations.
+ */
+function buildDrillingPlans(parts: GeneratedPart[]): DrillingOp[][] {
+  const plans: DrillingOp[][] = [];
+  for (const part of parts) {
+    if (part.drilling && part.drilling.length > 0) {
+      // One entry per physical piece (expand qty)
+      for (let i = 0; i < part.qty; i++) {
+        plans.push(part.drilling);
+      }
+    }
+  }
+  return plans;
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -487,7 +509,7 @@ export function generateProduction(
     assumptions: buildAssumptions(intent, structure),
     shopping_list: buildShoppingList(intent, parts, hardware),
     cutting_plans: buildCuttingPlans(intent, parts, layout),
-    drilling_plans: [], // Non implémenté — pas de coordonnées XYZ dans le modèle V3
+    drilling_plans: buildDrillingPlans(parts),
     assembly_guide: buildAssemblyGuide(intent, parts, hardware, structure),
     summary: buildSummary(intent, parts, hardware),
   };

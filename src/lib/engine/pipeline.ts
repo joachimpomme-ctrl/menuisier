@@ -1,9 +1,8 @@
 /**
  * Engine pipeline — intent → layout → structure → geometry → hardware → validation → production.
  *
- * Limitations actuelles :
- * - drilling_plans : non implémenté (toujours [])
- * - Portes : calculées automatiquement par layout.ts selon le type et la largeur
+ * Portes : calculées automatiquement par layout.ts selon le type et la largeur.
+ * Perçages : générés par drilling.ts et attachés à chaque pièce dans geometry.ts.
  */
 
 import type {

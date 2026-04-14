@@ -184,7 +184,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
 
       {/* Limitations */}
       <p className="text-xs text-gray-400 italic">
-        Plans de perçage non encore disponibles. Plans de coupe accessibles via l'éditeur classique (onglet Débit).
+        Plans de coupe accessibles via l'éditeur classique (onglet Débit).
       </p>
 
       {/* Actions */}

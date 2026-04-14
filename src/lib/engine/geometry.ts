@@ -17,6 +17,7 @@ import type {
   BackPanelSpec,
 } from '../knowledge/types';
 import { MATERIALS } from '../../data/materials';
+import { generateDrillingForPart, type DrillingContext } from './drilling';
 
 // ---------------------------------------------------------------------------
 // Geometry helpers — all exported, all pure
@@ -419,6 +420,15 @@ function generateBodyParts(
       body_id: bid,
       qty: door.count,
     }));
+  }
+
+  // --- Generate drilling ops for each part ---
+  const drillingCtx: DrillingContext = { body, bodyStruct, thickness_mm: thickness };
+  for (const part of parts) {
+    const ops = generateDrillingForPart(part, drillingCtx);
+    if (ops.length > 0) {
+      part.drilling = ops;
+    }
   }
 
   return parts;
