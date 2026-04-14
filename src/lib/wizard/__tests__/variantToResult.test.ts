@@ -16,6 +16,13 @@ describe('variantToResult', () => {
     expect(totalHeight(result)).toBe(1900);
   });
 
+  it('overrides are undefined for non-variant zones', () => {
+    const result = variantToResult({}, 1900);
+
+    expect(result.door_override).toBeUndefined();
+    expect(result.suspended_override).toBeUndefined();
+  });
+
   it('keeps a valid full-height split for mixed rods/drawers/shelves', () => {
     const result = variantToResult({ tringle: true, tiroirs: 3, tablettes: 4 }, 1900);
 
@@ -45,6 +52,16 @@ describe('variantToResult', () => {
 
     expect(result.door_override).toBe(false);
     expect(result.suspended_override).toBe(true);
+  });
+
+  it("overrides from previous variant don't leak", () => {
+    const withOverrides = variantToResult({ portes: false, fixation_murale: true }, 1900);
+    const withoutOverrides = variantToResult({}, 1900);
+
+    expect(withOverrides.door_override).toBe(false);
+    expect(withOverrides.suspended_override).toBe(true);
+    expect(withoutOverrides.door_override).toBeUndefined();
+    expect(withoutOverrides.suspended_override).toBeUndefined();
   });
 
   it('never creates non-positive height zones for aggressive combinations', () => {
