@@ -57,44 +57,99 @@ function defaultConfigForModule(moduleId: ModuleType, count: number): ModuleConf
 
 /**
  * Convert a preset variant into zones.
- * Maps variant boolean/number fields to module configs.
+ *
+ * Variant data from the JSON uses heterogeneous schemas per furniture type.
+ * This function interprets known fields and builds a sensible zone layout.
+ * Fields that describe features we can't map to a module (portes, vitrage,
+ * fixation_murale, etc.) are silently skipped — the engine handles those
+ * automatically via layout.ts and structure.ts.
  */
 function variantToZones(variant: PresetVariant, usableHeight: number): ZoneRow[] {
   const rows: ZoneRow[] = [];
   let key = Date.now();
   let remaining = usableHeight;
 
-  // Hanging rod
+  // --- Override total height if variant specifies one ---
+  const varH = typeof variant.hauteur_mm === 'number' ? variant.hauteur_mm : null;
+  if (varH && varH < remaining) {
+    remaining = varH;
+  }
+
+  // --- Hanging rods ---
   if (variant.tringle || variant.tringle_haute) {
-    const h = Math.round(usableHeight * 0.6);
+    const h = Math.round(remaining * 0.6);
+    rows.push({ key: key++, module_id: 'hanging_rod_short', height_mm: h, count: 1 });
+    remaining -= h;
+  }
+  if (variant.tringle_basse) {
+    const h = Math.round(remaining * 0.4);
     rows.push({ key: key++, module_id: 'hanging_rod_short', height_mm: h, count: 1 });
     remaining -= h;
   }
 
-  // Drawers
-  if (typeof variant.tiroirs === 'number' && variant.tiroirs > 0) {
+  // --- Drawers (accept number or boolean or array) ---
+  const drawerCount = typeof variant.tiroirs === 'number'
+    ? variant.tiroirs
+    : Array.isArray(variant.tiroirs)
+      ? (variant.tiroirs as unknown[]).length
+      : (variant.tiroirs === true || variant.tiroirs_profonds || variant.tiroirs_hauts)
+        ? 3
+        : typeof variant.nb_tiroirs === 'number'
+          ? variant.nb_tiroirs
+          : 0;
+
+  if (drawerCount > 0) {
     const drawerH = Math.min(remaining, Math.round(remaining * 0.4));
-    rows.push({ key: key++, module_id: 'drawer_stack', height_mm: drawerH, count: variant.tiroirs });
+    rows.push({ key: key++, module_id: 'drawer_stack', height_mm: drawerH, count: drawerCount });
     remaining -= drawerH;
   }
 
-  // Shelves
-  const shelfCount = typeof variant.tablettes === 'number' ? variant.tablettes : 0;
-  if (shelfCount > 0 && remaining > 0) {
-    rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: remaining, count: shelfCount });
-    remaining = 0;
-  }
-
-  // Shoe rack
+  // --- Shoe rack ---
   if (variant.etagere_chaussures) {
     const h = Math.min(remaining, 500);
     rows.push({ key: key++, module_id: 'shoe_rack_inclined', height_mm: h, count: 4 });
     remaining -= h;
   }
 
-  // If nothing was added or remaining > 0, fill with shelves
+  // --- TV niche ---
+  if (variant.niche_technique || variant.niches_techniques) {
+    const h = Math.min(remaining, 500);
+    rows.push({ key: key++, module_id: 'tv_niche', height_mm: h, count: 1 });
+    remaining -= h;
+  }
+
+  // --- Wine rack ---
+  if (variant.nom?.toLowerCase().includes('cave à vin') || variant.nom?.toLowerCase().includes('vin')) {
+    rows.push({ key: key++, module_id: 'wine_rack', height_mm: remaining, count: 4 });
+    remaining = 0;
+  }
+
+  // --- Bench / seat ---
+  if (variant.assise || variant.banc) {
+    const h = Math.min(remaining, 500);
+    rows.push({ key: key++, module_id: 'bench_storage', height_mm: h, count: 1 });
+    remaining -= h;
+  }
+
+  // --- Shelves (explicit count, or boolean, or via tablette_separation) ---
+  const shelfCount = typeof variant.tablettes === 'number'
+    ? variant.tablettes
+    : variant.tablettes === true
+      ? 4
+      : variant.tablette_separation
+        ? 3
+        : typeof variant.nb_tablettes === 'number'
+          ? variant.nb_tablettes
+          : 0;
+
+  if (shelfCount > 0 && remaining > 0) {
+    rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: remaining, count: shelfCount });
+    remaining = 0;
+  }
+
+  // --- Fallback: if nothing matched, fill with default shelves ---
   if (rows.length === 0) {
-    rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: usableHeight, count: 4 });
+    rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: remaining, count: 4 });
   } else if (remaining > 100) {
     rows.push({ key: key++, module_id: 'shelf_adjustable', height_mm: remaining, count: 2 });
   }
@@ -112,6 +167,7 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   ]);
 
   const [showContentMode, setShowContentMode] = useState(false);
+  const [selectedVariantName, setSelectedVariantName] = useState<string | null>(null);
 
   const applyContentZones = (zoneConfigs: ZoneConfig[]) => {
     const rows: ZoneRow[] = zoneConfigs.map((z) => ({
@@ -143,6 +199,7 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   const heightDelta = usableHeight - totalZoneHeight;
 
   const addZone = () => {
+    setSelectedVariantName(null);
     setZones((prev) => [
       ...prev,
       { key: _nextKey++, module_id: 'shelf_adjustable', height_mm: 500, count: 3 },
@@ -150,17 +207,20 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   };
 
   const updateZone = (key: number, field: keyof ZoneRow, value: string | number) => {
+    setSelectedVariantName(null);
     setZones((prev) =>
       prev.map((z) => (z.key === key ? { ...z, [field]: value } : z)),
     );
   };
 
   const removeZone = (key: number) => {
+    setSelectedVariantName(null);
     setZones((prev) => prev.filter((z) => z.key !== key));
   };
 
   const applyVariant = (variant: PresetVariant) => {
     setZones(variantToZones(variant, usableHeight));
+    setSelectedVariantName(variant.nom);
   };
 
   const handleGenerate = () => {
@@ -221,7 +281,11 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
               <button
                 key={i}
                 onClick={() => applyVariant(v)}
-                className="px-3 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                className={`px-3 py-1.5 text-xs border rounded-full transition-colors ${
+                  selectedVariantName === v.nom
+                    ? 'bg-amber-100 border-amber-400 text-amber-800 font-medium'
+                    : 'border-gray-300 hover:bg-blue-50 hover:border-blue-300'
+                }`}
               >
                 {v.nom}
               </button>

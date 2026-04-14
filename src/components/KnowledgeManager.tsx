@@ -55,7 +55,7 @@ export default function KnowledgeManager({ isOpen, onClose, onUpdate }: Props) {
           <div>
             <h3 className="text-amber-700 font-bold text-sm">Base de connaissances</h3>
             <p className="text-xs text-stone-500 mt-0.5">
-              {docs.length} document{docs.length > 1 ? 's' : ''} — enrichit l'IA et la validation
+              {docs.length} document{docs.length > 1 ? 's' : ''} — référence pour l'assistant IA
             </p>
           </div>
           <button

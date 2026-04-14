@@ -184,7 +184,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
 
       {/* Limitations */}
       <p className="text-xs text-gray-400 italic">
-        Plans de coupe et plans de perçage disponibles via l'éditeur classique (onglets Débit et Montage).
+        Plans de perçage non encore disponibles. Plans de coupe accessibles via l'éditeur classique (onglet Débit).
       </p>
 
       {/* Actions */}
@@ -197,7 +197,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
         </button>
         <button
           onClick={() => {
-            if (confirm('L\'éditeur classique ne conserve pas la quincaillerie ni les pièces verrouillées. Continuer ?')) {
+            if (confirm('Basculer vers l\'éditeur classique ? La quincaillerie et les hypothèses V3 seront conservées mais en lecture seule.')) {
               onClassicEditor(pipelineResultToAppState(result, materialKey));
             }
           }}

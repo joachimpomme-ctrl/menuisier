@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { runPipeline, pipelineResultToAppState } from '../pipeline';
-import type { ProjectIntent, GeneratedPart } from '../../knowledge/types';
+import type { ProjectIntent, GeneratedPart, ProjectStateV3 } from '../../knowledge/types';
 import { _resetCounter as resetIntent } from '../intent';
 import { _resetCounter as resetLayout } from '../layout';
 import { _resetPartCounter as resetGeom } from '../geometry';
@@ -317,6 +317,97 @@ describe('runPipeline', () => {
     // Equal distribution: all facade heights should be the same
     const facadeHeights = facades.map((f) => f.width_mm);
     expect(new Set(facadeHeights).size).toBe(1); // all equal
+  });
+
+  // =========================================================================
+  // BRIDGE V3 → LEGACY
+  // =========================================================================
+
+  it('11. Bridge preserves V3 fields (intent, hardware, validation, assumptions)', () => {
+    resetAll();
+    const intent: ProjectIntent = {
+      furniture_type: 'bibliotheque',
+      material_key: 'melamine',
+      space: { width_mm: 800, height_mm: 2000, depth_mm: 300, plinth_mm: 0, wall_type: 'concrete' },
+      zones: [
+        { module_id: 'shelf_adjustable', height_mm: 2000, config: { type: 'shelf_adjustable', count: 3, spacing_mm: 300 } },
+      ],
+    };
+
+    const result = runPipeline(intent);
+    const state = pipelineResultToAppState(result, 'melamine') as ProjectStateV3;
+
+    // Legacy fields
+    expect(state.materialKey).toBe('melamine');
+    expect(state.bodies.length).toBeGreaterThan(0);
+    expect(state.project.wallWidth).toBe(80);
+
+    // V3 extension fields preserved
+    expect(state.intent).toBeDefined();
+    expect(state.intent!.furniture_type).toBe('bibliotheque');
+    expect(state.hardwareList).toBeDefined();
+    expect(state.hardwareList!.length).toBeGreaterThan(0);
+    expect(state.validationIssues).toBeDefined();
+    expect(state.assumptions).toBeDefined();
+    expect(state.assumptions!.length).toBeGreaterThan(0);
+  });
+
+  it('12. Bridge maps DoorLayout → DoorConfig for placard', () => {
+    resetAll();
+    const intent: ProjectIntent = {
+      furniture_type: 'placard',
+      material_key: 'melamine',
+      space: { width_mm: 550, height_mm: 2400, depth_mm: 600, plinth_mm: 80, wall_type: 'concrete' },
+      zones: [
+        { module_id: 'hanging_rod_short', height_mm: 2320, config: { type: 'hanging_rod_short' } },
+      ],
+    };
+
+    const result = runPipeline(intent);
+    const state = pipelineResultToAppState(result, 'melamine');
+
+    // Width 550 > 500 → double doors, half overlay
+    const body = state.bodies[0];
+    expect(body.doorConfig).toBeDefined();
+    expect(body.doorConfig!.count).toBe(2);
+    expect(body.doorConfig!.poseType).toBe('demi-recouvrement');
+  });
+
+  it('13. Bridge generates cutting_plans via nesting', () => {
+    resetAll();
+    const intent: ProjectIntent = {
+      furniture_type: 'bibliotheque',
+      material_key: 'melamine',
+      space: { width_mm: 800, height_mm: 2000, depth_mm: 300, plinth_mm: 0, wall_type: 'concrete' },
+      zones: [
+        { module_id: 'shelf_adjustable', height_mm: 2000, config: { type: 'shelf_adjustable', count: 3, spacing_mm: 300 } },
+      ],
+    };
+
+    const result = runPipeline(intent);
+    expect(result.production).not.toBeNull();
+    expect(result.production!.cutting_plans).not.toBeNull();
+
+    const plans = result.production!.cutting_plans as { bins: unknown[]; metrics: { panelCount: number; efficiency: number } };
+    expect(plans.bins.length).toBeGreaterThan(0);
+    expect(plans.metrics.panelCount).toBeGreaterThan(0);
+    expect(plans.metrics.efficiency).toBeGreaterThan(0);
+  });
+
+  it('14. Project name uses furniture type instead of hardcoded Mon meuble', () => {
+    resetAll();
+    const intent: ProjectIntent = {
+      furniture_type: 'meuble_tv',
+      material_key: 'melamine',
+      space: { width_mm: 1200, height_mm: 500, depth_mm: 400, plinth_mm: 0, wall_type: 'unknown' },
+      zones: [
+        { module_id: 'tv_niche', height_mm: 500, config: { type: 'tv_niche', ventilation: true } },
+      ],
+    };
+
+    const result = runPipeline(intent);
+    const state = pipelineResultToAppState(result, 'melamine');
+    expect(state.project.name).toBe('meuble tv');
   });
 
   it('10. Pièce locked → non écrasée après régénération', async () => {

@@ -2,9 +2,8 @@
  * Engine pipeline — intent → layout → structure → geometry → hardware → validation → production.
  *
  * Limitations actuelles :
- * - cutting_plans : non intégré (nesting.ts legacy existe mais pas branché)
  * - drilling_plans : non implémenté (toujours [])
- * - Portes : calculées par layout.ts selon le type, pas depuis le choix wizard
+ * - Portes : calculées automatiquement par layout.ts selon le type et la largeur
  */
 
 import type {
@@ -15,8 +14,9 @@ import type {
   HardwareItem,
   ValidationIssue,
   ProductionOutput,
+  ProjectStateV3,
 } from '../knowledge/types';
-import type { AppState, MaterialKey } from '../../types';
+import type { MaterialKey } from '../../types';
 import { validateIntent } from './intent';
 import { generateLayout } from './layout';
 import { generateStructure } from './structure';
@@ -108,19 +108,20 @@ export function runPipeline(rawIntent: ProjectIntent): PipelineResult {
 // ---------------------------------------------------------------------------
 
 /**
- * Convert a PipelineResult to a legacy AppState for the classic editor.
+ * Convert a PipelineResult to a ProjectStateV3 for the classic editor.
  *
- * Conserved: pieces (dimensions, positions, types), body dimensions, material,
- *            panel config, doorConfig (mapped from DoorLayout).
- * Lost:      hardware (no legacy equivalent), edge_banding, locked state,
- *            standard_part_id, V3 validation issues.
- * Approximated: plinthDepth (hardcoded 2 cm), kerf (hardcoded 0.3 cm),
- *               sharedBoundaries (always false).
+ * ProjectStateV3 extends AppState with optional V3 fields, so all legacy
+ * code (tabs, validation, nesting, PDF) continues to work unchanged.
+ *
+ * Conserved in AppState: pieces, body dimensions, doorConfig, material, panel.
+ * Conserved in V3 extension: intent, hardware, validation issues, assumptions.
+ * Approximated: plinthDepth (2 cm), kerf (0.3 cm), sharedBoundaries (false).
+ * Not preserved: edge_banding, drilling ops, locked state, standard_part_id.
  */
 export function pipelineResultToAppState(
   result: PipelineResult,
   materialKey: MaterialKey,
-): AppState {
+): ProjectStateV3 {
   const mat = MATERIALS[materialKey];
   const panel = mat.panels[0];
   const { bodies } = generatedPartsToLegacy(result.parts, result.layout);
@@ -128,9 +129,10 @@ export function pipelineResultToAppState(
   const space = result.intent.space;
 
   return {
+    // --- Legacy AppState fields ---
     materialKey,
     project: {
-      name: 'Mon meuble',
+      name: result.intent.furniture_type.replace(/_/g, ' '),
       wallWidth: +(space.width_mm / 10).toFixed(1),
       wallDepth: +(space.depth_mm / 10).toFixed(1),
       ceilingHeight: +(space.height_mm / 10).toFixed(1),
@@ -149,5 +151,10 @@ export function pipelineResultToAppState(
     bodies,
     sharedBoundaries: Array(Math.max(0, bodies.length - 1)).fill(false),
     extraPanels: [],
+    // --- V3 extension fields (preserved for display & future use) ---
+    intent: result.intent,
+    hardwareList: result.hardware,
+    validationIssues: result.validation,
+    assumptions: result.production?.assumptions,
   };
 }
