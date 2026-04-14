@@ -146,6 +146,11 @@ function buildShoppingList(
     tools.push('Fraise Forstner Ø35mm (charnières)');
   }
 
+  // Add tool for edge banding
+  if (parts.some((p) => p.edge_banding && p.edge_banding.length > 0)) {
+    tools.push('Fer à repasser ou plaqueuse de chant');
+  }
+
   return {
     panels,
     hardware,
@@ -177,6 +182,7 @@ function buildAssemblyGuide(
   const hasRod = (intent.zones ?? []).some(
     (z) => z.module_id === 'hanging_rod_short' || z.module_id === 'hanging_rod_long',
   );
+  const hasEdgeBanding = parts.some((p) => p.edge_banding && p.edge_banding.length > 0);
 
   // Step 1: Preparation
   steps.push({
@@ -191,6 +197,22 @@ function buildAssemblyGuide(
     parts_involved: parts.map((p) => p.id),
     tip: 'Couper les pièces les plus grandes en premier pour optimiser les chutes',
   });
+
+  if (hasEdgeBanding) {
+    const edgeParts = parts.filter((p) => p.edge_banding && p.edge_banding.length > 0);
+    steps.push({
+      step_number: n++,
+      title: 'Application des bandes de chant',
+      instructions: [
+        'Découper les bandes de chant à longueur (prévoir 5mm de surplus)',
+        'Appliquer au fer à repasser (160°C, sans vapeur) ou à la plaqueuse',
+        'Presser fermement avec une cale en liège pendant le refroidissement',
+        'Araser les surplus au cutter ou à l\'affleureur',
+      ],
+      parts_involved: edgeParts.map((p) => p.id),
+      tip: 'Tester la température du fer sur une chute — la colle doit fondre sans brûler le mélaminé',
+    });
+  }
 
   // Step 2: Groove for back panel
   if (hasFond) {

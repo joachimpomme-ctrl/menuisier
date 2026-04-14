@@ -139,6 +139,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
                   <th className="py-2 pr-3 font-medium">Ép.</th>
                   <th className="py-2 pr-3 font-medium">Qté</th>
                   <th className="py-2 font-medium">Type</th>
+                  <th className="py-2 font-medium">Chant</th>
                 </tr>
               </thead>
               <tbody>
@@ -150,6 +151,15 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
                     <td className="py-1.5 pr-3 tabular-nums">{part.thickness_mm}</td>
                     <td className="py-1.5 pr-3 tabular-nums">{part.qty}</td>
                     <td className="py-1.5 text-gray-500">{part.type}</td>
+                    <td className="py-1.5 text-gray-400 text-xs">
+                      {part.edge_banding && part.edge_banding.length > 0
+                        ? part.edge_banding.length === 4
+                          ? '4 côtés'
+                          : part.edge_banding
+                              .map((s) => (s === 'front' ? 'AV' : s === 'back' ? 'AR' : s === 'left' ? 'G' : 'D'))
+                              .join(', ')
+                        : '—'}
+                    </td>
                   </tr>
                 ))}
               </tbody>
