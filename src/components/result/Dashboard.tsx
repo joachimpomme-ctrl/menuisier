@@ -7,6 +7,7 @@ import Assumptions from './Assumptions';
 import ShoppingListView from './ShoppingList';
 import HardwareDetail from './HardwareDetail';
 import AssemblyGuide from './AssemblyGuide';
+import DrillingPlanView from './DrillingPlanView';
 
 interface Props {
   intent: ProjectIntent;
@@ -44,6 +45,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
   const blockingIssues = result.validation.filter((v) => v.blocking);
   const warnings = result.validation.filter((v) => !v.blocking && v.severity === 'warning');
   const prod = result.production;
+  const hasDrillingPlans = result.parts.some((part) => (part.drilling?.length ?? 0) > 0);
 
   const handleExportPdf = async () => {
     setPdfLoading(true);
@@ -160,6 +162,12 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
       <Section title={`Quincaillerie (${result.hardware.reduce((s, h) => s + h.quantity, 0)} articles)`}>
         <HardwareDetail items={result.hardware} />
       </Section>
+
+      {hasDrillingPlans && (
+        <Section title="Plans de perçage">
+          <DrillingPlanView parts={result.parts} />
+        </Section>
+      )}
 
       {/* Shopping list */}
       {prod && (
