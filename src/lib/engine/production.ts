@@ -28,7 +28,12 @@ import { optimizeNesting } from '../nesting';
 // 1. Assumptions
 // ---------------------------------------------------------------------------
 
-function buildAssumptions(intent: ProjectIntent, structure: Structure): Assumption[] {
+function buildAssumptions(
+  intent: ProjectIntent,
+  structure: Structure,
+  layout: Layout,
+  parts: GeneratedPart[],
+): Assumption[] {
   const assumptions: Assumption[] = [];
 
   assumptions.push({
@@ -79,6 +84,107 @@ function buildAssumptions(intent: ProjectIntent, structure: Structure): Assumpti
       key: 'material',
       value: `${mat.name} ép. ${mat.defaultThickness}mm`,
       reason: `Densité ${mat.density} kg/m³, flexion ${mat.flexMPa} MPa`,
+      user_should_verify: false,
+    });
+  }
+
+  // --- Décisions moteur contextuelles ---
+
+  const hasDoors = parts.some((p) => p.type === 'porte');
+  const doorCount = parts.filter((p) => p.type === 'porte').reduce((s, p) => s + p.qty, 0);
+  if (hasDoors) {
+    const body = layout.bodies[0];
+    const overlay = body?.doors?.overlay ?? 'full';
+    assumptions.push({
+      key: 'doors_decision',
+      value: `${doorCount} porte${doorCount > 1 ? 's' : ''} (${overlay === 'half' ? 'demi-recouvrement' : overlay === 'inset' ? 'affleurantes' : 'recouvrement total'})`,
+      reason: body && body.width_mm > 500
+        ? 'Largeur > 500mm → 2 portes avec montant central implicite'
+        : 'Porte simple en recouvrement total',
+      user_should_verify: false,
+    });
+  } else if (intent.door_override === false) {
+    assumptions.push({
+      key: 'doors_decision',
+      value: 'Sans portes (choix utilisateur)',
+      reason: 'Portes désactivées par la variante choisie',
+      user_should_verify: false,
+    });
+  }
+
+  const suspended = structure.bodies.some((b) => b.wall_mounting?.type === 'rail');
+  if (suspended) {
+    assumptions.push({
+      key: 'mounting_decision',
+      value: 'Fixation murale par rail',
+      reason: 'Meuble suspendu — rail de suspension en partie haute, pas de pieds',
+      user_should_verify: true,
+    });
+  }
+
+  const hasAntiTip = structure.bodies.some((b) => b.wall_mounting?.type === 'anti_tip');
+  if (hasAntiTip) {
+    assumptions.push({
+      key: 'anti_tip_decision',
+      value: 'Équerre anti-basculement obligatoire',
+      reason: `Hauteur ${intent.space.height_mm}mm > 1500mm — sécurité enfants`,
+      user_should_verify: false,
+    });
+  }
+
+  if (layout.bodies.length > 1) {
+    assumptions.push({
+      key: 'multi_body',
+      value: `${layout.bodies.length} corps`,
+      reason: `Largeur ${intent.space.width_mm}mm dépasse la portée max du matériau → découpage en ${layout.bodies.length} corps égaux`,
+      user_should_verify: false,
+    });
+  }
+
+  const hasRod = (intent.zones ?? []).some(
+    (z) => z.module_id === 'hanging_rod_short' || z.module_id === 'hanging_rod_long',
+  );
+  if (hasRod) {
+    const depthOk = intent.space.depth_mm >= 550;
+    assumptions.push({
+      key: 'rod_depth',
+      value: `Profondeur ${intent.space.depth_mm}mm ${depthOk ? '≥' : '<'} 550mm`,
+      reason: depthOk
+        ? 'Profondeur suffisante pour cintres standard (550mm min)'
+        : 'Profondeur insuffisante pour cintres — prévoir une tringle perpendiculaire',
+      user_should_verify: !depthOk,
+    });
+  }
+
+  const hasDrawers = parts.some((p) => p.type === 'tiroir-facade');
+  if (hasDrawers) {
+    const drawerCount = parts.filter((p) => p.type === 'tiroir-facade').reduce((s, p) => s + p.qty, 0);
+    assumptions.push({
+      key: 'drawers_decision',
+      value: `${drawerCount} tiroir${drawerCount > 1 ? 's' : ''} sur coulisses à billes`,
+      reason: 'Coulisses à extension totale pour accès complet au contenu',
+      user_should_verify: false,
+    });
+  }
+
+  const fixedShelves = structure.bodies[0]?.fixed_shelves.filter(
+    (s) => s.role === 'zone_separator' || s.role === 'support',
+  ) ?? [];
+  if (fixedShelves.length > 0) {
+    assumptions.push({
+      key: 'structural_shelves',
+      value: `${fixedShelves.length} tablette${fixedShelves.length > 1 ? 's' : ''} fixe${fixedShelves.length > 1 ? 's' : ''} structurelle${fixedShelves.length > 1 ? 's' : ''}`,
+      reason: 'Séparations ajoutées pour rigidifier le caisson entre les zones fonctionnelles',
+      user_should_verify: false,
+    });
+  }
+
+  const hasEdgeBanding = parts.some((p) => p.edge_banding && p.edge_banding.length > 0);
+  if (hasEdgeBanding) {
+    assumptions.push({
+      key: 'edge_banding_decision',
+      value: 'Bandes de chant sur faces visibles',
+      reason: 'Protection + esthétique : chants visibles bandés, chants cachés laissés bruts',
       user_should_verify: false,
     });
   }
@@ -528,7 +634,7 @@ export function generateProduction(
   layout: Layout,
 ): ProductionOutput {
   return {
-    assumptions: buildAssumptions(intent, structure),
+    assumptions: buildAssumptions(intent, structure, layout, parts),
     shopping_list: buildShoppingList(intent, parts, hardware),
     cutting_plans: buildCuttingPlans(intent, parts, layout),
     drilling_plans: buildDrillingPlans(parts),
