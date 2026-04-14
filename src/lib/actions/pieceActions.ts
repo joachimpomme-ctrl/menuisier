@@ -1,6 +1,6 @@
 import type { AppState, PanelDef, Piece, PieceType } from '../../types';
 import { getBodyInnerWidth } from '../helpers';
-import { createPiece, detectPieceType, generateStandardPieces } from '../domain';
+import { createPiece, detectPieceType, generateStandardPieces, applySharedBoundary } from '../domain';
 
 export function updatePiece(
   state: AppState,
@@ -89,10 +89,35 @@ export function autoFillPieces(state: AppState, bodyId: string): AppState {
 
   const pieces = generateStandardPieces(body, bi, shared, th, state.project.ceilingHeight);
 
-  return {
+  let nextState: AppState = {
     ...state,
     bodies: state.bodies.map((b) => (b.id === bodyId ? { ...b, pieces } : b)),
   };
+
+  const boundaryCandidates = [bi - 1, bi].filter((boundaryIdx) => boundaryIdx >= 0 && boundaryIdx < shared.length && shared[boundaryIdx]);
+  for (const boundaryIdx of boundaryCandidates) {
+    const disabled = applySharedBoundary(
+      nextState.bodies,
+      boundaryIdx,
+      false,
+      nextState.sharedBoundaries ?? [],
+      th,
+      state.project.ceilingHeight,
+      state.project.plinthHeight,
+    );
+    const enabled = applySharedBoundary(
+      disabled.bodies,
+      boundaryIdx,
+      true,
+      disabled.sharedBoundaries,
+      th,
+      state.project.ceilingHeight,
+      state.project.plinthHeight,
+    );
+    nextState = { ...nextState, bodies: enabled.bodies, sharedBoundaries: enabled.sharedBoundaries };
+  }
+
+  return nextState;
 }
 
 export function removePiece(state: AppState, bodyId: string, pieceId: string): AppState {

@@ -2,11 +2,37 @@ import type { AppState, Body } from '../../types';
 import { uid } from '../helpers';
 import { recalcBodyPieces, applySharedBoundary } from '../domain';
 
+function refreshBoundary(
+  bodies: Body[],
+  sharedBoundaries: boolean[],
+  boundaryIdx: number,
+  thickness: number,
+  ceilingHeight: number,
+  plinthHeight: number,
+): { bodies: Body[]; sharedBoundaries: boolean[] } {
+  const disabled = applySharedBoundary(
+    bodies,
+    boundaryIdx,
+    false,
+    sharedBoundaries,
+    thickness,
+    ceilingHeight,
+    plinthHeight,
+  );
+  return applySharedBoundary(
+    disabled.bodies,
+    boundaryIdx,
+    true,
+    disabled.sharedBoundaries,
+    thickness,
+    ceilingHeight,
+    plinthHeight,
+  );
+}
+
 export function updateBody(state: AppState, id: string, key: keyof Body, value: string | number): AppState {
   const shared = state.sharedBoundaries ?? [];
-  return {
-    ...state,
-    bodies: state.bodies.map((b, i) => {
+  let bodies = state.bodies.map((b, i) => {
       if (b.id !== id) return b;
       const updated = { ...b, [key]: value };
 
@@ -21,7 +47,30 @@ export function updateBody(state: AppState, id: string, key: keyof Body, value: 
       }
 
       return updated;
-    }),
+    });
+
+  let nextShared = [...shared];
+  const idx = state.bodies.findIndex((b) => b.id === id);
+  if (key === 'depth') {
+    const boundaryCandidates = [idx - 1, idx].filter((boundaryIdx) => boundaryIdx >= 0 && boundaryIdx < nextShared.length && nextShared[boundaryIdx]);
+    for (const boundaryIdx of boundaryCandidates) {
+      const refreshed = refreshBoundary(
+        bodies,
+        nextShared,
+        boundaryIdx,
+        state.panel.thickness,
+        state.project.ceilingHeight,
+        state.project.plinthHeight,
+      );
+      bodies = refreshed.bodies;
+      nextShared = refreshed.sharedBoundaries;
+    }
+  }
+
+  return {
+    ...state,
+    bodies,
+    sharedBoundaries: nextShared,
   };
 }
 
@@ -35,9 +84,27 @@ export function addBody(state: AppState): AppState {
 }
 
 export function removeBody(state: AppState, id: string): AppState {
-  const shared = state.sharedBoundaries ?? [];
-  const idx = state.bodies.findIndex((b) => b.id === id);
-  const newBodies = state.bodies.filter((b) => b.id !== id);
+  let bodies = state.bodies;
+  let shared = [...(state.sharedBoundaries ?? [])];
+  const idx = bodies.findIndex((b) => b.id === id);
+  if (idx < 0) return state;
+
+  const boundaryCandidates = [idx, idx - 1].filter((boundaryIdx) => boundaryIdx >= 0 && boundaryIdx < shared.length && shared[boundaryIdx]);
+  for (const boundaryIdx of boundaryCandidates) {
+    const disabled = applySharedBoundary(
+      bodies,
+      boundaryIdx,
+      false,
+      shared,
+      state.panel.thickness,
+      state.project.ceilingHeight,
+      state.project.plinthHeight,
+    );
+    bodies = disabled.bodies;
+    shared = disabled.sharedBoundaries;
+  }
+
+  const newBodies = bodies.filter((b) => b.id !== id);
   const newShared = [...shared];
   if (idx > 0) {
     newShared.splice(idx - 1, 1);
@@ -48,17 +115,34 @@ export function removeBody(state: AppState, id: string): AppState {
 }
 
 export function duplicateBody(state: AppState, id: string): AppState {
-  const shared = state.sharedBoundaries ?? [];
-  const source = state.bodies.find((b) => b.id === id);
+  let bodiesSource = state.bodies;
+  let shared = [...(state.sharedBoundaries ?? [])];
+  const sourceIdx = bodiesSource.findIndex((b) => b.id === id);
+  const boundaryCandidates = [sourceIdx, sourceIdx - 1].filter((boundaryIdx) => boundaryIdx >= 0 && boundaryIdx < shared.length && shared[boundaryIdx]);
+  for (const boundaryIdx of boundaryCandidates) {
+    const disabled = applySharedBoundary(
+      bodiesSource,
+      boundaryIdx,
+      false,
+      shared,
+      state.panel.thickness,
+      state.project.ceilingHeight,
+      state.project.plinthHeight,
+    );
+    bodiesSource = disabled.bodies;
+    shared = disabled.sharedBoundaries;
+  }
+
+  const source = bodiesSource.find((b) => b.id === id);
   if (!source) return state;
-  const idx = state.bodies.findIndex((b) => b.id === id);
+  const idx = bodiesSource.findIndex((b) => b.id === id);
   const newBody: Body = {
     ...source,
     id: uid(),
     name: `${source.name} (copie)`,
-    pieces: source.pieces.map((p) => ({ ...p, id: uid() })),
+    pieces: source.pieces.map((p) => ({ ...p, id: uid(), sharedBoundaryMeta: undefined })),
   };
-  const bodies = [...state.bodies];
+  const bodies = [...bodiesSource];
   bodies.splice(idx + 1, 0, newBody);
   const newShared = [...shared];
   newShared.splice(idx, 0, false);

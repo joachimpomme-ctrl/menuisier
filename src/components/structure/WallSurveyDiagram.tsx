@@ -1,6 +1,5 @@
 import type { AppState } from '../../types';
 import { BODY_COLORS } from '../../data/materials';
-import { isSharedLeft } from '../../lib/helpers';
 import { cardClass, sectionTitle } from './styles';
 
 interface Props {
@@ -49,8 +48,6 @@ export default function WallSurveyDiagram({ state, totalPhysical }: Props) {
   const plinthH = state.project.plinthHeight;
   const bodies = state.bodies;
   const shared = state.sharedBoundaries ?? [];
-  const th = state.panel.thickness;
-
   const SVG_W = 580;
   const SVG_H = 200;
   const PAD_L = 48;
@@ -74,10 +71,8 @@ export default function WallSurveyDiagram({ state, totalPhysical }: Props) {
   let bx = 0;
   const bodyRects: { x: number; w: number; bi: number; name: string }[] = [];
   bodies.forEach((b, bi) => {
-    const sharedLeft = isSharedLeft(bi, shared);
-    const w = bi === 0 ? b.width : (sharedLeft ? b.width - th / 2 : b.width);
-    bodyRects.push({ x: bx, w, bi, name: b.name });
-    bx += w;
+    bodyRects.push({ x: bx, w: b.width, bi, name: b.name });
+    bx += b.width;
   });
   const totalBodyW = bx;
   const remaining = wallW - totalPhysical;

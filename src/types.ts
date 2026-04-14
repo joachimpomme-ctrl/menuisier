@@ -48,6 +48,7 @@ export interface Piece {
   thickness?: number; // cm — override épaisseur panneau (ex. double joue). undefined = épaisseur du panneau assigné
   edge_banding?: ('front' | 'back' | 'left' | 'right')[];
   drilling_count?: number;
+  sharedBoundaryMeta?: SharedBoundaryMeta;
   // ---- positions spatiales (optionnel) ----
   // posY : hauteur (cm) du dessous de la pièce horizontale (tablette/bandeau) ou du
   //        bas de la pièce verticale (séparateur), mesurée depuis le sol intérieur du
@@ -57,6 +58,25 @@ export interface Piece {
   // posX : distance (cm) du bord intérieur gauche du corps au bord gauche d'un séparateur
   //        vertical. Utilisé par : separateur. undefined → auto-distribué.
   posX?: number;
+}
+
+export interface SharedBoundarySnapshotPiece {
+  name: string;
+  length: number;
+  width: number;
+  qty: number;
+  type: PieceType;
+  panelId?: string;
+  thickness?: number;
+  posY?: number;
+  posX?: number;
+}
+
+export interface SharedBoundaryMeta {
+  boundaryIdx: number;
+  owner: 'left';
+  originalLeftPieces: SharedBoundarySnapshotPiece[];
+  originalRightPieces: SharedBoundarySnapshotPiece[];
 }
 
 export type DoorPoseType = 'enveloppante' | 'demi-recouvrement' | 'affleurante';

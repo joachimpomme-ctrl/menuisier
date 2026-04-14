@@ -20,7 +20,6 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
   const [editingPiece, setEditingPiece] = useState<string | null>(null);
   const mat = MATERIALS[state.materialKey];
   const shared = state.sharedBoundaries ?? [];
-  const th = state.panel.thickness;
 
   // ---------- thin shells over actions layer ----------
   const updateProject = (key: string, value: number) =>
@@ -62,8 +61,8 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
   const toggleSharing = (boundaryIdx: number, enabled: boolean) =>
     onChange(bodyActions.toggleSharing(state, boundaryIdx, enabled));
 
-  // Compute total physical width (accounting for shared boundaries)
-  const totalPhysical = state.bodies.reduce((s, b) => s + b.width, 0) - shared.filter(Boolean).length * th;
+  // Shared sides are fused into a thicker common panel, so total physical width stays unchanged.
+  const totalPhysical = state.bodies.reduce((s, b) => s + b.width, 0);
 
   return (
     <div className="space-y-4">
@@ -248,7 +247,7 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
           Largeur physique totale : <span className="font-semibold">{totalPhysical.toFixed(1)} cm</span>
           {shared.some(Boolean) && (
             <span className="text-amber-600 ml-1">
-              (économie de {(shared.filter(Boolean).length * th).toFixed(1)} cm grâce aux joues communes)
+              (joues communes fusionnées en épaisseur double aux jonctions)
             </span>
           )}
         </div>

@@ -1,4 +1,4 @@
-import type { Body, DoorConfig, Piece, PieceType } from '../../types';
+import type { Body, DoorConfig, Piece, PieceType, SharedBoundarySnapshotPiece } from '../../types';
 import { uid, getBodyInnerWidth, isSharedLeft, calculateDoor, getBodyEffectiveHeight, findSplitterTablette } from '../helpers';
 
 // ---------------------------------------------------------------------------
@@ -83,6 +83,151 @@ function findRightJoues(pieces: Body['pieces']) {
   return joues.slice(Math.floor(joues.length / 2));
 }
 
+type BoundarySide = 'left' | 'right';
+
+function cloneSnapshotPiece(piece: Piece): SharedBoundarySnapshotPiece {
+  return {
+    name: piece.name,
+    length: piece.length,
+    width: piece.width,
+    qty: piece.qty,
+    type: piece.type,
+    panelId: piece.panelId,
+    thickness: piece.thickness,
+    posY: piece.posY,
+    posX: piece.posX,
+  };
+}
+
+function restoreSnapshotPieces(
+  snapshots: SharedBoundarySnapshotPiece[],
+  side: BoundarySide,
+  depth: number,
+): Piece[] {
+  return snapshots.map((piece) => ({
+    ...piece,
+    id: uid(),
+    width: depth,
+    thickness: piece.thickness,
+    name: piece.name
+      .replace(/\s*\(commune\)/g, '')
+      .replace(side === 'left' ? /droite/gi : /gauche/gi, side === 'left' ? 'gauche' : 'droite')
+      .replace(side === 'left' ? /\bD\s*([—–-])/g : /\bG\s*([—–-])/g, side === 'left' ? 'G $1' : 'D $1'),
+    sharedBoundaryMeta: undefined,
+  }));
+}
+
+function getBoundaryJoues(body: Body, side: BoundarySide): Piece[] {
+  return side === 'left' ? body.pieces.filter((p) => findLeftJoueIds(body.pieces).includes(p.id)) : findRightJoues(body.pieces);
+}
+
+function replaceBoundaryJoues(body: Body, side: BoundarySide, pieces: Piece[]): Body {
+  const ids = new Set(getBoundaryJoues(body, side).map((piece) => piece.id));
+  const kept = body.pieces.filter((piece) => !ids.has(piece.id));
+  const insertAtStart = side === 'left';
+  return {
+    ...body,
+    pieces: insertAtStart ? [...pieces, ...kept] : [...kept, ...pieces],
+  };
+}
+
+function fallbackBoundaryTemplate(body: Body, side: BoundarySide): Piece[] {
+  const direct = getBoundaryJoues(body, side).filter((piece) => !piece.name.includes('(commune)'));
+  if (direct.length > 0) return direct;
+  return getBoundaryJoues(body, side === 'left' ? 'right' : 'left').filter((piece) => !piece.name.includes('(commune)'));
+}
+
+function getBoundaryTotalLength(pieces: Piece[]): number {
+  return pieces.reduce((sum, piece) => sum + piece.length, 0);
+}
+
+function findSegmentLengthByName(pieces: Piece[], pattern: RegExp): number {
+  return pieces
+    .filter((piece) => pattern.test(piece.name))
+    .reduce((max, piece) => Math.max(max, piece.length), 0);
+}
+
+function buildSharedBoundaryPieces(
+  leftPieces: Piece[],
+  rightPieces: Piece[],
+  boundaryIdx: number,
+  thickness: number,
+  depth: number,
+): Piece[] {
+  const hasSingle = leftPieces.length === 1 || rightPieces.length === 1;
+  if (hasSingle) {
+    return [{
+      id: uid(),
+      name: 'Joue D (commune)',
+      length: Math.max(getBoundaryTotalLength(leftPieces), getBoundaryTotalLength(rightPieces)),
+      width: depth,
+      qty: 1,
+      type: 'joue' as PieceType,
+      thickness: +(thickness * 2).toFixed(2),
+      posY: 0,
+      sharedBoundaryMeta: {
+        boundaryIdx,
+        owner: 'left',
+        originalLeftPieces: leftPieces.map(cloneSnapshotPiece),
+        originalRightPieces: rightPieces.map(cloneSnapshotPiece),
+      },
+    }];
+  }
+
+  const basLength = Math.max(
+    findSegmentLengthByName(leftPieces, /\bbas\b/i),
+    findSegmentLengthByName(rightPieces, /\bbas\b/i),
+  );
+  const hautLength = Math.max(
+    findSegmentLengthByName(leftPieces, /\bhaut\b/i),
+    findSegmentLengthByName(rightPieces, /\bhaut\b/i),
+  );
+
+  const segments = [
+    basLength > 0 ? { name: 'Joue D — bas (commune)', length: basLength, posY: 0 } : null,
+    hautLength > 0 ? { name: 'Joue D — haut (commune)', length: hautLength, posY: basLength } : null,
+  ].filter(Boolean) as { name: string; length: number; posY: number }[];
+
+  const meta = {
+    boundaryIdx,
+    owner: 'left' as const,
+    originalLeftPieces: leftPieces.map(cloneSnapshotPiece),
+    originalRightPieces: rightPieces.map(cloneSnapshotPiece),
+  };
+
+  if (segments.length > 0) {
+    return segments.map((segment) => ({
+      id: uid(),
+      name: segment.name,
+      length: segment.length,
+      width: depth,
+      qty: 1,
+      type: 'joue' as PieceType,
+      thickness: +(thickness * 2).toFixed(2),
+      posY: segment.posY,
+      sharedBoundaryMeta: meta,
+    }));
+  }
+
+  return [{
+    id: uid(),
+    name: 'Joue D (commune)',
+    length: Math.max(getBoundaryTotalLength(leftPieces), getBoundaryTotalLength(rightPieces)),
+    width: depth,
+    qty: 1,
+    type: 'joue' as PieceType,
+    thickness: +(thickness * 2).toFixed(2),
+    posY: 0,
+    sharedBoundaryMeta: meta,
+  }];
+}
+
+function getSharedBoundaryMeta(body: Body, boundaryIdx: number) {
+  return body.pieces.find(
+    (piece) => piece.type === 'joue' && piece.sharedBoundaryMeta?.boundaryIdx === boundaryIdx,
+  )?.sharedBoundaryMeta;
+}
+
 // ---------------------------------------------------------------------------
 // Apply / remove shared boundary between two adjacent bodies
 // ---------------------------------------------------------------------------
@@ -114,90 +259,36 @@ export function applySharedBoundary(
 
   if (enabled) {
     // ===== ACTIVER LA JOUE COMMUNE =====
+    const leftTemplate = fallbackBoundaryTemplate(leftBody, 'right');
+    const rightTemplate = fallbackBoundaryTemplate(rightBody, 'left');
+    const sharedPieces = buildSharedBoundaryPieces(
+      leftTemplate,
+      rightTemplate,
+      boundaryIdx,
+      th,
+      Math.max(leftBody.depth, rightBody.depth),
+    );
 
-    // 1. Width adjustments: compensate for shared joue
-    leftBody.width = +(leftBody.width + th / 2).toFixed(1);
-    rightBody.width = +(rightBody.width + th / 2).toFixed(1);
-
-    // 2. Remove ALL left joues from right body
-    const leftJoueIds = findLeftJoueIds(rightBody.pieces);
-    if (leftJoueIds.length > 0) {
-      rightBody.pieces = rightBody.pieces.filter((p) => !leftJoueIds.includes(p.id));
-    } else {
-      const joues = rightBody.pieces.filter((p) => p.type === 'joue');
-      if (joues.length === 1 && joues[0].qty >= 2) {
-        joues[0].qty = Math.ceil(joues[0].qty / 2);
-      } else if (joues.length >= 2) {
-        const half = Math.ceil(joues.length / 2);
-        const removeIds = new Set(joues.slice(0, half).map((p) => p.id));
-        rightBody.pieces = rightBody.pieces.filter((p) => !removeIds.has(p.id));
-      }
-    }
-
-    // 3. Mark the commune joues: right joues of left body
-    const maxD = Math.max(leftBody.depth, rightBody.depth);
-    const rightJouesOfLeft = findRightJoues(leftBody.pieces);
-    if (rightJouesOfLeft.length > 0) {
-      rightJouesOfLeft.forEach((j) => {
-        j.width = maxD;
-        if (!j.name.includes('(commune)')) {
-          j.name = j.name + ' (commune)';
-        }
-      });
-    } else {
-      leftBody.pieces.filter(p => p.type === 'joue').forEach(j => {
-        j.width = maxD;
-      });
-    }
-
+    const leftReplaced = replaceBoundaryJoues(leftBody, 'right', sharedPieces);
+    const rightReplaced = replaceBoundaryJoues(rightBody, 'left', []);
+    newBodies[boundaryIdx] = leftReplaced;
+    newBodies[boundaryIdx + 1] = rightReplaced;
   } else {
     // ===== DESACTIVER LA JOUE COMMUNE =====
+    const meta = getSharedBoundaryMeta(leftBody, boundaryIdx);
+    const restoredLeft = meta
+      ? restoreSnapshotPieces(meta.originalLeftPieces, 'right', leftBody.depth)
+      : restoreSnapshotPieces(fallbackBoundaryTemplate(leftBody, 'left').map(cloneSnapshotPiece), 'right', leftBody.depth);
+    const restoredRight = meta
+      ? restoreSnapshotPieces(meta.originalRightPieces, 'left', rightBody.depth)
+      : restoreSnapshotPieces(fallbackBoundaryTemplate(rightBody, 'right').map(cloneSnapshotPiece), 'left', rightBody.depth);
 
-    // 1. Width adjustments
-    leftBody.width = +(leftBody.width - th / 2).toFixed(1);
-    rightBody.width = +(rightBody.width - th / 2).toFixed(1);
-
-    // 2. Re-create left joues for right body
-    const communeJoues = leftBody.pieces.filter(
-      p => p.type === 'joue' && p.name.includes('(commune)')
-    );
-    const sourceJoues = communeJoues.length > 0
-      ? communeJoues
-      : findRightJoues(rightBody.pieces);
-
-    if (sourceJoues.length > 0) {
-      const newLeftJoues = sourceJoues.map((p) => ({
-        ...p,
-        id: uid(),
-        name: p.name
-          .replace(/\s*\(commune\)/g, '')
-          .replace(/droite/gi, 'gauche')
-          .replace(/\bD\s*([—–-])/g, 'G $1'),
-        width: rightBody.depth,
-      }));
-      rightBody.pieces = [...newLeftJoues, ...rightBody.pieces];
-    } else {
-      const joues = rightBody.pieces.filter((p) => p.type === 'joue');
-      if (joues.length === 1) {
-        joues[0].qty *= 2;
-      } else if (joues.length === 0) {
-        const basHeight = 180;
-        const hautHeight = +(ceilingHeight - basHeight).toFixed(1);
-        rightBody.pieces.unshift(
-          { id: uid(), name: 'Joue G — bas', length: basHeight, width: rightBody.depth, qty: 1, type: 'joue' as PieceType },
-          { id: uid(), name: 'Joue G — haut', length: hautHeight, width: rightBody.depth, qty: 1, type: 'joue' as PieceType },
-        );
-      }
-    }
-
-    // 3. Clean up commune joues in left body
-    leftBody.pieces.forEach((p) => {
-      if (p.type === 'joue' && p.name.includes('(commune)')) {
-        p.name = p.name.replace(/\s*\(commune\)/g, '');
-        p.width = leftBody.depth;
-      }
-    });
-    findRightJoues(leftBody.pieces).forEach((j) => { j.width = leftBody.depth; });
+    const leftWithoutShared = {
+      ...leftBody,
+      pieces: leftBody.pieces.filter((piece) => piece.sharedBoundaryMeta?.boundaryIdx !== boundaryIdx),
+    };
+    newBodies[boundaryIdx] = replaceBoundaryJoues(leftWithoutShared, 'right', restoredLeft);
+    newBodies[boundaryIdx + 1] = replaceBoundaryJoues(rightBody, 'left', restoredRight);
   }
 
   // 4. Recalculate tablettes and doors for ALL bodies
@@ -314,6 +405,7 @@ export function generateStandardPieces(
 ): Piece[] {
   const iw = getBodyInnerWidth(body.width, bodyIndex, bodyIndex + 1, sharedBoundaries, thickness);
   const sl = isSharedLeft(bodyIndex, sharedBoundaries);
+  const sr = bodyIndex < sharedBoundaries.length && (sharedBoundaries[bodyIndex] ?? false);
   const basHeight = 180;
   const hautHeight = +(ceilingHeight - basHeight).toFixed(1);
   const depth = body.depth;
@@ -331,8 +423,26 @@ export function generateStandardPieces(
   }
 
   // Right joues
-  pieces.push({ id: uid(), name: 'Joue D — bas', length: basHeight, width: depth, qty: 1, type: 'joue' as PieceType });
-  pieces.push({ id: uid(), name: 'Joue D — haut', length: hautHeight, width: depth, qty: 1, type: 'joue' as PieceType });
+  pieces.push({
+    id: uid(),
+    name: sr ? 'Joue D — bas (commune)' : 'Joue D — bas',
+    length: basHeight,
+    width: depth,
+    qty: 1,
+    type: 'joue' as PieceType,
+    thickness: sr ? +(thickness * 2).toFixed(2) : undefined,
+    posY: 0,
+  });
+  pieces.push({
+    id: uid(),
+    name: sr ? 'Joue D — haut (commune)' : 'Joue D — haut',
+    length: hautHeight,
+    width: depth,
+    qty: 1,
+    type: 'joue' as PieceType,
+    thickness: sr ? +(thickness * 2).toFixed(2) : undefined,
+    posY: basHeight,
+  });
 
   // Fixed shelves : basse au sol intérieur, haute en sommet
   pieces.push({ id: uid(), name: 'Tablette fixe basse', length: iw, width: depth, qty: 1, type: 'tablette-fixe' as PieceType, posY: 0 });
