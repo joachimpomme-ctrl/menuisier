@@ -30,7 +30,6 @@ export default function DoorConfigurator({ body, bodyIndex, state, onChange }: P
   const thickness = state.panel.thickness;
   const shared = state.sharedBoundaries ?? [];
   const innerW = getBodyInnerWidth(body.width, bodyIndex, state.bodies.length, shared, thickness);
-  const effectiveH = getBodyEffectiveHeight(body, ceilingHeight, plinthHeight);
 
   const config = body.doorConfig;
   const [expanded, setExpanded] = useState(false);
@@ -210,8 +209,8 @@ export default function DoorConfigurator({ body, bodyIndex, state, onChange }: P
           <div className="mt-2 text-[11px] bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-2">
             {fixedTablettes.length === 0 ? (
               <div className="text-amber-700">
-                ⚠ Aucune tablette fixe positionnée — la séparation est calée à la moitié ({(effectiveH / 2).toFixed(0)} cm).
-                Ajoute une tablette fixe avec une hauteur (posY) pour caler les portes.
+                ⚠ Aucune tablette fixe positionnée — la séparation est calée automatiquement sur une hauteur de portes standard.
+                Ajoute une tablette fixe avec une hauteur (posY) pour forcer une séparation précise.
               </div>
             ) : (
               <div className="flex items-center gap-2 flex-wrap">

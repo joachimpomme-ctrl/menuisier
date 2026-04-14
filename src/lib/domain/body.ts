@@ -22,14 +22,37 @@ export function resolveDoorCoverage(
   if (position === 'pleine') {
     return { coverageHeight: effectiveHeight, splitPosY: effectiveHeight };
   }
-  // Résoudre splitPosY : explicite > tablette détectée > moitié
+
+  const minSplit = +(thickness * 2).toFixed(1);
+  const maxSplit = +(effectiveHeight - thickness * 2).toFixed(1);
+
+  // Hauteur par défaut réaliste pour des portes partielles de bibliothèque:
+  // environ 40% de la hauteur utile, bornée à une plage standard.
+  const defaultCoverage = +Math.max(70, Math.min(110, effectiveHeight * 0.4)).toFixed(1);
+
+  // Résoudre splitPosY : explicite valable > tablette détectée > hauteur standard
   let splitPosY = config.splitPosY;
-  if (typeof splitPosY !== 'number') {
+  const isUsableSplit =
+    typeof splitPosY === 'number'
+    && splitPosY > minSplit
+    && splitPosY < maxSplit;
+
+  if (!isUsableSplit) {
     const splitter = findSplitterTablette(body, effectiveHeight);
-    splitPosY = splitter?.posY ?? +(effectiveHeight / 2).toFixed(1);
+    if (typeof splitter?.posY === 'number') {
+      splitPosY = splitter.posY ?? defaultCoverage;
+    } else {
+      splitPosY = position === 'bas'
+        ? defaultCoverage
+        : +(effectiveHeight - defaultCoverage).toFixed(1);
+    }
   }
+
   // Clamp dans une plage raisonnable
-  splitPosY = Math.max(thickness * 2, Math.min(effectiveHeight - thickness * 2, splitPosY));
+  const fallbackSplit = position === 'bas'
+    ? defaultCoverage
+    : +(effectiveHeight - defaultCoverage).toFixed(1);
+  splitPosY = Math.max(minSplit, Math.min(maxSplit, splitPosY ?? fallbackSplit));
   const coverageHeight = position === 'bas'
     ? +(splitPosY).toFixed(1)
     : +(effectiveHeight - splitPosY).toFixed(1);
