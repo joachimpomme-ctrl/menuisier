@@ -18,6 +18,7 @@ import type {
 } from '../knowledge/types';
 import { MATERIALS } from '../../data/materials';
 import { generateDrillingForPart, type DrillingContext } from './drilling';
+import { computeEdgeBanding } from './edgeBanding';
 
 // ---------------------------------------------------------------------------
 // Geometry helpers — all exported, all pure
@@ -428,6 +429,13 @@ function generateBodyParts(
     const ops = generateDrillingForPart(part, drillingCtx);
     if (ops.length > 0) {
       part.drilling = ops;
+    }
+  }
+
+  for (const part of parts) {
+    const sides = computeEdgeBanding(part);
+    if (sides.length > 0) {
+      part.edge_banding = sides;
     }
   }
 

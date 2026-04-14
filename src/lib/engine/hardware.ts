@@ -12,6 +12,7 @@ import type {
   HardwareItem,
   HardwareCategory,
 } from '../knowledge/types';
+import { computeEdgeBandingLength } from './edgeBanding';
 
 // ---------------------------------------------------------------------------
 // ID generation
@@ -189,6 +190,24 @@ export function selectHardware(
       8.0,
     ));
     items.push(item('Support tringle Ø25mm', rodZones.length * 2, 'rod', 'support_tringle_25', 2.0));
+  }
+
+  // --- Edge banding ---
+  let totalEdgeMm = 0;
+  for (const p of parts) {
+    if (p.edge_banding && p.edge_banding.length > 0) {
+      totalEdgeMm += computeEdgeBandingLength(p) * p.qty;
+    }
+  }
+  if (totalEdgeMm > 0) {
+    const totalM = Math.ceil(totalEdgeMm / 1000);
+    items.push(item(
+      `Bande de chant ${parts[0]?.thickness_mm ?? 18}mm`,
+      totalM,
+      'edge_band',
+      'bande_chant',
+      1.5,
+    ));
   }
 
   // --- Aggregate duplicates by reference ---
