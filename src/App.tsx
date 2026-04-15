@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { TabKey } from './types';
-import { exportToJson, syncToJson, LocalProjectRepository } from './lib/storage';
-import { seedBaseKnowledge } from './lib/knowledgeStore';
+import { exportToJson, LocalProjectRepository } from './lib/storage';
 import { isCloudConfigured, getCloudUrl, setCloudUrl } from './lib/cloudSync';
 import { normalizeProject } from './lib/normalizeProject';
 import { useProjectRepository } from './hooks/useProjectRepository';
@@ -14,7 +13,6 @@ import ValidationTab from './components/ValidationTab';
 import AssistantTab from './components/AssistantTab';
 import PlanTab from './components/PlanTab';
 import ProjectManager from './components/ProjectManager';
-import KnowledgeManager from './components/KnowledgeManager';
 import CloudSync from './components/CloudSync';
 import InstallBanner from './components/InstallBanner';
 import NewProjectWizard from './components/NewProjectWizard';
@@ -27,6 +25,7 @@ import type { PipelineResult } from './lib/engine/pipeline';
 import type { FurnitureType, SpaceDimensions, ProjectIntent } from './lib/knowledge/types';
 import type { MaterialKey } from './types';
 import PartsLibraryManager from './components/library/PartsLibraryManager';
+import MoreMenu from './components/MoreMenu';
 import Tip from './components/Tip';
 import TIPS from './data/tips';
 
@@ -81,11 +80,9 @@ export default function App() {
 
   const [tab, setTab] = useState<TabKey>('structure');
   const [showProjects, setShowProjects] = useState(false);
-  const [showKnowledge, setShowKnowledge] = useState(false);
   const [showCloud, setShowCloud] = useState(false);
   const [showNewWizard, setShowNewWizard] = useState(false);
   const [showPartsLibrary, setShowPartsLibrary] = useState(false);
-  const [, setKnowledgeVersion] = useState(0);
   const [pdfLoading, setPdfLoading] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
 
@@ -97,9 +94,6 @@ export default function App() {
   const [v3MaterialKey, setV3MaterialKey] = useState<MaterialKey>('cp_bouleau');
   const [v3Intent, setV3Intent] = useState<ProjectIntent | null>(null);
   const [v3Result, setV3Result] = useState<PipelineResult | null>(null);
-
-  // Seed base knowledge on first launch
-  useEffect(() => { seedBaseKnowledge(); }, []);
 
   useEffect(() => {
     const full = loadFull(projectId);
@@ -225,43 +219,18 @@ export default function App() {
           </div>
 
           <div className="mt-3 flex items-center gap-1.5 overflow-x-auto hide-scrollbar pb-0.5 -mx-1 px-1">
-            <Tip text={TIPS['savoirs']} side="bottom">
-              <button
-                onClick={() => setShowKnowledge(true)}
-                className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
-              >
-                Savoirs
-              </button>
-            </Tip>
-            <Tip text={TIPS['export-json']} side="bottom">
-              <button
-                onClick={() => exportToJson(state)}
-                className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
-              >
-                JSON
-              </button>
-            </Tip>
-            <button
-              onClick={() => syncToJson(state)}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
-              title="Télécharge avec un nom fixe pour sync Drive"
-            >
-              Sync
-            </button>
-            <button
-              onClick={() => importRef.current?.click()}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
-            >
-              Import
-            </button>
-            <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
             <button
               onClick={() => setShowPartsLibrary(true)}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
+              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-700 hover:text-amber-800 border border-amber-200 hover:bg-amber-100 whitespace-nowrap transition-colors"
               title="Bibliothèque de pièces standard"
             >
-              Pièces std
+              📚 Bibliothèque
             </button>
+            <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
+            <MoreMenu
+              onExport={() => exportToJson(state)}
+              onImport={() => importRef.current?.click()}
+            />
           </div>
 
           {importError && (
@@ -426,14 +395,6 @@ export default function App() {
         onClose={() => setShowNewWizard(false)}
         onCreate={handleCreateFromWizard}
       />
-
-      {/* Knowledge Manager Modal */}
-      <KnowledgeManager
-        isOpen={showKnowledge}
-        onClose={() => setShowKnowledge(false)}
-        onUpdate={() => setKnowledgeVersion((v) => v + 1)}
-      />
-
       {/* Cloud Sync Modal */}
       <CloudSync
         isOpen={showCloud}
