@@ -21,6 +21,7 @@ interface Props {
   removeBody: (id: string) => void;
   updatePiece: (bodyId: string, pieceId: string, key: string, value: string | number) => void;
   addPiece: (bodyId: string, pieceType?: PieceType) => void;
+  openLibraryPicker: (bodyId: string) => void;
   autoFillPieces: (bodyId: string) => void;
   removePiece: (bodyId: string, pieceId: string) => void;
   toggleSharing: (boundaryIdx: number, enabled: boolean) => void;
@@ -39,6 +40,7 @@ export default function BodyCard({
   removeBody,
   updatePiece,
   addPiece,
+  openLibraryPicker,
   autoFillPieces,
   removePiece,
   toggleSharing,
@@ -177,6 +179,13 @@ export default function BodyCard({
             className="text-[11px] px-2 py-1 rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 font-semibold transition-colors"
           >
             ⚡ Remplir auto
+          </button>
+          <button
+            onClick={() => openLibraryPicker(b.id)}
+            className="text-[11px] px-2 py-1 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 font-medium transition-colors"
+            title="Ajouter depuis la bibliothèque"
+          >
+            📚 Bibliothèque
           </button>
           <button onClick={() => addPiece(b.id, 'joue')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Joue</button>
           <button onClick={() => addPiece(b.id, 'tablette-fixe')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Tab. fixe</button>
