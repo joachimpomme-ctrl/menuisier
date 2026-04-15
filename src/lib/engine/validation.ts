@@ -83,7 +83,7 @@ function checkDeflection(
 export function validateProject(
   intent: ProjectIntent,
   layout: Layout,
-  _structure: Structure,
+  structure: Structure,
   parts: GeneratedPart[],
   hardware: HardwareItem[],
 ): ValidationIssue[] {
@@ -272,6 +272,86 @@ export function validateProject(
         { suggestion: 'Ajouter des grilles de ventilation ou des perforations dans le fond' },
       ));
     }
+  }
+
+  // =========================================================================
+  // 10. Additional business rules
+  // =========================================================================
+
+  // Shelf span check: adjustable shelves wider than material maxSpan risk sagging
+  if (mat) {
+    const materialMaxSpanMm = (mat.maxSpan18 ?? 80) * 10;
+    for (const part of parts) {
+      if ((part.type === 'tablette-reglable' || part.type === 'tablette-fixe') && part.length_mm > materialMaxSpanMm) {
+        issues.push({
+          id: nextId(),
+          severity: 'warning',
+          blocking: false,
+          message: `Tablette "${part.name}" : portée ${part.length_mm}mm dépasse la portée max ${materialMaxSpanMm}mm pour ${mat.short}`,
+          suggestion: `Ajouter un séparateur vertical ou choisir un matériau plus rigide (flexion > ${mat.flexMPa} MPa)`,
+          rule_id: 'VAL_SHELF_SPAN',
+        });
+      }
+    }
+  }
+
+  // Wardrobe depth check: hanging rods need >= 550mm depth
+  const hasRod = (intent.zones ?? []).some(
+    (z) => z.module_id === 'hanging_rod_short' || z.module_id === 'hanging_rod_long',
+  );
+  if (hasRod && intent.space.depth_mm < 550) {
+    issues.push({
+      id: nextId(),
+      severity: 'warning',
+      blocking: false,
+      message: `Profondeur ${intent.space.depth_mm}mm insuffisante pour une penderie (550mm min pour cintres standard)`,
+      suggestion: 'Augmenter la profondeur à 550mm ou utiliser une tringle perpendiculaire (pull-out)',
+      rule_id: 'VAL_ROD_DEPTH',
+    });
+  }
+
+  // Heavy door check: doors over 15kg need reinforced hinges
+  for (const part of parts) {
+    if (part.type === 'porte') {
+      const weightKg = (part.length_mm * part.width_mm * part.thickness_mm * density) / 1e9;
+      if (weightKg > 15) {
+        issues.push({
+          id: nextId(),
+          severity: 'warning',
+          blocking: false,
+          message: `Porte "${part.name}" : poids estimé ${weightKg.toFixed(1)}kg > 15kg`,
+          suggestion: 'Utiliser des charnières renforcées et ajouter une 3e charnière si hauteur > 1200mm',
+          rule_id: 'VAL_DOOR_WEIGHT',
+        });
+      }
+    }
+  }
+
+  // Tall furniture anti-tip check
+  const tallEnough = intent.space.height_mm > 1500;
+  const hasAntiTip = structure.bodies.some((b) => b.wall_mounting?.type === 'anti_tip' || b.wall_mounting?.type === 'rail');
+  if (tallEnough && !hasAntiTip) {
+    issues.push({
+      id: nextId(),
+      severity: 'warning',
+      blocking: false,
+      message: `Meuble de ${intent.space.height_mm}mm sans fixation murale — risque de basculement`,
+      suggestion: 'Ajouter une équerre anti-basculement ou fixer au mur (obligatoire si enfants)',
+      rule_id: 'VAL_ANTI_TIP',
+    });
+  }
+
+  // Suspended furniture on unknown wall
+  const isSuspended = structure.bodies.some((b) => b.wall_mounting?.type === 'rail');
+  if (isSuspended && intent.space.wall_type === 'unknown') {
+    issues.push({
+      id: nextId(),
+      severity: 'warning',
+      blocking: false,
+      message: 'Meuble suspendu sur type de mur inconnu — fixation potentiellement inadaptée',
+      suggestion: 'Identifier le type de mur (béton, placo, brique) pour choisir les chevilles adaptées. Placo creux nécessite des chevilles Molly ou à expansion',
+      rule_id: 'VAL_WALL_TYPE_SUSPENDED',
+    });
   }
 
   return issues;
