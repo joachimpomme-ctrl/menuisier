@@ -1,6 +1,9 @@
-import type { AppState, Body } from '../../types';
+import type { AppState, Body, DoorConfig, PieceType } from '../../types';
 import { uid } from '../helpers';
 import { recalcBodyPieces, applySharedBoundary } from '../domain';
+import { calculateDoor, getBodyEffectiveHeight, getBodyInnerWidth } from '../helpers';
+import { resolveDoorCoverage } from '../domain';
+import { autoFillBodyWidths as computeAutoFillBodyWidths } from '../bodyWidthAutoFill';
 
 function refreshBoundary(
   bodies: Body[],
@@ -28,6 +31,64 @@ function refreshBoundary(
     ceilingHeight,
     plinthHeight,
   );
+}
+
+function syncDoorConfigForWidth(config: DoorConfig, width: number): DoorConfig {
+  const count: 1 | 2 = width > 50 ? 2 : 1;
+  let poseType = config.poseType;
+
+  if (count === 2 && poseType === 'enveloppante') {
+    poseType = 'demi-recouvrement';
+  }
+
+  if (count === 1 && poseType === 'demi-recouvrement') {
+    poseType = 'enveloppante';
+  }
+
+  return { ...config, count, poseType };
+}
+
+function rebuildDoors(
+  body: Body,
+  bodyIndex: number,
+  state: AppState,
+  doorConfig: DoorConfig | undefined,
+): Body {
+  const piecesWithoutDoors = body.pieces.filter((piece) => piece.type !== 'porte');
+
+  if (!doorConfig) {
+    return { ...body, doorConfig: undefined, pieces: piecesWithoutDoors };
+  }
+
+  const shared = state.sharedBoundaries ?? [];
+  const bH = getBodyEffectiveHeight(body, state.project.ceilingHeight, state.project.plinthHeight);
+  const innerW = getBodyInnerWidth(body.width, bodyIndex, state.bodies.length, shared, state.panel.thickness);
+  const { coverageHeight, splitPosY } = resolveDoorCoverage(body, bH, state.panel.thickness, doorConfig);
+  const finalConfig: DoorConfig = { ...doorConfig, splitPosY };
+  const dims = calculateDoor(
+    body.width,
+    bH,
+    state.panel.thickness,
+    finalConfig.count,
+    finalConfig.poseType,
+    innerW,
+    coverageHeight,
+  );
+
+  const doorPieces = Array.from({ length: finalConfig.count }, (_, index) => ({
+    id: uid(),
+    name: finalConfig.count === 1 ? `Porte ${body.name}` : `Porte ${index === 0 ? 'G' : 'D'} ${body.name}`,
+    length: dims.doorHeight,
+    width: dims.doorWidth,
+    qty: 1,
+    type: 'porte' as PieceType,
+  }));
+
+  return {
+    ...body,
+    doorConfig: finalConfig,
+    pieces: [...piecesWithoutDoors, ...doorPieces],
+  };
 }
 
 export function updateBody(state: AppState, id: string, key: keyof Body, value: string | number): AppState {
@@ -157,4 +218,46 @@ export function toggleSharing(state: AppState, boundaryIdx: number, enabled: boo
     state.project.ceilingHeight, state.project.plinthHeight,
   );
   return { ...state, bodies: result.bodies, sharedBoundaries: result.sharedBoundaries };
+}
+
+export function autoFillBodyWidths(state: AppState): AppState {
+  if (state.bodies.length === 0) return state;
+
+  const widths = state.bodies.map((body) => body.width);
+  const nextWidths = computeAutoFillBodyWidths(widths, state.project.wallWidth, { minWidth: 10, precision: 10 });
+
+  let bodies = state.bodies.map((body, index) => {
+    const width = nextWidths[index];
+    const syncedDoorConfig = body.doorConfig ? syncDoorConfigForWidth(body.doorConfig, width) : undefined;
+    const recalculated = recalcBodyPieces(
+      { ...body, doorConfig: syncedDoorConfig },
+      index,
+      body.width,
+      body.depth,
+      width,
+      body.depth,
+      state.panel.thickness,
+      state.sharedBoundaries ?? [],
+      state.project.ceilingHeight,
+      state.project.plinthHeight,
+    );
+    return rebuildDoors(recalculated, index, state, syncedDoorConfig);
+  });
+
+  let shared = [...(state.sharedBoundaries ?? [])];
+  for (let boundaryIdx = 0; boundaryIdx < shared.length; boundaryIdx += 1) {
+    if (!shared[boundaryIdx]) continue;
+    const refreshed = refreshBoundary(
+      bodies,
+      shared,
+      boundaryIdx,
+      state.panel.thickness,
+      state.project.ceilingHeight,
+      state.project.plinthHeight,
+    );
+    bodies = refreshed.bodies;
+    shared = refreshed.sharedBoundaries;
+  }
+
+  return { ...state, bodies, sharedBoundaries: shared };
 }

@@ -146,6 +146,45 @@ describe('bodyActions.updateBody', () => {
   });
 });
 
+describe('bodyActions.autoFillBodyWidths', () => {
+  it('redistributes all body widths to exactly fill the wall width', () => {
+    const s = makeState();
+    s.project.wallWidth = 300;
+
+    const next = bodyActions.autoFillBodyWidths(s);
+
+    expect(next.bodies.map((body) => body.width)).toEqual([120, 180]);
+    expect(next.bodies.reduce((sum, body) => sum + body.width, 0)).toBe(300);
+  });
+
+  it('keeps the state unchanged when there are no bodies', () => {
+    const s = makeState();
+    s.bodies = [];
+    s.sharedBoundaries = [];
+
+    const next = bodyActions.autoFillBodyWidths(s);
+
+    expect(next).toBe(s);
+  });
+
+  it('switches a door-configured body to two doors when the autofilled width exceeds 50cm', () => {
+    const s = makeState();
+    s.project.wallWidth = 120;
+    s.bodies[0].width = 40;
+    s.bodies[1].width = 20;
+    s.bodies[0].doorConfig = { count: 1, poseType: 'enveloppante', position: 'pleine' };
+
+    const next = bodyActions.autoFillBodyWidths(s);
+    const body = next.bodies[0];
+    const doors = body.pieces.filter((piece) => piece.type === 'porte');
+
+    expect(body.width).toBe(80);
+    expect(body.doorConfig?.count).toBe(2);
+    expect(body.doorConfig?.poseType).toBe('demi-recouvrement');
+    expect(doors).toHaveLength(2);
+  });
+});
+
 // ---------------------------------------------------------------------------
 // pieceActions
 // ---------------------------------------------------------------------------
