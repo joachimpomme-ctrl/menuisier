@@ -64,6 +64,8 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
 
   const addBody = () => onChange(bodyActions.addBody(state));
 
+  const autoFillBodyWidths = () => onChange(bodyActions.autoFillBodyWidths(state));
+
   const removeBody = (id: string) => onChange(bodyActions.removeBody(state, id));
 
   const toggleSharing = (boundaryIdx: number, enabled: boolean) =>
@@ -241,18 +243,35 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
       {/* Bodies */}
       <div className="flex items-center justify-between mb-2">
         <Tip text={TIPS['corps']}><h3 className={sectionTitle + " mb-0"}>Corps ({state.bodies.length})</h3></Tip>
-        <button
-          onClick={addBody}
-          className="text-xs px-4 py-2 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 transition-colors"
-        >
-          + Ajouter un corps
-        </button>
+        <div className="flex items-center gap-2">
+          {state.bodies.length > 1 && (
+            <button
+              onClick={autoFillBodyWidths}
+              className="text-xs px-3 py-2 rounded-lg bg-white text-amber-700 border border-amber-200 hover:bg-amber-50 font-medium transition-colors"
+            >
+              Remplir la largeur
+            </button>
+          )}
+          <button
+            onClick={addBody}
+            className="text-xs px-4 py-2 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 transition-colors"
+          >
+            + Ajouter un corps
+          </button>
+        </div>
       </div>
 
       {/* Total width info */}
       {state.bodies.length > 1 && (
         <div className="text-[10px] text-stone-400 -mt-1 mb-2 px-1">
           Largeur physique totale : <span className="font-semibold">{totalPhysical.toFixed(1)} cm</span>
+          {' / '}
+          cible mur : <span className="font-semibold">{state.project.wallWidth.toFixed(1)} cm</span>
+          {Math.abs(totalPhysical - state.project.wallWidth) > 0.05 && (
+            <span className="text-amber-600 ml-1">
+              (écart {Math.abs(state.project.wallWidth - totalPhysical).toFixed(1)} cm)
+            </span>
+          )}
           {shared.some(Boolean) && (
             <span className="text-amber-600 ml-1">
               (joues communes fusionnées en épaisseur double aux jonctions)

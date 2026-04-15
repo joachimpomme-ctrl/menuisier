@@ -4,6 +4,7 @@ import { MATERIALS } from '../data/materials';
 import { TEMPLATES } from '../data/templates';
 // Imports allégés : le wizard n'a pas besoin de la base de connaissances complète
 import { uid, getUsableHeight } from '../lib/helpers';
+import { autoFillBodyWidths } from '../lib/bodyWidthAutoFill';
 
 interface Props {
   isOpen: boolean;
@@ -69,14 +70,19 @@ function autoLayout(
   const nbCorps = Math.max(1, Math.ceil(wallWidth / maxBodyWidth));
 
   // Répartir la largeur équitablement
-  const bodyWidth = +(wallWidth / nbCorps).toFixed(1);
-  const innerWidth = +(bodyWidth - 2 * th).toFixed(1);
+  const bodyWidths = autoFillBodyWidths(Array(nbCorps).fill(1), wallWidth, {
+    minWidth: 10,
+    maxWidth: maxBodyWidth,
+    precision: 10,
+  });
 
   // Nombre de tablettes réglables selon la hauteur et l'espacement
   const nbShelves = Math.max(0, Math.floor((meubleHeight - 10) / ft.shelfSpacing) - 2);
 
   const bodies: Body[] = [];
   for (let i = 0; i < nbCorps; i++) {
+    const bodyWidth = bodyWidths[i];
+    const innerWidth = +(bodyWidth - 2 * th).toFixed(1);
     const name = nbCorps === 1 ? 'Corps' : `Corps ${i + 1}`;
     const pieces: Piece[] = [
       { id: uid(), name: `Joue gauche`, length: +meubleHeight.toFixed(1), width: depth, qty: 1, type: 'joue' },

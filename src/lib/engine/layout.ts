@@ -21,6 +21,7 @@ import type { MaterialKey } from '../../types';
 import { getModuleDefinition } from '../knowledge/modules';
 import { getProjectPreset } from '../knowledge/index';
 import { MATERIALS } from '../../data/materials';
+import { autoFillBodyWidths } from '../bodyWidthAutoFill';
 
 // ---------------------------------------------------------------------------
 // Result type
@@ -63,17 +64,16 @@ function maxBodyWidth(materialKey: MaterialKey): number {
 
 /**
  * Split total width into N equal bodies so each body ≤ maxWidth.
- * Returns array of body widths (all equal, rounding handled).
+ * Returns array of body widths using the shared proportional auto-fill helper.
  */
 function splitBodies(totalWidth: number, maxWidth: number): number[] {
   if (totalWidth <= maxWidth) return [totalWidth];
   const count = Math.ceil(totalWidth / maxWidth);
-  const baseWidth = Math.floor(totalWidth / count);
-  const remainder = totalWidth - baseWidth * count;
-  // First body absorbs rounding remainder
-  return Array.from({ length: count }, (_, i) =>
-    i === 0 ? baseWidth + remainder : baseWidth,
-  );
+  return autoFillBodyWidths(Array(count).fill(1), totalWidth, {
+    minWidth: 10,
+    maxWidth,
+    precision: 1,
+  });
 }
 
 // ---------------------------------------------------------------------------
