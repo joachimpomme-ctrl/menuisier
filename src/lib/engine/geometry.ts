@@ -380,6 +380,74 @@ function generateBodyParts(
         break;
       }
 
+      case 'shoe_rack_inclined': {
+        const cfg = zone.config as { type: 'shoe_rack_inclined'; tiers: number };
+        for (let i = 0; i < cfg.tiers; i++) {
+          parts.push(makePart({
+            name: `Tablette inclinée ${i + 1}`,
+            length_mm: innerW,
+            width_mm: shelfDims.width,
+            thickness_mm: thickness,
+            type: 'tablette-inclinee',
+            body_id: bid,
+          }));
+          parts.push(makePart({
+            name: `Taquet d'arrêt ${i + 1}`,
+            length_mm: innerW,
+            width_mm: 30,
+            thickness_mm: thickness,
+            type: 'taquet-arret',
+            body_id: bid,
+          }));
+        }
+        break;
+      }
+
+      case 'wine_rack': {
+        const cfg = zone.config as { type: 'wine_rack'; columns: number; rows: number };
+        for (let i = 0; i < Math.max(0, cfg.rows - 1); i++) {
+          parts.push(makePart({
+            name: `Croisillon horizontal ${i + 1}`,
+            length_mm: innerW,
+            width_mm: shelfDims.width,
+            thickness_mm: thickness,
+            type: 'croisillon-h',
+            body_id: bid,
+          }));
+        }
+        for (let i = 0; i < Math.max(0, cfg.columns - 1); i++) {
+          parts.push(makePart({
+            name: `Croisillon vertical ${i + 1}`,
+            length_mm: zone.height_mm,
+            width_mm: shelfDims.width,
+            thickness_mm: thickness,
+            type: 'croisillon-v',
+            body_id: bid,
+          }));
+        }
+        break;
+      }
+
+      case 'bench_storage': {
+        parts.push(makePart({
+          name: 'Assise',
+          length_mm: innerW,
+          width_mm: body.depth_mm,
+          thickness_mm: thickness,
+          type: 'assise',
+          body_id: bid,
+        }));
+        parts.push(makePart({
+          name: 'Devant coffre',
+          length_mm: innerW,
+          width_mm: Math.max(1, zone.height_mm - thickness),
+          thickness_mm: thickness,
+          type: 'devant-coffre',
+          body_id: bid,
+        }));
+        break;
+      }
+
       // Other modules don't produce wood parts (hardware only)
       // or will be extended in later phases
       default:
@@ -390,8 +458,9 @@ function generateBodyParts(
   // --- Doors ---
   if (body.doors && body.doors.type !== 'none') {
     const door = body.doors;
+    const doorZoneHeight = door.height_mm ?? body.height_mm;
     const doorH = computeDoorHeight(
-      body.height_mm,
+      doorZoneHeight,
       DEFAULT_OVERLAY_MM,
       DEFAULT_OVERLAY_MM,
       DEFAULT_GAP_MM,

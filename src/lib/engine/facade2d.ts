@@ -34,6 +34,7 @@ export interface Shelf2D {
 export interface Door2D {
   count: 1 | 2;
   overlay: 'full' | 'half' | 'inset';
+  height_mm?: number;
 }
 
 export interface Body2D {
@@ -171,6 +172,7 @@ export function buildFacade2DModel(result: PipelineResult): Facade2DModel {
         ? {
             count: body.doors.count as 1 | 2,
             overlay: body.doors.overlay,
+            height_mm: body.doors.height_mm,
           }
         : undefined,
     });

@@ -100,6 +100,13 @@ describe('variantToResult', () => {
     expect(result.doorOverride).toBe(true);
   });
 
+  it('returns doorHeightMm for basses door variants', () => {
+    const result = variantToResult({ portes_position: 'basses' }, 2000);
+
+    expect(result.doorOverride).toBe(true);
+    expect(result.doorHeightMm).toBe(800);
+  });
+
   it('returns suggestedPlinthType legs when pieds is true', () => {
     const result = variantToResult({ pieds: true }, 1900);
 

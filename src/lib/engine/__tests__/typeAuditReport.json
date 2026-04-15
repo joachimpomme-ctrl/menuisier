@@ -369,7 +369,7 @@
     },
     "result": {
       "bodyCount": 2,
-      "partCount": 18,
+      "partCount": 34,
       "hardwareCount": 7,
       "blockingErrors": [],
       "warnings": [
@@ -1135,8 +1135,8 @@
     },
     "result": {
       "bodyCount": 1,
-      "partCount": 5,
-      "hardwareCount": 2,
+      "partCount": 13,
+      "hardwareCount": 3,
       "blockingErrors": [],
       "warnings": [],
       "hasJoues": true,
@@ -1265,8 +1265,8 @@
     },
     "result": {
       "bodyCount": 1,
-      "partCount": 7,
-      "hardwareCount": 3,
+      "partCount": 9,
+      "hardwareCount": 5,
       "blockingErrors": [],
       "warnings": [],
       "hasJoues": true,
@@ -1297,8 +1297,8 @@
     },
     "result": {
       "bodyCount": 1,
-      "partCount": 5,
-      "hardwareCount": 2,
+      "partCount": 11,
+      "hardwareCount": 3,
       "blockingErrors": [],
       "warnings": [],
       "hasJoues": true,
@@ -1328,8 +1328,8 @@
     },
     "result": {
       "bodyCount": 2,
-      "partCount": 10,
-      "hardwareCount": 2,
+      "partCount": 14,
+      "hardwareCount": 4,
       "blockingErrors": [],
       "warnings": [
         "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
@@ -1436,8 +1436,8 @@
     },
     "result": {
       "bodyCount": 1,
-      "partCount": 8,
-      "hardwareCount": 4,
+      "partCount": 10,
+      "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
         "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"

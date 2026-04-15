@@ -192,6 +192,32 @@ export function selectHardware(
     items.push(item('Support tringle Ø25mm', rodZones.length * 2, 'rod', 'support_tringle_25', 2.0));
   }
 
+  // --- Shoe racks ---
+  const inclinedShelves = parts.filter((p) => p.type === 'tablette-inclinee');
+  const totalInclinedShelves = inclinedShelves.reduce((sum, p) => sum + p.qty, 0);
+  if (totalInclinedShelves > 0) {
+    items.push(item(
+      'Taquet Ø5mm',
+      totalInclinedShelves * 4,
+      'shelf_support',
+      'taquet_5mm',
+      0.15,
+    ));
+  }
+
+  // --- Wine rack ---
+  const croisillons = parts.filter((p) => p.type === 'croisillon-h' || p.type === 'croisillon-v');
+  if (croisillons.length > 0) {
+    items.push(item('Colle à bois PU', 1, 'glue', 'colle_bois_pu', 8.0));
+  }
+
+  // --- Bench storage ---
+  const seatPanels = parts.filter((p) => p.type === 'assise');
+  if (seatPanels.length > 0) {
+    items.push(item('Charnière piano 600mm', 1, 'hinge', 'charniere_piano_600', 6.0));
+    items.push(item('Compas de retenue', 1, 'hinge', 'compas_retenue', 4.5));
+  }
+
   // --- Edge banding ---
   let totalEdgeMm = 0;
   for (const p of parts) {
