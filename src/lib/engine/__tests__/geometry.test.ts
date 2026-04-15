@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   generateParts,
+  computeDoorHeight,
   computeOverlayDoubleDoorWidth,
   computeProgressiveDrawerFronts,
   computeBackPanelDimensions,
@@ -81,5 +82,47 @@ describe('generateParts', () => {
     // groove: w = innerW, h = innerH (groove adds back what it subtracts)
     expect(dims.w).toBe(764);
     expect(dims.h).toBe(1964);
+  });
+
+  describe('partial door height', () => {
+    it('generates doors with zone-specific height when DoorLayout.height_mm is set', () => {
+      _resetPartCounter();
+      const intent = makeIntent({
+        furniture_type: 'placard',
+        space: {
+          width_mm: 800,
+          height_mm: 2000,
+          depth_mm: 600,
+          plinth_mm: 0,
+          wall_type: 'concrete',
+        },
+        door_height_mm: 600,
+      });
+      const { parts } = fullPipeline(intent);
+      const doors = parts.filter((p) => p.type === 'porte');
+
+      expect(doors).toHaveLength(1);
+      expect(doors[0].width_mm).toBe(computeDoorHeight(600, 2, 2, 2, 2));
+      expect(doors[0].width_mm).not.toBe(computeDoorHeight(2000, 2, 2, 2, 2));
+    });
+
+    it('falls back to full body height when DoorLayout.height_mm is undefined', () => {
+      _resetPartCounter();
+      const intent = makeIntent({
+        furniture_type: 'placard',
+        space: {
+          width_mm: 800,
+          height_mm: 2000,
+          depth_mm: 600,
+          plinth_mm: 0,
+          wall_type: 'concrete',
+        },
+      });
+      const { parts } = fullPipeline(intent);
+      const doors = parts.filter((p) => p.type === 'porte');
+
+      expect(doors).toHaveLength(1);
+      expect(doors[0].width_mm).toBe(computeDoorHeight(2000, 2, 2, 2, 2));
+    });
   });
 });

@@ -261,15 +261,20 @@ const DOOR_TYPES: ReadonlySet<FurnitureType> = new Set([
  * - Double doors: half overlay (montant central implied by overlay type)
  * - door_override: true forces doors, false suppresses them
  */
-function resolveDoors(type: FurnitureType, width_mm: number, doorOverride?: boolean): DoorLayout | undefined {
+function resolveDoors(
+  type: FurnitureType,
+  width_mm: number,
+  doorOverride?: boolean,
+  doorHeight_mm?: number,
+): DoorLayout | undefined {
   // Explicit override from variant
   if (doorOverride === false) return undefined;
   if (doorOverride !== true && !DOOR_TYPES.has(type)) return undefined;
 
   if (width_mm <= 500) {
-    return { type: 'hinged', count: 1, overlay: 'full' };
+    return { type: 'hinged', count: 1, overlay: 'full', height_mm: doorHeight_mm };
   }
-  return { type: 'hinged', count: 2, overlay: 'half' };
+  return { type: 'hinged', count: 2, overlay: 'half', height_mm: doorHeight_mm };
 }
 
 // ---------------------------------------------------------------------------
@@ -390,7 +395,7 @@ export function generateLayout(intent: ProjectIntent): LayoutResult {
     height_mm: space.height_mm,
     depth_mm: space.depth_mm,
     zones,  // each body gets the same zone layout
-    doors: resolveDoors(furniture_type, w, intent.door_override),
+    doors: resolveDoors(furniture_type, w, intent.door_override, intent.door_height_mm),
   }));
 
   return {

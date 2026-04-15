@@ -57,6 +57,7 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   const [showContentMode, setShowContentMode] = useState(false);
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(null);
   const [doorOverride, setDoorOverride] = useState<boolean | undefined>(undefined);
+  const [doorHeightMm, setDoorHeightMm] = useState<number | undefined>(undefined);
   const [suspendedOverride, setSuspendedOverride] = useState<boolean | undefined>(undefined);
   const [variantWarnings, setVariantWarnings] = useState<string[]>([]);
   const [suggestedDepthMm, setSuggestedDepthMm] = useState<number | undefined>(undefined);
@@ -97,6 +98,7 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   const clearVariantOverrides = () => {
     setSelectedVariantName(null);
     setDoorOverride(undefined);
+    setDoorHeightMm(undefined);
     setSuspendedOverride(undefined);
     setVariantWarnings([]);
     setSuggestedDepthMm(undefined);
@@ -129,6 +131,7 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
     const result = variantToResult(variant, usableHeight);
     setZones(result.zones);
     setDoorOverride(result.doorOverride);
+    setDoorHeightMm(result.doorHeightMm);
     setSuspendedOverride(result.suspendedOverride);
     setVariantWarnings(result.warnings ?? []);
     setSuggestedDepthMm(result.suggestedDepthMm);
@@ -160,6 +163,7 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
       zones: zoneConfigs,
       ...(selectedVariantName && { variant: selectedVariantName }),
       ...(doorOverride !== undefined && { door_override: doorOverride }),
+      ...(doorHeightMm !== undefined && { door_height_mm: doorHeightMm }),
       ...(suspendedOverride !== undefined && { suspended_override: suspendedOverride }),
     };
 

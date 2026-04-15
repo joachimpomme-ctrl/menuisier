@@ -72,6 +72,8 @@ export interface ProjectIntent {
   site_constraints?: SiteConstraint[];
   /** Override automatic door generation: true = force doors, false = suppress doors */
   door_override?: boolean;
+  /** If set, doors only cover this height from the bottom of the body. */
+  door_height_mm?: number;
   /** Override suspended detection: true = force rail mounting */
   suspended_override?: boolean;
 }
@@ -106,6 +108,7 @@ export interface DoorLayout {
   type: 'hinged' | 'sliding' | 'lift_up' | 'none';
   count: number;
   overlay: 'full' | 'half' | 'inset';
+  height_mm?: number;
 }
 
 export interface ZoneLayout {
@@ -192,7 +195,11 @@ export type GeneratedPartType =
   | 'tiroir-fond'
   | 'tablette-inclinee'
   | 'croisillon'
+  | 'croisillon-h'
+  | 'croisillon-v'
+  | 'taquet-arret'
   | 'assise'
+  | 'devant-coffre'
   | 'coffre'
   | 'traverse'
   | 'plinthe'
@@ -225,6 +232,7 @@ export type HardwareCategory =
   | 'hinge'
   | 'slide'
   | 'shelf_support'
+  | 'glue'
   | 'screw'
   | 'connector'
   | 'handle'
@@ -406,7 +414,11 @@ const PART_TYPE_TO_PIECE_TYPE: Record<GeneratedPartType, PieceType> = {
   'tiroir-fond': 'fond',
   'tablette-inclinee': 'tablette-fixe',
   'croisillon': 'autre',
+  'croisillon-h': 'autre',
+  'croisillon-v': 'autre',
+  'taquet-arret': 'bandeau',
   'assise': 'tablette-fixe',
+  'devant-coffre': 'bandeau',
   'coffre': 'autre',
   'traverse': 'autre',
   'plinthe': 'bandeau',

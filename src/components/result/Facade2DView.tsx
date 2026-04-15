@@ -299,6 +299,10 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
             const bodyW = body.width_mm * scale;
             const bodyH = body.height_mm * scale;
             const bodyRight = bodyX + bodyW;
+            const doorHeightMm = body.doors?.height_mm ?? body.height_mm;
+            const doorY = facadeYToSvg(doorHeightMm, scale, svgH);
+            const doorH = doorHeightMm * scale;
+            const doorMidY = doorY + doorH / 2;
 
             return (
               <g key={body.bodyId}>
@@ -343,14 +347,14 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
                   <g>
                     <rect
                       x={bodyX + 1}
-                      y={bodyY + 1}
+                      y={doorY + 1}
                       width={bodyW - 2}
-                      height={bodyH - 2}
+                      height={doorH - 2}
                       fill="rgba(180,180,180,0.15)"
                       stroke="#78716c"
                       strokeWidth="0.5"
                     />
-                    <circle cx={bodyX + bodyW - 10} cy={bodyY + bodyH / 2} r="2.3" fill="#78716c" />
+                    <circle cx={bodyX + bodyW - 10} cy={doorMidY} r="2.3" fill="#78716c" />
                   </g>
                 )}
 
@@ -358,24 +362,24 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
                   <g>
                     <rect
                       x={bodyX + 1}
-                      y={bodyY + 1}
+                      y={doorY + 1}
                       width={bodyW / 2 - 2}
-                      height={bodyH - 2}
+                      height={doorH - 2}
                       fill="rgba(180,180,180,0.15)"
                       stroke="#78716c"
                       strokeWidth="0.5"
                     />
                     <rect
                       x={bodyX + bodyW / 2 + 1}
-                      y={bodyY + 1}
+                      y={doorY + 1}
                       width={bodyW / 2 - 2}
-                      height={bodyH - 2}
+                      height={doorH - 2}
                       fill="rgba(180,180,180,0.15)"
                       stroke="#78716c"
                       strokeWidth="0.5"
                     />
-                    <circle cx={bodyX + bodyW / 2 - 8} cy={bodyY + bodyH / 2} r="2.3" fill="#78716c" />
-                    <circle cx={bodyX + bodyW / 2 + 8} cy={bodyY + bodyH / 2} r="2.3" fill="#78716c" />
+                    <circle cx={bodyX + bodyW / 2 - 8} cy={doorMidY} r="2.3" fill="#78716c" />
+                    <circle cx={bodyX + bodyW / 2 + 8} cy={doorMidY} r="2.3" fill="#78716c" />
                   </g>
                 )}
               </g>

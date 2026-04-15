@@ -15,6 +15,7 @@ export interface ZoneRow {
 export interface VariantResult {
   zones: ZoneRow[];
   doorOverride?: boolean;
+  doorHeightMm?: number;
   suspendedOverride?: boolean;
   suggestedDepthMm?: number;
   suggestedWidthMm?: number;
@@ -166,6 +167,14 @@ export function variantToResult(variant: PresetVariant, usableHeight: number): V
   if (variant.portes_position) doorOverride = true;
   if (variant.porte_unique) doorOverride = true;
 
+  let doorHeightMm: number | undefined;
+  const portesPosition = typeof variant.portes_position === 'string'
+    ? variant.portes_position.toLowerCase()
+    : '';
+  if (portesPosition === 'basses' || variantName.includes('portes basses')) {
+    doorHeightMm = Math.round(safeUsableHeight * 0.4);
+  }
+
   let suspendedOverride: boolean | undefined;
   if (variant.fixation_murale === true || variant.fixation === 'rail') {
     suspendedOverride = true;
@@ -207,6 +216,7 @@ export function variantToResult(variant: PresetVariant, usableHeight: number): V
   return {
     zones: normalizedRows,
     doorOverride,
+    doorHeightMm,
     suspendedOverride,
     suggestedDepthMm,
     suggestedWidthMm,
