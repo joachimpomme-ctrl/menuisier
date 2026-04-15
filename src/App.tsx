@@ -26,6 +26,7 @@ import type { FurnitureType, SpaceDimensions, ProjectIntent } from './lib/knowle
 import type { MaterialKey } from './types';
 import PartsLibraryManager from './components/library/PartsLibraryManager';
 import MoreMenu from './components/MoreMenu';
+import HelpGuide from './components/HelpGuide';
 import Tip from './components/Tip';
 import TIPS from './data/tips';
 
@@ -83,6 +84,7 @@ export default function App() {
   const [showCloud, setShowCloud] = useState(false);
   const [showNewWizard, setShowNewWizard] = useState(false);
   const [showPartsLibrary, setShowPartsLibrary] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
 
@@ -231,6 +233,13 @@ export default function App() {
               onExport={() => exportToJson(state)}
               onImport={() => importRef.current?.click()}
             />
+            <button
+              onClick={() => setShowHelp(true)}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
+              title="Guide utilisateur"
+            >
+              ❓ Aide
+            </button>
           </div>
 
           {importError && (
@@ -413,6 +422,11 @@ export default function App() {
       <PartsLibraryManager
         isOpen={showPartsLibrary}
         onClose={() => setShowPartsLibrary(false)}
+      />
+
+      <HelpGuide
+        isOpen={showHelp}
+        onClose={() => setShowHelp(false)}
       />
 
       {/* Project Manager Modal */}
