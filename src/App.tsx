@@ -218,7 +218,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="mt-3 flex items-center gap-1.5 overflow-x-auto hide-scrollbar pb-0.5 -mx-1 px-1">
+          <div className="mt-3 flex items-center gap-1.5 overflow-visible pb-0.5 -mx-1 px-1">
             <button
               onClick={() => setShowPartsLibrary(true)}
               className="text-[11px] px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-700 hover:text-amber-800 border border-amber-200 hover:bg-amber-100 whitespace-nowrap transition-colors"
