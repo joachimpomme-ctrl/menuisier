@@ -107,6 +107,7 @@ interface V3PdfData {
   hardware: HardwareItem[];
   assumptions: Assumption[];
   edgeBandingParts: { name: string; sides: string }[];
+  drillingParts?: { name: string; ops: string[] }[];
 }
 
 export async function generatePdf(
@@ -261,14 +262,60 @@ export async function generatePdf(
     y = (doc as any).lastAutoTable.finalY + 8;
   }
 
+  if (v3Data && v3Data.drillingParts && v3Data.drillingParts.length > 0) {
+    y = ensureSpace(doc, y, 30);
+    y = sectionTitle(doc, y, 'Plans de percage');
+
+    const drillingRows = v3Data.drillingParts.flatMap((part) =>
+      part.ops.map((op, index) => [index === 0 ? part.name : '', op]),
+    );
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: MARGIN, right: MARGIN },
+      head: [['Piece', 'Operations']],
+      body: drillingRows,
+      styles: { font: 'helvetica', fontSize: 9, textColor: TEXT_COLOR, cellPadding: 2 },
+      headStyles: { fillColor: TITLE_COLOR, textColor: [255, 255, 255], fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: ROW_ALT_COLOR },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    y = (doc as any).lastAutoTable.finalY + 8;
+  }
+
   if (v3Data && v3Data.assumptions.length > 0) {
     y = ensureSpace(doc, y, 20);
     y = sectionTitle(doc, y, 'Hypotheses et decisions');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
 
-    const toVerify = v3Data.assumptions.filter((a) => a.user_should_verify);
-    const auto = v3Data.assumptions.filter((a) => !a.user_should_verify);
+    const decisions = v3Data.assumptions.filter(
+      (a) => a.category === 'decision' || a.key.endsWith('_decision'),
+    );
+    const toVerify = v3Data.assumptions.filter(
+      (a) => a.category !== 'decision' && !a.key.endsWith('_decision') && a.user_should_verify,
+    );
+    const auto = v3Data.assumptions.filter(
+      (a) => a.category !== 'decision' && !a.key.endsWith('_decision') && !a.user_should_verify,
+    );
+
+    if (decisions.length > 0) {
+      doc.setTextColor(...hexToRgb('#4f46e5'));
+      doc.setFont('helvetica', 'bold');
+      doc.text('Decisions du moteur :', MARGIN, y);
+      y += 5;
+      doc.setFont('helvetica', 'normal');
+      for (const a of decisions) {
+        y = ensureSpace(doc, y, 6);
+        const lines = doc.splitTextToSize(`• ${a.value} — ${a.reason}`, CONTENT_W - 8);
+        for (const line of lines) {
+          y = ensureSpace(doc, y, 5);
+          doc.text(line, MARGIN + 4, y);
+          y += 4.5;
+        }
+      }
+      y += 3;
+    }
 
     if (toVerify.length > 0) {
       doc.setTextColor(...hexToRgb('#ea580c'));
@@ -291,7 +338,7 @@ export async function generatePdf(
     if (auto.length > 0) {
       doc.setTextColor(...TEXT_COLOR);
       doc.setFont('helvetica', 'bold');
-      doc.text('Valeurs par defaut :', MARGIN, y);
+      doc.text('Hypotheses et valeurs par defaut :', MARGIN, y);
       y += 5;
       doc.setFont('helvetica', 'normal');
       for (const a of auto) {
@@ -314,6 +361,40 @@ export async function generatePdf(
     MARGIN,
     y,
   );
+  y += 6;
+
+  if (validation.errors.length > 0) {
+    doc.setTextColor(...hexToRgb('#dc2626'));
+    doc.setFont('helvetica', 'bold');
+    doc.text('Erreurs bloquantes :', MARGIN, y);
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    for (const error of validation.errors) {
+      const lines = doc.splitTextToSize(`• ${error}`, CONTENT_W - 8);
+      for (const line of lines) {
+        y = ensureSpace(doc, y, 5);
+        doc.text(line, MARGIN + 4, y);
+        y += 4.5;
+      }
+    }
+    y += 3;
+  }
+
+  if (validation.warnings.length > 0) {
+    doc.setTextColor(...hexToRgb('#ea580c'));
+    doc.setFont('helvetica', 'bold');
+    doc.text('Avertissements :', MARGIN, y);
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    for (const warning of validation.warnings) {
+      const lines = doc.splitTextToSize(`• ${warning}`, CONTENT_W - 8);
+      for (const line of lines) {
+        y = ensureSpace(doc, y, 5);
+        doc.text(line, MARGIN + 4, y);
+        y += 4.5;
+      }
+    }
+  }
 
   // =========================================================================
   // Page 2+ — Cut list table (grouped by body, sorted by area desc)

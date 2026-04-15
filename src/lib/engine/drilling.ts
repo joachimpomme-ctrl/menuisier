@@ -40,6 +40,31 @@ const CONFIRMAT_THROUGH_DIAMETER_MM = 7;
 const SLIDE_SETBACK_MM = 37;        // from bottom edge of zone
 
 // ---------------------------------------------------------------------------
+// Formatting helper
+// ---------------------------------------------------------------------------
+
+export function aggregateDrillingOps(ops: DrillingOp[]): string[] {
+  if (ops.length === 0) return [];
+
+  const groups = new Map<string, { diameter: number; depth: number; count: number }>();
+
+  for (const op of ops) {
+    const key = `${op.diameter_mm}:${op.depth_mm}`;
+    const group = groups.get(key) ?? {
+      diameter: op.diameter_mm,
+      depth: op.depth_mm,
+      count: 0,
+    };
+    group.count += 1;
+    groups.set(key, group);
+  }
+
+  return Array.from(groups.values())
+    .sort((a, b) => a.diameter - b.diameter || a.depth - b.depth)
+    .map((group) => `Perçage Ø${group.diameter}mm prof.${group.depth}mm x${group.count}`);
+}
+
+// ---------------------------------------------------------------------------
 // System 32 — shelf pin rows in side panels (joues)
 // ---------------------------------------------------------------------------
 
