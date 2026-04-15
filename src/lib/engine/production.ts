@@ -102,6 +102,7 @@ function buildAssumptions(
         ? 'Largeur > 500mm → 2 portes avec montant central implicite'
         : 'Porte simple en recouvrement total',
       user_should_verify: false,
+      category: 'decision',
     });
   } else if (intent.door_override === false) {
     assumptions.push({
@@ -109,6 +110,7 @@ function buildAssumptions(
       value: 'Sans portes (choix utilisateur)',
       reason: 'Portes désactivées par la variante choisie',
       user_should_verify: false,
+      category: 'decision',
     });
   }
 
@@ -119,6 +121,7 @@ function buildAssumptions(
       value: 'Fixation murale par rail',
       reason: 'Meuble suspendu — rail de suspension en partie haute, pas de pieds',
       user_should_verify: true,
+      category: 'decision',
     });
   }
 
@@ -129,6 +132,7 @@ function buildAssumptions(
       value: 'Équerre anti-basculement obligatoire',
       reason: `Hauteur ${intent.space.height_mm}mm > 1500mm — sécurité enfants`,
       user_should_verify: false,
+      category: 'decision',
     });
   }
 
@@ -138,6 +142,7 @@ function buildAssumptions(
       value: `${layout.bodies.length} corps`,
       reason: `Largeur ${intent.space.width_mm}mm dépasse la portée max du matériau → découpage en ${layout.bodies.length} corps égaux`,
       user_should_verify: false,
+      category: 'decision',
     });
   }
 
@@ -153,6 +158,7 @@ function buildAssumptions(
         ? 'Profondeur suffisante pour cintres standard (550mm min)'
         : 'Profondeur insuffisante pour cintres — prévoir une tringle perpendiculaire',
       user_should_verify: !depthOk,
+      category: 'decision',
     });
   }
 
@@ -164,6 +170,7 @@ function buildAssumptions(
       value: `${drawerCount} tiroir${drawerCount > 1 ? 's' : ''} sur coulisses à billes`,
       reason: 'Coulisses à extension totale pour accès complet au contenu',
       user_should_verify: false,
+      category: 'decision',
     });
   }
 
@@ -176,6 +183,7 @@ function buildAssumptions(
       value: `${fixedShelves.length} tablette${fixedShelves.length > 1 ? 's' : ''} fixe${fixedShelves.length > 1 ? 's' : ''} structurelle${fixedShelves.length > 1 ? 's' : ''}`,
       reason: 'Séparations ajoutées pour rigidifier le caisson entre les zones fonctionnelles',
       user_should_verify: false,
+      category: 'decision',
     });
   }
 
@@ -186,6 +194,7 @@ function buildAssumptions(
       value: 'Bandes de chant sur faces visibles',
       reason: 'Protection + esthétique : chants visibles bandés, chants cachés laissés bruts',
       user_should_verify: false,
+      category: 'decision',
     });
   }
 
