@@ -1,6 +1,19 @@
 import type { AppState, PanelDef, Piece, PieceType } from '../../types';
+import type { StandardPart } from '../knowledge/types';
 import { getBodyInnerWidth } from '../helpers';
 import { createPiece, detectPieceType, generateStandardPieces, applySharedBoundary } from '../domain';
+import { uid } from '../helpers';
+
+const STANDARD_PART_TYPE_MAP: Record<StandardPart['category'], PieceType> = {
+  shelf: 'tablette-fixe',
+  side_panel: 'joue',
+  door: 'porte',
+  drawer_front: 'tiroir-facade',
+  back_panel: 'fond',
+  top_bottom: 'tablette-fixe',
+  divider: 'separateur',
+  custom: 'autre',
+};
 
 export function updatePiece(
   state: AppState,
@@ -118,6 +131,34 @@ export function autoFillPieces(state: AppState, bodyId: string): AppState {
   }
 
   return nextState;
+}
+
+export function addPieceFromLibrary(
+  state: AppState,
+  bodyId: string,
+  standardPart: StandardPart,
+): AppState {
+  const body = state.bodies.find((b) => b.id === bodyId);
+  if (!body) return state;
+
+  const piece: Piece = {
+    id: uid(),
+    name: standardPart.name,
+    length: standardPart.length_mm / 10,
+    width: standardPart.width_mm / 10,
+    qty: 1,
+    type: STANDARD_PART_TYPE_MAP[standardPart.category],
+    thickness: standardPart.thickness_mm / 10,
+    edge_banding: standardPart.edge_banding,
+    standardPartId: standardPart.id,
+  };
+
+  return {
+    ...state,
+    bodies: state.bodies.map((b) =>
+      b.id === bodyId ? { ...b, pieces: [...b.pieces, piece] } : b,
+    ),
+  };
 }
 
 export function removePiece(state: AppState, bodyId: string, pieceId: string): AppState {

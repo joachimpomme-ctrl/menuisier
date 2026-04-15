@@ -456,6 +456,11 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
                   <span className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: PIECE_COLORS[p.type] }} />
                     <span className="text-stone-700 truncate">{p.name}</span>
+                    {p.standardPartId && (
+                      <span className="ml-1 text-[9px] bg-amber-100 text-amber-700 px-1 rounded flex-shrink-0" title="Pièce standard (bibliothèque)">
+                        STD
+                      </span>
+                    )}
                     <span className="text-stone-400 hidden sm:inline flex-shrink-0">{p.bodyName}</span>
                     {panelLabel && (
                       <span className="text-[9px] bg-sky-50 text-sky-600 border border-sky-200 rounded px-1 py-0 flex-shrink-0">{panelLabel}</span>

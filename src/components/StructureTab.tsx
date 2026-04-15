@@ -8,6 +8,7 @@ import NumberInput from './structure/NumberInput';
 import Glossary from './structure/Glossary';
 import WallSurveyDiagram from './structure/WallSurveyDiagram';
 import BodyCard from './structure/BodyCard';
+import PartsPicker from './library/PartsPicker';
 import { inputClass, cardClass, sectionTitle } from './structure/styles';
 
 interface Props {
@@ -18,6 +19,8 @@ interface Props {
 
 export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
   const [editingPiece, setEditingPiece] = useState<string | null>(null);
+  const [showPicker, setShowPicker] = useState(false);
+  const [pickerBodyId, setPickerBodyId] = useState<string | null>(null);
   const mat = MATERIALS[state.materialKey];
   const shared = state.sharedBoundaries ?? [];
 
@@ -39,6 +42,11 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
 
   const addPiece = (bodyId: string, pieceType?: PieceType) =>
     onChange(pieceActions.addPiece(state, bodyId, pieceType, allPanelDefs));
+
+  const openLibraryPicker = (bodyId: string) => {
+    setPickerBodyId(bodyId);
+    setShowPicker(true);
+  };
 
   const autoFillPieces = (bodyId: string) => {
     const body = state.bodies.find((b) => b.id === bodyId);
@@ -268,11 +276,23 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
           removeBody={removeBody}
           updatePiece={updatePiece}
           addPiece={addPiece}
+          openLibraryPicker={openLibraryPicker}
           autoFillPieces={autoFillPieces}
           removePiece={removePiece}
           toggleSharing={toggleSharing}
         />
       ))}
+
+      <PartsPicker
+        isOpen={showPicker}
+        onClose={() => setShowPicker(false)}
+        onSelect={(part) => {
+          if (pickerBodyId) {
+            onChange(pieceActions.addPieceFromLibrary(state, pickerBodyId, part));
+          }
+          setShowPicker(false);
+        }}
+      />
     </div>
   );
 }

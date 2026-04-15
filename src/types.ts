@@ -49,6 +49,7 @@ export interface Piece {
   panelId?: string; // undefined = panneau principal (state.panel)
   thickness?: number; // cm — override épaisseur panneau (ex. double joue). undefined = épaisseur du panneau assigné
   edge_banding?: ('front' | 'back' | 'left' | 'right')[];
+  standardPartId?: string; // ID dans la bibliothèque de pièces standard
   drilling_count?: number;
   sharedBoundaryMeta?: SharedBoundaryMeta;
   // ---- positions spatiales (optionnel) ----
