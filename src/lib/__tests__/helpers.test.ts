@@ -73,13 +73,11 @@ describe('getBodyInnerWidth', () => {
     expect(getBodyInnerWidth(80, 0, 2, [], th)).toBeCloseTo(76.4, 1);
   });
 
-  it('shared left body — no left joue', () => {
-    // Body index 1 with shared boundary at index 0
-    // inner = 80 - 0 - 1.8 = 78.2
-    expect(getBodyInnerWidth(80, 1, 2, [true], th)).toBeCloseTo(78.2, 1);
+  it('shared left body keeps the same usable inner width', () => {
+    expect(getBodyInnerWidth(80, 1, 2, [true], th)).toBeCloseTo(76.4, 1);
   });
 
-  it('non-shared body ignores empty boundaries', () => {
+  it('ignores boundary flags in the width formula', () => {
     expect(getBodyInnerWidth(80, 0, 2, [false], th)).toBeCloseTo(76.4, 1);
   });
 });

@@ -272,12 +272,12 @@ describe('generateStandardPieces', () => {
     expect(joues.every(j => j.name.includes('D'))).toBe(true);
   });
 
-  it('uses wider inner width for shared-left body', () => {
-    // Body at index 1 with shared boundary at index 0
-    // Inner width: 80 - 0 - 1.8 = 78.2
+  it('keeps the same inner width for a shared-left body with a fused common side', () => {
+    // Shared side is modeled as a fused double-thickness panel, so the usable width
+    // stays aligned with the standard formula.
     const pieces = generateStandardPieces(body, 1, [true], th, cH);
     const tabFixes = pieces.filter(p => p.type === 'tablette-fixe');
-    expect(tabFixes[0].length).toBeCloseTo(78.2, 1);
+    expect(tabFixes[0].length).toBeCloseTo(76.4, 1);
   });
 
   it('all pieces have unique ids', () => {

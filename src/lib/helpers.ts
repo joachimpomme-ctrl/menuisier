@@ -31,14 +31,12 @@ export function clampInt(value: string, fallback: number, min: number, max: numb
  */
 export function getBodyInnerWidth(
   bodyWidth: number,
-  bodyIndex: number,
+  _bodyIndex: number,
   _bodyCount: number,
-  sharedBoundaries: boolean[],
+  _sharedBoundaries: boolean[],
   thickness: number,
 ): number {
-  const sharedLeft = bodyIndex > 0 && (sharedBoundaries[bodyIndex - 1] ?? false);
-  const leftTh = sharedLeft ? 0 : thickness;
-  return +(bodyWidth - leftTh - thickness).toFixed(1);
+  return +(bodyWidth - thickness - thickness).toFixed(1);
 }
 
 /** Renvoie true si ce corps n'a pas de joue gauche propre (partagée avec le voisin) */

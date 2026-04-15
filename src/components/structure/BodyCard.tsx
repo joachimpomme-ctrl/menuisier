@@ -106,8 +106,8 @@ export default function BodyCard({
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-2 text-xs text-blue-800">
             <div className="font-semibold mb-1">Joue gauche commune</div>
             <p className="text-blue-700 leading-relaxed">
-              Cette joue est physiquement la joue droite du corps
-              &laquo;&thinsp;{state.bodies[bi - 1]?.name}&thinsp;&raquo;.
+              Cette joue est portée par le corps
+              &laquo;&thinsp;{state.bodies[bi - 1]?.name}&thinsp;&raquo; sous forme de panneau commun épaissi.
               Elle n'apparait pas dans la liste ci-dessous — c'est normal.
             </p>
             <p className="text-blue-600 mt-1 font-mono text-[10px]">
@@ -130,7 +130,7 @@ export default function BodyCard({
 
         <div className="text-xs text-stone-500 mb-3 flex items-center gap-1 flex-wrap">
           <Tip text={sl
-            ? "Largeur intérieure augmentée : la joue gauche est commune avec le corps voisin. Pas de double épaisseur à la jonction."
+            ? "La joue gauche est commune avec le corps voisin, mais la largeur intérieure reste calculée avec une séparation structurelle complète."
             : TIPS['int-tablette']
           }>
             <span>

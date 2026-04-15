@@ -19,17 +19,14 @@ export default function MontageTab({ state }: Props) {
   const SVG_WIDTH = 580;
   const MARGIN = 50;
   const totalBodyWidth = state.bodies.reduce((s, b) => s + b.width, 0);
-  const sharedCount = shared.filter(Boolean).length;
   const gapCount = Math.max(state.bodies.length - 1, 0);
-  const normalGaps = gapCount - sharedCount;
-  const scale = (SVG_WIDTH - 2 * MARGIN - 20 * normalGaps) / Math.max(totalBodyWidth - sharedCount * thickness, 1);
+  const scale = (SVG_WIDTH - 2 * MARGIN - 20 * gapCount) / Math.max(totalBodyWidth, 1);
   const svgHeight = MARGIN * 2 + usableHeight * scale;
 
   let offsetX = MARGIN;
-  const offsets = state.bodies.map((b, i) => {
+  const offsets = state.bodies.map((b) => {
     const x = offsetX;
-    const isShared = i < state.bodies.length - 1 && (shared[i] ?? false);
-    offsetX += b.width * scale + (isShared ? -thickness * scale : 20);
+    offsetX += b.width * scale + 20;
     return x;
   });
 
