@@ -130,12 +130,16 @@ export class LocalProjectRepository implements ProjectRepository {
   }
 
   load(id: string): AppState | null {
+    return this.loadFull(id)?.state ?? null;
+  }
+
+  loadFull(id: string): StoredProject | null {
     try {
       const raw = localStorage.getItem(PROJECT_PREFIX + id);
       if (!raw) return null;
       const parsed = JSON.parse(raw) as StoredProject;
       if (!parsed || parsed.version !== CURRENT_VERSION || !parsed.state) return null;
-      return parsed.state;
+      return parsed;
     } catch (err) {
       console.error(`storage: projet ${id} illisible`, err);
       return null;
@@ -150,8 +154,14 @@ export class LocalProjectRepository implements ProjectRepository {
   save(id: string, state: AppState): void {
     const now = new Date().toISOString();
     const normalized = normalizeProject(state);
+    const existingStored = this.loadFull(id);
 
-    const stored: StoredProject = { version: CURRENT_VERSION, state: normalized, savedAt: now };
+    const stored: StoredProject = {
+      version: CURRENT_VERSION,
+      state: normalized,
+      savedAt: now,
+      v3: existingStored?.v3,
+    };
     try {
       localStorage.setItem(PROJECT_PREFIX + id, JSON.stringify(stored));
     } catch (err) {
@@ -159,6 +169,33 @@ export class LocalProjectRepository implements ProjectRepository {
     }
 
     // Index update is best-effort w.r.t. atomicity but must also throw on quota
+    const index = readIndex();
+    const existing = index.find((m) => m.id === id);
+    if (existing) {
+      existing.name = normalized.project.name;
+      existing.materialShort = MATERIALS[normalized.materialKey]?.short ?? normalized.materialKey;
+      existing.bodyCount = normalized.bodies.length;
+      existing.updatedAt = now;
+    } else {
+      index.push(buildMeta(id, normalized, now));
+    }
+    writeIndex(index);
+  }
+
+  saveV3(id: string, state: AppState, v3Data: StoredProject['v3']): void {
+    const now = new Date().toISOString();
+    const normalized = normalizeProject(state);
+    const stored: StoredProject = {
+      version: CURRENT_VERSION,
+      state: normalized,
+      savedAt: now,
+      v3: v3Data,
+    };
+    try {
+      localStorage.setItem(PROJECT_PREFIX + id, JSON.stringify(stored));
+    } catch (err) {
+      throw wrapStorageError(err, `de la sauvegarde V3 du projet "${normalized.project.name}"`);
+    }
     const index = readIndex();
     const existing = index.find((m) => m.id === id);
     if (existing) {

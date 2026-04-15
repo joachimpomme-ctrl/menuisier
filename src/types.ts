@@ -1,3 +1,5 @@
+import type { ProjectIntent, FurnitureType } from './lib/knowledge/types';
+
 export type PieceType = 'joue' | 'tablette-fixe' | 'tablette-reglable' | 'separateur' | 'bandeau' | 'porte' | 'tiroir-facade' | 'fond' | 'autre';
 
 export type MaterialKey = 'cp_bouleau' | 'cp_peuplier' | 'cp_okoume' | 'mdf' | 'melamine' | 'osb';
@@ -210,6 +212,12 @@ export interface StoredProject {
   version: 2;
   state: AppState;
   savedAt: string;
+  /** V3 wizard data — present when project was created via the V3 wizard */
+  v3?: {
+    intent: ProjectIntent;
+    materialKey: MaterialKey;
+    furnitureType: FurnitureType;
+  };
 }
 
 // Repository abstraction — prépare l'auth future (E)
@@ -218,7 +226,9 @@ export interface StoredProject {
 export interface ProjectRepository {
   list(): ProjectMeta[];
   load(id: string): AppState | null;
+  loadFull(id: string): StoredProject | null;
   save(id: string, state: AppState): void;
+  saveV3(id: string, state: AppState, v3Data: StoredProject['v3']): void;
   delete(id: string): void;
   duplicate(id: string, newName: string): string | null;
   getCurrentId(): string | null;
