@@ -19,8 +19,8 @@ describe('variantToResult', () => {
   it('overrides are undefined for non-variant zones', () => {
     const result = variantToResult({}, 1900);
 
-    expect(result.door_override).toBeUndefined();
-    expect(result.suspended_override).toBeUndefined();
+    expect(result.doorOverride).toBeUndefined();
+    expect(result.suspendedOverride).toBeUndefined();
   });
 
   it('keeps a valid full-height split for mixed rods/drawers/shelves', () => {
@@ -50,18 +50,18 @@ describe('variantToResult', () => {
   it('extracts door and suspension overrides', () => {
     const result = variantToResult({ portes: false, fixation: 'rail' }, 1800);
 
-    expect(result.door_override).toBe(false);
-    expect(result.suspended_override).toBe(true);
+    expect(result.doorOverride).toBe(false);
+    expect(result.suspendedOverride).toBe(true);
   });
 
   it("overrides from previous variant don't leak", () => {
     const withOverrides = variantToResult({ portes: false, fixation_murale: true }, 1900);
     const withoutOverrides = variantToResult({}, 1900);
 
-    expect(withOverrides.door_override).toBe(false);
-    expect(withOverrides.suspended_override).toBe(true);
-    expect(withoutOverrides.door_override).toBeUndefined();
-    expect(withoutOverrides.suspended_override).toBeUndefined();
+    expect(withOverrides.doorOverride).toBe(false);
+    expect(withOverrides.suspendedOverride).toBe(true);
+    expect(withoutOverrides.doorOverride).toBeUndefined();
+    expect(withoutOverrides.suspendedOverride).toBeUndefined();
   });
 
   it('never creates non-positive height zones for aggressive combinations', () => {
@@ -80,5 +80,65 @@ describe('variantToResult', () => {
 
     expect(result.zones.every((z) => z.height_mm > 0)).toBe(true);
     expect(totalHeight(result)).toBe(1700);
+  });
+
+  it('returns suggestedDepthMm when profondeur_mm is present', () => {
+    const result = variantToResult({ profondeur_mm: 400 }, 1900);
+
+    expect(result.suggestedDepthMm).toBe(400);
+  });
+
+  it('returns suggestedWidthMm when largeur_mm is present', () => {
+    const result = variantToResult({ largeur_mm: 600 }, 1900);
+
+    expect(result.suggestedWidthMm).toBe(600);
+  });
+
+  it('forces doorOverride when porte_unique is true', () => {
+    const result = variantToResult({ porte_unique: true }, 1900);
+
+    expect(result.doorOverride).toBe(true);
+  });
+
+  it('returns suggestedPlinthType legs when pieds is true', () => {
+    const result = variantToResult({ pieds: true }, 1900);
+
+    expect(result.suggestedPlinthType).toBe('legs');
+  });
+
+  it('returns a vitrage warning when vitrage is true', () => {
+    const result = variantToResult({ vitrage: true }, 1900);
+
+    expect(result.warnings?.some((warning) => warning.includes('vitrées'))).toBe(true);
+  });
+
+  it('returns a pateres warning when pateres is true', () => {
+    const result = variantToResult({ pateres: true }, 1900);
+
+    expect(result.warnings?.some((warning) => warning.includes('Patères'))).toBe(true);
+  });
+
+  it('returns a facade warning when tiroirs contain h_facade_mm', () => {
+    const result = variantToResult({
+      tiroirs: [
+        { h_facade_mm: 140 },
+        { h_facade_mm: 280 },
+      ],
+    }, 1900);
+
+    expect(result.warnings?.some((warning) => warning.includes('façade'))).toBe(true);
+  });
+
+  it('returns no warnings for a clean supported variant', () => {
+    const result = variantToResult({ portes: true, tablettes: 4 }, 1900);
+
+    expect(result.warnings === undefined || result.warnings.length === 0).toBe(true);
+  });
+
+  it('combines hanging rod zones with depth suggestions', () => {
+    const result = variantToResult({ tringle: true, profondeur_mm: 600 }, 1900);
+
+    expect(result.zones.some((z) => z.module_id === 'hanging_rod_short')).toBe(true);
+    expect(result.suggestedDepthMm).toBe(600);
   });
 });

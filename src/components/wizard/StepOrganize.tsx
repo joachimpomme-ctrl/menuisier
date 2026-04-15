@@ -58,6 +58,11 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(null);
   const [doorOverride, setDoorOverride] = useState<boolean | undefined>(undefined);
   const [suspendedOverride, setSuspendedOverride] = useState<boolean | undefined>(undefined);
+  const [variantWarnings, setVariantWarnings] = useState<string[]>([]);
+  const [suggestedDepthMm, setSuggestedDepthMm] = useState<number | undefined>(undefined);
+  const [suggestedWidthMm, setSuggestedWidthMm] = useState<number | undefined>(undefined);
+  const [suggestedHeightMm, setSuggestedHeightMm] = useState<number | undefined>(undefined);
+  const [suggestedPlinthType, setSuggestedPlinthType] = useState<'legs' | 'none' | undefined>(undefined);
 
   const applyContentZones = (zoneConfigs: ZoneConfig[]) => {
     clearVariantOverrides();
@@ -93,6 +98,11 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
     setSelectedVariantName(null);
     setDoorOverride(undefined);
     setSuspendedOverride(undefined);
+    setVariantWarnings([]);
+    setSuggestedDepthMm(undefined);
+    setSuggestedWidthMm(undefined);
+    setSuggestedHeightMm(undefined);
+    setSuggestedPlinthType(undefined);
   };
 
   const addZone = () => {
@@ -118,8 +128,13 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   const applyVariant = (variant: PresetVariant) => {
     const result = variantToResult(variant, usableHeight);
     setZones(result.zones);
-    setDoorOverride(result.door_override);
-    setSuspendedOverride(result.suspended_override);
+    setDoorOverride(result.doorOverride);
+    setSuspendedOverride(result.suspendedOverride);
+    setVariantWarnings(result.warnings ?? []);
+    setSuggestedDepthMm(result.suggestedDepthMm);
+    setSuggestedWidthMm(result.suggestedWidthMm);
+    setSuggestedHeightMm(result.suggestedHeightMm);
+    setSuggestedPlinthType(result.suggestedPlinthType);
     setSelectedVariantName(variant.nom ?? null);
   };
 
@@ -130,11 +145,20 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
       config: defaultConfigForModule(z.module_id, z.count),
     }));
 
+    const effectiveSpace = {
+      ...space,
+      ...(suggestedWidthMm !== undefined && { width_mm: suggestedWidthMm }),
+      ...(suggestedDepthMm !== undefined && { depth_mm: suggestedDepthMm }),
+      ...(suggestedHeightMm !== undefined && { height_mm: suggestedHeightMm }),
+      ...(suggestedPlinthType === 'none' && { plinth_mm: 0 }),
+    };
+
     const intent: ProjectIntent = {
       furniture_type: furnitureType,
       material_key: materialKey,
-      space,
+      space: effectiveSpace,
       zones: zoneConfigs,
+      ...(selectedVariantName && { variant: selectedVariantName }),
       ...(doorOverride !== undefined && { door_override: doorOverride }),
       ...(suspendedOverride !== undefined && { suspended_override: suspendedOverride }),
     };
@@ -193,6 +217,23 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {(suggestedWidthMm !== undefined || suggestedDepthMm !== undefined || suggestedHeightMm !== undefined || suggestedPlinthType !== undefined) && (
+        <div className="mb-4 text-xs text-blue-600 bg-blue-50 rounded-lg px-3 py-2 space-y-1">
+          {suggestedWidthMm !== undefined && <p>ℹ Largeur suggérée par la variante : {suggestedWidthMm} mm</p>}
+          {suggestedDepthMm !== undefined && <p>ℹ Profondeur suggérée par la variante : {suggestedDepthMm} mm</p>}
+          {suggestedHeightMm !== undefined && <p>ℹ Hauteur suggérée par la variante : {suggestedHeightMm} mm</p>}
+          {suggestedPlinthType === 'legs' && <p>ℹ Piètement suggéré : meuble sur pieds</p>}
+        </div>
+      )}
+
+      {variantWarnings.length > 0 && (
+        <div className="mb-4 text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2 space-y-1">
+          {variantWarnings.map((w, i) => (
+            <p key={i}>⚠ {w}</p>
+          ))}
         </div>
       )}
 

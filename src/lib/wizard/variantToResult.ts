@@ -14,9 +14,22 @@ export interface ZoneRow {
 
 export interface VariantResult {
   zones: ZoneRow[];
-  door_override?: boolean;
-  suspended_override?: boolean;
+  doorOverride?: boolean;
+  suspendedOverride?: boolean;
+  suggestedDepthMm?: number;
+  suggestedWidthMm?: number;
+  suggestedHeightMm?: number;
+  suggestedPlinthType?: 'legs' | 'none';
+  warnings?: string[];
 }
+
+const UNSUPPORTED_PROPS: Record<string, string> = {
+  vitrage: 'Portes vitrées non supportées — portes pleines générées',
+  pateres: 'Patères non modélisées — à ajouter manuellement',
+  compact: 'Abattants basculants non supportés — portes classiques générées',
+  caisson: 'Position du caisson (gauche/droite) non gérée — tiroirs centrés',
+  tabouret_mm: 'Hauteur tabouret indicative, non utilisée dans la génération',
+};
 
 function roundToInt(value: number): number {
   return Math.round(Number.isFinite(value) ? value : 0);
@@ -27,6 +40,7 @@ export function variantToResult(variant: PresetVariant, usableHeight: number): V
   let key = Date.now();
   const safeUsableHeight = Math.max(100, roundToInt(usableHeight));
   let remaining = safeUsableHeight;
+  const warnings: string[] = [];
 
   const consumeHeight = (requested: number): number => {
     const safeRequested = Math.max(0, roundToInt(requested));
@@ -146,15 +160,58 @@ export function variantToResult(variant: PresetVariant, usableHeight: number): V
     }
   }
 
-  let door_override: boolean | undefined;
-  if (variant.portes === false) door_override = false;
-  else if (variant.portes === true) door_override = true;
-  if (variant.portes_position) door_override = true;
+  let doorOverride: boolean | undefined;
+  if (variant.portes === false) doorOverride = false;
+  else if (variant.portes === true) doorOverride = true;
+  if (variant.portes_position) doorOverride = true;
+  if (variant.porte_unique) doorOverride = true;
 
-  let suspended_override: boolean | undefined;
+  let suspendedOverride: boolean | undefined;
   if (variant.fixation_murale === true || variant.fixation === 'rail') {
-    suspended_override = true;
+    suspendedOverride = true;
   }
 
-  return { zones: normalizedRows, door_override, suspended_override };
+  let suggestedDepthMm: number | undefined;
+  if (typeof variant.profondeur_mm === 'number') {
+    suggestedDepthMm = roundToInt(variant.profondeur_mm);
+  }
+
+  let suggestedWidthMm: number | undefined;
+  if (typeof variant.largeur_mm === 'number') {
+    suggestedWidthMm = roundToInt(variant.largeur_mm);
+  }
+
+  let suggestedHeightMm: number | undefined;
+  if (typeof variant.hauteur_mm === 'number') {
+    suggestedHeightMm = roundToInt(variant.hauteur_mm);
+  }
+
+  let suggestedPlinthType: 'legs' | 'none' | undefined;
+  if (variant.pieds === true) {
+    suggestedPlinthType = 'legs';
+  }
+
+  for (const [key, message] of Object.entries(UNSUPPORTED_PROPS)) {
+    if (variant[key] !== undefined && variant[key] !== false && variant[key] !== 0) {
+      warnings.push(message);
+    }
+  }
+
+  if (Array.isArray(variant.tiroirs) && variant.tiroirs.some((t: unknown) => {
+    if (!t || typeof t !== 'object') return false;
+    return 'h_facade_mm' in (t as Record<string, unknown>);
+  })) {
+    warnings.push('Hauteurs de façade par tiroir non supportées — distribution égale appliquée');
+  }
+
+  return {
+    zones: normalizedRows,
+    doorOverride,
+    suspendedOverride,
+    suggestedDepthMm,
+    suggestedWidthMm,
+    suggestedHeightMm,
+    suggestedPlinthType,
+    warnings: warnings.length > 0 ? warnings : undefined,
+  };
 }
