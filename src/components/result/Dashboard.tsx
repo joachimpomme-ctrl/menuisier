@@ -236,7 +236,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
         </button>
         <button
           onClick={() => {
-            if (confirm('Basculer vers l\'éditeur classique ? La quincaillerie et les hypothèses V3 seront conservées mais en lecture seule.')) {
+            if (confirm('Basculer vers l\'éditeur classique ? Toutes les pièces, portes et dimensions sont conservées. Seul le détail des opérations de perçage n\'est pas transféré.')) {
               onClassicEditor(pipelineResultToAppState(result, materialKey));
             }
           }}
