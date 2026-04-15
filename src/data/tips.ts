@@ -93,9 +93,6 @@ const TIPS: Record<string, string> = {
   // ===== ASSISTANT IA =====
   'assistant-ia': "L'assistant connaît votre projet en détail (dimensions, matériau, pièces, erreurs). Il s'appuie sur une base de connaissances menuiserie professionnelle (Dunod 2022).",
 
-  // ===== HEADER =====
-  'savoirs': "La base de connaissances contient des règles métier, propriétés de matériaux et normes issues de manuels professionnels. Vous pouvez ajouter vos propres documents JSON pour enrichir l'IA.",
-  'export-json': "Exporte votre projet en fichier JSON pour le sauvegarder, le partager ou le réimporter plus tard sur un autre appareil.",
   'export-pdf': "Génère un PDF complet avec la liste de coupe, les plans de calepinage, la notice de montage et la validation. À imprimer pour l'atelier.",
 };
 
