@@ -1,0 +1,1651 @@
+[
+  {
+    "type": "bibliotheque",
+    "variant": "default",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 300,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 9,
+      "hardwareCount": 4,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "bibliotheque",
+    "variant": "Bibliothèque ouverte",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 300,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 9,
+      "hardwareCount": 4,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "bibliotheque",
+    "variant": "Bibliothèque avec portes basses",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 300,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 9,
+      "hardwareCount": 6,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 2,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_doors."
+  },
+  {
+    "type": "bibliotheque",
+    "variant": "Bibliothèque vitrée",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 300,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 10,
+      "hardwareCount": 6,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 2,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_doors."
+  },
+  {
+    "type": "bibliotheque",
+    "variant": "Bibliothèque enfant",
+    "dimensions": {
+      "width": 800,
+      "height": 1200,
+      "depth": 280,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 10,
+      "hardwareCount": 3,
+      "blockingErrors": [],
+      "warnings": [],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "bibliotheque",
+    "variant": "Bibliothèque suspendue",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 300,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 9,
+      "hardwareCount": 5,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "etagere_murale",
+    "variant": "default",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 220,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 9,
+      "hardwareCount": 5,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "placard",
+    "variant": "default",
+    "dimensions": {
+      "width": 1200,
+      "height": 2400,
+      "depth": 600,
+      "plinth": 80
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 30,
+      "hardwareCount": 7,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 4,
+      "zoneTypes": [
+        "hanging_rod_short",
+        "drawer_stack"
+      ],
+      "fixedShelfCount": 6,
+      "approximationFlags": [
+        "simplified_drawers",
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades.",
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_drawers, simplified_doors."
+  },
+  {
+    "type": "placard",
+    "variant": "Penderie simple",
+    "dimensions": {
+      "width": 1200,
+      "height": 2400,
+      "depth": 600,
+      "plinth": 80
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 16,
+      "hardwareCount": 9,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 4,
+      "zoneTypes": [
+        "hanging_rod_short",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 6,
+      "approximationFlags": [
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_doors."
+  },
+  {
+    "type": "placard",
+    "variant": "Dressing complet",
+    "dimensions": {
+      "width": 1200,
+      "height": 2400,
+      "depth": 600,
+      "plinth": 80
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 50,
+      "hardwareCount": 10,
+      "blockingErrors": [],
+      "warnings": [
+        "Penderie courte (chemises/vestes) : hauteur zone 371mm < recommandé 1100mm",
+        "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 4,
+      "zoneTypes": [
+        "hanging_rod_short",
+        "drawer_stack",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 10,
+      "approximationFlags": [
+        "simplified_drawers",
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades.",
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_drawers, simplified_doors."
+  },
+  {
+    "type": "placard",
+    "variant": "Placard d'entrée",
+    "dimensions": {
+      "width": 1200,
+      "height": 2400,
+      "depth": 400,
+      "plinth": 80
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 18,
+      "hardwareCount": 7,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 4,
+      "zoneTypes": [
+        "shoe_rack_inclined",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 6,
+      "approximationFlags": [
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_doors."
+  },
+  {
+    "type": "placard",
+    "variant": "Dressing ouvert sans porte",
+    "dimensions": {
+      "width": 1200,
+      "height": 2400,
+      "depth": 600,
+      "plinth": 80
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 18,
+      "hardwareCount": 5,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "armoire",
+    "variant": "default",
+    "dimensions": {
+      "width": 1000,
+      "height": 2000,
+      "depth": 550,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 30,
+      "hardwareCount": 6,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 2,
+      "zoneTypes": [
+        "hanging_rod_short",
+        "drawer_stack"
+      ],
+      "fixedShelfCount": 6,
+      "approximationFlags": [
+        "simplified_drawers",
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades.",
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_drawers, simplified_doors."
+  },
+  {
+    "type": "armoire",
+    "variant": "Armoire lingère",
+    "dimensions": {
+      "width": 1000,
+      "height": 2000,
+      "depth": 550,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 20,
+      "hardwareCount": 6,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 2,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_doors."
+  },
+  {
+    "type": "armoire",
+    "variant": "Armoire bonnetière",
+    "dimensions": {
+      "width": 1000,
+      "height": 2000,
+      "depth": 550,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 20,
+      "hardwareCount": 6,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 2,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_doors."
+  },
+  {
+    "type": "vestiaire_entree",
+    "variant": "default",
+    "dimensions": {
+      "width": 1000,
+      "height": 1900,
+      "depth": 350,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 28,
+      "hardwareCount": 5,
+      "blockingErrors": [
+        "Penderie courte (chemises/vestes) : profondeur 350mm < minimum 550mm"
+      ],
+      "warnings": [
+        "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "hanging_rod_short",
+        "drawer_stack"
+      ],
+      "fixedShelfCount": 6,
+      "approximationFlags": [
+        "simplified_drawers"
+      ],
+      "facade2dWarnings": [
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades."
+      ]
+    },
+    "verdict": "broken",
+    "notes": "Erreurs bloquantes présentes."
+  },
+  {
+    "type": "meuble_tv",
+    "variant": "default",
+    "dimensions": {
+      "width": 1600,
+      "height": 450,
+      "depth": 450,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 10,
+      "hardwareCount": 2,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1600mm > portée max 836mm (CP bouleau) → 2 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "tv_niche"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "meuble_tv",
+    "variant": "Meuble TV bas posé",
+    "dimensions": {
+      "width": 1600,
+      "height": 450,
+      "depth": 450,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 18,
+      "hardwareCount": 3,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1600mm > portée max 836mm (CP bouleau) → 2 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "meuble_tv",
+    "variant": "Meuble TV suspendu",
+    "dimensions": {
+      "width": 1600,
+      "height": 350,
+      "depth": 450,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 22,
+      "hardwareCount": 5,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1600mm > portée max 836mm (CP bouleau) → 2 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "buffet",
+    "variant": "default",
+    "dimensions": {
+      "width": 1800,
+      "height": 850,
+      "depth": 450,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 3,
+      "partCount": 27,
+      "hardwareCount": 3,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1800mm > portée max 836mm (CP bouleau) → 3 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 6,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "buffet",
+    "variant": "Enfilade portes + tiroirs hauts",
+    "dimensions": {
+      "width": 1800,
+      "height": 850,
+      "depth": 450,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 3,
+      "partCount": 60,
+      "hardwareCount": 5,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1800mm > portée max 836mm (CP bouleau) → 3 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "drawer_stack",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 9,
+      "approximationFlags": [
+        "simplified_drawers"
+      ],
+      "facade2dWarnings": [
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_drawers."
+  },
+  {
+    "type": "bureau",
+    "variant": "default",
+    "dimensions": {
+      "width": 1400,
+      "height": 2000,
+      "depth": 700,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 18,
+      "hardwareCount": 4,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1400mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "bureau",
+    "variant": "Bureau avec caisson tiroirs",
+    "dimensions": {
+      "width": 1400,
+      "height": 2000,
+      "depth": 700,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 40,
+      "hardwareCount": 6,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1400mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "drawer_stack",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 6,
+      "approximationFlags": [
+        "simplified_drawers"
+      ],
+      "facade2dWarnings": [
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_drawers."
+  },
+  {
+    "type": "bureau",
+    "variant": "Bureau niche imprimante",
+    "dimensions": {
+      "width": 1400,
+      "height": 2000,
+      "depth": 700,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 16,
+      "hardwareCount": 4,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1400mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "tv_niche",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 6,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "commode",
+    "variant": "default",
+    "dimensions": {
+      "width": 1000,
+      "height": 900,
+      "depth": 500,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 18,
+      "hardwareCount": 3,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "commode",
+    "variant": "Chiffonnier étroit",
+    "dimensions": {
+      "width": 600,
+      "height": 900,
+      "depth": 500,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 32,
+      "hardwareCount": 5,
+      "blockingErrors": [],
+      "warnings": [],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "drawer_stack",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 3,
+      "approximationFlags": [
+        "simplified_drawers"
+      ],
+      "facade2dWarnings": [
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_drawers."
+  },
+  {
+    "type": "cuisine",
+    "variant": "default",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 400,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 10,
+      "hardwareCount": 6,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 2,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_doors."
+  },
+  {
+    "type": "cuisine",
+    "variant": "Casserolier (tiroirs uniquement)",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 400,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 20,
+      "hardwareCount": 6,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "drawer_stack",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 3,
+      "approximationFlags": [
+        "simplified_drawers"
+      ],
+      "facade2dWarnings": [
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_drawers."
+  },
+  {
+    "type": "cuisine",
+    "variant": "Caisson avec casserolier",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 400,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 21,
+      "hardwareCount": 7,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 2,
+      "zoneTypes": [
+        "drawer_stack",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 3,
+      "approximationFlags": [
+        "simplified_drawers",
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades.",
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_drawers, simplified_doors."
+  },
+  {
+    "type": "cuisine",
+    "variant": "Colonne four + micro-ondes",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 400,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 9,
+      "hardwareCount": 6,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 2,
+      "zoneTypes": [
+        "tv_niche",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 3,
+      "approximationFlags": [
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_doors."
+  },
+  {
+    "type": "meuble_salle_de_bain",
+    "variant": "default",
+    "dimensions": {
+      "width": 800,
+      "height": 850,
+      "depth": 450,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 10,
+      "hardwareCount": 5,
+      "blockingErrors": [],
+      "warnings": [],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 2,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_doors."
+  },
+  {
+    "type": "meuble_chaussures",
+    "variant": "default",
+    "dimensions": {
+      "width": 800,
+      "height": 1200,
+      "depth": 300,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 5,
+      "hardwareCount": 2,
+      "blockingErrors": [],
+      "warnings": [],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shoe_rack_inclined"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "meuble_chaussures",
+    "variant": "Meuble fermé avec portes",
+    "dimensions": {
+      "width": 800,
+      "height": 1200,
+      "depth": 350,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 10,
+      "hardwareCount": 5,
+      "blockingErrors": [],
+      "warnings": [
+        "Stockage chaussures/textiles fermé — prévoir des aérations"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": true,
+      "doorCount": 2,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [
+        "simplified_doors"
+      ],
+      "facade2dWarnings": [
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: simplified_doors."
+  },
+  {
+    "type": "meuble_chaussures",
+    "variant": "Tablettes inclinées ouvertes",
+    "dimensions": {
+      "width": 800,
+      "height": 1200,
+      "depth": 250,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 9,
+      "hardwareCount": 3,
+      "blockingErrors": [],
+      "warnings": [],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "meuble_chaussures",
+    "variant": "Abattants basculants",
+    "dimensions": {
+      "width": 800,
+      "height": 1200,
+      "depth": 180,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 9,
+      "hardwareCount": 3,
+      "blockingErrors": [],
+      "warnings": [],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "meuble_chaussures",
+    "variant": "Banc à chaussures",
+    "dimensions": {
+      "width": 800,
+      "height": 500,
+      "depth": 300,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 7,
+      "hardwareCount": 3,
+      "blockingErrors": [
+        "Banquette coffre : profondeur 300mm < minimum 400mm"
+      ],
+      "warnings": [],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "bench_storage",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "broken",
+    "notes": "Erreurs bloquantes présentes."
+  },
+  {
+    "type": "cave_vin",
+    "variant": "default",
+    "dimensions": {
+      "width": 600,
+      "height": 1200,
+      "depth": 350,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 5,
+      "hardwareCount": 2,
+      "blockingErrors": [],
+      "warnings": [],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "wine_rack"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "banquette_coffre",
+    "variant": "default",
+    "dimensions": {
+      "width": 1200,
+      "height": 2000,
+      "depth": 450,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 10,
+      "hardwareCount": 3,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Meuble d'entrée : profondeur 450mm > 400mm — vérifier la circulation (80cm min)"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "bench_storage"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [],
+      "facade2dWarnings": []
+    },
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+  },
+  {
+    "type": "sous_escalier",
+    "variant": "default",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 800,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 9,
+      "hardwareCount": 4,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [
+        "non_orthogonal_geometry"
+      ],
+      "facade2dWarnings": [
+        "Sous-escalier : la vue façade reste rectangulaire et simplifie la géométrie non orthogonale."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: non_orthogonal_geometry."
+  },
+  {
+    "type": "sous_escalier",
+    "variant": "Tiroirs extractibles (zone basse)",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 800,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 17,
+      "hardwareCount": 5,
+      "blockingErrors": [],
+      "warnings": [],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "drawer_stack"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [
+        "non_orthogonal_geometry",
+        "simplified_drawers"
+      ],
+      "facade2dWarnings": [
+        "Sous-escalier : la vue façade reste rectangulaire et simplifie la géométrie non orthogonale.",
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: non_orthogonal_geometry, simplified_drawers."
+  },
+  {
+    "type": "sous_escalier",
+    "variant": "Vestiaire d'entrée",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 800,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 8,
+      "hardwareCount": 4,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "bench_storage",
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 3,
+      "approximationFlags": [
+        "non_orthogonal_geometry"
+      ],
+      "facade2dWarnings": [
+        "Sous-escalier : la vue façade reste rectangulaire et simplifie la géométrie non orthogonale."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: non_orthogonal_geometry."
+  },
+  {
+    "type": "lit_cabane_mezzanine",
+    "variant": "default",
+    "dimensions": {
+      "width": 800,
+      "height": 2000,
+      "depth": 400,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 1,
+      "partCount": 9,
+      "hardwareCount": 4,
+      "blockingErrors": [],
+      "warnings": [
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 2,
+      "approximationFlags": [
+        "partial_preset"
+      ],
+      "facade2dWarnings": [
+        "Type \"lit_cabane_mezzanine\" : représentation façade partielle basée sur un preset simplifié."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: partial_preset."
+  },
+  {
+    "type": "table",
+    "variant": "default",
+    "dimensions": {
+      "width": 900,
+      "height": 750,
+      "depth": 400,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 18,
+      "hardwareCount": 3,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 900mm > portée max 836mm (CP bouleau) → 2 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [
+        "partial_preset"
+      ],
+      "facade2dWarnings": [
+        "Type \"table\" : représentation façade partielle basée sur un preset simplifié."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: partial_preset."
+  },
+  {
+    "type": "table",
+    "variant": "Table de repas",
+    "dimensions": {
+      "width": 900,
+      "height": 750,
+      "depth": 400,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 18,
+      "hardwareCount": 3,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 900mm > portée max 836mm (CP bouleau) → 2 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [
+        "partial_preset"
+      ],
+      "facade2dWarnings": [
+        "Type \"table\" : représentation façade partielle basée sur un preset simplifié."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: partial_preset."
+  },
+  {
+    "type": "table",
+    "variant": "Table basse",
+    "dimensions": {
+      "width": 900,
+      "height": 400,
+      "depth": 600,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 22,
+      "hardwareCount": 3,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 900mm > portée max 836mm (CP bouleau) → 2 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [
+        "partial_preset"
+      ],
+      "facade2dWarnings": [
+        "Type \"table\" : représentation façade partielle basée sur un preset simplifié."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: partial_preset."
+  },
+  {
+    "type": "table",
+    "variant": "Table haute / bar",
+    "dimensions": {
+      "width": 900,
+      "height": 1100,
+      "depth": 400,
+      "plinth": 0
+    },
+    "result": {
+      "bodyCount": 2,
+      "partCount": 18,
+      "hardwareCount": 3,
+      "blockingErrors": [],
+      "warnings": [
+        "Largeur 900mm > portée max 836mm (CP bouleau) → 2 corps"
+      ],
+      "hasJoues": true,
+      "hasTop": true,
+      "hasBottom": true,
+      "hasFond": true,
+      "hasDoors": false,
+      "doorCount": 0,
+      "zoneTypes": [
+        "shelf_adjustable"
+      ],
+      "fixedShelfCount": 4,
+      "approximationFlags": [
+        "partial_preset"
+      ],
+      "facade2dWarnings": [
+        "Type \"table\" : représentation façade partielle basée sur un preset simplifié."
+      ]
+    },
+    "verdict": "partial",
+    "notes": "Approximation: partial_preset."
+  }
+]
