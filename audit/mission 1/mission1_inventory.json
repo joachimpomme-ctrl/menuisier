@@ -1,0 +1,689 @@
+{
+  "generated_at": "2026-04-15T20:45:23.967Z",
+  "types": [
+    {
+      "type": "bibliotheque",
+      "nom": "Bibliothèque",
+      "variant_count": 5,
+      "variants": [
+        {
+          "index": 1,
+          "nom": "Bibliothèque ouverte",
+          "raw": {
+            "nom": "Bibliothèque ouverte",
+            "portes": false,
+            "tiroirs": false
+          },
+          "keys": [
+            "portes",
+            "tiroirs"
+          ],
+          "handled_keys": [
+            "portes",
+            "tiroirs"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 2,
+          "nom": "Bibliothèque avec portes basses",
+          "raw": {
+            "nom": "Bibliothèque avec portes basses",
+            "portes_position": "bas",
+            "tablette_separation": true
+          },
+          "keys": [
+            "portes_position",
+            "tablette_separation"
+          ],
+          "handled_keys": [
+            "portes_position",
+            "tablette_separation"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 3,
+          "nom": "Bibliothèque vitrée",
+          "raw": {
+            "nom": "Bibliothèque vitrée",
+            "portes": true,
+            "vitrage": true
+          },
+          "keys": [
+            "portes",
+            "vitrage"
+          ],
+          "handled_keys": [
+            "portes"
+          ],
+          "unsupported_keys": [
+            "vitrage"
+          ],
+          "explicit_warning_keys": [
+            "vitrage"
+          ]
+        },
+        {
+          "index": 4,
+          "nom": "Bibliothèque enfant",
+          "raw": {
+            "nom": "Bibliothèque enfant",
+            "hauteur_mm": 1200,
+            "profondeur_mm": 280,
+            "niches_bacs": true
+          },
+          "keys": [
+            "hauteur_mm",
+            "profondeur_mm",
+            "niches_bacs"
+          ],
+          "handled_keys": [
+            "hauteur_mm",
+            "profondeur_mm",
+            "niches_bacs"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 5,
+          "nom": "Bibliothèque suspendue",
+          "raw": {
+            "nom": "Bibliothèque suspendue",
+            "fixation_murale": true
+          },
+          "keys": [
+            "fixation_murale"
+          ],
+          "handled_keys": [
+            "fixation_murale"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        }
+      ]
+    },
+    {
+      "type": "placard",
+      "nom": "Placard / Dressing",
+      "variant_count": 4,
+      "variants": [
+        {
+          "index": 1,
+          "nom": "Penderie simple",
+          "raw": {
+            "nom": "Penderie simple",
+            "tringle": true,
+            "tablettes": 1,
+            "tiroirs": 0
+          },
+          "keys": [
+            "tringle",
+            "tablettes",
+            "tiroirs"
+          ],
+          "handled_keys": [
+            "tringle",
+            "tablettes",
+            "tiroirs"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 2,
+          "nom": "Dressing complet",
+          "raw": {
+            "nom": "Dressing complet",
+            "tringle_haute": true,
+            "tringle_basse": true,
+            "tiroirs": 3,
+            "tablettes": 4
+          },
+          "keys": [
+            "tringle_haute",
+            "tringle_basse",
+            "tiroirs",
+            "tablettes"
+          ],
+          "handled_keys": [
+            "tringle_haute",
+            "tringle_basse",
+            "tiroirs",
+            "tablettes"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 3,
+          "nom": "Placard d'entrée",
+          "raw": {
+            "nom": "Placard d'entrée",
+            "profondeur_mm": 400,
+            "pateres": true,
+            "etagere_chaussures": true
+          },
+          "keys": [
+            "profondeur_mm",
+            "pateres",
+            "etagere_chaussures"
+          ],
+          "handled_keys": [
+            "profondeur_mm",
+            "etagere_chaussures"
+          ],
+          "unsupported_keys": [
+            "pateres"
+          ],
+          "explicit_warning_keys": [
+            "pateres"
+          ]
+        },
+        {
+          "index": 4,
+          "nom": "Dressing ouvert sans porte",
+          "raw": {
+            "nom": "Dressing ouvert sans porte",
+            "portes": false
+          },
+          "keys": [
+            "portes"
+          ],
+          "handled_keys": [
+            "portes"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        }
+      ]
+    },
+    {
+      "type": "cuisine",
+      "nom": "Cuisine",
+      "variant_count": 3,
+      "variants": [
+        {
+          "index": 1,
+          "nom": "Casserolier (tiroirs uniquement)",
+          "raw": {
+            "nom": "Casserolier (tiroirs uniquement)",
+            "portes": false,
+            "tiroirs": [
+              {
+                "h_facade_mm": 140
+              },
+              {
+                "h_facade_mm": 140
+              },
+              {
+                "h_facade_mm": 400
+              }
+            ]
+          },
+          "keys": [
+            "portes",
+            "tiroirs"
+          ],
+          "handled_keys": [
+            "portes",
+            "tiroirs"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 2,
+          "nom": "Caisson avec casserolier",
+          "raw": {
+            "nom": "Caisson avec casserolier",
+            "tiroirs_profonds": true
+          },
+          "keys": [
+            "tiroirs_profonds"
+          ],
+          "handled_keys": [
+            "tiroirs_profonds"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 3,
+          "nom": "Colonne four + micro-ondes",
+          "raw": {
+            "nom": "Colonne four + micro-ondes",
+            "niches_techniques": true
+          },
+          "keys": [
+            "niches_techniques"
+          ],
+          "handled_keys": [
+            "niches_techniques"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        }
+      ]
+    },
+    {
+      "type": "bureau",
+      "nom": "Bureau",
+      "variant_count": 2,
+      "variants": [
+        {
+          "index": 1,
+          "nom": "Bureau avec caisson tiroirs",
+          "raw": {
+            "nom": "Bureau avec caisson tiroirs",
+            "caisson": "droite",
+            "tiroirs": 3
+          },
+          "keys": [
+            "caisson",
+            "tiroirs"
+          ],
+          "handled_keys": [
+            "tiroirs"
+          ],
+          "unsupported_keys": [
+            "caisson"
+          ],
+          "explicit_warning_keys": [
+            "caisson"
+          ]
+        },
+        {
+          "index": 2,
+          "nom": "Bureau niche imprimante",
+          "raw": {
+            "nom": "Bureau niche imprimante",
+            "niche_technique": true
+          },
+          "keys": [
+            "niche_technique"
+          ],
+          "handled_keys": [
+            "niche_technique"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        }
+      ]
+    },
+    {
+      "type": "meuble_tv",
+      "nom": "Meuble TV",
+      "variant_count": 2,
+      "variants": [
+        {
+          "index": 1,
+          "nom": "Meuble TV bas posé",
+          "raw": {
+            "nom": "Meuble TV bas posé",
+            "hauteur_mm": 450,
+            "pieds": true
+          },
+          "keys": [
+            "hauteur_mm",
+            "pieds"
+          ],
+          "handled_keys": [
+            "hauteur_mm",
+            "pieds"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 2,
+          "nom": "Meuble TV suspendu",
+          "raw": {
+            "nom": "Meuble TV suspendu",
+            "hauteur_mm": 350,
+            "fixation": "rail"
+          },
+          "keys": [
+            "hauteur_mm",
+            "fixation"
+          ],
+          "handled_keys": [
+            "hauteur_mm",
+            "fixation"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        }
+      ]
+    },
+    {
+      "type": "armoire",
+      "nom": "Armoire",
+      "variant_count": 2,
+      "variants": [
+        {
+          "index": 1,
+          "nom": "Armoire lingère",
+          "raw": {
+            "nom": "Armoire lingère",
+            "tablettes": true,
+            "tringle": false
+          },
+          "keys": [
+            "tablettes",
+            "tringle"
+          ],
+          "handled_keys": [
+            "tablettes",
+            "tringle"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 2,
+          "nom": "Armoire bonnetière",
+          "raw": {
+            "nom": "Armoire bonnetière",
+            "porte_unique": true,
+            "largeur_etroite": true
+          },
+          "keys": [
+            "porte_unique",
+            "largeur_etroite"
+          ],
+          "handled_keys": [
+            "porte_unique"
+          ],
+          "unsupported_keys": [
+            "largeur_etroite"
+          ],
+          "explicit_warning_keys": []
+        }
+      ]
+    },
+    {
+      "type": "buffet",
+      "nom": "Buffet / Enfilade",
+      "variant_count": 1,
+      "variants": [
+        {
+          "index": 1,
+          "nom": "Enfilade portes + tiroirs hauts",
+          "raw": {
+            "nom": "Enfilade portes + tiroirs hauts",
+            "tiroirs_hauts": true
+          },
+          "keys": [
+            "tiroirs_hauts"
+          ],
+          "handled_keys": [
+            "tiroirs_hauts"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        }
+      ]
+    },
+    {
+      "type": "etagere_murale",
+      "nom": "Étagère murale",
+      "variant_count": 0,
+      "variants": []
+    },
+    {
+      "type": "meuble_salle_de_bain",
+      "nom": "Meuble salle de bain",
+      "variant_count": 0,
+      "variants": []
+    },
+    {
+      "type": "commode",
+      "nom": "Commode / Chiffonnier",
+      "variant_count": 1,
+      "variants": [
+        {
+          "index": 1,
+          "nom": "Chiffonnier étroit",
+          "raw": {
+            "nom": "Chiffonnier étroit",
+            "largeur_mm": 600,
+            "nb_tiroirs": 6
+          },
+          "keys": [
+            "largeur_mm",
+            "nb_tiroirs"
+          ],
+          "handled_keys": [
+            "largeur_mm",
+            "nb_tiroirs"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "nom": "Table sur mesure",
+      "variant_count": 3,
+      "variants": [
+        {
+          "index": 1,
+          "nom": "Table de repas",
+          "raw": {
+            "nom": "Table de repas",
+            "hauteur_mm": 750
+          },
+          "keys": [
+            "hauteur_mm"
+          ],
+          "handled_keys": [
+            "hauteur_mm"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 2,
+          "nom": "Table basse",
+          "raw": {
+            "nom": "Table basse",
+            "hauteur_mm": 400,
+            "profondeur_mm": 600
+          },
+          "keys": [
+            "hauteur_mm",
+            "profondeur_mm"
+          ],
+          "handled_keys": [
+            "hauteur_mm",
+            "profondeur_mm"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 3,
+          "nom": "Table haute / bar",
+          "raw": {
+            "nom": "Table haute / bar",
+            "hauteur_mm": 1100,
+            "tabouret_mm": 800
+          },
+          "keys": [
+            "hauteur_mm",
+            "tabouret_mm"
+          ],
+          "handled_keys": [
+            "hauteur_mm"
+          ],
+          "unsupported_keys": [
+            "tabouret_mm"
+          ],
+          "explicit_warning_keys": [
+            "tabouret_mm"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sous_escalier",
+      "nom": "Meuble sous-escalier",
+      "variant_count": 2,
+      "variants": [
+        {
+          "index": 1,
+          "nom": "Tiroirs extractibles (zone basse)",
+          "raw": {
+            "nom": "Tiroirs extractibles (zone basse)",
+            "type": "tiroirs_profonds"
+          },
+          "keys": [
+            "type"
+          ],
+          "handled_keys": [
+            "type"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 2,
+          "nom": "Vestiaire d'entrée",
+          "raw": {
+            "nom": "Vestiaire d'entrée",
+            "pateres": true,
+            "banc": true
+          },
+          "keys": [
+            "pateres",
+            "banc"
+          ],
+          "handled_keys": [
+            "banc"
+          ],
+          "unsupported_keys": [
+            "pateres"
+          ],
+          "explicit_warning_keys": [
+            "pateres"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "banquette_coffre",
+      "nom": "Banquette / Coffre d'entrée",
+      "variant_count": 0,
+      "variants": []
+    },
+    {
+      "type": "meuble_chaussures",
+      "nom": "Meuble à chaussures",
+      "variant_count": 4,
+      "variants": [
+        {
+          "index": 1,
+          "nom": "Meuble fermé avec portes",
+          "raw": {
+            "nom": "Meuble fermé avec portes",
+            "profondeur_mm": 350,
+            "portes": true
+          },
+          "keys": [
+            "profondeur_mm",
+            "portes"
+          ],
+          "handled_keys": [
+            "profondeur_mm",
+            "portes"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 2,
+          "nom": "Tablettes inclinées ouvertes",
+          "raw": {
+            "nom": "Tablettes inclinées ouvertes",
+            "profondeur_mm": 250,
+            "portes": false
+          },
+          "keys": [
+            "profondeur_mm",
+            "portes"
+          ],
+          "handled_keys": [
+            "profondeur_mm",
+            "portes"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        },
+        {
+          "index": 3,
+          "nom": "Abattants basculants",
+          "raw": {
+            "nom": "Abattants basculants",
+            "profondeur_mm": 180,
+            "compact": true
+          },
+          "keys": [
+            "profondeur_mm",
+            "compact"
+          ],
+          "handled_keys": [
+            "profondeur_mm"
+          ],
+          "unsupported_keys": [
+            "compact"
+          ],
+          "explicit_warning_keys": [
+            "compact"
+          ]
+        },
+        {
+          "index": 4,
+          "nom": "Banc à chaussures",
+          "raw": {
+            "nom": "Banc à chaussures",
+            "assise": true,
+            "hauteur_mm": 500
+          },
+          "keys": [
+            "assise",
+            "hauteur_mm"
+          ],
+          "handled_keys": [
+            "assise",
+            "hauteur_mm"
+          ],
+          "unsupported_keys": [],
+          "explicit_warning_keys": []
+        }
+      ]
+    },
+    {
+      "type": "lit_cabane_mezzanine",
+      "nom": "Lit cabane / Mezzanine enfant",
+      "variant_count": 0,
+      "variants": []
+    },
+    {
+      "type": "vestiaire_entree",
+      "nom": "Vestiaire d'entrée",
+      "variant_count": 0,
+      "variants": []
+    },
+    {
+      "type": "cave_vin",
+      "nom": "Cave à vin / Casier bouteilles",
+      "variant_count": 0,
+      "variants": []
+    }
+  ]
+}

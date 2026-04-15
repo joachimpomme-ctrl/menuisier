@@ -1,0 +1,1340 @@
+{
+  "generated_at": "2026-04-15T20:58:55.441Z",
+  "source": {
+    "knowledge": "public/knowledge/base_v3_normalized.json",
+    "pipeline": "src/lib/engine/pipeline.ts"
+  },
+  "total_types": 17,
+  "cases": [
+    {
+      "type": "armoire",
+      "presetName": "Armoire",
+      "intent": {
+        "furniture_type": "armoire",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 1000,
+          "height_mm": 2000,
+          "depth_mm": 550,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 2,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "hanging_rod_short",
+              "drawer_stack"
+            ],
+            "zoneCount": 2
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "hanging_rod_short",
+              "drawer_stack"
+            ],
+            "zoneCount": 2
+          }
+        ],
+        "doors": [
+          {
+            "body_id": "body_1",
+            "type": "hinged",
+            "count": 1
+          },
+          {
+            "body_id": "body_2",
+            "type": "hinged",
+            "count": 1
+          }
+        ]
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 3,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 3,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          }
+        ]
+      },
+      "parts": {
+        "total": 38,
+        "byType": {
+          "joue": 4,
+          "tablette-fixe": 2,
+          "dessus": 2,
+          "dessous": 2,
+          "fond": 2,
+          "tiroir-facade": 4,
+          "tiroir-caisson": 16,
+          "tiroir-fond": 4,
+          "porte": 2
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 3,
+        "hardwareCount": 6,
+        "assumptionsCount": 12
+      }
+    },
+    {
+      "type": "banquette_coffre",
+      "presetName": "Banquette / Coffre d'entrée",
+      "intent": {
+        "furniture_type": "banquette_coffre",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 1200,
+          "height_mm": 900,
+          "depth_mm": 450,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 2,
+      "layout": {
+        "bodyCount": 3,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "bench_storage"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "bench_storage"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_3",
+            "modules": [
+              "bench_storage"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_3",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          }
+        ]
+      },
+      "parts": {
+        "total": 15,
+        "byType": {
+          "joue": 6,
+          "dessus": 3,
+          "dessous": 3,
+          "fond": 3
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 2,
+        "assumptionsCount": 8
+      }
+    },
+    {
+      "type": "bibliotheque",
+      "presetName": "Bibliothèque",
+      "intent": {
+        "furniture_type": "bibliotheque",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 800,
+          "height_mm": 2000,
+          "depth_mm": 300,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 2,
+      "layout": {
+        "bodyCount": 2,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          }
+        ]
+      },
+      "parts": {
+        "total": 18,
+        "byType": {
+          "joue": 4,
+          "dessus": 2,
+          "dessous": 2,
+          "fond": 2,
+          "tablette-reglable": 8
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 4,
+        "assumptionsCount": 9
+      }
+    },
+    {
+      "type": "buffet",
+      "presetName": "Buffet / Enfilade",
+      "intent": {
+        "furniture_type": "buffet",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 1800,
+          "height_mm": 850,
+          "depth_mm": 450,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 4,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_3",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_4",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_3",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_4",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          }
+        ]
+      },
+      "parts": {
+        "total": 36,
+        "byType": {
+          "joue": 8,
+          "dessus": 4,
+          "dessous": 4,
+          "fond": 4,
+          "tablette-reglable": 16
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 3,
+        "assumptionsCount": 8
+      }
+    },
+    {
+      "type": "bureau",
+      "presetName": "Bureau",
+      "intent": {
+        "furniture_type": "bureau",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 1400,
+          "height_mm": 900,
+          "depth_mm": 700,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 3,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_3",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_3",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          }
+        ]
+      },
+      "parts": {
+        "total": 27,
+        "byType": {
+          "joue": 6,
+          "dessus": 3,
+          "dessous": 3,
+          "fond": 3,
+          "tablette-reglable": 12
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 3,
+        "assumptionsCount": 8
+      }
+    },
+    {
+      "type": "cave_vin",
+      "presetName": "Cave à vin / Casier bouteilles",
+      "intent": {
+        "furniture_type": "cave_vin",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 600,
+          "height_mm": 1200,
+          "depth_mm": 350,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 2,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "wine_rack"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "wine_rack"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          }
+        ]
+      },
+      "parts": {
+        "total": 10,
+        "byType": {
+          "joue": 4,
+          "dessus": 2,
+          "dessous": 2,
+          "fond": 2
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 2,
+        "assumptionsCount": 8
+      }
+    },
+    {
+      "type": "commode",
+      "presetName": "Commode / Chiffonnier",
+      "intent": {
+        "furniture_type": "commode",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 1000,
+          "height_mm": 900,
+          "depth_mm": 500,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 2,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          }
+        ]
+      },
+      "parts": {
+        "total": 18,
+        "byType": {
+          "joue": 4,
+          "dessus": 2,
+          "dessous": 2,
+          "fond": 2,
+          "tablette-reglable": 8
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 3,
+        "assumptionsCount": 8
+      }
+    },
+    {
+      "type": "cuisine",
+      "presetName": "Cuisine",
+      "intent": {
+        "furniture_type": "cuisine",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 800,
+          "height_mm": 900,
+          "depth_mm": 450,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 2,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": [
+          {
+            "body_id": "body_1",
+            "type": "hinged",
+            "count": 1
+          },
+          {
+            "body_id": "body_2",
+            "type": "hinged",
+            "count": 1
+          }
+        ]
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          }
+        ]
+      },
+      "parts": {
+        "total": 20,
+        "byType": {
+          "joue": 4,
+          "dessus": 2,
+          "dessous": 2,
+          "fond": 2,
+          "tablette-reglable": 8,
+          "porte": 2
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 5,
+        "assumptionsCount": 9
+      }
+    },
+    {
+      "type": "etagere_murale",
+      "presetName": "Étagère murale",
+      "intent": {
+        "furniture_type": "etagere_murale",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 800,
+          "height_mm": 900,
+          "depth_mm": 220,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 2,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none",
+            "wallMounting": "rail"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none",
+            "wallMounting": "rail"
+          }
+        ]
+      },
+      "parts": {
+        "total": 18,
+        "byType": {
+          "joue": 4,
+          "dessus": 2,
+          "dessous": 2,
+          "fond": 2,
+          "tablette-reglable": 8
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 5,
+        "assumptionsCount": 9
+      }
+    },
+    {
+      "type": "lit_cabane_mezzanine",
+      "presetName": "Lit cabane / Mezzanine enfant",
+      "intent": {
+        "furniture_type": "lit_cabane_mezzanine",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 1900,
+          "height_mm": 1800,
+          "depth_mm": 900,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 4,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_3",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_4",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          },
+          {
+            "body_id": "body_3",
+            "fixedShelfCount": 2,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          },
+          {
+            "body_id": "body_4",
+            "fixedShelfCount": 2,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          }
+        ]
+      },
+      "parts": {
+        "total": 36,
+        "byType": {
+          "joue": 8,
+          "dessus": 4,
+          "dessous": 4,
+          "fond": 4,
+          "tablette-reglable": 16
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 4,
+        "assumptionsCount": 9
+      }
+    },
+    {
+      "type": "meuble_chaussures",
+      "presetName": "Meuble à chaussures",
+      "intent": {
+        "furniture_type": "meuble_chaussures",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 800,
+          "height_mm": 1200,
+          "depth_mm": 300,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 2,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "shoe_rack_inclined"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "shoe_rack_inclined"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          }
+        ]
+      },
+      "parts": {
+        "total": 10,
+        "byType": {
+          "joue": 4,
+          "dessus": 2,
+          "dessous": 2,
+          "fond": 2
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 2,
+        "assumptionsCount": 8
+      }
+    },
+    {
+      "type": "meuble_salle_de_bain",
+      "presetName": "Meuble salle de bain",
+      "intent": {
+        "furniture_type": "meuble_salle_de_bain",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 800,
+          "height_mm": 850,
+          "depth_mm": 450,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 2,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": [
+          {
+            "body_id": "body_1",
+            "type": "hinged",
+            "count": 1
+          },
+          {
+            "body_id": "body_2",
+            "type": "hinged",
+            "count": 1
+          }
+        ]
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          }
+        ]
+      },
+      "parts": {
+        "total": 20,
+        "byType": {
+          "joue": 4,
+          "dessus": 2,
+          "dessous": 2,
+          "fond": 2,
+          "tablette-reglable": 8,
+          "porte": 2
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 5,
+        "assumptionsCount": 9
+      }
+    },
+    {
+      "type": "meuble_tv",
+      "presetName": "Meuble TV",
+      "intent": {
+        "furniture_type": "meuble_tv",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 1600,
+          "height_mm": 450,
+          "depth_mm": 450,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 3,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "tv_niche"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "tv_niche"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_3",
+            "modules": [
+              "tv_niche"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_3",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          }
+        ]
+      },
+      "parts": {
+        "total": 15,
+        "byType": {
+          "joue": 6,
+          "dessus": 3,
+          "dessous": 3,
+          "fond": 3
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 2,
+        "assumptionsCount": 8
+      }
+    },
+    {
+      "type": "placard",
+      "presetName": "Placard / Dressing",
+      "intent": {
+        "furniture_type": "placard",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 1200,
+          "height_mm": 2400,
+          "depth_mm": 600,
+          "plinth_mm": 80,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 3,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "hanging_rod_short",
+              "drawer_stack"
+            ],
+            "zoneCount": 2
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "hanging_rod_short",
+              "drawer_stack"
+            ],
+            "zoneCount": 2
+          },
+          {
+            "body_id": "body_3",
+            "modules": [
+              "hanging_rod_short",
+              "drawer_stack"
+            ],
+            "zoneCount": 2
+          }
+        ],
+        "doors": [
+          {
+            "body_id": "body_1",
+            "type": "hinged",
+            "count": 1
+          },
+          {
+            "body_id": "body_2",
+            "type": "hinged",
+            "count": 1
+          },
+          {
+            "body_id": "body_3",
+            "type": "hinged",
+            "count": 1
+          }
+        ]
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 3,
+            "plinth": "legs",
+            "wallMounting": "anti_tip"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 3,
+            "plinth": "legs",
+            "wallMounting": "anti_tip"
+          },
+          {
+            "body_id": "body_3",
+            "fixedShelfCount": 3,
+            "plinth": "legs",
+            "wallMounting": "anti_tip"
+          }
+        ]
+      },
+      "parts": {
+        "total": 57,
+        "byType": {
+          "joue": 6,
+          "tablette-fixe": 3,
+          "dessus": 3,
+          "dessous": 3,
+          "fond": 3,
+          "tiroir-facade": 6,
+          "tiroir-caisson": 24,
+          "tiroir-fond": 6,
+          "porte": 3
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 3,
+        "hardwareCount": 7,
+        "assumptionsCount": 12
+      }
+    },
+    {
+      "type": "sous_escalier",
+      "presetName": "Meuble sous-escalier",
+      "intent": {
+        "furniture_type": "sous_escalier",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 1200,
+          "height_mm": 2200,
+          "depth_mm": 800,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 2,
+      "layout": {
+        "bodyCount": 3,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_3",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          },
+          {
+            "body_id": "body_3",
+            "fixedShelfCount": 2,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          }
+        ]
+      },
+      "parts": {
+        "total": 27,
+        "byType": {
+          "joue": 6,
+          "dessus": 3,
+          "dessous": 3,
+          "fond": 3,
+          "tablette-reglable": 12
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 4,
+        "assumptionsCount": 9
+      }
+    },
+    {
+      "type": "table",
+      "presetName": "Table sur mesure",
+      "intent": {
+        "furniture_type": "table",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 900,
+          "height_mm": 750,
+          "depth_mm": 900,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 0,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 2,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "shelf_adjustable"
+            ],
+            "zoneCount": 1
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 2,
+            "plinth": "none"
+          }
+        ]
+      },
+      "parts": {
+        "total": 18,
+        "byType": {
+          "joue": 4,
+          "dessus": 2,
+          "dessous": 2,
+          "fond": 2,
+          "tablette-reglable": 8
+        }
+      },
+      "production": {
+        "available": true,
+        "sheetCount": 2,
+        "hardwareCount": 3,
+        "assumptionsCount": 8
+      }
+    },
+    {
+      "type": "vestiaire_entree",
+      "presetName": "Vestiaire d'entrée",
+      "intent": {
+        "furniture_type": "vestiaire_entree",
+        "material_key": "melamine",
+        "space": {
+          "width_mm": 1000,
+          "height_mm": 1900,
+          "depth_mm": 350,
+          "plinth_mm": 0,
+          "wall_type": "concrete"
+        }
+      },
+      "validationBlocking": 1,
+      "validationWarnings": 1,
+      "layout": {
+        "bodyCount": 2,
+        "zones": [
+          {
+            "body_id": "body_1",
+            "modules": [
+              "hanging_rod_short",
+              "drawer_stack"
+            ],
+            "zoneCount": 2
+          },
+          {
+            "body_id": "body_2",
+            "modules": [
+              "hanging_rod_short",
+              "drawer_stack"
+            ],
+            "zoneCount": 2
+          }
+        ],
+        "doors": []
+      },
+      "structure": {
+        "bodies": [
+          {
+            "body_id": "body_1",
+            "fixedShelfCount": 3,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          },
+          {
+            "body_id": "body_2",
+            "fixedShelfCount": 3,
+            "plinth": "none",
+            "wallMounting": "anti_tip"
+          }
+        ]
+      },
+      "parts": {
+        "total": 36,
+        "byType": {
+          "joue": 4,
+          "tablette-fixe": 2,
+          "dessus": 2,
+          "dessous": 2,
+          "fond": 2,
+          "tiroir-facade": 4,
+          "tiroir-caisson": 16,
+          "tiroir-fond": 4
+        }
+      },
+      "production": {
+        "available": false,
+        "sheetCount": 0,
+        "hardwareCount": 0,
+        "assumptionsCount": 0
+      }
+    }
+  ]
+}
