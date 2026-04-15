@@ -57,8 +57,22 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
       const analysis = analyzeProject(appState);
       const validation = validate(appState);
       const steps = generateSteps(appState);
+      const v3Data = {
+        hardware: result.hardware,
+        assumptions: result.production?.assumptions ?? [],
+        edgeBandingParts: result.parts
+          .filter((p) => p.edge_banding && p.edge_banding.length > 0)
+          .map((p) => ({
+            name: p.name,
+            sides: p.edge_banding!.length === 4
+              ? '4 cotes'
+              : p.edge_banding!
+                  .map((s) => (s === 'front' ? 'AV' : s === 'back' ? 'AR' : s === 'left' ? 'G' : 'D'))
+                  .join(', '),
+          })),
+      };
       const { generatePdf } = await import('../../lib/pdf');
-      await generatePdf(appState, analysis, validation, steps);
+      await generatePdf(appState, analysis, validation, steps, v3Data);
     } catch (err) {
       console.error('Erreur PDF:', err);
     }

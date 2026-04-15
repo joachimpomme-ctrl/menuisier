@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { AppState, ValidationResult, Step, PackedPiece, PanelDef } from '../types';
+import type { HardwareItem, Assumption } from './knowledge/types';
 import type { ProjectAnalysis } from './projectAnalysis';
 import { MATERIALS } from '../data/materials';
 import { getUsableHeight } from './helpers';
@@ -102,11 +103,18 @@ function ensureSpace(doc: jsPDF, y: number, needed: number): number {
 // Main export
 // ---------------------------------------------------------------------------
 
+interface V3PdfData {
+  hardware: HardwareItem[];
+  assumptions: Assumption[];
+  edgeBandingParts: { name: string; sides: string }[];
+}
+
 export async function generatePdf(
   state: AppState,
   analysis: ProjectAnalysis,
   validation: ValidationResult,
   steps: Step[],
+  v3Data?: V3PdfData,
 ): Promise<void> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const mat = MATERIALS[state.materialKey];
@@ -229,6 +237,72 @@ export async function generatePdf(
     y += 10;
   }
 
+  if (v3Data && v3Data.hardware.length > 0) {
+    y = ensureSpace(doc, y, 30);
+    y = sectionTitle(doc, y, 'Quincaillerie');
+
+    const hwRows = v3Data.hardware.map((h) => [
+      h.name,
+      String(h.quantity),
+      h.category,
+      h.unit_price_eur !== undefined ? `${(h.unit_price_eur * h.quantity).toFixed(2)} €` : '—',
+    ]);
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: MARGIN, right: MARGIN },
+      head: [['Article', 'Qte', 'Categorie', 'Cout']],
+      body: hwRows,
+      styles: { font: 'helvetica', fontSize: 9, textColor: TEXT_COLOR },
+      headStyles: { fillColor: TITLE_COLOR, textColor: [255, 255, 255], fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: ROW_ALT_COLOR },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    y = (doc as any).lastAutoTable.finalY + 8;
+  }
+
+  if (v3Data && v3Data.assumptions.length > 0) {
+    y = ensureSpace(doc, y, 20);
+    y = sectionTitle(doc, y, 'Hypotheses et decisions');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+
+    const toVerify = v3Data.assumptions.filter((a) => a.user_should_verify);
+    const auto = v3Data.assumptions.filter((a) => !a.user_should_verify);
+
+    if (toVerify.length > 0) {
+      doc.setTextColor(...hexToRgb('#ea580c'));
+      doc.setFont('helvetica', 'bold');
+      doc.text('A verifier :', MARGIN, y);
+      y += 5;
+      doc.setFont('helvetica', 'normal');
+      for (const a of toVerify) {
+        y = ensureSpace(doc, y, 6);
+        const lines = doc.splitTextToSize(`• ${a.value} — ${a.reason}`, CONTENT_W - 8);
+        for (const line of lines) {
+          y = ensureSpace(doc, y, 5);
+          doc.text(line, MARGIN + 4, y);
+          y += 4.5;
+        }
+      }
+      y += 3;
+    }
+
+    if (auto.length > 0) {
+      doc.setTextColor(...TEXT_COLOR);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Valeurs par defaut :', MARGIN, y);
+      y += 5;
+      doc.setFont('helvetica', 'normal');
+      for (const a of auto) {
+        y = ensureSpace(doc, y, 6);
+        doc.text(`• ${a.key}: ${a.value}`, MARGIN + 4, y);
+        y += 4.5;
+      }
+      y += 3;
+    }
+  }
+
   // Validation summary
   y = ensureSpace(doc, y, 15);
   y = sectionTitle(doc, y, 'Validation');
@@ -279,6 +353,7 @@ export async function generatePdf(
 
     for (const p of bodyPieces) {
       bodyQty += p.qty;
+      const edgeInfo = v3Data?.edgeBandingParts.find((e) => e.name === p.name);
       tableBody.push([
         p.name,
         p.type,
@@ -287,12 +362,13 @@ export async function generatePdf(
         String(p.qty),
         getPanelLabel(p.panelId),
         String(getPanelThicknessMm(p.panelId)),
+        edgeInfo?.sides ?? '—',
       ]);
     }
 
     // Subtotal row for body
     tableBody.push([
-      { content: `${b.name} — ${bodyQty} pcs`, colSpan: 7, styles: { fontStyle: 'bold', fillColor: [235, 235, 240] } },
+      { content: `${b.name} — ${bodyQty} pcs`, colSpan: 8, styles: { fontStyle: 'bold', fillColor: [235, 235, 240] } },
     ]);
 
     grandTotalQty += bodyQty;
@@ -300,13 +376,13 @@ export async function generatePdf(
 
   // Grand total
   tableBody.push([
-    { content: `TOTAL : ${grandTotalQty} pieces`, colSpan: 7, styles: { fontStyle: 'bold', fillColor: TITLE_COLOR } },
+    { content: `TOTAL : ${grandTotalQty} pieces`, colSpan: 8, styles: { fontStyle: 'bold', fillColor: TITLE_COLOR } },
   ]);
 
   autoTable(doc, {
     startY: y,
     margin: { left: MARGIN, right: MARGIN },
-    head: [['Piece', 'Type', 'L (cm)', 'l (cm)', 'Qte', 'Panneau', 'Ep. (mm)']],
+    head: [['Piece', 'Type', 'L (cm)', 'l (cm)', 'Qte', 'Panneau', 'Ep. (mm)', 'Chant']],
     body: tableBody,
     styles: { font: 'helvetica', fontSize: 8, textColor: TEXT_COLOR, cellPadding: 2 },
     headStyles: {
