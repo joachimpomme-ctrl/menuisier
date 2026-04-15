@@ -44,6 +44,7 @@ describe('buildAssumptions', () => {
 
     expect(doorsDecision).toBeDefined();
     expect(doorsDecision!.value).toContain('2 portes');
+    expect(doorsDecision!.category).toBe('decision');
   });
 
   it('includes a no-doors decision when door_override is false', () => {
@@ -155,5 +156,20 @@ describe('buildAssumptions', () => {
     expect(findAssumption(assumptions, 'hinge_overlay')).toBeDefined();
     expect(findAssumption(assumptions, 'square_check')).toBeDefined();
     expect(findAssumption(assumptions, 'material')).toBeDefined();
+  });
+
+  it('does not mark generic assumptions as decisions', () => {
+    const intent: ProjectIntent = {
+      furniture_type: 'bibliotheque',
+      material_key: 'cp_bouleau',
+      space: { width_mm: 800, height_mm: 2000, depth_mm: 300, plinth_mm: 0, wall_type: 'concrete' },
+    };
+
+    const assumptions = fullProduction(intent).assumptions;
+    const material = findAssumption(assumptions, 'material');
+    const wallType = findAssumption(assumptions, 'wall_type');
+
+    expect(material?.category).not.toBe('decision');
+    expect(wallType?.category).not.toBe('decision');
   });
 });

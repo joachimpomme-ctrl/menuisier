@@ -272,6 +272,7 @@ export interface Assumption {
   value: string;
   reason: string;
   user_should_verify: boolean;
+  category?: 'decision' | 'default';
 }
 
 export interface AssemblyStep {
