@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ProjectIntent } from '../../lib/knowledge/types';
 import type { PipelineResult } from '../../lib/engine/pipeline';
 import { pipelineResultToAppState } from '../../lib/engine/pipeline';
+import { aggregateDrillingOps } from '../../lib/engine/drilling';
 import type { MaterialKey } from '../../types';
 import Assumptions from './Assumptions';
 import ShoppingListView from './ShoppingList';
@@ -69,6 +70,12 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
               : p.edge_banding!
                   .map((s) => (s === 'front' ? 'AV' : s === 'back' ? 'AR' : s === 'left' ? 'G' : 'D'))
                   .join(', '),
+          })),
+        drillingParts: result.parts
+          .filter((p) => p.drilling && p.drilling.length > 0)
+          .map((p) => ({
+            name: p.name,
+            ops: aggregateDrillingOps(p.drilling!),
           })),
       };
       const { generatePdf } = await import('../../lib/pdf');

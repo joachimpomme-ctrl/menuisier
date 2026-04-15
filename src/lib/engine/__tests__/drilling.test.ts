@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  aggregateDrillingOps,
   generateSystem32,
   generateHingeCups,
   generateConfirmatEdgeHoles,
@@ -38,6 +39,33 @@ describe('generateSystem32', () => {
       expect(op.diameter_mm).toBe(5);
       expect(op.depth_mm).toBe(10);
     }
+  });
+});
+
+describe('aggregateDrillingOps', () => {
+  it('aggregates identical ops into a single drilling line', () => {
+    const lines = aggregateDrillingOps([
+      { type: 'system_32', x_mm: 10, y_mm: 10, diameter_mm: 5, depth_mm: 12, face: 'front' },
+      { type: 'system_32', x_mm: 10, y_mm: 42, diameter_mm: 5, depth_mm: 12, face: 'front' },
+    ]);
+
+    expect(lines).toEqual(['Perçage Ø5mm prof.12mm x2']);
+  });
+
+  it('separates drilling lines with different diameters', () => {
+    const lines = aggregateDrillingOps([
+      { type: 'system_32', x_mm: 10, y_mm: 10, diameter_mm: 5, depth_mm: 12, face: 'front' },
+      { type: 'cam_15', x_mm: 20, y_mm: 20, diameter_mm: 8, depth_mm: 30, face: 'front' },
+    ]);
+
+    expect(lines).toEqual([
+      'Perçage Ø5mm prof.12mm x1',
+      'Perçage Ø8mm prof.30mm x1',
+    ]);
+  });
+
+  it('returns an empty array for empty drilling ops', () => {
+    expect(aggregateDrillingOps([])).toEqual([]);
   });
 });
 
