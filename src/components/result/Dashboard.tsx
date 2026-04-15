@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { ProjectIntent } from '../../lib/knowledge/types';
 import type { PipelineResult } from '../../lib/engine/pipeline';
 import { pipelineResultToAppState } from '../../lib/engine/pipeline';
 import { aggregateDrillingOps } from '../../lib/engine/drilling';
+import { buildFacade2DModel } from '../../lib/engine/facade2d';
 import type { MaterialKey } from '../../types';
 import Assumptions from './Assumptions';
 import ShoppingListView from './ShoppingList';
 import HardwareDetail from './HardwareDetail';
 import AssemblyGuide from './AssemblyGuide';
 import DrillingPlanView from './DrillingPlanView';
+import Facade2DView from './Facade2DView';
 
 interface Props {
   intent: ProjectIntent;
@@ -47,6 +49,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
   const warnings = result.validation.filter((v) => !v.blocking && v.severity === 'warning');
   const prod = result.production;
   const hasDrillingPlans = result.parts.some((part) => (part.drilling?.length ?? 0) > 0);
+  const facade2DModel = useMemo(() => buildFacade2DModel(result), [result]);
 
   const handleExportPdf = async () => {
     setPdfLoading(true);
@@ -187,6 +190,10 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
             </table>
           </div>
         )}
+      </Section>
+
+      <Section title="Vue 2D — Façade" defaultOpen>
+        <Facade2DView model={facade2DModel} />
       </Section>
 
       {/* Hardware */}
