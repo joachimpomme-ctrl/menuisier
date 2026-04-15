@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { AppState, ProjectMeta } from '../types';
+import type { AppState, ProjectMeta, StoredProject } from '../types';
 import { LocalProjectRepository, StorageError, importFromJson } from '../lib/storage';
 import { normalizeProject } from '../lib/normalizeProject';
 import { migrateState, createInitialState } from '../lib/state';
@@ -148,6 +148,13 @@ export function useProjectRepository(repo: LocalProjectRepository) {
   }, [refreshProjects, repo]);
 
   const loadLocal = useCallback((id: string) => repo.load(id), [repo]);
+  const loadFull = useCallback((id: string) => repo.loadFull(id), [repo]);
+  const saveV3 = useCallback((id: string, nextState: AppState, v3Data: StoredProject['v3']) => {
+    return safeRepoWrite(() => {
+      repo.saveV3(id, nextState, v3Data);
+      refreshProjects();
+    });
+  }, [refreshProjects, safeRepoWrite, repo]);
 
   return {
     projectId,
@@ -165,5 +172,7 @@ export function useProjectRepository(repo: LocalProjectRepository) {
     importProject,
     pullCloud,
     loadLocal,
+    loadFull,
+    saveV3,
   };
 }

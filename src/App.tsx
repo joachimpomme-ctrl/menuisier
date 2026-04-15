@@ -60,6 +60,8 @@ export default function App() {
     importProject,
     pullCloud,
     loadLocal,
+    loadFull,
+    saveV3,
   } = useProjectRepository(repo);
 
   const {
@@ -98,6 +100,24 @@ export default function App() {
 
   // Seed base knowledge on first launch
   useEffect(() => { seedBaseKnowledge(); }, []);
+
+  useEffect(() => {
+    const full = loadFull(projectId);
+    if (full?.v3) {
+      const intent = full.v3.intent;
+      setV3Mode(true);
+      setWizardStep(4);
+      setV3FurnitureType(full.v3.furnitureType);
+      setV3MaterialKey(full.v3.materialKey);
+      setV3Intent(intent);
+      setV3Result(runPipeline(intent));
+      return;
+    }
+    setV3Mode(false);
+    setWizardStep(1);
+    setV3Intent(null);
+    setV3Result(null);
+  }, [projectId, loadFull]);
 
   const handleNewProject = useCallback(() => {
     setShowProjects(false);
@@ -314,6 +334,11 @@ export default function App() {
                   converted.project.name = intent.furniture_type.replace(/_/g, ' ');
                   setState(normalizeProject(converted));
                   setWizardStep(4);
+                  saveV3(projectId, normalizeProject(converted), {
+                    intent,
+                    materialKey: intent.material_key,
+                    furnitureType: intent.furniture_type,
+                  });
                 }}
               />
             )}
@@ -435,7 +460,10 @@ export default function App() {
         onClose={() => setShowProjects(false)}
         projects={projects}
         currentId={projectId}
-        onLoad={(id) => { switchProject(id); setShowProjects(false); }}
+        onLoad={(id) => {
+          switchProject(id);
+          setShowProjects(false);
+        }}
         onNew={handleNewProject}
         onDuplicate={handleDuplicate}
         onRename={renameProject}
