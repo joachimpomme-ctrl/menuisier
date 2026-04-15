@@ -46,7 +46,7 @@ export default function MoreMenu({ onExport, onImport }: MoreMenuProps) {
         onClick={() => setOpen((current) => toggleMoreMenu(current))}
         className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
       >
-        ⋯
+        ...
       </button>
 
       {open && (
