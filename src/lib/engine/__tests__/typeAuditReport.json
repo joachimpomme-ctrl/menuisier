@@ -553,18 +553,17 @@
     "dimensions": {
       "width": 1000,
       "height": 1900,
-      "depth": 350,
+      "depth": 550,
       "plinth": 0
     },
     "result": {
       "bodyCount": 2,
       "partCount": 28,
       "hardwareCount": 5,
-      "blockingErrors": [
-        "Penderie courte (chemises/vestes) : profondeur 350mm < minimum 550mm"
-      ],
+      "blockingErrors": [],
       "warnings": [
-        "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps"
+        "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Meuble d'entrée : profondeur 550mm > 400mm — vérifier la circulation (80cm min)"
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -584,8 +583,8 @@
         "Les tiroirs sont représentés en pile simple, sans détail individuel de façades."
       ]
     },
-    "verdict": "broken",
-    "notes": "Erreurs bloquantes présentes."
+    "verdict": "partial",
+    "notes": "Approximation: simplified_drawers."
   },
   {
     "type": "meuble_tv",
@@ -730,8 +729,8 @@
     },
     "result": {
       "bodyCount": 3,
-      "partCount": 60,
-      "hardwareCount": 5,
+      "partCount": 63,
+      "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
         "Largeur 1800mm > portée max 836mm (CP bouleau) → 3 corps"
@@ -740,40 +739,41 @@
       "hasTop": true,
       "hasBottom": true,
       "hasFond": true,
-      "hasDoors": false,
-      "doorCount": 0,
+      "hasDoors": true,
+      "doorCount": 6,
       "zoneTypes": [
         "drawer_stack",
         "shelf_adjustable"
       ],
       "fixedShelfCount": 9,
       "approximationFlags": [
-        "simplified_drawers"
+        "simplified_drawers",
+        "simplified_doors"
       ],
       "facade2dWarnings": [
-        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades."
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades.",
+        "Les portes sont représentées de manière simplifiée, sans détail de charnières ni de recouvrement fin."
       ]
     },
     "verdict": "partial",
-    "notes": "Approximation: simplified_drawers."
+    "notes": "Approximation: simplified_drawers, simplified_doors."
   },
   {
     "type": "bureau",
     "variant": "default",
     "dimensions": {
       "width": 1400,
-      "height": 2000,
+      "height": 750,
       "depth": 700,
       "plinth": 0
     },
     "result": {
       "bodyCount": 2,
       "partCount": 18,
-      "hardwareCount": 4,
+      "hardwareCount": 3,
       "blockingErrors": [],
       "warnings": [
-        "Largeur 1400mm > portée max 836mm (CP bouleau) → 2 corps",
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Largeur 1400mm > portée max 836mm (CP bouleau) → 2 corps"
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -796,18 +796,17 @@
     "variant": "Bureau avec caisson tiroirs",
     "dimensions": {
       "width": 1400,
-      "height": 2000,
+      "height": 750,
       "depth": 700,
       "plinth": 0
     },
     "result": {
       "bodyCount": 2,
       "partCount": 40,
-      "hardwareCount": 6,
+      "hardwareCount": 5,
       "blockingErrors": [],
       "warnings": [
-        "Largeur 1400mm > portée max 836mm (CP bouleau) → 2 corps",
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Largeur 1400mm > portée max 836mm (CP bouleau) → 2 corps"
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -835,18 +834,17 @@
     "variant": "Bureau niche imprimante",
     "dimensions": {
       "width": 1400,
-      "height": 2000,
+      "height": 750,
       "depth": 700,
       "plinth": 0
     },
     "result": {
       "bodyCount": 2,
       "partCount": 16,
-      "hardwareCount": 4,
+      "hardwareCount": 3,
       "blockingErrors": [],
       "warnings": [
-        "Largeur 1400mm > portée max 836mm (CP bouleau) → 2 corps",
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Largeur 1400mm > portée max 836mm (CP bouleau) → 2 corps"
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -876,8 +874,8 @@
     },
     "result": {
       "bodyCount": 2,
-      "partCount": 18,
-      "hardwareCount": 3,
+      "partCount": 42,
+      "hardwareCount": 4,
       "blockingErrors": [],
       "warnings": [
         "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps"
@@ -889,14 +887,18 @@
       "hasDoors": false,
       "doorCount": 0,
       "zoneTypes": [
-        "shelf_adjustable"
+        "drawer_stack"
       ],
       "fixedShelfCount": 4,
-      "approximationFlags": [],
-      "facade2dWarnings": []
+      "approximationFlags": [
+        "simplified_drawers"
+      ],
+      "facade2dWarnings": [
+        "Les tiroirs sont représentés en pile simple, sans détail individuel de façades."
+      ]
     },
-    "verdict": "ok",
-    "notes": "Résultat cohérent avec les règles actuellement implémentées."
+    "verdict": "partial",
+    "notes": "Approximation: simplified_drawers."
   },
   {
     "type": "commode",
@@ -1258,16 +1260,14 @@
     "dimensions": {
       "width": 800,
       "height": 500,
-      "depth": 300,
+      "depth": 400,
       "plinth": 0
     },
     "result": {
       "bodyCount": 1,
       "partCount": 7,
       "hardwareCount": 3,
-      "blockingErrors": [
-        "Banquette coffre : profondeur 300mm < minimum 400mm"
-      ],
+      "blockingErrors": [],
       "warnings": [],
       "hasJoues": true,
       "hasTop": true,
@@ -1283,8 +1283,8 @@
       "approximationFlags": [],
       "facade2dWarnings": []
     },
-    "verdict": "broken",
-    "notes": "Erreurs bloquantes présentes."
+    "verdict": "ok",
+    "notes": "Résultat cohérent avec les règles actuellement implémentées."
   },
   {
     "type": "cave_vin",
@@ -1322,14 +1322,14 @@
     "variant": "default",
     "dimensions": {
       "width": 1200,
-      "height": 2000,
+      "height": 450,
       "depth": 450,
       "plinth": 0
     },
     "result": {
       "bodyCount": 2,
       "partCount": 10,
-      "hardwareCount": 3,
+      "hardwareCount": 2,
       "blockingErrors": [],
       "warnings": [
         "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",

@@ -4858,6 +4858,7 @@
         "bandeau_pudeur"
       ],
       "dimensions_defaut": {
+        "hauteur_mm": 750,
         "hauteur_plateau_mm": 750,
         "largeur_mm": 1400,
         "profondeur_mm": 700,
@@ -5231,7 +5232,8 @@
       "variantes": [
         {
           "nom": "Enfilade portes + tiroirs hauts",
-          "tiroirs_hauts": true
+          "tiroirs_hauts": true,
+          "portes": true
         }
       ]
     },
@@ -5644,6 +5646,7 @@
         "porte"
       ],
       "dimensions_defaut": {
+        "hauteur_mm": 450,
         "hauteur_assise_mm": 450,
         "largeur_mm": 1200,
         "profondeur_mm": 450,
@@ -5769,7 +5772,8 @@
         {
           "nom": "Banc à chaussures",
           "assise": true,
-          "hauteur_mm": 500
+          "hauteur_mm": 500,
+          "profondeur_mm": 400
         }
       ],
       "pieges_courants": [
@@ -5924,7 +5928,7 @@
       "dimensions_defaut": {
         "hauteur_mm": 1900,
         "largeur_mm": 1000,
-        "profondeur_mm": 350,
+        "profondeur_mm": 550,
         "hauteur_banc_mm": 450
       },
       "generation": {

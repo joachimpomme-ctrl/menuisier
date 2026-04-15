@@ -126,6 +126,18 @@ function defaultZones(
       ];
     }
 
+    // Commode: drawers from nb_tiroirs
+    const nbTiroirs = typeof dims.nb_tiroirs === 'number' ? dims.nb_tiroirs : undefined;
+    if (nbTiroirs !== undefined && type === 'commode') {
+      return [
+        {
+          module_id: 'drawer_stack',
+          height_mm,
+          config: { type: 'drawer_stack', count: nbTiroirs, distribution: 'progressive' },
+        },
+      ];
+    }
+
     // Bibliothèque / étagère: shelves
     if (nbShelves !== undefined) {
       return [
@@ -175,6 +187,15 @@ function hardcodedDefaultZones(
         },
       ];
     }
+
+    case 'commode':
+      return [
+        {
+          module_id: 'drawer_stack',
+          height_mm,
+          config: { type: 'drawer_stack', count: 4, distribution: 'progressive' },
+        },
+      ];
 
     case 'meuble_chaussures':
       return [
