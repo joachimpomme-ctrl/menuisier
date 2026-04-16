@@ -26,7 +26,7 @@ import type { PipelineResult } from '../../lib/engine/pipeline';
 import { pipelineResultToAppState } from '../../lib/engine/pipeline';
 import { aggregateDrillingOps } from '../../lib/engine/drilling';
 import { buildFacade2DModel } from '../../lib/engine/facade2d';
-import { classifyProcurement, summarizeProcurement } from '../../lib/engine/procurement';
+import type { ProcurementDecision } from '../../lib/engine/procurement';
 import type { MaterialKey } from '../../types';
 import Facade2DView, { type Facade2DSelection } from './Facade2DView';
 import {
@@ -89,7 +89,18 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
   const infos = result.validation.filter((v) => !v.blocking && v.severity === 'info');
   const prod = result.production;
   const facade2DModel = useMemo(() => buildFacade2DModel(result), [result]);
-  const procSummary = useMemo(() => summarizeProcurement(result.parts), [result.parts]);
+
+  // --- Source UNIQUE de vérité procurement pour toute l'UI -----------------
+  //
+  // Les trois lieux d'affichage (PartsTable colonne Approvisionnement,
+  // Inspector ligne Approvisionnement, bottom bar Procurement) tirent de
+  // `result.procurement`. Aucun recalcul depuis `part.standard_part_id` ou
+  // `part.drilling` côté UI — toute décision vient du moteur.
+  // Demain, `resolveProcurement` interne sera remplacé par le vrai
+  // resolver métier, sans qu'une seule ligne du Dashboard ne bouge.
+  const procByPartId = result.procurement.byPartId;
+  const procSummary = result.procurement.summary;
+
   const selectedPart = useMemo<GeneratedPart | null>(
     () => result.parts.find((p) => p.id === selectedPartId) ?? null,
     [result.parts, selectedPartId],
@@ -336,6 +347,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
             parts={filteredParts}
             selectedId={selectedPartId}
             onSelect={(id) => setSelectedPartId(id)}
+            procByPartId={procByPartId}
           />
         )}
         {activeTab === 'hardware' && <HardwareTable result={result} />}
@@ -353,6 +365,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
     <Inspector
       part={selectedPart}
       result={result}
+      procByPartId={procByPartId}
       onClear={() => setSelectedPartId(null)}
       facadeSelection={facadeSel}
       onClearFacade={() => setFacadeSel(null)}
@@ -446,11 +459,16 @@ interface PartsTableProps {
   parts: GeneratedPart[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  /**
+   * Dictionnaire des décisions procurement. L'UI ne recalcule rien —
+   * elle lit `procByPartId[row.id]` qui vient du moteur.
+   */
+  procByPartId: Record<string, ProcurementDecision>;
 }
 
 type PartRow = GeneratedPart & { __idx: number };
 
-function PartsTable({ parts, selectedId, onSelect }: PartsTableProps) {
+function PartsTable({ parts, selectedId, onSelect, procByPartId }: PartsTableProps) {
   const rows: PartRow[] = parts.map((p, i) => ({ ...p, __idx: i }));
   const columns: DataTableColumn<PartRow>[] = [
     {
@@ -496,7 +514,11 @@ function PartsTable({ parts, selectedId, onSelect }: PartsTableProps) {
     {
       key: 'proc',
       header: 'Approvisionnement',
-      render: (row) => <ProcurementBadge status={classifyProcurement(row)} />,
+      render: (row) => {
+        const decision = procByPartId[row.id];
+        if (!decision) return <span className="text-[color:var(--fg-subtle)]">—</span>;
+        return <ProcurementBadge status={decision.status} title={decision.reason} />;
+      },
     },
   ];
 
@@ -711,12 +733,21 @@ function AssumptionsTable({ prod }: { prod: NonNullable<PipelineResult['producti
 interface InspectorProps {
   part: GeneratedPart | null;
   result: PipelineResult;
+  /** Dictionnaire partagé avec la PartsTable — même donnée, zéro divergence. */
+  procByPartId: Record<string, ProcurementDecision>;
   facadeSelection: Facade2DSelection | null;
   onClear: () => void;
   onClearFacade: () => void;
 }
 
-function Inspector({ part, result, facadeSelection, onClear, onClearFacade }: InspectorProps) {
+function Inspector({
+  part,
+  result,
+  procByPartId,
+  facadeSelection,
+  onClear,
+  onClearFacade,
+}: InspectorProps) {
   if (!part) {
     // Si une zone est sélectionnée : info zone
     if (facadeSelection) {
@@ -782,9 +813,27 @@ function Inspector({ part, result, facadeSelection, onClear, onClearFacade }: In
     );
   }
 
-  const proc = classifyProcurement(part);
+  const decision = procByPartId[part.id];
   const area_m2 = (part.length_mm * part.width_mm) / 1_000_000;
   const body = result.layout.bodies.find((b) => b.body_id === part.body_id);
+
+  const classificationRows: PropertyGroup['rows'] = [
+    { label: 'Type', value: part.type },
+    {
+      label: 'Corps',
+      value: body ? `${part.body_id} (${body.width_mm}×${body.height_mm})` : part.body_id,
+    },
+  ];
+  if (decision) {
+    classificationRows.push({
+      label: 'Approvisionnement',
+      value: <ProcurementBadge status={decision.status} title={decision.reason} />,
+      mono: false,
+    });
+    if (decision.standard_part_id) {
+      classificationRows.push({ label: 'Réf. standard', value: decision.standard_part_id });
+    }
+  }
 
   const groups: PropertyGroup[] = [
     {
@@ -799,23 +848,7 @@ function Inspector({ part, result, facadeSelection, onClear, onClearFacade }: In
     },
     {
       title: 'Classification',
-      rows: [
-        { label: 'Type', value: part.type },
-        {
-          label: 'Corps',
-          value: body
-            ? `${part.body_id} (${body.width_mm}×${body.height_mm})`
-            : part.body_id,
-        },
-        {
-          label: 'Approvisionnement',
-          value: <ProcurementBadge status={proc} />,
-          mono: false,
-        },
-        ...(part.standard_part_id
-          ? [{ label: 'Réf. standard', value: part.standard_part_id }]
-          : []),
-      ],
+      rows: classificationRows,
     },
   ];
 
@@ -867,6 +900,20 @@ function Inspector({ part, result, facadeSelection, onClear, onClearFacade }: In
         <div className="font-mono text-[10.5px] text-[color:var(--fg-muted)] mb-3">{part.id}</div>
 
         <PropertyGrid groups={groups} />
+
+        {decision && (
+          <div className="mt-3">
+            <SectionTitle flush>Décision procurement</SectionTitle>
+            <div className="mt-1 text-[11.5px] text-[color:var(--fg-muted)] leading-snug">
+              {decision.reason}
+            </div>
+            {decision.source === 'heuristic' && (
+              <div className="mt-1 text-[10px] uppercase tracking-wider text-[color:var(--fg-subtle)] font-mono">
+                Source : règle provisoire
+              </div>
+            )}
+          </div>
+        )}
 
         {part.drilling && part.drilling.length > 0 && (
           <div className="mt-3">

@@ -53,20 +53,28 @@ export const color = {
 // ---------------------------------------------------------------------------
 // Statuts procurement — pattern critique métier
 // ---------------------------------------------------------------------------
+//
+// ⚠ Le vocabulaire (`ProcurementStatus`) est défini canoniquement dans
+// `src/lib/engine/procurement.ts` — couche métier. L'ui-system n'en
+// définit que l'habillage visuel. Le type est ré-exporté ici uniquement
+// pour que les composants UI (`StatusBadge`, `ProcurementBadge`) gardent
+// leurs imports centralisés dans `@/ui-system`.
 
-export const procurementColor = {
+import type { ProcurementStatus as EngineProcurementStatus } from '../lib/engine/procurement';
+
+export type ProcurementStatus = EngineProcurementStatus;
+
+export const procurementColor: Record<ProcurementStatus, { fg: string; bg: string }> = {
   buy_exact:      { fg: '#2d5a3d', bg: '#e4eee6' },
   buy_and_rework: { fg: '#8a5a00', bg: '#f4e9d1' },
   cut_from_sheet: { fg: '#333c4d', bg: '#dfe3ea' },
 } as const;
 
-export const procurementLabel = {
+export const procurementLabel: Record<ProcurementStatus, string> = {
   buy_exact:      'ACHAT',
   buy_and_rework: 'ACHAT+RETOUCHE',
   cut_from_sheet: 'DÉBIT',
 } as const;
-
-export type ProcurementStatus = keyof typeof procurementColor;
 
 // ---------------------------------------------------------------------------
 // Spacing — pas de 2px, utile uniquement

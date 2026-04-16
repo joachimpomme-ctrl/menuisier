@@ -23,6 +23,11 @@ import { generateParts } from './geometry';
 import { selectHardware } from './hardware';
 import { validateProject } from './validation';
 import { generateProduction } from './production';
+import {
+  resolveProcurement,
+  emptyProcurementView,
+  type ProcurementView,
+} from './procurement';
 import { generatedPartsToLegacy } from '../knowledge/types';
 import { MATERIALS } from '../../data/materials';
 
@@ -38,6 +43,13 @@ export interface PipelineResult {
   hardware: HardwareItem[];
   validation: ValidationIssue[];
   production: ProductionOutput | null;
+  /**
+   * Vue procurement — résolue une seule fois par run, partagée par le
+   * tableau, l'inspecteur et la barre-résumé. Garantit une source
+   * UNIQUE pour l'UI (cf. `lib/engine/procurement.ts`). Jamais `null` :
+   * vide si le pipeline échoue tôt.
+   */
+  procurement: ProcurementView;
 }
 
 // ---------------------------------------------------------------------------
@@ -58,6 +70,7 @@ export function runPipeline(rawIntent: ProjectIntent): PipelineResult {
       hardware: [],
       validation: intentResult.issues,
       production: null,
+      procurement: emptyProcurementView(),
     };
   }
 
@@ -91,6 +104,9 @@ export function runPipeline(rawIntent: ProjectIntent): PipelineResult {
     ? null
     : generateProduction(intent, parts, hardware, structure, validation, layoutResult.layout);
 
+  // Step 8 — Procurement (résolu une seule fois, point d'extension futur)
+  const procurement = resolveProcurement(parts);
+
   return {
     intent,
     layout: layoutResult.layout,
@@ -99,6 +115,7 @@ export function runPipeline(rawIntent: ProjectIntent): PipelineResult {
     hardware,
     validation,
     production,
+    procurement,
   };
 }
 
