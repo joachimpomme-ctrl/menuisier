@@ -1,4 +1,5 @@
 import type { Body2D, Facade2DModel, VisualHint, Zone2D } from '../../lib/engine/facade2d';
+import { AlertStrip, color as dsColor } from '../../ui-system';
 
 export interface Facade2DSelection {
   bodyId: string;
@@ -314,22 +315,23 @@ function renderZoneHint(
 export default function Facade2DView({ model, monochrome, selected, onSelect }: Facade2DViewProps) {
   const scale = computeFacadeScale(model);
   const svgH = computeFacadeSvgHeight(model, scale);
-  const bg = monochrome ? '#fbfbf9' : '#faf8f5';
-  const bodyStroke = monochrome ? '#1d1d1b' : '#78716c';
-  const dimColor = monochrome ? '#1d1d1b' : '#78716c';
+  // Couleurs alimentées par les tokens DS — aucune valeur hex littérale.
+  const bg = monochrome ? dsColor.panelAlt : dsColor.canvas;
+  const bodyStroke = monochrome ? dsColor.border : dsColor.fgMuted;
+  const dimColor = monochrome ? dsColor.border : dsColor.fgMuted;
   const hitCursor = onSelect ? 'pointer' : 'default';
 
   return (
-    <div className={monochrome ? '' : 'space-y-3'}>
+    <div className={monochrome ? '' : 'space-y-2'}>
       <div className="overflow-x-auto">
         <svg
           width="100%"
           viewBox={`0 0 ${SVG_W} ${svgH}`}
           preserveAspectRatio="xMidYMid meet"
-          className={monochrome ? 'block' : 'rounded-lg bg-[#faf8f5]'}
-          style={monochrome ? { background: bg } : undefined}
+          className="block"
+          style={{ background: bg }}
         >
-          <rect width={SVG_W} height={svgH} fill={bg} rx={monochrome ? 0 : 8} />
+          <rect width={SVG_W} height={svgH} fill={bg} />
 
           {model.bodies.map((body, bodyIndex) => {
             const bodyX = getFacadeBodyX(body, scale);
@@ -530,11 +532,11 @@ export default function Facade2DView({ model, monochrome, selected, onSelect }: 
       </div>
 
       {!monochrome && hasFacadeWarnings(model) && (
-        <div className="mt-3 space-y-1">
+        <div className="space-y-1">
           {model.warnings.map((warning, index) => (
-            <p key={index} className="text-xs text-amber-600 bg-amber-50 rounded px-2 py-1">
+            <AlertStrip key={index} kind="warning">
               {warning}
-            </p>
+            </AlertStrip>
           ))}
         </div>
       )}
