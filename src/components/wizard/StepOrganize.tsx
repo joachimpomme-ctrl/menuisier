@@ -66,7 +66,9 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   const [suggestedPlinthType, setSuggestedPlinthType] = useState<'legs' | 'none' | undefined>(undefined);
 
   const applyContentZones = (zoneConfigs: ZoneConfig[]) => {
-    clearVariantOverrides();
+    // Ne pas effacer les overrides de la variante : on ne remplace que les zones.
+    // Les portes, hauteur de portes, suspension et suggestions de dimensions
+    // issues d'une variante rapide précédemment sélectionnée restent actives.
     const rows: ZoneRow[] = zoneConfigs.map((z) => ({
       key: _nextKey++,
       module_id: z.module_id,
@@ -241,12 +243,21 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
         </div>
       )}
 
-      {/* Content mode button — discreet */}
+      {/* Content mode button — visible call-to-action */}
       <button
         onClick={() => setShowContentMode(true)}
-        className="mb-5 text-xs text-gray-400 hover:text-blue-600 transition-colors"
+        className="mb-5 w-full flex items-center gap-3 px-4 py-3 border-2 border-dashed border-blue-300 bg-blue-50 hover:bg-blue-100 hover:border-blue-400 rounded-lg text-left transition-colors"
       >
-        Je décris ce que je range
+        <span className="text-xl" aria-hidden="true">📦</span>
+        <span className="flex-1">
+          <span className="block text-sm font-semibold text-blue-800">
+            Je décris ce que je range
+          </span>
+          <span className="block text-xs text-blue-600 mt-0.5">
+            Laisse-nous proposer l'organisation des zones à partir de ton contenu (vêtements, livres, etc.)
+          </span>
+        </span>
+        <span className="text-blue-500" aria-hidden="true">→</span>
       </button>
 
       {/* Content mode modal */}
