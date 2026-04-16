@@ -155,6 +155,32 @@ export default function App() {
     setState((s) => ({ ...s, costConfig: { ...s.costConfig, panelPrice: price } }));
   };
 
+  // Dashboard V3 (Terminal Métier) is rendered full-bleed: it has its own
+  // SplitLayout + Toolbar and must not be constrained by the legacy
+  // max-width / padded shell designed for mobile SaaS views.
+  if (v3Mode && wizardStep === 4 && v3Intent && v3Result) {
+    return (
+      <div className="min-h-screen min-h-dvh text-[color:var(--fg)] bg-[color:var(--bg-canvas)] flex flex-col">
+        <Dashboard
+          intent={v3Intent}
+          result={v3Result}
+          materialKey={v3MaterialKey}
+          onModify={() => setWizardStep(3)}
+          onClassicEditor={(appState) => {
+            setState(normalizeProject(appState));
+            setV3Mode(false);
+          }}
+        />
+        <InstallBanner />
+        <NewProjectWizard
+          isOpen={showNewWizard}
+          onClose={() => setShowNewWizard(false)}
+          onCreate={handleCreateFromWizard}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen min-h-dvh text-stone-800 bg-[#faf8f5]">
       <div className="max-w-3xl mx-auto px-4 pt-4 pb-24 sm:py-6">
@@ -263,16 +289,18 @@ export default function App() {
           )}
         </div>
 
-        {/* V3 Wizard */}
+        {/* V3 Wizard (steps 1-3 ; step 4 = Dashboard full-bleed, rendu plus haut) */}
         {v3Mode ? (
-          <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs text-stone-400">Étape {wizardStep}/4</span>
+          <div className="bg-[color:var(--bg-panel)] border border-[color:var(--border)] p-4">
+            <div className="flex items-center justify-between mb-3 pb-2 border-b border-[color:var(--border-hairline)]">
+              <span className="text-[10.5px] uppercase tracking-wider font-semibold text-[color:var(--fg-muted)]">
+                Étape {wizardStep}/4
+              </span>
               <button
                 onClick={() => setV3Mode(false)}
-                className="text-xs text-stone-400 hover:text-stone-600"
+                className="text-[11px] text-[color:var(--fg-subtle)] hover:text-[color:var(--fg)]"
               >
-                ✕ Fermer
+                × Fermer
               </button>
             </div>
 
@@ -317,19 +345,6 @@ export default function App() {
                     materialKey: intent.material_key,
                     furnitureType: intent.furniture_type,
                   });
-                }}
-              />
-            )}
-
-            {wizardStep === 4 && v3Intent && v3Result && (
-              <Dashboard
-                intent={v3Intent}
-                result={v3Result}
-                materialKey={v3MaterialKey}
-                onModify={() => setWizardStep(3)}
-                onClassicEditor={(appState) => {
-                  setState(normalizeProject(appState));
-                  setV3Mode(false);
                 }}
               />
             )}
