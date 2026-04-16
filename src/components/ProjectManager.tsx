@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Panel, ToolbarButton } from '../ui-system';
 
 interface ProjectMeta {
   id: string;
@@ -82,154 +83,105 @@ export default function ProjectManager({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60  transition-opacity"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--bg-overlay)]/60"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg mx-4 max-h-[85vh] flex flex-col bg-white border border-stone-200 rounded-xl shadow-xl"
+        className="w-full max-w-lg mx-4 max-h-[85vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
-          <h2 className="text-lg font-semibold text-stone-800">Mes projets</h2>
-          <button
-            onClick={onClose}
-            className="text-stone-500 hover:text-stone-800 text-2xl leading-none transition-colors"
-          >
-            &times;
-          </button>
-        </div>
+        <Panel
+          title="Mes projets"
+          actions={<ToolbarButton onClick={onClose}>Fermer</ToolbarButton>}
+          className="max-h-[85vh] overflow-hidden"
+        >
+          <div className="space-y-3">
+            <ToolbarButton variant="primary" onClick={onNew} className="w-full">
+              Nouveau projet
+            </ToolbarButton>
 
-        {/* New project button */}
-        <div className="px-6 pt-4">
-          <button
-            onClick={onNew}
-            className="w-full py-2.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-stone-950 font-medium transition-colors"
-          >
-            Nouveau projet
-          </button>
-        </div>
+            <div className="max-h-[60vh] overflow-y-auto space-y-3">
+              {sorted.length === 0 ? (
+                <p className="text-center text-[color:var(--fg-muted)] py-8">Aucun projet sauvegardé</p>
+              ) : (
+                sorted.map((project) => {
+                  const isCurrent = project.id === currentId;
+                  const isRenaming = renamingId === project.id;
+                  const isDeleting = deletingId === project.id;
 
-        {/* Project list */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
-          {sorted.length === 0 ? (
-            <p className="text-center text-stone-500 py-8">Aucun projet sauvegard&eacute;</p>
-          ) : (
-            sorted.map((project) => {
-              const isCurrent = project.id === currentId;
-              const isRenaming = renamingId === project.id;
-              const isDeleting = deletingId === project.id;
-
-              return (
-                <div
-                  key={project.id}
-                  className={`rounded-xl border p-4 transition-colors ${
-                    isCurrent
-                      ? 'border-amber-600/50 bg-stone-100'
-                      : 'border-stone-200 bg-white/40 hover:bg-white/70'
-                  }`}
-                >
-                  {/* Top row: name + current indicator */}
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      {isRenaming ? (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            value={renameValue}
-                            onChange={(e) => setRenameValue(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') confirmRename(project.id);
-                              if (e.key === 'Escape') cancelRename();
-                            }}
-                            autoFocus
-                            className="flex-1 px-2 py-1 rounded-md bg-stone-100 border border-stone-300 text-stone-800 text-sm focus:outline-none focus:border-amber-500"
-                          />
-                          <button
-                            onClick={() => confirmRename(project.id)}
-                            className="text-xs text-amber-700 hover:text-amber-300 font-medium transition-colors"
-                          >
-                            OK
-                          </button>
-                          <button
-                            onClick={cancelRename}
-                            className="text-xs text-stone-500 hover:text-stone-400 transition-colors"
-                          >
-                            Annuler
-                          </button>
+                  return (
+                    <div
+                      key={project.id}
+                      className={`border p-3 ${
+                        isCurrent
+                          ? 'border-[color:var(--accent)] bg-[color:var(--accent-bg)]'
+                          : 'border-[color:var(--border-weak)] bg-[color:var(--bg-panel)]'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          {isRenaming ? (
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                value={renameValue}
+                                onChange={(e) => setRenameValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') confirmRename(project.id);
+                                  if (e.key === 'Escape') cancelRename();
+                                }}
+                                autoFocus
+                                className="inp flex-1"
+                              />
+                              <ToolbarButton onClick={() => confirmRename(project.id)}>OK</ToolbarButton>
+                              <ToolbarButton onClick={cancelRename}>Annuler</ToolbarButton>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => onLoad(project.id)}
+                              className="text-[13px] font-semibold text-[color:var(--fg)] hover:text-[color:var(--fg)] truncate block text-left"
+                            >
+                              {project.name}
+                            </button>
+                          )}
                         </div>
-                      ) : (
-                        <button
-                          onClick={() => onLoad(project.id)}
-                          className="text-sm font-bold text-stone-800 hover:text-amber-700 transition-colors truncate block text-left"
-                        >
-                          {project.name}
-                        </button>
-                      )}
+                        {isCurrent && (
+                          <span className="shrink-0 text-[10.5px] uppercase tracking-[0.08em] text-[color:var(--accent)]">
+                            Actif
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mt-1.5 flex items-center gap-3 text-[12px] text-[color:var(--fg-muted)]">
+                        <span>{project.materialShort}</span>
+                        <span>·</span>
+                        <span>{project.bodyCount} corps</span>
+                        <span>·</span>
+                        <span>{formatDate(project.updatedAt)}</span>
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        {isDeleting ? (
+                          <>
+                            <span className="text-[12px] text-[color:var(--alert)] mr-1">Confirmer ?</span>
+                            <ToolbarButton onClick={() => confirmDelete(project.id)}>Supprimer</ToolbarButton>
+                            <ToolbarButton onClick={cancelDelete}>Annuler</ToolbarButton>
+                          </>
+                        ) : (
+                          <>
+                            <ToolbarButton onClick={() => onDuplicate(project.id)}>Dupliquer</ToolbarButton>
+                            <ToolbarButton onClick={() => startRename(project.id, project.name)}>Renommer</ToolbarButton>
+                            <ToolbarButton onClick={() => startDelete(project.id)}>Supprimer</ToolbarButton>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    {isCurrent && (
-                      <span className="shrink-0 flex items-center gap-1.5 text-xs text-amber-700">
-                        <span className="w-2 h-2 rounded-full bg-amber-400" />
-                        Actif
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Details row */}
-                  <div className="mt-1.5 flex items-center gap-3 text-xs text-stone-500">
-                    <span>{project.materialShort}</span>
-                    <span className="text-stone-400">&middot;</span>
-                    <span>{project.bodyCount} corps</span>
-                    <span className="text-stone-400">&middot;</span>
-                    <span>{formatDate(project.updatedAt)}</span>
-                  </div>
-
-                  {/* Actions row */}
-                  <div className="mt-3 flex items-center gap-2">
-                    {isDeleting ? (
-                      <>
-                        <span className="text-xs text-red-400 mr-1">Confirmer ?</span>
-                        <button
-                          onClick={() => confirmDelete(project.id)}
-                          className="text-xs px-2.5 py-1 rounded-md bg-red-600/20 text-red-400 hover:bg-red-600/30 transition-colors"
-                        >
-                          Supprimer
-                        </button>
-                        <button
-                          onClick={cancelDelete}
-                          className="text-xs px-2.5 py-1 rounded-md text-stone-500 hover:text-stone-400 transition-colors"
-                        >
-                          Annuler
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => onDuplicate(project.id)}
-                          className="text-xs px-2.5 py-1 rounded-md bg-stone-100/50 text-stone-400 hover:bg-stone-100 transition-colors"
-                        >
-                          Dupliquer
-                        </button>
-                        <button
-                          onClick={() => startRename(project.id, project.name)}
-                          className="text-xs px-2.5 py-1 rounded-md bg-stone-100/50 text-stone-400 hover:bg-stone-100 transition-colors"
-                        >
-                          Renommer
-                        </button>
-                        <button
-                          onClick={() => startDelete(project.id)}
-                          className="text-xs px-2.5 py-1 rounded-md bg-stone-100/50 text-red-400 hover:bg-red-600/20 transition-colors"
-                        >
-                          Supprimer
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </Panel>
       </div>
     </div>
   );
