@@ -1,8 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { FurnitureType, WallType, SpaceDimensions } from '../../lib/knowledge/types';
 import type { MaterialKey } from '../../types';
 import { MATERIALS } from '../../data/materials';
 import { getPresetSpaceDefaults } from '../../lib/knowledge/index';
+import {
+  Field,
+  NumberInput,
+  Panel,
+  SectionTitle,
+  Select,
+  Toolbar,
+  ToolbarButton,
+} from '../../ui-system';
 
 interface Props {
   furnitureType: FurnitureType;
@@ -43,97 +52,100 @@ export default function StepSpace({ furnitureType, initial, onBack, onNext }: Pr
     plinth_mm: initial?.plinth_mm ?? defaults.plinth_mm ?? 0,
     wall_type: initial?.wall_type ?? 'unknown',
   });
-
   const [materialKey, setMaterialKey] = useState<MaterialKey>(initial?.material_key ?? 'cp_bouleau');
   const [errors, setErrors] = useState<Partial<Record<DimKey, string>>>({});
 
   useEffect(() => {
-    const errs: Partial<Record<DimKey, string>> = {};
+    const nextErrors: Partial<Record<DimKey, string>> = {};
     for (const [key, range] of Object.entries(RANGES) as [DimKey, (typeof RANGES)[DimKey]][]) {
-      const v = dims[key];
-      if (v < range.min || v > range.max) {
-        errs[key] = `${range.min}–${range.max} mm`;
+      const value = dims[key];
+      if (value < range.min || value > range.max) {
+        nextErrors[key] = `${range.min}–${range.max} mm`;
       }
     }
-    setErrors(errs);
+    setErrors(nextErrors);
   }, [dims]);
 
   const valid = Object.keys(errors).length === 0;
 
   const handleDim = (key: DimKey, raw: string) => {
-    const n = parseInt(raw, 10);
-    if (!isNaN(n)) setDims((prev) => ({ ...prev, [key]: n }));
+    const nextValue = parseInt(raw, 10);
+    if (!Number.isNaN(nextValue)) {
+      setDims((prev) => ({ ...prev, [key]: nextValue }));
+    }
   };
 
   return (
-    <div>
-      <h3 className="text-lg font-semibold mb-4">Dimensions et matériau</h3>
+    <Panel>
+      <SectionTitle>Dimensions et matériau</SectionTitle>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        {(Object.entries(RANGES) as [DimKey, (typeof RANGES)[DimKey]][]).map(([key, range]) => (
-          <div key={key}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{range.label}</label>
-            <input
-              type="number"
-              value={dims[key]}
-              min={range.min}
-              max={range.max}
-              onChange={(e) => handleDim(key, e.target.value)}
-              className={`w-full border rounded-lg px-3 py-2 text-sm ${errors[key] ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
-            />
-            {errors[key] && <p className="text-xs text-red-500 mt-1">{errors[key]}</p>}
-          </div>
-        ))}
+      <div className="grid grid-cols-1 gap-3 pt-3 sm:grid-cols-2">
+        {(Object.entries(RANGES) as [DimKey, (typeof RANGES)[DimKey]][]).map(([key, range]) => {
+          const fieldId = `wizard-space-${key}`;
+          return (
+            <Field key={key} label={range.label} htmlFor={fieldId}>
+              <>
+                <NumberInput
+                  id={fieldId}
+                  value={dims[key]}
+                  min={range.min}
+                  max={range.max}
+                  onChange={(e) => handleDim(key, e.target.value)}
+                  aria-describedby={errors[key] ? `${fieldId}-error` : undefined}
+                />
+                {errors[key] && (
+                  <div id={`${fieldId}-error`} className="pt-1 text-[10.5px] text-[color:var(--alert)]">
+                    Limite autorisée : {errors[key]}
+                  </div>
+                )}
+              </>
+            </Field>
+          );
+        })}
       </div>
 
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Type de mur</label>
-        <div className="flex flex-wrap gap-3">
-          {WALL_OPTIONS.map((opt) => (
-            <label key={opt.value} className="flex items-center gap-1.5 text-sm cursor-pointer">
-              <input
-                type="radio"
-                name="wall_type"
-                checked={dims.wall_type === opt.value}
-                onChange={() => setDims((prev) => ({ ...prev, wall_type: opt.value }))}
-                className="accent-blue-500"
-              />
-              {opt.label}
-            </label>
-          ))}
-        </div>
+      <div className="grid grid-cols-1 gap-3 pt-3 sm:grid-cols-2">
+        <Field label="Mur" htmlFor="wizard-space-wall">
+          <Select
+            id="wizard-space-wall"
+            value={dims.wall_type}
+            onChange={(e) => setDims((prev) => ({ ...prev, wall_type: e.target.value as WallType }))}
+          >
+            {WALL_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
+        </Field>
+
+        <Field label="Matériau" htmlFor="wizard-space-material">
+          <Select
+            id="wizard-space-material"
+            value={materialKey}
+            onChange={(e) => setMaterialKey(e.target.value as MaterialKey)}
+          >
+            {MATERIAL_ENTRIES.map(([key, material]) => (
+              <option key={key} value={key}>
+                {material.name} — ép. {material.defaultThickness} mm
+              </option>
+            ))}
+          </Select>
+        </Field>
       </div>
 
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Matériau</label>
-        <select
-          value={materialKey}
-          onChange={(e) => setMaterialKey(e.target.value as MaterialKey)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-        >
-          {MATERIAL_ENTRIES.map(([key, mat]) => (
-            <option key={key} value={key}>
-              {mat.name} — ép. {mat.defaultThickness}mm
-            </option>
-          ))}
-        </select>
+      <div className="pt-3">
+        <Toolbar
+          end={(
+            <>
+              <ToolbarButton onClick={onBack}>Retour</ToolbarButton>
+              <ToolbarButton variant="primary" onClick={() => valid && onNext(dims, materialKey)} disabled={!valid}>
+                Suivant
+              </ToolbarButton>
+            </>
+          )}
+        />
       </div>
-
-      <div className="flex justify-between">
-        <button
-          onClick={onBack}
-          className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
-        >
-          ← Retour
-        </button>
-        <button
-          onClick={() => valid && onNext(dims, materialKey)}
-          disabled={!valid}
-          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-40"
-        >
-          Suivant →
-        </button>
-      </div>
-    </div>
+    </Panel>
   );
 }

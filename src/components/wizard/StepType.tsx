@@ -1,45 +1,45 @@
 import type { FurnitureType } from '../../lib/knowledge/types';
+import { Panel, ToolbarButton } from '../../ui-system';
 
 interface Props {
   onSelect: (type: FurnitureType) => void;
 }
 
-const TYPES: { id: FurnitureType; name: string; icon: string }[] = [
-  { id: 'bibliotheque', name: 'Bibliothèque', icon: '📚' },
-  { id: 'etagere_murale', name: 'Étagère murale', icon: '🪵' },
-  { id: 'placard', name: 'Placard', icon: '🚪' },
-  { id: 'armoire', name: 'Armoire', icon: '👔' },
-  { id: 'vestiaire_entree', name: 'Vestiaire entrée', icon: '🧥' },
-  { id: 'meuble_tv', name: 'Meuble TV', icon: '📺' },
-  { id: 'buffet', name: 'Buffet', icon: '🍽️' },
-  { id: 'bureau', name: 'Bureau', icon: '🖥️' },
-  { id: 'commode', name: 'Commode', icon: '🗄️' },
-  { id: 'cuisine', name: 'Cuisine', icon: '🍳' },
-  { id: 'meuble_salle_de_bain', name: 'Salle de bain', icon: '🚿' },
-  { id: 'meuble_chaussures', name: 'Meuble chaussures', icon: '👟' },
-  { id: 'cave_vin', name: 'Cave à vin', icon: '🍷' },
-  { id: 'banquette_coffre', name: 'Banquette coffre', icon: '🪑' },
-  { id: 'sous_escalier', name: 'Sous-escalier', icon: '🪜' },
-  { id: 'lit_cabane_mezzanine', name: 'Lit cabane / Mezzanine', icon: '🛏️' },
-  { id: 'table', name: 'Table', icon: '🪵' },
+const TYPES: { id: FurnitureType; name: string }[] = [
+  { id: 'bibliotheque', name: 'Bibliothèque' },
+  { id: 'etagere_murale', name: 'Étagère murale' },
+  { id: 'placard', name: 'Placard' },
+  { id: 'armoire', name: 'Armoire' },
+  { id: 'vestiaire_entree', name: 'Vestiaire entrée' },
+  { id: 'meuble_tv', name: 'Meuble TV' },
+  { id: 'buffet', name: 'Buffet' },
+  { id: 'bureau', name: 'Bureau' },
+  { id: 'commode', name: 'Commode' },
+  { id: 'cuisine', name: 'Cuisine' },
+  { id: 'meuble_salle_de_bain', name: 'Salle de bain' },
+  { id: 'meuble_chaussures', name: 'Meuble chaussures' },
+  { id: 'cave_vin', name: 'Cave à vin' },
+  { id: 'banquette_coffre', name: 'Banquette coffre' },
+  { id: 'sous_escalier', name: 'Sous-escalier' },
+  { id: 'lit_cabane_mezzanine', name: 'Lit cabane / Mezzanine' },
+  { id: 'table', name: 'Table' },
 ];
 
 export default function StepType({ onSelect }: Props) {
   return (
-    <div>
-      <h3 className="text-lg font-semibold mb-4">Quel meuble voulez-vous construire ?</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        {TYPES.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => onSelect(t.id)}
-            className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors text-center"
+    <Panel title="Choix du meuble">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {TYPES.map((typeItem) => (
+          <ToolbarButton
+            key={typeItem.id}
+            variant="ghost"
+            onClick={() => onSelect(typeItem.id)}
+            className="!h-auto !justify-start !px-3 !py-2 text-left"
           >
-            <span className="text-3xl">{t.icon}</span>
-            <span className="text-sm font-medium leading-tight">{t.name}</span>
-          </button>
+            <span className="text-[12px] leading-tight">{typeItem.name}</span>
+          </ToolbarButton>
         ))}
       </div>
-    </div>
+    </Panel>
   );
 }

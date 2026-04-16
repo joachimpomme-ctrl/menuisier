@@ -1,18 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type {
   FurnitureType,
-  SpaceDimensions,
-  ProjectIntent,
-  ModuleType,
-  ZoneConfig,
   ModuleConfig,
+  ModuleType,
+  ProjectIntent,
+  SpaceDimensions,
+  ZoneConfig,
 } from '../../lib/knowledge/types';
+import { getProjectPreset, loadKnowledge } from '../../lib/knowledge/index';
+import { getAllModules } from '../../lib/knowledge/modules';
 import { variantToResult, type PresetVariant, type ZoneRow } from '../../lib/wizard/variantToResult';
 import type { MaterialKey } from '../../types';
-import { getAllModules } from '../../lib/knowledge/modules';
-import { getProjectPreset } from '../../lib/knowledge/index';
 import ContentMode from './ContentMode';
-
+import {
+  AlertStrip,
+  DataTable,
+  KpiBar,
+  NumberInput,
+  Panel,
+  PropertyGrid,
+  SectionTitle,
+  Select,
+  Toolbar,
+  ToolbarButton,
+} from '../../ui-system';
 
 const ALL_MODULES = getAllModules();
 
@@ -37,6 +48,24 @@ function defaultConfigForModule(moduleId: ModuleType, count: number): ModuleConf
   }
 }
 
+function moduleLabel(moduleId: ModuleType): string {
+  return ALL_MODULES.find((module) => module.id === moduleId)?.name ?? moduleId;
+}
+
+function variantLabel(variant: PresetVariant, index: number): string {
+  return typeof variant.nom === 'string' && variant.nom.trim().length > 0 ? variant.nom : `Variante ${index + 1}`;
+}
+
+interface VariantTableRow {
+  id: string;
+  variant: PresetVariant;
+  label: string;
+  modules: string;
+  width?: number;
+  height?: number;
+  depth?: number;
+}
+
 interface Props {
   furnitureType: FurnitureType;
   space: SpaceDimensions;
@@ -45,15 +74,13 @@ interface Props {
   onGenerate: (intent: ProjectIntent) => void;
 }
 
-let _nextKey = 1;
+let nextKey = 1;
 
 export default function StepOrganize({ furnitureType, space, materialKey, onBack, onGenerate }: Props) {
   const usableHeight = space.height_mm - (space.plinth_mm || 0);
-
   const [zones, setZones] = useState<ZoneRow[]>([
-    { key: _nextKey++, module_id: 'shelf_adjustable', height_mm: usableHeight, count: 4 },
+    { key: nextKey++, module_id: 'shelf_adjustable', height_mm: usableHeight, count: 4 },
   ]);
-
   const [showContentMode, setShowContentMode] = useState(false);
   const [selectedVariantName, setSelectedVariantName] = useState<string | null>(null);
   const [doorOverride, setDoorOverride] = useState<boolean | undefined>(undefined);
@@ -64,37 +91,36 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   const [suggestedWidthMm, setSuggestedWidthMm] = useState<number | undefined>(undefined);
   const [suggestedHeightMm, setSuggestedHeightMm] = useState<number | undefined>(undefined);
   const [suggestedPlinthType, setSuggestedPlinthType] = useState<'legs' | 'none' | undefined>(undefined);
+  const [variants, setVariants] = useState<PresetVariant[]>([]);
 
   const applyContentZones = (zoneConfigs: ZoneConfig[]) => {
-    // Ne pas effacer les overrides de la variante : on ne remplace que les zones.
-    // Les portes, hauteur de portes, suspension et suggestions de dimensions
-    // issues d'une variante rapide précédemment sélectionnée restent actives.
-    const rows: ZoneRow[] = zoneConfigs.map((z) => ({
-      key: _nextKey++,
-      module_id: z.module_id,
-      height_mm: z.height_mm,
-      count: (z.config as Record<string, unknown>).count as number ?? 1,
+    const rows: ZoneRow[] = zoneConfigs.map((zone) => ({
+      key: nextKey++,
+      module_id: zone.module_id,
+      height_mm: zone.height_mm,
+      count: (zone.config as Record<string, unknown>).count as number ?? 1,
     }));
     setZones(rows);
   };
 
-  // Load preset variants (knowledge base may need async loading)
-  const [variants, setVariants] = useState<PresetVariant[]>([]);
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { loadKnowledge } = await import('../../lib/knowledge/index');
       await loadKnowledge();
-      if (cancelled) return;
+      if (cancelled) {
+        return;
+      }
       const preset = getProjectPreset(furnitureType);
       if (preset?.variantes) {
         setVariants(preset.variantes as PresetVariant[]);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [furnitureType]);
 
-  const totalZoneHeight = zones.reduce((s, z) => s + z.height_mm, 0);
+  const totalZoneHeight = zones.reduce((sum, zone) => sum + zone.height_mm, 0);
   const heightDelta = usableHeight - totalZoneHeight;
 
   const clearVariantOverrides = () => {
@@ -113,20 +139,18 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
     clearVariantOverrides();
     setZones((prev) => [
       ...prev,
-      { key: _nextKey++, module_id: 'shelf_adjustable', height_mm: 500, count: 3 },
+      { key: nextKey++, module_id: 'shelf_adjustable', height_mm: 500, count: 3 },
     ]);
   };
 
   const updateZone = (key: number, field: keyof ZoneRow, value: string | number) => {
     clearVariantOverrides();
-    setZones((prev) =>
-      prev.map((z) => (z.key === key ? { ...z, [field]: value } : z)),
-    );
+    setZones((prev) => prev.map((zone) => (zone.key === key ? { ...zone, [field]: value } : zone)));
   };
 
   const removeZone = (key: number) => {
     clearVariantOverrides();
-    setZones((prev) => prev.filter((z) => z.key !== key));
+    setZones((prev) => prev.filter((zone) => zone.key !== key));
   };
 
   const applyVariant = (variant: PresetVariant) => {
@@ -144,10 +168,10 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
   };
 
   const handleGenerate = () => {
-    const zoneConfigs: ZoneConfig[] = zones.map((z) => ({
-      module_id: z.module_id,
-      height_mm: z.height_mm,
-      config: defaultConfigForModule(z.module_id, z.count),
+    const zoneConfigs: ZoneConfig[] = zones.map((zone) => ({
+      module_id: zone.module_id,
+      height_mm: zone.height_mm,
+      config: defaultConfigForModule(zone.module_id, zone.count),
     }));
 
     const effectiveSpace = {
@@ -172,95 +196,228 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
     onGenerate(intent);
   };
 
-  return (
-    <div>
-      <h3 className="text-lg font-semibold mb-4">Organisation des zones</h3>
+  const variantRows: VariantTableRow[] = variants.map((variant, index) => {
+    const result = variantToResult(variant, usableHeight);
+    return {
+      id: variantLabel(variant, index),
+      variant,
+      label: variantLabel(variant, index),
+      modules: result.zones.map((zone) => moduleLabel(zone.module_id)).join(' · '),
+      width: result.suggestedWidthMm,
+      height: result.suggestedHeightMm,
+      depth: result.suggestedDepthMm,
+    };
+  });
 
-      {/* Height indicator */}
-      <div className="mb-4 flex items-center gap-3">
-        <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all ${
-              heightDelta === 0
-                ? 'bg-green-500'
-                : heightDelta > 0
-                  ? 'bg-amber-400'
-                  : 'bg-red-400'
-            }`}
-            style={{ width: `${Math.min(100, Math.round((totalZoneHeight / usableHeight) * 100))}%` }}
+  const suggestionLines = [
+    suggestedWidthMm !== undefined ? `Largeur suggérée : ${suggestedWidthMm} mm` : null,
+    suggestedHeightMm !== undefined ? `Hauteur suggérée : ${suggestedHeightMm} mm` : null,
+    suggestedDepthMm !== undefined ? `Profondeur suggérée : ${suggestedDepthMm} mm` : null,
+    suggestedPlinthType === 'legs' ? 'Piètement suggéré : meuble sur pieds' : null,
+    suggestedPlinthType === 'none' ? 'Plinthe suggérée : aucune plinthe' : null,
+  ].filter((line): line is string => line !== null);
+
+  const propertyGroups = [
+    {
+      title: 'Paramètres actifs',
+      rows: [
+        { label: 'Variante', value: selectedVariantName ?? 'Aucune' },
+        {
+          label: 'Portes',
+          value:
+            doorOverride === undefined
+              ? 'Auto'
+              : doorOverride
+                ? 'Forcées'
+                : 'Désactivées',
+        },
+        { label: 'Hauteur portes', value: doorHeightMm !== undefined ? `${doorHeightMm} mm` : 'Auto' },
+        {
+          label: 'Suspension',
+          value:
+            suspendedOverride === undefined
+              ? 'Auto'
+              : suspendedOverride
+                ? 'Oui'
+                : 'Non',
+        },
+        {
+          label: 'Plinthe',
+          value:
+            suggestedPlinthType === 'none'
+              ? 'Aucune'
+              : suggestedPlinthType === 'legs'
+                ? 'Sur pieds'
+                : `${space.plinth_mm} mm`,
+        },
+      ],
+    },
+    {
+      title: 'Dimensions de sortie',
+      rows: [
+        { label: 'Largeur', value: `${suggestedWidthMm ?? space.width_mm} mm` },
+        { label: 'Hauteur', value: `${suggestedHeightMm ?? space.height_mm} mm` },
+        { label: 'Profondeur', value: `${suggestedDepthMm ?? space.depth_mm} mm` },
+      ],
+    },
+  ];
+
+  return (
+    <div className="space-y-3">
+      <Panel>
+        <SectionTitle>Organisation des zones</SectionTitle>
+        <div className="pt-3">
+          <KpiBar
+            items={[
+              { key: 'used', label: 'Zone totale', value: totalZoneHeight, unit: 'mm' },
+              { key: 'target', label: 'Hauteur utile', value: usableHeight, unit: 'mm' },
+              { key: 'delta', label: 'Écart', value: `${heightDelta > 0 ? '+' : ''}${heightDelta}`, unit: 'mm' },
+            ]}
           />
         </div>
-        <span className={`text-xs font-medium tabular-nums whitespace-nowrap ${
-          heightDelta === 0
-            ? 'text-green-600'
-            : heightDelta > 0
-              ? 'text-amber-600'
-              : 'text-red-600'
-        }`}>
-          {totalZoneHeight} / {usableHeight} mm
-          {heightDelta !== 0 && (
-            <span> ({heightDelta > 0 ? '+' : ''}{heightDelta})</span>
-          )}
-        </span>
-      </div>
+      </Panel>
 
-      {/* Quick variant buttons */}
       {variants.length > 0 && (
-        <div className="mb-5">
-          <label className="block text-xs font-medium text-gray-500 uppercase mb-2">Variantes rapides</label>
-          <div className="flex flex-wrap gap-2">
-            {variants.map((v, i) => (
-              <button
-                key={i}
-                onClick={() => applyVariant(v)}
-                className={`px-3 py-1.5 text-xs border rounded-full transition-colors ${
-                  selectedVariantName === v.nom
-                    ? 'bg-amber-100 border-amber-400 text-amber-800 font-medium'
-                    : 'border-gray-300 hover:bg-blue-50 hover:border-blue-300'
-                }`}
-              >
-                {v.nom}
-              </button>
+        <Panel title="Configurations types" flush>
+          <DataTable
+            columns={[
+              {
+                key: 'variant',
+                header: 'Variante',
+                render: (row) => row.label,
+              },
+              {
+                key: 'modules',
+                header: 'Modules',
+                render: (row) => row.modules || 'Organisation standard',
+              },
+              {
+                key: 'depth',
+                header: 'Prof.',
+                align: 'right',
+                render: (row) => (row.depth !== undefined ? `${row.depth} mm` : '—'),
+              },
+              {
+                key: 'apply',
+                header: 'Action',
+                render: (row) => (
+                  <ToolbarButton
+                    variant="ghost"
+                    onClick={() => applyVariant(row.variant)}
+                    className="!h-[22px] !px-2"
+                  >
+                    Appliquer
+                  </ToolbarButton>
+                ),
+              },
+            ]}
+            rows={variantRows}
+            rowId={(row) => row.id}
+            selectedId={selectedVariantName}
+            onSelect={(row) => applyVariant(row.variant)}
+            emptyLabel="Aucune configuration type"
+            maxHeight={208}
+          />
+        </Panel>
+      )}
+
+      {suggestionLines.length > 0 && (
+        <AlertStrip kind="info" title="Ajustements proposés">
+          <div className="space-y-1">
+            {suggestionLines.map((line) => (
+              <div key={line}>{line}</div>
             ))}
           </div>
-        </div>
+        </AlertStrip>
       )}
 
-      {(suggestedWidthMm !== undefined || suggestedDepthMm !== undefined || suggestedHeightMm !== undefined || suggestedPlinthType !== undefined) && (
-        <div className="mb-4 text-xs text-blue-600 bg-blue-50 rounded-lg px-3 py-2 space-y-1">
-          {suggestedWidthMm !== undefined && <p>ℹ Largeur suggérée par la variante : {suggestedWidthMm} mm</p>}
-          {suggestedDepthMm !== undefined && <p>ℹ Profondeur suggérée par la variante : {suggestedDepthMm} mm</p>}
-          {suggestedHeightMm !== undefined && <p>ℹ Hauteur suggérée par la variante : {suggestedHeightMm} mm</p>}
-          {suggestedPlinthType === 'legs' && <p>ℹ Piètement suggéré : meuble sur pieds</p>}
-        </div>
+      {variantWarnings.map((warning) => (
+        <AlertStrip key={warning} kind="warning" title="Point d'attention">
+          {warning}
+        </AlertStrip>
+      ))}
+
+      {['placard', 'armoire', 'cuisine', 'meuble_salle_de_bain'].includes(furnitureType) && (
+        <AlertStrip kind="info" title="Portes automatiques">
+          Les portes sont calculées automatiquement selon le type de meuble et la largeur.
+        </AlertStrip>
       )}
 
-      {variantWarnings.length > 0 && (
-        <div className="mb-4 text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2 space-y-1">
-          {variantWarnings.map((w, i) => (
-            <p key={i}>⚠ {w}</p>
-          ))}
-        </div>
-      )}
+      <Panel title="Zones" flush>
+        <DataTable
+          columns={[
+            {
+              key: 'module',
+              header: 'Module',
+              render: (row) => (
+                <Select
+                  value={row.module_id}
+                  onChange={(e) => updateZone(row.key, 'module_id', e.target.value)}
+                  aria-label={`Module zone ${row.key}`}
+                >
+                  {ALL_MODULES.map((module) => (
+                    <option key={module.id} value={module.id}>
+                      {module.name}
+                    </option>
+                  ))}
+                </Select>
+              ),
+            },
+            {
+              key: 'height',
+              header: 'Hauteur (mm)',
+              align: 'right',
+              render: (row) => (
+                <NumberInput
+                  value={row.height_mm}
+                  min={100}
+                  onChange={(e) => updateZone(row.key, 'height_mm', parseInt(e.target.value, 10) || 0)}
+                  className="w-[92px] text-right"
+                  aria-label={`Hauteur zone ${row.key}`}
+                />
+              ),
+            },
+            {
+              key: 'count',
+              header: 'Qté',
+              align: 'right',
+              render: (row) => (
+                <NumberInput
+                  value={row.count}
+                  min={1}
+                  max={12}
+                  onChange={(e) => updateZone(row.key, 'count', parseInt(e.target.value, 10) || 1)}
+                  className="w-[64px] text-right"
+                  aria-label={`Quantité zone ${row.key}`}
+                />
+              ),
+            },
+            {
+              key: 'actions',
+              header: 'Action',
+              render: (row) => (
+                <ToolbarButton
+                  variant="ghost"
+                  onClick={() => removeZone(row.key)}
+                  className="!h-[22px] !px-2"
+                  aria-label={`Supprimer zone ${row.key}`}
+                >
+                  Supprimer
+                </ToolbarButton>
+              ),
+            },
+          ]}
+          rows={zones}
+          rowId={(row) => String(row.key)}
+          emptyLabel="Aucune zone configurée"
+          maxHeight={320}
+        />
+      </Panel>
 
-      {/* Content mode button — visible call-to-action */}
-      <button
-        onClick={() => setShowContentMode(true)}
-        className="mb-5 w-full flex items-center gap-3 px-4 py-3 border-2 border-dashed border-blue-300 bg-blue-50 hover:bg-blue-100 hover:border-blue-400 rounded-lg text-left transition-colors"
-      >
-        <span className="text-xl" aria-hidden="true">📦</span>
-        <span className="flex-1">
-          <span className="block text-sm font-semibold text-blue-800">
-            Je décris ce que je range
-          </span>
-          <span className="block text-xs text-blue-600 mt-0.5">
-            Laisse-nous proposer l'organisation des zones à partir de ton contenu (vêtements, livres, etc.)
-          </span>
-        </span>
-        <span className="text-blue-500" aria-hidden="true">→</span>
-      </button>
+      <Panel title="Synthèse d'organisation">
+        <PropertyGrid groups={propertyGroups} />
+      </Panel>
 
-      {/* Content mode modal */}
       {showContentMode && (
         <ContentMode
           furnitureType={furnitureType}
@@ -270,86 +427,24 @@ export default function StepOrganize({ furnitureType, space, materialKey, onBack
         />
       )}
 
-      <div className="space-y-3 mb-6">
-        {zones.map((z) => (
-          <div key={z.key} className="flex flex-wrap items-end gap-2 p-3 bg-gray-50 rounded-lg">
-            <div className="flex-1 min-w-[140px]">
-              <label className="block text-xs text-gray-500 mb-1">Module</label>
-              <select
-                value={z.module_id}
-                onChange={(e) => updateZone(z.key, 'module_id', e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-              >
-                {ALL_MODULES.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.icon} {m.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="w-24">
-              <label className="block text-xs text-gray-500 mb-1">Hauteur mm</label>
-              <input
-                type="number"
-                value={z.height_mm}
-                min={100}
-                onChange={(e) => updateZone(z.key, 'height_mm', parseInt(e.target.value, 10) || 0)}
-                className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-              />
-            </div>
-
-            <div className="w-16">
-              <label className="block text-xs text-gray-500 mb-1">Qté</label>
-              <input
-                type="number"
-                value={z.count}
-                min={1}
-                max={12}
-                onChange={(e) => updateZone(z.key, 'count', parseInt(e.target.value, 10) || 1)}
-                className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
-              />
-            </div>
-
-            <button
-              onClick={() => removeZone(z.key)}
-              className="text-red-400 hover:text-red-600 text-lg px-1"
-              title="Supprimer"
-            >
-              ×
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <button
-        onClick={addZone}
-        className="mb-6 text-sm text-blue-600 hover:text-blue-800"
-      >
-        + Ajouter une zone
-      </button>
-
-      {['placard', 'armoire', 'cuisine', 'meuble_salle_de_bain'].includes(furnitureType) && (
-        <p className="mb-6 text-xs text-gray-400 italic">
-          Portes calculées automatiquement selon le type de meuble et la largeur.
-        </p>
-      )}
-
-      <div className="flex justify-between">
-        <button
-          onClick={onBack}
-          className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
-        >
-          ← Retour
-        </button>
-        <button
-          onClick={handleGenerate}
-          disabled={zones.length === 0}
-          className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-40"
-        >
-          Générer →
-        </button>
-      </div>
+      <Toolbar
+        start={(
+          <>
+            <ToolbarButton onClick={addZone}>Ajouter une zone</ToolbarButton>
+            <ToolbarButton variant="ghost" onClick={() => setShowContentMode(true)}>
+              Je décris ce que je range
+            </ToolbarButton>
+          </>
+        )}
+        end={(
+          <>
+            <ToolbarButton onClick={onBack}>Retour</ToolbarButton>
+            <ToolbarButton variant="primary" onClick={handleGenerate} disabled={zones.length === 0}>
+              Générer
+            </ToolbarButton>
+          </>
+        )}
+      />
     </div>
   );
 }
