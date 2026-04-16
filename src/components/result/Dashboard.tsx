@@ -26,6 +26,25 @@ const DIFFICULTY_LABELS: Record<string, string> = {
   avance: 'Avancé',
 };
 
+/**
+ * Types de meubles que le moteur V3 actuel ne sait pas modéliser correctement.
+ * Le paradigme "carcasse en panneaux" génère un caisson rectangulaire au lieu
+ * de la structure attendue (plateau + pieds pour table, poteaux + plateforme
+ * pour lit). Les pièces générées ne sont PAS fabricables en l'état.
+ */
+const NON_FABRICABLE_TYPES: Record<string, { label: string; explanation: string }> = {
+  table: {
+    label: 'Table',
+    explanation:
+      'Le moteur V3 génère un caisson rectangulaire avec joues et fond. Une table nécessite un plateau, des pieds (ou tréteaux) et une éventuelle ceinture — structures qui ne sont pas supportées. La liste de pièces affichée n\'est pas fabricable en l\'état.',
+  },
+  lit_cabane_mezzanine: {
+    label: 'Lit cabane / mezzanine',
+    explanation:
+      'Le moteur V3 génère une bibliothèque (joues, tablettes). Un lit cabane/mezzanine nécessite des poteaux massifs, des longerons, une plateforme de couchage, une échelle et des garde-corps — structures qui ne sont pas supportées. La liste de pièces affichée n\'est pas fabricable en l\'état.',
+  },
+};
+
 function Section({ title, defaultOpen, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen ?? false);
   return (
@@ -118,6 +137,23 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
           <span className="bg-stone-100 border border-stone-200 rounded-full px-2.5 py-1">
             {prod.assembly_guide.length} étapes
           </span>
+        </div>
+      )}
+
+      {/* Non-fabricable type warning — hard red banner */}
+      {NON_FABRICABLE_TYPES[intent.furniture_type] && (
+        <div className="rounded-lg bg-red-100 border-2 border-red-400 p-4">
+          <h3 className="font-bold text-red-800 text-sm mb-2 flex items-center gap-2">
+            <span className="text-lg">⚠️</span>
+            Type non supporté par le moteur V3 — aperçu uniquement
+          </h3>
+          <p className="text-sm text-red-700 leading-relaxed">
+            {NON_FABRICABLE_TYPES[intent.furniture_type].explanation}
+          </p>
+          <p className="text-xs text-red-600 mt-2 italic">
+            Ne pas utiliser cette liste de pièces pour une fabrication réelle. Un moteur de
+            géométrie dédié est nécessaire pour ce type de meuble.
+          </p>
         </div>
       )}
 
@@ -253,8 +289,13 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
         </button>
         <button
           onClick={handleExportPdf}
-          disabled={pdfLoading}
-          className="px-4 py-2 text-sm bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50 font-semibold"
+          disabled={pdfLoading || Boolean(NON_FABRICABLE_TYPES[intent.furniture_type])}
+          title={
+            NON_FABRICABLE_TYPES[intent.furniture_type]
+              ? 'Export PDF désactivé : la liste de pièces n\'est pas fabricable pour ce type de meuble'
+              : undefined
+          }
+          className="px-4 py-2 text-sm bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
         >
           {pdfLoading ? '...' : '📄 Exporter PDF'}
         </button>
