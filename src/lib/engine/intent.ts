@@ -11,7 +11,7 @@ import type {
   ValidationIssue,
   SpaceDimensions,
 } from '../knowledge/types';
-import { getProjectPreset } from '../knowledge/index';
+import { getPresetSpaceDefaults } from '../knowledge/index';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -47,14 +47,6 @@ const DIMENSION_RANGES: Record<keyof Pick<SpaceDimensions, 'width_mm' | 'height_
   height_mm: { min: 200, max: 3000 },
   depth_mm:  { min: 100, max: 1000 },
   plinth_mm: { min: 0,   max: 200 },
-};
-
-// Mapping from preset dimension keys to SpaceDimensions keys
-const PRESET_KEY_MAP: Record<string, keyof SpaceDimensions> = {
-  largeur_mm: 'width_mm',
-  hauteur_mm: 'height_mm',
-  profondeur_mm: 'depth_mm',
-  plinthe_mm: 'plinth_mm',
 };
 
 // ---------------------------------------------------------------------------
@@ -94,22 +86,11 @@ export function validateIntent(intent: ProjectIntent): IntentResult {
   }
 
   // --- Fill missing dimensions from preset ---
-  const preset = getProjectPreset(intent.furniture_type);
-  if (preset) {
-    const defaults = preset.dimensions_defaut as Record<string, unknown>;
-    // Flatten: some presets have nested sub-objects (e.g. cuisine.meuble_bas)
-    // We only use top-level numeric values.
-    for (const [presetKey, spaceKey] of Object.entries(PRESET_KEY_MAP)) {
-      if (spaceKey === 'wall_type') continue;
-      const dimKey = spaceKey as keyof Pick<SpaceDimensions, 'width_mm' | 'height_mm' | 'depth_mm' | 'plinth_mm'>;
-      if (
-        (normalized.space[dimKey] === undefined ||
-          normalized.space[dimKey] === 0) &&
-        typeof defaults[presetKey] === 'number'
-      ) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (normalized.space as any)[dimKey] = defaults[presetKey];
-      }
+  const presetDefaults = getPresetSpaceDefaults(intent.furniture_type);
+  for (const [key, value] of Object.entries(presetDefaults)) {
+    const dimKey = key as keyof Pick<SpaceDimensions, 'width_mm' | 'height_mm' | 'depth_mm' | 'plinth_mm'>;
+    if ((normalized.space[dimKey] === undefined || normalized.space[dimKey] === 0) && typeof value === 'number') {
+      normalized.space[dimKey] = value;
     }
   }
 

@@ -1,0 +1,108 @@
+.
+├── README.md
+├── api
+│   └── chat.ts
+├── arborescence.txt
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── public
+│   ├── favicon.svg
+│   ├── google-apps-script.js
+│   ├── icons
+│   │   ├── icon-192.png
+│   │   ├── icon-512.png
+│   │   ├── icon.svg
+│   │   └── icon.svg.png
+│   ├── icons.svg
+│   ├── knowledge
+│   │   ├── base_v1.json
+│   │   └── base_v2.json
+│   ├── manifest.json
+│   └── sw.js
+├── src
+│   ├── App.tsx
+│   ├── assets
+│   │   ├── hero.png
+│   │   └── vite.svg
+│   ├── components
+│   │   ├── AssistantTab.tsx
+│   │   ├── CloudSync.tsx
+│   │   ├── CostPanel.tsx
+│   │   ├── DebitTab.tsx
+│   │   ├── InstallBanner.tsx
+│   │   ├── KnowledgeManager.tsx
+│   │   ├── MontageTab.tsx
+│   │   ├── NewProjectWizard.tsx
+│   │   ├── NoticeTab.tsx
+│   │   ├── PlanTab.tsx
+│   │   ├── ProjectManager.tsx
+│   │   ├── StructureTab.tsx
+│   │   ├── Tip.tsx
+│   │   ├── ValidationTab.tsx
+│   │   └── structure
+│   │       ├── BodyCard.tsx
+│   │       ├── DoorConfigurator.tsx
+│   │       ├── Glossary.tsx
+│   │       ├── NumberInput.tsx
+│   │       ├── PieceEditor.tsx
+│   │       ├── WallSurveyDiagram.tsx
+│   │       └── styles.ts
+│   ├── data
+│   │   ├── knowledge.ts
+│   │   ├── materials.ts
+│   │   ├── templates.ts
+│   │   └── tips.ts
+│   ├── hooks
+│   │   ├── useProjectAnalysis.ts
+│   │   └── useProjectRepository.ts
+│   ├── index.css
+│   ├── lib
+│   │   ├── __tests__
+│   │   │   ├── actions.test.ts
+│   │   │   ├── aiPatch.test.ts
+│   │   │   ├── cost.test.ts
+│   │   │   ├── csv.test.ts
+│   │   │   ├── domain.test.ts
+│   │   │   ├── helpers.test.ts
+│   │   │   ├── nesting.test.ts
+│   │   │   ├── normalizeProject.test.ts
+│   │   │   ├── projectAnalysis.test.ts
+│   │   │   ├── steps.test.ts
+│   │   │   └── validation.test.ts
+│   │   ├── actions
+│   │   │   ├── bodyActions.ts
+│   │   │   ├── index.ts
+│   │   │   ├── pieceActions.ts
+│   │   │   └── projectActions.ts
+│   │   ├── ai
+│   │   │   ├── aiPatch.ts
+│   │   │   └── buildContext.ts
+│   │   ├── cloudSync.ts
+│   │   ├── cost.ts
+│   │   ├── csv.ts
+│   │   ├── domain
+│   │   │   ├── body.ts
+│   │   │   ├── index.ts
+│   │   │   ├── panels.ts
+│   │   │   └── pieces.ts
+│   │   ├── helpers.ts
+│   │   ├── knowledgeStore.ts
+│   │   ├── nesting.ts
+│   │   ├── normalizeProject.ts
+│   │   ├── pdf.ts
+│   │   ├── projectAnalysis.ts
+│   │   ├── state.ts
+│   │   ├── steps.ts
+│   │   ├── storage.ts
+│   │   └── validation.ts
+│   ├── main.tsx
+│   ├── types.ts
+│   └── vite-env.d.ts
+├── tsconfig.json
+├── tsconfig.node.json
+├── vercel.json
+└── vite.config.ts
+
+16 directories, 90 files

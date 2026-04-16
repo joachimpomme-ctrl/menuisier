@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { loadKnowledge, getProjectPreset } from '../../knowledge/index';
+import { loadKnowledge, getProjectPreset, getPresetSpaceDefaults } from '../../knowledge/index';
 import type { FurnitureType, ProjectIntent } from '../../knowledge/types';
 import { runPipeline } from '../pipeline';
 import { buildFacade2DModel } from '../facade2d';
@@ -87,13 +87,12 @@ function resetAll() {
 }
 
 function getDefaultDimensions(type: FurnitureType) {
-  const preset = getProjectPreset(type);
-  const dims = preset?.dimensions_defaut as Record<string, number> | undefined;
+  const dims = getPresetSpaceDefaults(type);
   return {
-    width: dims?.largeur_mm ?? 800,
-    height: dims?.hauteur_mm ?? 2000,
-    depth: dims?.profondeur_mm ?? 400,
-    plinth: dims?.plinthe_mm ?? 0,
+    width: dims.width_mm ?? 800,
+    height: dims.height_mm ?? 2000,
+    depth: dims.depth_mm ?? 400,
+    plinth: dims.plinth_mm ?? 0,
   };
 }
 

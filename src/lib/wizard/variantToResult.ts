@@ -188,6 +188,10 @@ export function variantToResult(variant: PresetVariant, usableHeight: number): V
   let suggestedWidthMm: number | undefined;
   if (typeof variant.largeur_mm === 'number') {
     suggestedWidthMm = roundToInt(variant.largeur_mm);
+  } else if (variant.largeur_etroite === true || variant.porte_unique === true) {
+    // Bonnetière-like : largeur étroite implicite pour que `resolveDoors`
+    // génère 1 porte (seuil 500mm dans layout.ts).
+    suggestedWidthMm = 500;
   }
 
   let suggestedHeightMm: number | undefined;

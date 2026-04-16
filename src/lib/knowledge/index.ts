@@ -13,7 +13,7 @@
  *   elles sont codées dans engine/validation.ts.
  */
 
-import type { FurnitureType } from './types';
+import type { FurnitureType, SpaceDimensions } from './types';
 
 // ---------------------------------------------------------------------------
 // Raw JSON shape (loosely typed — the JSON is large and heterogeneous)
@@ -89,4 +89,38 @@ export function isLoaded(): boolean {
  */
 export function getProjectPreset(type: FurnitureType): ProjectPreset | null {
   return _kb?.projets[type] ?? null;
+}
+
+/**
+ * Normalize heterogeneous preset dimension keys into wizard/engine space dimensions.
+ *
+ * Some presets use direct defaults (`hauteur_mm`), while others only expose a
+ * maximum or domain-specific measure (`hauteur_max_mm` for sous-escalier).
+ */
+export function getPresetSpaceDefaults(type: FurnitureType): Partial<SpaceDimensions> {
+  const preset = getProjectPreset(type);
+  if (!preset?.dimensions_defaut) return {};
+
+  const dims = preset.dimensions_defaut as Record<string, unknown>;
+  const defaults: Partial<SpaceDimensions> = {};
+
+  if (typeof dims.largeur_mm === 'number') {
+    defaults.width_mm = dims.largeur_mm;
+  }
+
+  if (typeof dims.hauteur_mm === 'number') {
+    defaults.height_mm = dims.hauteur_mm;
+  } else if (typeof dims.hauteur_max_mm === 'number') {
+    defaults.height_mm = dims.hauteur_max_mm;
+  }
+
+  if (typeof dims.profondeur_mm === 'number') {
+    defaults.depth_mm = dims.profondeur_mm;
+  }
+
+  if (typeof dims.plinthe_mm === 'number') {
+    defaults.plinth_mm = dims.plinthe_mm;
+  }
+
+  return defaults;
 }

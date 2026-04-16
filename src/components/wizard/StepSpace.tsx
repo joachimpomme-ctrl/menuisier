@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type { FurnitureType, WallType, SpaceDimensions } from '../../lib/knowledge/types';
 import type { MaterialKey } from '../../types';
 import { MATERIALS } from '../../data/materials';
-import { getProjectPreset } from '../../lib/knowledge/index';
+import { getPresetSpaceDefaults } from '../../lib/knowledge/index';
 
 interface Props {
   furnitureType: FurnitureType;
@@ -30,15 +30,7 @@ const RANGES = {
 type DimKey = keyof typeof RANGES;
 
 function loadDefaults(type: FurnitureType): Partial<SpaceDimensions> {
-  const preset = getProjectPreset(type);
-  if (!preset?.dimensions_defaut) return {};
-  const d = preset.dimensions_defaut as Record<string, unknown>;
-  const out: Partial<SpaceDimensions> = {};
-  if (typeof d.largeur_mm === 'number') out.width_mm = d.largeur_mm;
-  if (typeof d.hauteur_mm === 'number') out.height_mm = d.hauteur_mm;
-  if (typeof d.profondeur_mm === 'number') out.depth_mm = d.profondeur_mm;
-  if (typeof d.plinthe_mm === 'number') out.plinth_mm = d.plinthe_mm;
-  return out;
+  return getPresetSpaceDefaults(type);
 }
 
 export default function StepSpace({ furnitureType, initial, onBack, onNext }: Props) {

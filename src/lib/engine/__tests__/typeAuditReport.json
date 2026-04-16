@@ -513,18 +513,17 @@
     "type": "armoire",
     "variant": "Armoire bonnetière",
     "dimensions": {
-      "width": 1000,
+      "width": 500,
       "height": 2000,
       "depth": 550,
       "plinth": 0
     },
     "result": {
-      "bodyCount": 2,
-      "partCount": 20,
+      "bodyCount": 1,
+      "partCount": 10,
       "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
-        "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps",
         "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
       ],
       "hasJoues": true,
@@ -532,11 +531,11 @@
       "hasBottom": true,
       "hasFond": true,
       "hasDoors": true,
-      "doorCount": 2,
+      "doorCount": 1,
       "zoneTypes": [
         "shelf_adjustable"
       ],
-      "fixedShelfCount": 4,
+      "fixedShelfCount": 2,
       "approximationFlags": [
         "simplified_doors"
       ],
@@ -1356,7 +1355,7 @@
     "variant": "default",
     "dimensions": {
       "width": 800,
-      "height": 2000,
+      "height": 2200,
       "depth": 800,
       "plinth": 0
     },
@@ -1393,7 +1392,7 @@
     "variant": "Tiroirs extractibles (zone basse)",
     "dimensions": {
       "width": 800,
-      "height": 2000,
+      "height": 2200,
       "depth": 800,
       "plinth": 0
     },
@@ -1430,7 +1429,7 @@
     "variant": "Vestiaire d'entrée",
     "dimensions": {
       "width": 800,
-      "height": 2000,
+      "height": 2200,
       "depth": 800,
       "plinth": 0
     },
