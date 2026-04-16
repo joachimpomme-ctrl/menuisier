@@ -43,6 +43,8 @@ import {
   ProcurementBadge,
   AlertStrip,
   SectionTitle,
+  KpiBar,
+  Legend,
 } from '../../ui-system';
 
 interface Props {
@@ -270,35 +272,15 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
         </div>
       </Panel>
 
-      {/* Légende façade */}
-      <div className="p-2 text-[10px] flex flex-wrap gap-x-3 gap-y-1 text-[color:var(--fg-muted)] bg-[color:var(--bg-panel)]">
-        <span>
-          <span
-            className="inline-block w-2 h-2 mr-1 align-middle"
-            style={{ border: '1px solid #1d1d1b', background: '#ebe8e1' }}
-          />
-          plinthe
-        </span>
-        <span>
-          <span
-            className="inline-block w-2 h-2 mr-1 align-middle"
-            style={{ background: '#1d1d1b' }}
-          />
-          tablette fixe
-        </span>
-        <span>
-          <span
-            className="inline-block w-2 h-2 mr-1 align-middle"
-            style={{
-              outline: '2px solid var(--accent)',
-              outlineOffset: -1,
-              background: 'transparent',
-            }}
-          />
-          sélection
-        </span>
-        {facade2DModel.wallMounting && <span>— suspendu</span>}
-      </div>
+      {/* Légende façade — composant canonique */}
+      <Legend
+        items={[
+          { key: 'plinth', label: 'plinthe', swatch: 'outline' },
+          { key: 'shelf', label: 'tablette fixe', swatch: 'solid' },
+          { key: 'sel', label: 'sélection', swatch: 'selected' },
+        ]}
+        note={facade2DModel.wallMounting ? '— suspendu' : undefined}
+      />
 
       {facade2DModel.warnings.length > 0 && (
         <div className="p-2 rule-t flex flex-col gap-1 bg-[color:var(--bg-panel)]">
@@ -377,27 +359,31 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
   // -------------------------------------------------------------------------
   const bottom = (
     <div className="grid grid-cols-3 gap-0">
-      {/* Procurement */}
-      <div className="rule-r p-3">
-        <SectionTitle flush>Procurement</SectionTitle>
-        <div className="grid grid-cols-3 gap-3 mt-2">
-          <div>
-            <ProcurementBadge status="buy_exact" />
-            <div className="font-mono tabular-nums text-xl mt-0.5">{procSummary.buy_exact}</div>
-          </div>
-          <div>
-            <ProcurementBadge status="buy_and_rework" />
-            <div className="font-mono tabular-nums text-xl mt-0.5">
-              {procSummary.buy_and_rework}
-            </div>
-          </div>
-          <div>
-            <ProcurementBadge status="cut_from_sheet" />
-            <div className="font-mono tabular-nums text-xl mt-0.5">
-              {procSummary.cut_from_sheet}
-            </div>
-          </div>
-        </div>
+      {/* Procurement — canonique KpiBar */}
+      <div className="rule-r">
+        <KpiBar
+          title="Procurement"
+          items={[
+            {
+              key: 'buy_exact',
+              label: 'Achat',
+              value: procSummary.buy_exact,
+              badge: <ProcurementBadge status="buy_exact" />,
+            },
+            {
+              key: 'buy_and_rework',
+              label: 'Achat+Retouche',
+              value: procSummary.buy_and_rework,
+              badge: <ProcurementBadge status="buy_and_rework" />,
+            },
+            {
+              key: 'cut_from_sheet',
+              label: 'Débit',
+              value: procSummary.cut_from_sheet,
+              badge: <ProcurementBadge status="cut_from_sheet" />,
+            },
+          ]}
+        />
       </div>
 
       {/* Warnings */}

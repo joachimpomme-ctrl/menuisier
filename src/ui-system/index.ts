@@ -32,6 +32,10 @@ export type {
 } from './components/Toolbar';
 export { SplitLayout } from './components/SplitLayout';
 export type { SplitLayoutProps } from './components/SplitLayout';
+export { KpiBar } from './components/KpiBar';
+export type { KpiBarProps, KpiItem } from './components/KpiBar';
+export { Legend } from './components/Legend';
+export type { LegendProps, LegendItem } from './components/Legend';
 export { AlertStrip } from './components/AlertStrip';
 export type { AlertStripProps, AlertKind } from './components/AlertStrip';
 export { SectionTitle } from './components/SectionTitle';
@@ -42,4 +46,9 @@ export {
   NumberInput,
   Select,
 } from './components/Input';
-export type { FieldProps } from './components/Input';
+export type {
+  FieldProps,
+  TextInputProps,
+  NumberInputProps,
+  SelectProps,
+} from './components/Input';
