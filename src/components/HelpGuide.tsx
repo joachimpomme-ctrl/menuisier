@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import HELP_GUIDE from '../data/helpGuide';
 import type { ContentBlock, GlossaryBlock, HelpSection } from '../data/helpGuide';
-import { AlertStrip, Panel, ToolbarButton } from '../ui-system';
 
 export interface HelpGuideProps {
   isOpen: boolean;
@@ -48,11 +47,15 @@ function renderBlock(block: ContentBlock, key: string): React.JSX.Element {
       );
     case 'tip':
       return (
-        <AlertStrip key={key} kind="info" title="Conseil">{block.content}</AlertStrip>
+        <div key={key} className="text-sm bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg px-3 py-2">
+          💡 {block.content}
+        </div>
       );
     case 'warning':
       return (
-        <AlertStrip key={key} kind="warning" title="Attention">{block.content}</AlertStrip>
+        <div key={key} className="text-sm bg-amber-50 text-amber-800 border border-amber-200 rounded-lg px-3 py-2">
+          ⚠️ {block.content}
+        </div>
       );
     case 'glossary':
       return (
@@ -130,79 +133,87 @@ export default function HelpGuide({ isOpen, onClose }: HelpGuideProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--bg-overlay)]/60" onClick={onClose}>
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center" onClick={onClose}>
       <div
-        className="w-full max-w-4xl max-h-[90vh] flex mx-4 overflow-hidden"
+        className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex mx-4 overflow-hidden"
         onClick={(event) => event.stopPropagation()}
       >
-        <Panel
-          title="Guide utilisateur"
-          actions={<ToolbarButton onClick={onClose} aria-label="Fermer le guide utilisateur">Fermer</ToolbarButton>}
-          className="w-full"
-        >
-          <div className="flex min-h-0 overflow-hidden">
-            <div className="hidden sm:flex w-56 rule-r bg-[color:var(--bg-panel-alt)] overflow-y-auto flex-col shrink-0">
-              <div className="px-3 py-3 rule-b">
-                <h2 className="text-[12px] font-semibold">Navigation</h2>
-              </div>
-              <nav className="p-2 space-y-1">
-                {sections.map((section) => {
-                  const isActive = activeSectionId === section.id;
-                  return (
-                    <button
-                      key={section.id}
-                      onClick={() => scrollToSection(section.id)}
-                      className={`w-full text-left px-3 py-2 text-[12px] border ${
-                        isActive
-                          ? 'border-[color:var(--accent)] bg-[color:var(--accent-bg)] text-[color:var(--fg)]'
-                          : 'border-[color:var(--border-hairline)] bg-[color:var(--bg-panel)] text-[color:var(--fg-muted)] hover:bg-[color:var(--bg-panel-alt)]'
-                      }`}
-                    >
-                      {section.title}
-                    </button>
-                  );
-                })}
-              </nav>
-            </div>
-
-            <div className="flex-1 flex flex-col min-w-0">
-              <div className="sm:hidden px-3 py-3 rule-b">
-                <select
-                  value={activeSectionId}
-                  onChange={(event) => scrollToSection(event.target.value)}
-                  className="sel"
-                >
-                  {sections.map((section) => (
-                    <option key={section.id} value={section.id}>
-                      {section.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div ref={contentRef} className="flex-1 overflow-y-auto px-3 py-3 space-y-8">
-                {sections.map((section) => (
-                  <section
-                    key={section.id}
-                    id={`help-${section.id}`}
-                    data-help-id={section.id}
-                    ref={(node) => {
-                      sectionRefs.current[section.id] = node;
-                    }}
-                    className="scroll-mt-4"
-                  >
-                    <div className="mb-4">
-                      <h2 className="text-[16px] font-semibold text-[color:var(--fg)]">{section.title}</h2>
-                    </div>
-                    <div className="space-y-4">
-                      {section.blocks.map((block, index) => renderBlock(block, `${section.id}-${index}`))}
-                    </div>
-                  </section>
-                ))}
-              </div>
-            </div>
+        <div className="hidden sm:flex w-56 border-r border-stone-200 bg-stone-50 overflow-y-auto flex-col shrink-0">
+          <div className="px-4 py-4 border-b border-stone-200">
+            <h2 className="text-sm font-semibold text-stone-800">Guide utilisateur</h2>
           </div>
-        </Panel>
+          <nav className="p-2 space-y-1">
+            {sections.map((section) => {
+              const isActive = activeSectionId === section.id;
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => scrollToSection(section.id)}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                    isActive
+                      ? 'bg-amber-100 text-amber-700 font-medium'
+                      : 'text-stone-600 hover:bg-white hover:text-stone-800'
+                  }`}
+                >
+                  <span className="mr-2">{section.icon}</span>
+                  {section.title}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className="px-5 py-4 border-b border-stone-200 flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-semibold text-stone-800">Guide utilisateur</h1>
+              <p className="text-xs text-stone-500 mt-0.5">Mode d’emploi intégré de l’application</p>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-stone-400 hover:text-stone-700 text-xl leading-none"
+              aria-label="Fermer le guide utilisateur"
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="sm:hidden px-4 py-3 border-b border-stone-200">
+            <select
+              value={activeSectionId}
+              onChange={(event) => scrollToSection(event.target.value)}
+              className="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm bg-white text-stone-700"
+            >
+              {sections.map((section) => (
+                <option key={section.id} value={section.id}>
+                  {section.icon} {section.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div ref={contentRef} className="flex-1 overflow-y-auto px-5 py-5 space-y-8">
+            {sections.map((section) => (
+              <section
+                key={section.id}
+                id={`help-${section.id}`}
+                data-help-id={section.id}
+                ref={(node) => {
+                  sectionRefs.current[section.id] = node;
+                }}
+                className="scroll-mt-4"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xl">{section.icon}</span>
+                  <h2 className="text-xl font-semibold text-stone-800">{section.title}</h2>
+                </div>
+                <div className="space-y-4">
+                  {section.blocks.map((block, index) => renderBlock(block, `${section.id}-${index}`))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

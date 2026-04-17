@@ -4,11 +4,11 @@ import { LocalProjectRepository, StorageError, importFromJson } from '../lib/sto
 import { normalizeProject } from '../lib/normalizeProject';
 import { migrateState, createInitialState } from '../lib/state';
 
-function ensureProject(repo: LocalProjectRepository): { id: string; state: AppState; createdFresh: boolean } {
+function ensureProject(repo: LocalProjectRepository): { id: string; state: AppState } {
   let id = repo.getCurrentId();
   if (id) {
     const state = repo.load(id);
-    if (state) return { id, state: normalizeProject(migrateState(state)), createdFresh: false };
+    if (state) return { id, state: normalizeProject(migrateState(state)) };
   }
   const list = repo.list();
   if (list.length > 0) {
@@ -16,14 +16,14 @@ function ensureProject(repo: LocalProjectRepository): { id: string; state: AppSt
     const state = repo.load(id);
     if (state) {
       repo.setCurrentId(id);
-      return { id, state: normalizeProject(migrateState(state)), createdFresh: false };
+      return { id, state: normalizeProject(migrateState(state)) };
     }
   }
   const freshId = crypto.randomUUID();
   const freshState = createInitialState('cp_bouleau');
   repo.save(freshId, freshState);
   repo.setCurrentId(freshId);
-  return { id: freshId, state: freshState, createdFresh: true };
+  return { id: freshId, state: freshState };
 }
 
 export function useProjectRepository(repo: LocalProjectRepository) {
@@ -33,9 +33,6 @@ export function useProjectRepository(repo: LocalProjectRepository) {
   const [projects, setProjects] = useState<ProjectMeta[]>(repo.list());
   const [storageError, setStorageError] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
-  const [freshProjectIds, setFreshProjectIds] = useState<Set<string>>(
-    () => new Set(initial.current.createdFresh ? [initial.current.id] : []),
-  );
 
   const safeRepoWrite = useCallback(<T,>(action: () => T): T | undefined => {
     try {
@@ -87,29 +84,6 @@ export function useProjectRepository(repo: LocalProjectRepository) {
     }) === undefined) return;
     setProjectId(newId);
     setState(normalized);
-    setFreshProjectIds((prev) => {
-      const next = new Set(prev);
-      next.delete(newId);
-      return next;
-    });
-    refreshProjects();
-  }, [projectId, state, refreshProjects, safeRepoWrite, repo]);
-
-  const createEmptyProject = useCallback(() => {
-    if (safeRepoWrite(() => repo.save(projectId, state)) === undefined) return;
-    const newId = crypto.randomUUID();
-    const freshState = createInitialState('cp_bouleau');
-    if (safeRepoWrite(() => {
-      repo.save(newId, freshState);
-      repo.setCurrentId(newId);
-    }) === undefined) return;
-    setProjectId(newId);
-    setState(freshState);
-    setFreshProjectIds((prev) => {
-      const next = new Set(prev);
-      next.add(newId);
-      return next;
-    });
     refreshProjects();
   }, [projectId, state, refreshProjects, safeRepoWrite, repo]);
 
@@ -178,11 +152,6 @@ export function useProjectRepository(repo: LocalProjectRepository) {
   const saveV3 = useCallback((id: string, nextState: AppState, v3Data: StoredProject['v3']) => {
     return safeRepoWrite(() => {
       repo.saveV3(id, nextState, v3Data);
-      setFreshProjectIds((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
       refreshProjects();
     });
   }, [refreshProjects, safeRepoWrite, repo]);
@@ -197,7 +166,6 @@ export function useProjectRepository(repo: LocalProjectRepository) {
     importError,
     switchProject,
     createFromWizard,
-    createEmptyProject,
     duplicateProject,
     renameProject,
     deleteProject,
@@ -206,6 +174,5 @@ export function useProjectRepository(repo: LocalProjectRepository) {
     loadLocal,
     loadFull,
     saveV3,
-    isCurrentProjectFresh: freshProjectIds.has(projectId),
   };
 }
