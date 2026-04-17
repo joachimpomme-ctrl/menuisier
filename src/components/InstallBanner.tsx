@@ -1,16 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ToolbarButton } from '../ui-system';
-
-/**
- * Bandeau d'installation PWA.
- *
- * Style strictement conforme au design system :
- *   - fond `--bg-panel`, filet supérieur 1px, pas d'ombre, pas de radius
- *   - typographie 12px technique, pas de pastel ambré SaaS
- *   - boutons via `<ToolbarButton>`
- *
- * Positionné via CSS position fixed au-dessus de la zone safe-area bas.
- */
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -76,49 +64,36 @@ export default function InstallBanner() {
   if (dismissed || (!deferredPrompt && !showIosTip)) return null;
 
   return (
-    <div
-      className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom bg-[color:var(--bg-panel)] rule-t"
-      role="region"
-      aria-label="Installer l'application"
-    >
-      <div className="flex items-center gap-3 px-3 py-2">
-        <div className="flex-1 min-w-0 leading-tight">
-          <div className="text-[12px] font-semibold text-[color:var(--fg)]">
-            Installer l'app
-          </div>
+    <div className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
+      <div className="mx-4 mb-4 rounded-xl border border-amber-700/50 bg-white/95  shadow-xl shadow-stone-300/50 px-4 py-3 flex items-center gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium text-amber-700">Installer l'app</div>
           {deferredPrompt ? (
-            <div className="text-[11px] text-[color:var(--fg-muted)]">
-              Ajoutez Menuisier sur l'écran d'accueil pour un accès rapide.
+            <div className="text-xs text-stone-500 mt-0.5">
+              Ajoutez Menuisier sur votre écran d'accueil pour un accès rapide
             </div>
           ) : (
-            <div className="text-[11px] text-[color:var(--fg-muted)] flex items-center gap-1">
-              <span>Tapez l'icône de partage</span>
-              <svg
-                className="w-3.5 h-3.5 inline-block shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                />
-              </svg>
-              <span>puis « Sur l'écran d'accueil ».</span>
+            <div className="text-xs text-stone-500 mt-0.5">
+              Tapez <span className="inline-flex items-center mx-0.5 text-stone-400">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              </span> puis « Sur l'écran d'accueil »
             </div>
           )}
         </div>
         {deferredPrompt && (
-          <ToolbarButton variant="primary" onClick={install}>
+          <button
+            onClick={install}
+            className="text-xs px-4 py-2 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 transition-colors flex-shrink-0"
+          >
             Installer
-          </ToolbarButton>
+          </button>
         )}
-        <ToolbarButton variant="ghost" onClick={dismiss} aria-label="Fermer">
-          ×
-        </ToolbarButton>
+        <button
+          onClick={dismiss}
+          className="text-stone-500 hover:text-stone-400 text-lg flex-shrink-0 px-1"
+        >
+          x
+        </button>
       </div>
     </div>
   );

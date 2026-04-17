@@ -1,19 +1,7 @@
 import type { Body2D, Facade2DModel, VisualHint, Zone2D } from '../../lib/engine/facade2d';
-import { AlertStrip, color as dsColor } from '../../ui-system';
-
-export interface Facade2DSelection {
-  bodyId: string;
-  zoneIndex: number | null;
-}
 
 export interface Facade2DViewProps {
   model: Facade2DModel;
-  /** Monochrome technique rendering (for the Terminal-style dashboard). */
-  monochrome?: boolean;
-  /** Currently selected body+zone (for visual highlight). */
-  selected?: Facade2DSelection | null;
-  /** Click handler on a zone. Passing null zoneIndex means body-level click. */
-  onSelect?: (sel: Facade2DSelection) => void;
 }
 
 export const SVG_W = 600;
@@ -28,17 +16,6 @@ const ZONE_COLORS: Record<VisualHint['type'], string> = {
   shoe_rack: '#d1fae5',
   bench: '#e5e7eb',
   generic: '#f5f5f4',
-};
-
-const ZONE_COLORS_MONO: Record<VisualHint['type'], string> = {
-  shelves: '#f4f2ed',
-  drawers: '#ebe8e1',
-  hanging_rod: '#f4f2ed',
-  tv_niche: '#ebe8e1',
-  wine_rack: '#f4f2ed',
-  shoe_rack: '#ebe8e1',
-  bench: '#ebe8e1',
-  generic: '#f4f2ed',
 };
 
 export function computeFacadeScale(
@@ -148,14 +125,8 @@ function renderZoneHint(
   y: number,
   width: number,
   height: number,
-  opts?: { monochrome?: boolean },
 ) {
-  const color = opts?.monochrome
-    ? ZONE_COLORS_MONO[zone.visualHint.type]
-    : ZONE_COLORS[zone.visualHint.type];
-  const mono = opts?.monochrome ?? false;
-  const strokeColor = mono ? '#1d1d1b' : '#a8a29e';
-  const detailColor = mono ? '#1d1d1b' : undefined;
+  const color = ZONE_COLORS[zone.visualHint.type];
   const elements: React.JSX.Element[] = [
     <rect
       key="bg"
@@ -164,10 +135,10 @@ function renderZoneHint(
       width={width}
       height={height}
       fill={color}
-      stroke={strokeColor}
-      strokeWidth={mono ? 0.6 : 0.4}
-      opacity={mono ? 1 : (zone.visualHint.type === 'bench' ? 0.85 : 0.75)}
-      rx={mono ? 0 : 1}
+      stroke="#a8a29e"
+      strokeWidth="0.4"
+      opacity={zone.visualHint.type === 'bench' ? 0.85 : 0.75}
+      rx="1"
     />,
   ];
 
@@ -183,7 +154,7 @@ function renderZoneHint(
             y1={lineY}
             x2={x + width - 4}
             y2={lineY}
-            stroke={detailColor ?? '#2563eb'}
+            stroke="#2563eb"
             strokeWidth="0.8"
             strokeDasharray="4,3"
           />,
@@ -197,7 +168,7 @@ function renderZoneHint(
         const top = y + (height * i) / count;
         const drawerH = height / count;
         elements.push(
-          <rect key={`drawer-${i}`} x={x} y={top} width={width} height={drawerH} fill="none" stroke={detailColor ?? '#b45309'} strokeWidth="0.8" />,
+          <rect key={`drawer-${i}`} x={x} y={top} width={width} height={drawerH} fill="none" stroke="#b45309" strokeWidth="0.8" />,
         );
         elements.push(
           <rect
@@ -206,8 +177,8 @@ function renderZoneHint(
             y={top + drawerH / 2 - 1}
             width={10}
             height={2}
-            fill={detailColor ?? '#92400e'}
-            rx={mono ? 0 : 1}
+            fill="#92400e"
+            rx="1"
           />,
         );
       }
@@ -215,8 +186,8 @@ function renderZoneHint(
     }
     case 'hanging_rod': {
       const rodY = y + height * 0.32;
-      elements.push(<line key="rod" x1={x + 8} y1={rodY} x2={x + width - 8} y2={rodY} stroke={detailColor ?? '#7c3aed'} strokeWidth="1.5" />);
-      elements.push(<circle key="hanger" cx={x + width / 2} cy={rodY + 12} r="5" fill="none" stroke={detailColor ?? '#7c3aed'} strokeWidth="1" />);
+      elements.push(<line key="rod" x1={x + 8} y1={rodY} x2={x + width - 8} y2={rodY} stroke="#7c3aed" strokeWidth="1.5" />);
+      elements.push(<circle key="hanger" cx={x + width / 2} cy={rodY + 12} r="5" fill="none" stroke="#7c3aed" strokeWidth="1" />);
       break;
     }
     case 'tv_niche': {
@@ -228,7 +199,7 @@ function renderZoneHint(
           width={width - 6}
           height={height - 6}
           fill="none"
-          stroke={detailColor ?? '#4f46e5'}
+          stroke="#4f46e5"
           strokeWidth="1"
           strokeDasharray="5,3"
         />,
@@ -247,7 +218,7 @@ function renderZoneHint(
               cy={y + ((ry + 0.5) * height) / rows}
               r={Math.min(width / cols, height / rows) * 0.18}
               fill="none"
-              stroke={detailColor ?? '#be185d'}
+              stroke="#be185d"
               strokeWidth="0.8"
             />,
           );
@@ -267,7 +238,7 @@ function renderZoneHint(
             y1={bottom - 5}
             x2={x + width - 6}
             y2={top + 5}
-            stroke={detailColor ?? '#047857'}
+            stroke="#047857"
             strokeWidth="1"
           />,
         );
@@ -282,9 +253,9 @@ function renderZoneHint(
           y={y + height * 0.55}
           width={width - 8}
           height={height * 0.3}
-          fill={detailColor ?? '#9ca3af'}
-          opacity={mono ? 0.2 : 0.55}
-          rx={mono ? 0 : 1}
+          fill="#9ca3af"
+          opacity="0.55"
+          rx="1"
         />,
       );
       break;
@@ -297,7 +268,7 @@ function renderZoneHint(
           y={y + height / 2}
           textAnchor="middle"
           dominantBaseline="middle"
-          fill={detailColor ?? '#57534e'}
+          fill="#57534e"
           fontSize="8"
           fontFamily="system-ui"
           fontWeight="600"
@@ -312,28 +283,17 @@ function renderZoneHint(
   return elements;
 }
 
-export default function Facade2DView({ model, monochrome, selected, onSelect }: Facade2DViewProps) {
+export default function Facade2DView({ model }: Facade2DViewProps) {
   const scale = computeFacadeScale(model);
   const svgH = computeFacadeSvgHeight(model, scale);
-  // Couleurs alimentées par les tokens DS — aucune valeur hex littérale.
-  const bg = monochrome ? dsColor.panelAlt : dsColor.canvas;
-  const bodyStroke = monochrome ? dsColor.border : dsColor.fgMuted;
-  const dimColor = monochrome ? dsColor.border : dsColor.fgMuted;
-  const hitCursor = onSelect ? 'pointer' : 'default';
 
   return (
-    <div className={monochrome ? '' : 'space-y-2'}>
+    <div className="space-y-3">
       <div className="overflow-x-auto">
-        <svg
-          width="100%"
-          viewBox={`0 0 ${SVG_W} ${svgH}`}
-          preserveAspectRatio="xMidYMid meet"
-          className="block"
-          style={{ background: bg }}
-        >
-          <rect width={SVG_W} height={svgH} fill={bg} />
+        <svg width="100%" viewBox={`0 0 ${SVG_W} ${svgH}`} preserveAspectRatio="xMidYMid meet" className="rounded-lg bg-[#faf8f5]">
+          <rect width={SVG_W} height={svgH} fill="#faf8f5" rx="8" />
 
-          {model.bodies.map((body, bodyIndex) => {
+          {model.bodies.map((body) => {
             const bodyX = getFacadeBodyX(body, scale);
             const bodyY = facadeYToSvg(body.height_mm, scale, svgH);
             const bodyW = body.width_mm * scale;
@@ -344,32 +304,9 @@ export default function Facade2DView({ model, monochrome, selected, onSelect }: 
             const doorH = doorHeightMm * scale;
             const doorMidY = doorY + doorH / 2;
 
-            const isBodySelected = selected?.bodyId === body.bodyId;
-
             return (
               <g key={body.bodyId}>
-                <rect
-                  x={bodyX}
-                  y={bodyY}
-                  width={bodyW}
-                  height={bodyH}
-                  fill="none"
-                  stroke={bodyStroke}
-                  strokeWidth={monochrome ? 1.2 : 1}
-                />
-
-                {monochrome && model.bodies.length > 1 && (
-                  <text
-                    x={bodyX + 4}
-                    y={bodyY + 12}
-                    fill="#1d1d1b"
-                    fontSize="9"
-                    fontFamily="ui-monospace, SF Mono, Menlo, monospace"
-                    fontWeight="600"
-                  >
-                    C{bodyIndex + 1}
-                  </text>
-                )}
+                <rect x={bodyX} y={bodyY} width={bodyW} height={bodyH} fill="none" stroke="#78716c" strokeWidth="1" />
 
                 {model.plinthHeight_mm > 0 && (
                   <rect
@@ -377,44 +314,18 @@ export default function Facade2DView({ model, monochrome, selected, onSelect }: 
                     y={facadeYToSvg(model.plinthHeight_mm, scale, svgH)}
                     width={bodyW}
                     height={model.plinthHeight_mm * scale}
-                    fill={monochrome ? '#ebe8e1' : '#e7e5e4'}
-                    stroke={monochrome ? '#1d1d1b' : '#a8a29e'}
+                    fill="#e7e5e4"
+                    stroke="#a8a29e"
                     strokeWidth="0.5"
                   />
                 )}
 
-                {getOrderedZones(body).map((zone, orderedIdx) => {
+                {getOrderedZones(body).flatMap((zone) => {
                   const zoneX = bodyX;
                   const zoneY = facadeYToSvg(zone.y_mm + zone.height_mm, scale, svgH);
                   const zoneW = bodyW;
                   const zoneH = zone.height_mm * scale;
-                  // Find original index in body.zones for stable selection id
-                  const originalIdx = body.zones.indexOf(zone);
-                  const isZoneSelected = isBodySelected && selected?.zoneIndex === originalIdx;
-                  return (
-                    <g
-                      key={`zone-${orderedIdx}`}
-                      style={{ cursor: hitCursor }}
-                      onClick={onSelect ? (e) => {
-                        e.stopPropagation();
-                        onSelect({ bodyId: body.bodyId, zoneIndex: originalIdx });
-                      } : undefined}
-                    >
-                      {renderZoneHint(zone, zoneX, zoneY, zoneW, zoneH, { monochrome })}
-                      {isZoneSelected && (
-                        <rect
-                          x={zoneX}
-                          y={zoneY}
-                          width={zoneW}
-                          height={zoneH}
-                          fill="none"
-                          stroke="#a66400"
-                          strokeWidth="2"
-                          pointerEvents="none"
-                        />
-                      )}
-                    </g>
-                  );
+                  return renderZoneHint(zone, zoneX, zoneY, zoneW, zoneH);
                 })}
 
                 {body.fixedShelves.map((shelf, index) => {
@@ -426,7 +337,7 @@ export default function Facade2DView({ model, monochrome, selected, onSelect }: 
                       x2={bodyRight}
                       y1={shelfY}
                       y2={shelfY}
-                      stroke={monochrome ? '#1d1d1b' : '#92400e'}
+                      stroke="#92400e"
                       strokeWidth="1.5"
                     />
                   );
@@ -501,7 +412,6 @@ export default function Facade2DView({ model, monochrome, selected, onSelect }: 
             y2={facadeYToSvg(0, scale, svgH)}
             label={`${model.totalWidth_mm} mm`}
             offset={22}
-            color={dimColor}
           />
           <DimLine
             x1={M + model.totalWidth_mm * scale}
@@ -510,7 +420,6 @@ export default function Facade2DView({ model, monochrome, selected, onSelect }: 
             y2={facadeYToSvg(model.totalHeight_mm, scale, svgH)}
             label={`${model.totalHeight_mm} mm`}
             offset={22}
-            color={dimColor}
           />
 
           {model.bodies.length > 1 && model.bodies.map((body) => {
@@ -524,19 +433,18 @@ export default function Facade2DView({ model, monochrome, selected, onSelect }: 
                 y2={M}
                 label={`${body.width_mm} mm`}
                 offset={-14}
-                color={dimColor}
               />
             );
           })}
         </svg>
       </div>
 
-      {!monochrome && hasFacadeWarnings(model) && (
-        <div className="space-y-1">
+      {hasFacadeWarnings(model) && (
+        <div className="mt-3 space-y-1">
           {model.warnings.map((warning, index) => (
-            <AlertStrip key={index} kind="warning">
-              {warning}
-            </AlertStrip>
+            <p key={index} className="text-xs text-amber-600 bg-amber-50 rounded px-2 py-1">
+              ⚠ {warning}
+            </p>
           ))}
         </div>
       )}

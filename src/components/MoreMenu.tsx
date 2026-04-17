@@ -44,20 +44,20 @@ export default function MoreMenu({ onExport, onImport }: MoreMenuProps) {
         aria-label="Plus d'options"
         aria-expanded={open}
         onClick={() => setOpen((current) => toggleMoreMenu(current))}
-        className="text-[11px] px-2.5 py-1.5 bg-[color:var(--bg-panel)] text-[color:var(--fg-muted)] hover:text-[color:var(--fg)] border border-[color:var(--border-weak)] whitespace-nowrap"
+        className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-stone-700 border border-stone-200 whitespace-nowrap transition-colors"
       >
-        ···
+        ...
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full mt-px min-w-[160px] border border-[color:var(--border)] bg-[color:var(--bg-panel)] z-50 overflow-hidden">
+        <div className="absolute left-0 top-full mt-1 min-w-44 rounded-lg border border-stone-200 bg-white shadow-lg z-50 overflow-hidden">
           <button
             type="button"
             onClick={() => {
               onExport();
               setOpen(closeMoreMenu());
             }}
-            className="block w-full px-3 py-2 text-left text-[12px] text-[color:var(--fg)] hover:bg-[color:var(--bg-panel-alt)]"
+            className="block w-full px-3 py-2 text-left text-sm text-stone-700 hover:bg-stone-50"
           >
             Exporter JSON
           </button>
@@ -67,7 +67,7 @@ export default function MoreMenu({ onExport, onImport }: MoreMenuProps) {
               onImport();
               setOpen(closeMoreMenu());
             }}
-            className="block w-full px-3 py-2 text-left text-[12px] text-[color:var(--fg)] hover:bg-[color:var(--bg-panel-alt)] border-t border-[color:var(--border-hairline)]"
+            className="block w-full px-3 py-2 text-left text-sm text-stone-700 hover:bg-stone-50"
           >
             Importer un projet
           </button>

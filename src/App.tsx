@@ -20,7 +20,6 @@ import StepType from './components/wizard/StepType';
 import StepSpace from './components/wizard/StepSpace';
 import StepOrganize from './components/wizard/StepOrganize';
 import Dashboard from './components/result/Dashboard';
-import { Panel, Toolbar, ToolbarButton } from './ui-system';
 import { runPipeline, pipelineResultToAppState } from './lib/engine/pipeline';
 import type { PipelineResult } from './lib/engine/pipeline';
 import type { FurnitureType, SpaceDimensions, ProjectIntent } from './lib/knowledge/types';
@@ -156,102 +155,6 @@ export default function App() {
     setState((s) => ({ ...s, costConfig: { ...s.costConfig, panelPrice: price } }));
   };
 
-  // Dashboard V3 (Terminal Métier) is rendered full-bleed: it has its own
-  // SplitLayout + Toolbar and must not be constrained by the legacy
-  // max-width / padded shell designed for mobile SaaS views.
-  if (v3Mode && wizardStep === 4 && v3Intent && v3Result) {
-    return (
-      <div className="min-h-screen min-h-dvh text-[color:var(--fg)] bg-[color:var(--bg-canvas)] flex flex-col">
-        <Dashboard
-          intent={v3Intent}
-          result={v3Result}
-          materialKey={v3MaterialKey}
-          onModify={() => setWizardStep(3)}
-          onClassicEditor={(appState) => {
-            setState(normalizeProject(appState));
-            setV3Mode(false);
-          }}
-        />
-        <InstallBanner />
-        <NewProjectWizard
-          isOpen={showNewWizard}
-          onClose={() => setShowNewWizard(false)}
-          onCreate={handleCreateFromWizard}
-        />
-      </div>
-    );
-  }
-
-  // V3 wizard (steps 1-3) — shell DS isolé du header legacy.
-  // Les écrans 1-3 n'ont aucune raison d'afficher "Mes projets / ☁️ / PDF /
-  // Bibliothèque / Aide" : ce sont des actions de gestion de projet.
-  // Le wizard occupe donc son propre shell Toolbar + Panel, plein cadre,
-  // pour garder la cohérence visuelle avec le Dashboard.
-  if (v3Mode && wizardStep < 4) {
-    return (
-      <div className="min-h-screen min-h-dvh text-[color:var(--fg)] bg-[color:var(--bg-canvas)] flex flex-col">
-        <Toolbar
-          start={
-            <div className="px-3 text-[10.5px] uppercase tracking-wider font-semibold text-[color:var(--fg-muted)]">
-              Nouveau projet — étape {wizardStep}/4
-            </div>
-          }
-          end={
-            <ToolbarButton variant="ghost" onClick={() => setV3Mode(false)}>
-              × Fermer
-            </ToolbarButton>
-          }
-        />
-        <div className="flex-1 overflow-auto p-3">
-          <Panel>
-            {wizardStep === 1 && (
-              <StepType
-                onSelect={(type) => {
-                  setV3FurnitureType(type);
-                  setWizardStep(2);
-                }}
-              />
-            )}
-            {wizardStep === 2 && (
-              <StepSpace
-                furnitureType={v3FurnitureType}
-                onBack={() => setWizardStep(1)}
-                onNext={(space, matKey) => {
-                  setV3Space(space);
-                  setV3MaterialKey(matKey);
-                  setWizardStep(3);
-                }}
-              />
-            )}
-            {wizardStep === 3 && v3Space && (
-              <StepOrganize
-                furnitureType={v3FurnitureType}
-                space={v3Space}
-                materialKey={v3MaterialKey}
-                onBack={() => setWizardStep(2)}
-                onGenerate={(intent) => {
-                  setV3Intent(intent);
-                  const result = runPipeline(intent);
-                  setV3Result(result);
-                  const converted = pipelineResultToAppState(result, intent.material_key);
-                  converted.project.name = intent.furniture_type.replace(/_/g, ' ');
-                  setState(normalizeProject(converted));
-                  setWizardStep(4);
-                  saveV3(projectId, normalizeProject(converted), {
-                    intent,
-                    materialKey: intent.material_key,
-                    furnitureType: intent.furniture_type,
-                  });
-                }}
-              />
-            )}
-          </Panel>
-        </div>
-        <InstallBanner />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen min-h-dvh text-stone-800 bg-[#faf8f5]">
       <div className="max-w-3xl mx-auto px-4 pt-4 pb-24 sm:py-6">
@@ -360,9 +263,79 @@ export default function App() {
           )}
         </div>
 
-        {/* V3 wizard (steps 1-3) et Dashboard (step 4) sont rendus full-bleed
-            plus haut dans le composant. Ici seul le classique est visible. */}
-        <>
+        {/* V3 Wizard */}
+        {v3Mode ? (
+          <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs text-stone-400">Étape {wizardStep}/4</span>
+              <button
+                onClick={() => setV3Mode(false)}
+                className="text-xs text-stone-400 hover:text-stone-600"
+              >
+                ✕ Fermer
+              </button>
+            </div>
+
+            {wizardStep === 1 && (
+              <StepType
+                onSelect={(type) => {
+                  setV3FurnitureType(type);
+                  setWizardStep(2);
+                }}
+              />
+            )}
+
+            {wizardStep === 2 && (
+              <StepSpace
+                furnitureType={v3FurnitureType}
+                onBack={() => setWizardStep(1)}
+                onNext={(space, matKey) => {
+                  setV3Space(space);
+                  setV3MaterialKey(matKey);
+                  setWizardStep(3);
+                }}
+              />
+            )}
+
+            {wizardStep === 3 && v3Space && (
+              <StepOrganize
+                furnitureType={v3FurnitureType}
+                space={v3Space}
+                materialKey={v3MaterialKey}
+                onBack={() => setWizardStep(2)}
+                onGenerate={(intent) => {
+                  setV3Intent(intent);
+                  const result = runPipeline(intent);
+                  setV3Result(result);
+                  // Pre-convert to AppState so header stats update immediately
+                  const converted = pipelineResultToAppState(result, intent.material_key);
+                  converted.project.name = intent.furniture_type.replace(/_/g, ' ');
+                  setState(normalizeProject(converted));
+                  setWizardStep(4);
+                  saveV3(projectId, normalizeProject(converted), {
+                    intent,
+                    materialKey: intent.material_key,
+                    furnitureType: intent.furniture_type,
+                  });
+                }}
+              />
+            )}
+
+            {wizardStep === 4 && v3Intent && v3Result && (
+              <Dashboard
+                intent={v3Intent}
+                result={v3Result}
+                materialKey={v3MaterialKey}
+                onModify={() => setWizardStep(3)}
+                onClassicEditor={(appState) => {
+                  setState(normalizeProject(appState));
+                  setV3Mode(false);
+                }}
+              />
+            )}
+          </div>
+        ) : (
+          <>
             {/* Tab bar */}
             <div className="flex gap-1 mb-5 overflow-x-auto hide-scrollbar pb-0.5 -mx-1 px-1">
               {TABS.map((t) => {
@@ -419,6 +392,7 @@ export default function App() {
               />
             </div>
           </>
+        )}
       </div>
 
       {/* PWA Install Banner */}
