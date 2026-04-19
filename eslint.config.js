@@ -25,7 +25,23 @@ export default defineConfig([
       },
     },
     rules: {
+      // TypeScript applique deja noUnusedLocals/noUnusedParameters via `npm run typecheck`.
+      // Garder une seule source de verite evite les doublons et faux positifs ESLint/TS.
       '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
+  {
+    files: [
+      'src/components/HelpGuide.tsx',
+      'src/components/MoreMenu.tsx',
+      'src/components/result/Assumptions.tsx',
+      'src/components/result/Facade2DView.tsx',
+      'src/components/structure/Glossary.tsx',
+    ],
+    rules: {
+      // Ces composants exportent aussi des helpers purs exercés par les tests unitaires.
+      // Les déplacer serait un refactor hors périmètre du ménage ESLint.
+      'react-refresh/only-export-components': 'off',
     },
   },
 ])

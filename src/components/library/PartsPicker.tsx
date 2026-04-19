@@ -21,7 +21,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function PartsPicker({ isOpen, onClose, onSelect }: PartsPickerProps) {
   const [query, setQuery] = useState('');
-  const parts = useMemo(() => getAllParts(), [isOpen]);
+  const parts = useMemo(() => getAllParts(), []);
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) return parts;

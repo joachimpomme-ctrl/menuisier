@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import type { FurnitureType, WallType, SpaceDimensions } from '../../lib/knowledge/types';
 import type { MaterialKey } from '../../types';
 import { MATERIALS } from '../../data/materials';
@@ -33,6 +33,17 @@ function loadDefaults(type: FurnitureType): Partial<SpaceDimensions> {
   return getPresetSpaceDefaults(type);
 }
 
+function validateDimensions(dims: SpaceDimensions): Partial<Record<DimKey, string>> {
+  const errs: Partial<Record<DimKey, string>> = {};
+  for (const [key, range] of Object.entries(RANGES) as [DimKey, (typeof RANGES)[DimKey]][]) {
+    const v = dims[key];
+    if (v < range.min || v > range.max) {
+      errs[key] = `${range.min}–${range.max} mm`;
+    }
+  }
+  return errs;
+}
+
 export default function StepSpace({ furnitureType, initial, onBack, onNext }: Props) {
   const defaults = loadDefaults(furnitureType);
 
@@ -45,18 +56,7 @@ export default function StepSpace({ furnitureType, initial, onBack, onNext }: Pr
   });
 
   const [materialKey, setMaterialKey] = useState<MaterialKey>(initial?.material_key ?? 'cp_bouleau');
-  const [errors, setErrors] = useState<Partial<Record<DimKey, string>>>({});
-
-  useEffect(() => {
-    const errs: Partial<Record<DimKey, string>> = {};
-    for (const [key, range] of Object.entries(RANGES) as [DimKey, (typeof RANGES)[DimKey]][]) {
-      const v = dims[key];
-      if (v < range.min || v > range.max) {
-        errs[key] = `${range.min}–${range.max} mm`;
-      }
-    }
-    setErrors(errs);
-  }, [dims]);
+  const errors = useMemo(() => validateDimensions(dims), [dims]);
 
   const valid = Object.keys(errors).length === 0;
 

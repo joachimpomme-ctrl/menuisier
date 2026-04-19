@@ -30,7 +30,7 @@ export function createPiece(
   let name = 'Nouvelle pièce';
   let length = 50;
   let width = bodyDepth;
-  let qty = 1;
+  const qty = 1;
   let panelId: string | undefined;
   let posY: number | undefined;
   let posX: number | undefined;
@@ -92,8 +92,8 @@ export function detectPieceType(name: string, currentType: PieceType): PieceType
   if (currentType !== 'autre') return currentType;
   const lower = name.toLowerCase();
   if (/joue/i.test(lower)) return 'joue';
-  if (/tablette\s*(fixe|tabl[\.\s]*fixe)/i.test(lower)) return 'tablette-fixe';
-  if (/tablette\s*(réglable|reglable|tabl[\.\s]*rég)/i.test(lower)) return 'tablette-reglable';
+  if (/tablette\s*(fixe|tabl[.\s]*fixe)/i.test(lower)) return 'tablette-fixe';
+  if (/tablette\s*(réglable|reglable|tabl[.\s]*rég)/i.test(lower)) return 'tablette-reglable';
   if (/s[eé]parateur|cloison|montant\s*vertical/i.test(lower)) return 'separateur';
   if (/bandeau/i.test(lower)) return 'bandeau';
   if (/porte/i.test(lower)) return 'porte';

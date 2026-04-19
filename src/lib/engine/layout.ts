@@ -290,7 +290,6 @@ function evalConditionString(
   try {
     const keys = Object.keys(context);
     const values = keys.map((key) => context[key]);
-    // eslint-disable-next-line no-new-func
     const fn = new Function(...keys, `return !!(${condition})`);
     return Boolean(fn(...values));
   } catch (e) {

@@ -23,12 +23,12 @@ export default function MontageTab({ state }: Props) {
   const scale = (SVG_WIDTH - 2 * MARGIN - 20 * gapCount) / Math.max(totalBodyWidth, 1);
   const svgHeight = MARGIN * 2 + usableHeight * scale;
 
-  let offsetX = MARGIN;
-  const offsets = state.bodies.map((b) => {
-    const x = offsetX;
-    offsetX += b.width * scale + 20;
-    return x;
-  });
+  const offsets = state.bodies.reduce<number[]>((acc, _body, index) => {
+    const previous = acc[index - 1] ?? MARGIN;
+    const x = index === 0 ? MARGIN : previous + state.bodies[index - 1].width * scale + 20;
+    acc.push(x);
+    return acc;
+  }, []);
 
   // Hinge total — basé sur les pièces porte réelles
   const hingeTotal = state.bodies.reduce((sum, b) => {

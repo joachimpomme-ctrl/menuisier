@@ -1,6 +1,7 @@
 // =============================================================================
 // Menuisier — Google Apps Script pour sync cloud
 // =============================================================================
+/* global SpreadsheetApp, ContentService */
 // INSTALLATION :
 // 1. Creer un Google Sheet "Menuisier — Projets"
 // 2. Extensions > Apps Script

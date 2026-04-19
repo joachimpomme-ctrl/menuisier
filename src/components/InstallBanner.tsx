@@ -7,39 +7,32 @@ interface BeforeInstallPromptEvent extends Event {
 
 const DISMISS_KEY = 'menuisier_install_dismissed';
 
+function getInitialDismissed(): boolean {
+  const dismissedAt = localStorage.getItem(DISMISS_KEY);
+  return Boolean(
+    dismissedAt &&
+    Date.now() - Number(dismissedAt) < 7 * 24 * 60 * 60 * 1000,
+  ) || window.matchMedia('(display-mode: standalone)').matches;
+}
+
+function isIosSafari(): boolean {
+  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
+  return isIos && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+}
+
 export default function InstallBanner() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showIosTip, setShowIosTip] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  const [showIosTip, setShowIosTip] = useState(isIosSafari);
+  const [dismissed, setDismissed] = useState(getInitialDismissed);
 
   useEffect(() => {
-    // Already dismissed recently?
-    const dismissedAt = localStorage.getItem(DISMISS_KEY);
-    if (dismissedAt && Date.now() - Number(dismissedAt) < 7 * 24 * 60 * 60 * 1000) {
-      setDismissed(true);
-      return;
-    }
-
-    // Already installed as PWA?
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setDismissed(true);
-      return;
-    }
-
     // Android/Chrome: intercept install prompt
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
     window.addEventListener('beforeinstallprompt', handler);
-
-    // iOS Safari: show manual tip
-    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
-    const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-    if (isIos && isSafari) {
-      setShowIosTip(true);
-    }
 
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
