@@ -21,7 +21,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function PartsPicker({ isOpen, onClose, onSelect }: PartsPickerProps) {
   const [query, setQuery] = useState('');
-  const parts = useMemo(() => getAllParts(), []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- rafraîchir la liste à chaque ouverture, la library peut être enrichie via PartsLibraryManager
+  const parts = useMemo(() => getAllParts(), [isOpen]);
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) return parts;
