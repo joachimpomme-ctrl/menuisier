@@ -78,18 +78,13 @@
       "blocking": false
     },
     {
-      "code": "VAL_DEPTH_WARDROBE",
-      "severity": "error",
-      "blocking": true
+      "code": "VAL_ROD_DEPTH",
+      "severity": "warning",
+      "blocking": false
     },
     {
       "code": "ERGO_ZONE_ACTIVE",
       "severity": "info",
-      "blocking": false
-    },
-    {
-      "code": "VAL_ROD_DEPTH",
-      "severity": "warning",
       "blocking": false
     }
   ],
