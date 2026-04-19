@@ -64,10 +64,10 @@ describe('validation business rules', () => {
     );
     const issues = validateProject(intent, layout, structure, widenedParts, hardware);
 
-    expect(hasRule(issues, 'VAL_SHELF_SPAN')).toBe(true);
+    expect(hasRule(issues, 'RT_004')).toBe(true);
   });
 
-  it('does not add VAL_SHELF_SPAN for a short shelf span', () => {
+  it('does not add RT_004 for a short shelf span', () => {
     const result = runPipeline(makeIntent({
       space: { width_mm: 700, height_mm: 1800, depth_mm: 300, plinth_mm: 0, wall_type: 'concrete' },
       zones: [
@@ -75,7 +75,7 @@ describe('validation business rules', () => {
       ],
     }));
 
-    expect(hasRule(result.validation, 'VAL_SHELF_SPAN')).toBe(false);
+    expect(hasRule(result.validation, 'RT_004')).toBe(false);
   });
 
   it('adds VAL_ROD_DEPTH for a shallow wardrobe with hanging rod', () => {

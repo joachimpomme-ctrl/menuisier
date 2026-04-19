@@ -57,12 +57,12 @@ describe('validateProject', () => {
     const { layout, structure, parts, hardware } = fullPipeline(intent);
     const issues = validateProject(intent, layout, structure, parts, hardware);
 
-    const depthErr = issues.find((i) => i.rule_id === 'VAL_DEPTH_WARDROBE');
+    const depthErr = issues.find((i) => i.rule_id === 'VAL_ROD_DEPTH');
     expect(depthErr).toBeDefined();
-    expect(depthErr!.blocking).toBe(true);
+    expect(depthErr!.blocking).toBe(false);
   });
 
-  it('tall furniture (2000mm) with hardware has no anti-tip error (already provided)', () => {
+  it('tall furniture (2000mm) with structure anti-tip has no VAL_ANTI_TIP warning', () => {
     const intent: ProjectIntent = {
       furniture_type: 'bibliotheque',
       material_key: 'cp_bouleau',
@@ -72,8 +72,8 @@ describe('validateProject', () => {
     const issues = validateProject(intent, layout, structure, parts, hardware);
 
     // Hardware should include anti-tip (structure adds it for H>1500)
-    const antiTipErr = issues.find((i) => i.rule_id === 'RT_001');
-    expect(antiTipErr).toBeUndefined(); // no error because hardware provides it
+    const antiTipWarn = issues.find((i) => i.rule_id === 'VAL_ANTI_TIP');
+    expect(antiTipWarn).toBeUndefined(); // no warning because structure provides wall_mounting
   });
 
   it('suspended heavy furniture on plasterboard triggers wall load warning', () => {

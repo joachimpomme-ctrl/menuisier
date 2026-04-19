@@ -86,7 +86,7 @@ export function validateProject(
   layout: Layout,
   structure: Structure,
   parts: GeneratedPart[],
-  hardware: HardwareItem[],
+  _hardware: HardwareItem[],
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const mat = MATERIALS[intent.material_key];
@@ -117,7 +117,7 @@ export function validateProject(
   }
 
   // =========================================================================
-  // 2. Wardrobe min depth
+  // 2. Wardrobe min depth (VAL_ROD_DEPTH)
   // =========================================================================
   const rodZones = (intent.zones ?? []).filter(
     (z) => z.module_id === 'hanging_rod_short' || z.module_id === 'hanging_rod_long',
@@ -127,12 +127,12 @@ export function validateProject(
     intent.space.depth_mm < THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM
   ) {
     issues.push(issue(
-      'error',
-      true,
-      `Penderie : profondeur ${intent.space.depth_mm}mm < ${THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM}mm minimum`,
-      'VAL_DEPTH_WARDROBE',
+      'warning',
+      false,
+      `Profondeur ${intent.space.depth_mm}mm insuffisante pour une penderie (${THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM}mm min pour cintres standard)`,
+      'VAL_ROD_DEPTH',
       {
-        suggestion: `Augmenter la profondeur à ${THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM}mm ou utiliser une tringle perpendiculaire`,
+        suggestion: `Augmenter la profondeur à ${THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM}mm ou utiliser une tringle perpendiculaire (pull-out)`,
       },
     ));
   }
@@ -168,23 +168,23 @@ export function validateProject(
   }
 
   // =========================================================================
-  // 4. Anti-tip (RT_001)
+  // 4. Anti-tip (VAL_ANTI_TIP)
   // =========================================================================
   const SUSPENDED = new Set(['etagere_murale']);
   if (
     intent.space.height_mm > THRESHOLDS.ANTI_TIP_HEIGHT_MM &&
     !SUSPENDED.has(intent.furniture_type)
   ) {
-    const hasAntiTip = hardware.some(
-      (h) => h.reference === 'anti_tip' || h.reference === 'rail_suspension',
+    const hasAntiTip = structure.bodies.some(
+      (b) => b.wall_mounting?.type === 'anti_tip' || b.wall_mounting?.type === 'rail',
     );
     if (!hasAntiTip) {
       issues.push(issue(
-        'error',
-        true,
-        `Meuble > ${THRESHOLDS.ANTI_TIP_HEIGHT_MM}mm : anti-basculement obligatoire (RT_001)`,
-        'RT_001',
-        { suggestion: 'Ajouter une fixation murale ou un kit anti-basculement' },
+        'warning',
+        false,
+        `Meuble de ${intent.space.height_mm}mm sans fixation murale — risque de basculement`,
+        'VAL_ANTI_TIP',
+        { suggestion: 'Ajouter une équerre anti-basculement ou fixer au mur (obligatoire si enfants)' },
       ));
     }
   }
@@ -287,83 +287,17 @@ export function validateProject(
   }
 
   // =========================================================================
-  // 10. Additional business rules
+  // 10. Suspended furniture on unknown wall (VAL_WALL_TYPE_SUSPENDED)
   // =========================================================================
-
-  // Shelf span check: adjustable shelves wider than material maxSpan risk sagging
-  if (mat) {
-    const materialMaxSpanMm = (mat.maxSpan18 ?? 80) * 10;
-    for (const part of parts) {
-      if ((part.type === 'tablette-reglable' || part.type === 'tablette-fixe') && part.length_mm > materialMaxSpanMm) {
-        issues.push({
-          id: nextId(),
-          severity: 'warning',
-          blocking: false,
-          message: `Tablette "${part.name}" : portée ${part.length_mm}mm dépasse la portée max ${materialMaxSpanMm}mm pour ${mat.short}`,
-          suggestion: `Ajouter un séparateur vertical ou choisir un matériau plus rigide (flexion > ${mat.flexMPa} MPa)`,
-          rule_id: 'VAL_SHELF_SPAN',
-        });
-      }
-    }
-  }
-
-  // Wardrobe depth check: hanging rods need enough depth
-  const hasRod = (intent.zones ?? []).some(
-    (z) => z.module_id === 'hanging_rod_short' || z.module_id === 'hanging_rod_long',
-  );
-  if (hasRod && intent.space.depth_mm < THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM) {
-    issues.push({
-      id: nextId(),
-      severity: 'warning',
-      blocking: false,
-      message: `Profondeur ${intent.space.depth_mm}mm insuffisante pour une penderie (${THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM}mm min pour cintres standard)`,
-      suggestion: `Augmenter la profondeur à ${THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM}mm ou utiliser une tringle perpendiculaire (pull-out)`,
-      rule_id: 'VAL_ROD_DEPTH',
-    });
-  }
-
-  // Heavy door check: heavy doors need reinforced hinges
-  for (const part of parts) {
-    if (part.type === 'porte') {
-      const weightKg = (part.length_mm * part.width_mm * part.thickness_mm * density) / 1e9;
-      if (weightKg > THRESHOLDS.DOOR_WEIGHT_REINFORCE_KG) {
-        issues.push({
-          id: nextId(),
-          severity: 'warning',
-          blocking: false,
-          message: `Porte "${part.name}" : poids estimé ${weightKg.toFixed(1)}kg > ${THRESHOLDS.DOOR_WEIGHT_REINFORCE_KG}kg`,
-          suggestion: 'Utiliser des charnières renforcées et ajouter une 3e charnière si hauteur > 1200mm',
-          rule_id: 'VAL_DOOR_WEIGHT',
-        });
-      }
-    }
-  }
-
-  // Tall furniture anti-tip check
-  const tallEnough = intent.space.height_mm > THRESHOLDS.ANTI_TIP_HEIGHT_MM;
-  const hasAntiTip = structure.bodies.some((b) => b.wall_mounting?.type === 'anti_tip' || b.wall_mounting?.type === 'rail');
-  if (tallEnough && !hasAntiTip) {
-    issues.push({
-      id: nextId(),
-      severity: 'warning',
-      blocking: false,
-      message: `Meuble de ${intent.space.height_mm}mm sans fixation murale — risque de basculement`,
-      suggestion: 'Ajouter une équerre anti-basculement ou fixer au mur (obligatoire si enfants)',
-      rule_id: 'VAL_ANTI_TIP',
-    });
-  }
-
-  // Suspended furniture on unknown wall
   const isSuspended = structure.bodies.some((b) => b.wall_mounting?.type === 'rail');
   if (isSuspended && intent.space.wall_type === 'unknown') {
-    issues.push({
-      id: nextId(),
-      severity: 'warning',
-      blocking: false,
-      message: 'Meuble suspendu sur type de mur inconnu — fixation potentiellement inadaptée',
-      suggestion: 'Identifier le type de mur (béton, placo, brique) pour choisir les chevilles adaptées. Placo creux nécessite des chevilles Molly ou à expansion',
-      rule_id: 'VAL_WALL_TYPE_SUSPENDED',
-    });
+    issues.push(issue(
+      'warning',
+      false,
+      'Meuble suspendu sur type de mur inconnu — fixation potentiellement inadaptée',
+      'VAL_WALL_TYPE_SUSPENDED',
+      { suggestion: 'Identifier le type de mur (béton, placo, brique) pour choisir les chevilles adaptées. Placo creux nécessite des chevilles Molly ou à expansion' },
+    ));
   }
 
   return issues;
