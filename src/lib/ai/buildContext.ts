@@ -1,7 +1,8 @@
 import type { AppState } from '../../types';
 import type { ProjectAnalysis } from '../projectAnalysis';
 import { MATERIALS } from '../../data/materials';
-import { buildKnowledgeSummary } from '../../data/knowledge';
+import { buildFullKnowledgeSummary } from '../../data/knowledge';
+import { getTransversalRules } from '../knowledge';
 import { PATCH_INSTRUCTIONS } from './aiPatch';
 
 export interface AIContext {
@@ -51,7 +52,19 @@ export function buildAIContext(state: AppState, analysis: ProjectAnalysis): AICo
     pieceSummary,
   ].join('\n');
 
-  const knowledge = buildKnowledgeSummary();
+  const transversalRules = getTransversalRules();
+  const transversalRulesSummary = transversalRules.length > 0
+    ? [
+        '## Règles transversales actives',
+        ...transversalRules.map((rule) =>
+          `- ${rule.id} : ${rule.regle} → sévérité ${rule.severite}`
+        ),
+      ].join('\n')
+    : '';
+  const knowledge = [
+    buildFullKnowledgeSummary(),
+    transversalRulesSummary,
+  ].filter(Boolean).join('\n\n');
 
   const systemPrompt = `Tu es un menuisier expert. R\u00e9ponds en fran\u00e7ais, concis et pratique.
 

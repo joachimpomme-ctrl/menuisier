@@ -281,9 +281,29 @@ function resolveDoors(
 // Zone validation
 // ---------------------------------------------------------------------------
 
+type ConditionScalar = number | string | boolean;
+
+function evalConditionString(
+  condition: string,
+  context: Record<string, ConditionScalar>,
+): boolean {
+  try {
+    const keys = Object.keys(context);
+    const values = keys.map((key) => context[key]);
+    // eslint-disable-next-line no-new-func
+    const fn = new Function(...keys, `return !!(${condition})`);
+    return Boolean(fn(...values));
+  } catch (e) {
+    console.warn('[layout] evalConditionString failed:', condition, e);
+    return false;
+  }
+}
+
 function validateZones(
   zones: ZoneConfig[],
   depth_mm: number,
+  material_key: MaterialKey,
+  bodyWidth: number,
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
@@ -327,6 +347,38 @@ function validateZones(
       });
     }
 
+    const configScalars = Object.fromEntries(
+      Object.entries(zone.config ?? {}).filter(([, value]) =>
+        typeof value === 'number' ||
+        typeof value === 'string' ||
+        typeof value === 'boolean',
+      ),
+    ) as Record<string, ConditionScalar>;
+    const configAsRecord = zone.config as Record<string, unknown>;
+    const zoneContext: Record<string, ConditionScalar> = {
+      ...configScalars,
+      zone_width_mm: bodyWidth,
+      zone_depth_mm: depth_mm,
+      zone_height_mm: zone.height_mm,
+      material: material_key,
+      ventilated_back: typeof configAsRecord?.ventilation === 'boolean'
+        ? configAsRecord.ventilation
+        : false,
+    };
+
+    for (const constraint of def.constraints) {
+      if (evalConditionString(constraint.condition, zoneContext)) {
+        issues.push({
+          id: nextIssueId(),
+          severity: constraint.severity,
+          blocking: constraint.blocking,
+          message: `${def.name} : ${constraint.message}`,
+          suggestion: constraint.suggestion,
+          rule_id: `MOD_${def.id.toUpperCase()}_C${def.constraints.indexOf(constraint)}`,
+        });
+      }
+    }
+
     // Incompatibilities within the same layout
     for (const other of zones) {
       if (other === zone) continue;
@@ -368,16 +420,18 @@ export function generateLayout(intent: ProjectIntent): LayoutResult {
     zones = defaultZones(furniture_type, usableHeight);
   }
 
+  // Multi-body splitting based on material maxSpan
+  const maxW = maxBodyWidth(material_key);
+  const bodyWidths = splitBodies(space.width_mm, maxW);
+
   // Validate all zones against module constraints
   const zoneIssues = validateZones(
     zones.map((z) => ({ module_id: z.module_id, height_mm: z.height_mm, config: z.config })),
     space.depth_mm,
+    material_key,
+    space.width_mm,
   );
   issues.push(...zoneIssues);
-
-  // Multi-body splitting based on material maxSpan
-  const maxW = maxBodyWidth(material_key);
-  const bodyWidths = splitBodies(space.width_mm, maxW);
 
   if (bodyWidths.length > 1) {
     issues.push({

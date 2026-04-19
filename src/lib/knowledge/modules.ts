@@ -58,7 +58,7 @@ export interface ModuleDefinition {
 // Catalogue — 8 modules
 // ---------------------------------------------------------------------------
 
-const MODULE_CATALOG: Record<ModuleType, ModuleDefinition> = {
+export const MODULE_CATALOG: Record<ModuleType, ModuleDefinition> = {
   shelf_adjustable: {
     id: 'shelf_adjustable',
     name: 'Étagères réglables',
@@ -83,11 +83,11 @@ const MODULE_CATALOG: Record<ModuleType, ModuleDefinition> = {
     },
     constraints: [
       {
-        condition: "zone_width_mm > 800 && material == 'particleboard_19'",
+        condition: "zone_width_mm > 800 && (material == 'melamine' || material == 'osb')",
         severity: 'warning',
         blocking: false,
-        message: 'Portée > 800mm en aggloméré : fléchissement probable',
-        suggestion: 'Ajouter un séparateur vertical ou passer en CP/MDF',
+        message: 'Portée > 800mm en mélaminé ou OSB : fléchissement probable',
+        suggestion: 'Ajouter un séparateur vertical ou choisir un matériau plus rigide (CP, MDF)',
       },
     ],
   },
@@ -227,6 +227,7 @@ const MODULE_CATALOG: Record<ModuleType, ModuleDefinition> = {
     },
     constraints: [
       {
+        // ventilated_back est mappé depuis config.ventilation dans validateZones()
         condition: 'ventilated_back == false',
         severity: 'warning',
         blocking: false,
