@@ -58,7 +58,7 @@ export interface ModuleDefinition {
 // Catalogue — 8 modules
 // ---------------------------------------------------------------------------
 
-const MODULE_CATALOG: Record<ModuleType, ModuleDefinition> = {
+export const MODULE_CATALOG: Record<ModuleType, ModuleDefinition> = {
   shelf_adjustable: {
     id: 'shelf_adjustable',
     name: 'Étagères réglables',

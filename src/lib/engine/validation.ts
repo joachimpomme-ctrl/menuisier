@@ -16,6 +16,7 @@ import type {
   ValidationIssue,
   ValidationSeverity,
 } from '../knowledge/types';
+import { THRESHOLDS } from '../knowledge/rules/thresholds';
 import { MATERIALS } from '../../data/materials';
 
 // ---------------------------------------------------------------------------
@@ -116,18 +117,23 @@ export function validateProject(
   }
 
   // =========================================================================
-  // 2. Wardrobe min depth 550mm
+  // 2. Wardrobe min depth
   // =========================================================================
   const rodZones = (intent.zones ?? []).filter(
     (z) => z.module_id === 'hanging_rod_short' || z.module_id === 'hanging_rod_long',
   );
-  if (rodZones.length > 0 && intent.space.depth_mm < 550) {
+  if (
+    rodZones.length > 0 &&
+    intent.space.depth_mm < THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM
+  ) {
     issues.push(issue(
       'error',
       true,
-      `Penderie : profondeur ${intent.space.depth_mm}mm < 550mm minimum`,
+      `Penderie : profondeur ${intent.space.depth_mm}mm < ${THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM}mm minimum`,
       'VAL_DEPTH_WARDROBE',
-      { suggestion: 'Augmenter la profondeur à 550mm ou utiliser une tringle perpendiculaire' },
+      {
+        suggestion: `Augmenter la profondeur à ${THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM}mm ou utiliser une tringle perpendiculaire`,
+      },
     ));
   }
 
@@ -138,7 +144,7 @@ export function validateProject(
   const density = mat?.density ?? 680;
   for (const door of doors) {
     const weightKg = (door.length_mm * door.width_mm * door.thickness_mm * density) / 1e9;
-    if (weightKg > 15) {
+    if (weightKg > THRESHOLDS.DOOR_WEIGHT_REINFORCE_KG) {
       issues.push(issue(
         'warning',
         false,
@@ -162,11 +168,11 @@ export function validateProject(
   }
 
   // =========================================================================
-  // 4. Anti-tip (RT_001) — H > 1500mm non intégré
+  // 4. Anti-tip (RT_001)
   // =========================================================================
   const SUSPENDED = new Set(['etagere_murale']);
   if (
-    intent.space.height_mm > 1500 &&
+    intent.space.height_mm > THRESHOLDS.ANTI_TIP_HEIGHT_MM &&
     !SUSPENDED.has(intent.furniture_type)
   ) {
     const hasAntiTip = hardware.some(
@@ -176,7 +182,7 @@ export function validateProject(
       issues.push(issue(
         'error',
         true,
-        'Meuble > 1500mm : anti-basculement obligatoire (RT_001)',
+        `Meuble > ${THRESHOLDS.ANTI_TIP_HEIGHT_MM}mm : anti-basculement obligatoire (RT_001)`,
         'RT_001',
         { suggestion: 'Ajouter une fixation murale ou un kit anti-basculement' },
       ));
@@ -192,7 +198,10 @@ export function validateProject(
       return sum + (p.length_mm * p.width_mm * p.thickness_mm * density * p.qty) / 1e9;
     }, 0);
 
-    if (intent.space.wall_type === 'plasterboard' && totalWeight > 25) {
+    if (
+      intent.space.wall_type === 'plasterboard' &&
+      totalWeight > THRESHOLDS.SUSPENDED_PLACO_WARN_KG
+    ) {
       issues.push(issue(
         'warning',
         false,
@@ -201,7 +210,7 @@ export function validateProject(
         { suggestion: 'Utiliser des chevilles Molly ou fixer dans les montants' },
       ));
     }
-    if (totalWeight > 50) {
+    if (totalWeight > THRESHOLDS.SUSPENDED_MAX_KG) {
       issues.push(issue(
         'error',
         true,
@@ -215,13 +224,13 @@ export function validateProject(
   // =========================================================================
   // 6. Ergonomic zones
   // =========================================================================
-  // Active zone: 400-1400mm — adjustable shelves should be here
+  // Active zone: adjustable shelves should be here
   const adjShelves = parts.filter((p) => p.type === 'tablette-reglable');
   if (adjShelves.length > 0 && intent.space.height_mm > 1800) {
     issues.push(issue(
       'info',
       false,
-      'Zone active (400–1400mm) : placez les objets fréquents dans cette zone',
+      `Zone active (${THRESHOLDS.ERGO_ZONE_LOW_MM}–${THRESHOLDS.ERGO_ZONE_HIGH_MM}mm) : placez les objets fréquents dans cette zone`,
       'ERGO_ZONE_ACTIVE',
     ));
   }
@@ -230,11 +239,14 @@ export function validateProject(
   // 7. Entry furniture depth (RT_009)
   // =========================================================================
   const ENTRY_TYPES = new Set(['vestiaire_entree', 'meuble_chaussures', 'banquette_coffre']);
-  if (ENTRY_TYPES.has(intent.furniture_type) && intent.space.depth_mm > 400) {
+  if (
+    ENTRY_TYPES.has(intent.furniture_type) &&
+    intent.space.depth_mm > THRESHOLDS.ENTRY_MAX_DEPTH_MM
+  ) {
     issues.push(issue(
       'warning',
       false,
-      `Meuble d'entrée : profondeur ${intent.space.depth_mm}mm > 400mm — vérifier la circulation (80cm min)`,
+      `Meuble d'entrée : profondeur ${intent.space.depth_mm}mm > ${THRESHOLDS.ENTRY_MAX_DEPTH_MM}mm — vérifier la circulation (80cm min)`,
       'RT_009',
     ));
   }
@@ -247,7 +259,7 @@ export function validateProject(
     const cfg = wz.config as { type: 'wine_rack'; columns: number; rows: number };
     const bottles = cfg.columns * cfg.rows;
     const weightKg = bottles * 1.3;
-    if (weightKg > 30) {
+    if (weightKg > THRESHOLDS.WINE_RACK_WARN_KG) {
       issues.push(issue(
         'warning',
         false,
@@ -295,31 +307,31 @@ export function validateProject(
     }
   }
 
-  // Wardrobe depth check: hanging rods need >= 550mm depth
+  // Wardrobe depth check: hanging rods need enough depth
   const hasRod = (intent.zones ?? []).some(
     (z) => z.module_id === 'hanging_rod_short' || z.module_id === 'hanging_rod_long',
   );
-  if (hasRod && intent.space.depth_mm < 550) {
+  if (hasRod && intent.space.depth_mm < THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM) {
     issues.push({
       id: nextId(),
       severity: 'warning',
       blocking: false,
-      message: `Profondeur ${intent.space.depth_mm}mm insuffisante pour une penderie (550mm min pour cintres standard)`,
-      suggestion: 'Augmenter la profondeur à 550mm ou utiliser une tringle perpendiculaire (pull-out)',
+      message: `Profondeur ${intent.space.depth_mm}mm insuffisante pour une penderie (${THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM}mm min pour cintres standard)`,
+      suggestion: `Augmenter la profondeur à ${THRESHOLDS.WARDROBE_ROD_MIN_DEPTH_MM}mm ou utiliser une tringle perpendiculaire (pull-out)`,
       rule_id: 'VAL_ROD_DEPTH',
     });
   }
 
-  // Heavy door check: doors over 15kg need reinforced hinges
+  // Heavy door check: heavy doors need reinforced hinges
   for (const part of parts) {
     if (part.type === 'porte') {
       const weightKg = (part.length_mm * part.width_mm * part.thickness_mm * density) / 1e9;
-      if (weightKg > 15) {
+      if (weightKg > THRESHOLDS.DOOR_WEIGHT_REINFORCE_KG) {
         issues.push({
           id: nextId(),
           severity: 'warning',
           blocking: false,
-          message: `Porte "${part.name}" : poids estimé ${weightKg.toFixed(1)}kg > 15kg`,
+          message: `Porte "${part.name}" : poids estimé ${weightKg.toFixed(1)}kg > ${THRESHOLDS.DOOR_WEIGHT_REINFORCE_KG}kg`,
           suggestion: 'Utiliser des charnières renforcées et ajouter une 3e charnière si hauteur > 1200mm',
           rule_id: 'VAL_DOOR_WEIGHT',
         });
@@ -328,7 +340,7 @@ export function validateProject(
   }
 
   // Tall furniture anti-tip check
-  const tallEnough = intent.space.height_mm > 1500;
+  const tallEnough = intent.space.height_mm > THRESHOLDS.ANTI_TIP_HEIGHT_MM;
   const hasAntiTip = structure.bodies.some((b) => b.wall_mounting?.type === 'anti_tip' || b.wall_mounting?.type === 'rail');
   if (tallEnough && !hasAntiTip) {
     issues.push({

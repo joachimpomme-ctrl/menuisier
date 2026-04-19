@@ -9,11 +9,20 @@
  * - Seul getProjectPreset() est réellement utilisé par le moteur.
  * - Les formules JSON (F_CON_*, F_QUI_*) ne sont PAS évaluées dynamiquement ;
  *   les calculs sont implémentés en TypeScript dans engine/*.ts.
- * - Les règles transversales (RT_*) ne sont pas lues depuis la base ;
- *   elles sont codées dans engine/validation.ts.
+ * - Les règles transversales (RT_*) sont exposées pour le contexte IA ;
+ *   leur connexion au moteur de validation reste implémentée en TypeScript.
  */
 
 import type { FurnitureType, SpaceDimensions } from './types';
+import {
+  DOOR_SIZING_RULES,
+  DRAWER_RULES,
+  HINGE_RULES,
+  MECHANICAL_PROPERTIES,
+  ORIENTATION_RULES,
+  SYSTEME_32_RULES,
+} from '../../data/knowledge';
+import { MODULE_CATALOG } from './modules';
 
 // ---------------------------------------------------------------------------
 // Raw JSON shape (loosely typed — the JSON is large and heterogeneous)
@@ -34,13 +43,50 @@ interface ProjectPreset {
   pieges_courants: string[];
 }
 
+/**
+ * Structure observée dans base_v3_normalized.json/regles_transversales :
+ * {
+ *   id: "RT_001",
+ *   regle: "Tout meuble > 150cm...",
+ *   severite: "critique" | "importante" | "recommandation",
+ *   types_concernes?: string[],
+ *   materiaux_autorises?: string[],
+ *   seuils?: Record<string, number>,
+ *   unite?: string
+ * }
+ */
+export interface TransversalRule {
+  id: string;
+  regle: string;
+  severite: 'critique' | 'importante' | 'recommandation';
+  types_concernes?: string[];
+  materiaux_autorises?: string[];
+  seuils?: Record<string, number>;
+  unite?: string;
+}
+
 interface KnowledgeBase {
   metadata: Record<string, unknown>;
   ergonomie: Record<string, unknown>;
   quincaillerie: Record<string, unknown>;
   conception: Record<string, unknown>;
   projets: Record<string, ProjectPreset>;
-  regles_transversales: unknown[];
+  regles_transversales: TransversalRule[];
+}
+
+export interface KnowledgeSnapshot {
+  /** Presets projets — null si KB async non chargée */
+  projectPresets: Record<string, ProjectPreset> | null;
+  /** Règles transversales disponibles après loadKnowledge() */
+  transversalRules: TransversalRule[];
+  /** Catalogue des 8 modules avec contraintes */
+  modules: typeof MODULE_CATALOG;
+  mechanicalProperties: typeof MECHANICAL_PROPERTIES;
+  orientationRules: typeof ORIENTATION_RULES;
+  systeme32Rules: typeof SYSTEME_32_RULES;
+  hingeRules: typeof HINGE_RULES;
+  doorSizingRules: typeof DOOR_SIZING_RULES;
+  drawerRules: typeof DRAWER_RULES;
 }
 
 // ---------------------------------------------------------------------------
@@ -89,6 +135,30 @@ export function isLoaded(): boolean {
  */
 export function getProjectPreset(type: FurnitureType): ProjectPreset | null {
   return _kb?.projets[type] ?? null;
+}
+
+/** Get transversal business rules from the loaded knowledge base. */
+export function getTransversalRules(): TransversalRule[] {
+  return _kb?.regles_transversales ?? [];
+}
+
+/**
+ * Point d'entrée unifié de la base de connaissance.
+ * Les imports directs depuis data/knowledge.ts et knowledge/modules.ts
+ * restent valides — cette façade est additive.
+ */
+export function getKnowledge(): KnowledgeSnapshot {
+  return {
+    projectPresets: _kb?.projets ?? null,
+    transversalRules: getTransversalRules(),
+    modules: MODULE_CATALOG,
+    mechanicalProperties: MECHANICAL_PROPERTIES,
+    orientationRules: ORIENTATION_RULES,
+    systeme32Rules: SYSTEME_32_RULES,
+    hingeRules: HINGE_RULES,
+    doorSizingRules: DOOR_SIZING_RULES,
+    drawerRules: DRAWER_RULES,
+  };
 }
 
 /**

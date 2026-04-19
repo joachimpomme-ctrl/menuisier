@@ -592,26 +592,30 @@ export function buildKnowledgeSummary(): string {
 }
 
 /**
- * Résumé complet (ancienne version) — disponible pour injection contextuelle future.
+ * Résumé complet de connaissances pour le prompt IA.
  */
 export function buildFullKnowledgeSummary(): string {
   const lines: string[] = [
-    '--- PROPRIÉTÉS MÉCANIQUES (MPa) ---',
+    '## Propriétés mécaniques des essences (source: Dunod 2022)',
     ...MECHANICAL_PROPERTIES.map(p =>
-      `${p.name}: flexion ${p.flexion_statique}, E=${p.module_elasticite} MPa`
+      `- ${p.name} : flexion ${p.flexion_statique} MPa, module élasticité ${p.module_elasticite.toLocaleString('fr-FR')} MPa`
     ),
     '',
-    '--- SYSTÈME 32 ---',
-    ...SYSTEME_32_RULES.map(r => `• ${r.regle}: ${r.valeur}`),
+    '## Système 32',
+    ...SYSTEME_32_RULES.map(r => `- ${r.regle} : ${r.valeur}`),
     '',
-    '--- PORTES & CHARNIÈRES ---',
-    ...DOOR_RULES.map(r => `• ${r.type_pose}: jeu ${r.jeu}. ${r.details}`),
+    '## Règles de charnières',
+    ...HINGE_RULES.map(r => `- ${r.type} : ouverture ${r.ouverture}. ${r.details}`),
     '',
-    '--- TIROIRS ---',
-    ...DRAWER_RULES.map(r => `• ${r.regle}: ${r.details}`),
+    '## Types de pose des portes',
+    ...DOOR_RULES.map(r => `- ${r.type_pose} : jeu ${r.jeu}. ${r.details}`),
     '',
-    '--- RÈGLES MÉTIER ---',
-    ...TRADE_RULES.map(r => `• ${r.description}`),
+    '## Dimensionnement portes et tiroirs',
+    ...DOOR_SIZING_RULES.map(r => `- ${r.regle} : ${r.formule}`),
+    ...DRAWER_RULES.map(r => `- ${r.regle} : ${r.details}`),
+    '',
+    '## Règles métier',
+    ...TRADE_RULES.map(r => `- ${r.description}`),
   ];
   return lines.join('\n');
 }

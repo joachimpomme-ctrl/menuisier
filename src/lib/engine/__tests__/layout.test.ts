@@ -108,6 +108,59 @@ describe('generateLayout', () => {
     expect(depthError!.message).toContain('550');
   });
 
+  it('wine rack over 30 bottles produces declarative module warning', () => {
+    const intent = makeIntent({
+      furniture_type: 'cave_vin',
+      zones: [
+        {
+          module_id: 'wine_rack',
+          height_mm: 1000,
+          config: { type: 'wine_rack', columns: 6, rows: 6 },
+        },
+      ],
+      space: {
+        width_mm: 800,
+        height_mm: 1200,
+        depth_mm: 400,
+        plinth_mm: 0,
+        wall_type: 'concrete',
+      },
+    });
+
+    const { issues } = generateLayout(intent);
+    const wineRackWarning = issues.find((issue) =>
+      issue.rule_id?.includes('WINE_RACK') &&
+      issue.severity === 'warning',
+    );
+
+    expect(wineRackWarning).toBeDefined();
+    expect(wineRackWarning!.message).toContain('Plus de 30 bouteilles');
+  });
+
+  it('shelf adjustable below min depth does not duplicate structural depth issue', () => {
+    const intent = makeIntent({
+      zones: [
+        {
+          module_id: 'shelf_adjustable',
+          height_mm: 1000,
+          config: { type: 'shelf_adjustable', count: 3, spacing_mm: 300 },
+        },
+      ],
+      space: {
+        width_mm: 800,
+        height_mm: 2000,
+        depth_mm: 100,
+        plinth_mm: 0,
+        wall_type: 'concrete',
+      },
+    });
+
+    const { issues } = generateLayout(intent);
+
+    expect(issues.filter((issue) => issue.rule_id === 'LAY_DEPTH_MIN')).toHaveLength(1);
+    expect(issues.find((issue) => issue.rule_id === 'MOD_SHELF_ADJUSTABLE_CONSTRAINT')).toBeUndefined();
+  });
+
   // ---------- NEW: multicorps tests ----------
 
   it('1600mm mélaminé (maxSpan 55cm) → 2 corps', () => {
