@@ -26,7 +26,7 @@ export default function MontageTab({ state }: Props) {
   let offsetX = MARGIN;
   const offsets = state.bodies.map((b) => {
     const x = offsetX;
-    // eslint-disable-next-line react-hooks/immutability -- accumulateur local modifié dans .map, remplacer par reduce nuit à la lisibilité
+    // eslint-disable-next-line react-hooks/immutability -- accumulateur local modifié dans .map, conserver le rendu historique sans refactor reduce
     offsetX += b.width * scale + 20;
     return x;
   });
