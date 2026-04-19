@@ -354,13 +354,16 @@ function validateZones(
         typeof value === 'boolean',
       ),
     ) as Record<string, ConditionScalar>;
+    const configAsRecord = zone.config as Record<string, unknown>;
     const zoneContext: Record<string, ConditionScalar> = {
       ...configScalars,
       zone_width_mm: bodyWidth,
       zone_depth_mm: depth_mm,
       zone_height_mm: zone.height_mm,
       material: material_key,
-      ventilated_back: false,
+      ventilated_back: typeof configAsRecord?.ventilation === 'boolean'
+        ? configAsRecord.ventilation
+        : false,
     };
 
     for (const constraint of def.constraints) {
@@ -371,7 +374,7 @@ function validateZones(
           blocking: constraint.blocking,
           message: `${def.name} : ${constraint.message}`,
           suggestion: constraint.suggestion,
-          rule_id: `MOD_${def.id.toUpperCase()}_CONSTRAINT`,
+          rule_id: `MOD_${def.id.toUpperCase()}_C${def.constraints.indexOf(constraint)}`,
         });
       }
     }
@@ -426,7 +429,7 @@ export function generateLayout(intent: ProjectIntent): LayoutResult {
     zones.map((z) => ({ module_id: z.module_id, height_mm: z.height_mm, config: z.config })),
     space.depth_mm,
     material_key,
-    Math.max(...bodyWidths),
+    space.width_mm,
   );
   issues.push(...zoneIssues);
 

@@ -161,6 +161,133 @@ describe('generateLayout', () => {
     expect(issues.find((issue) => issue.rule_id === 'MOD_SHELF_ADJUSTABLE_CONSTRAINT')).toBeUndefined();
   });
 
+  it('drawer_stack constraint fires based on intent width, not split body width', () => {
+    const intent = makeIntent({
+      material_key: 'cp_bouleau',
+      zones: [
+        {
+          module_id: 'drawer_stack',
+          height_mm: 800,
+          config: { type: 'drawer_stack', count: 3, distribution: 'equal' },
+        },
+      ],
+      space: {
+        width_mm: 1200,
+        height_mm: 2000,
+        depth_mm: 500,
+        plinth_mm: 0,
+        wall_type: 'concrete',
+      },
+    });
+
+    const { issues } = generateLayout(intent);
+    const drawerWarning = issues.find((i) =>
+      i.rule_id?.includes('DRAWER_STACK') && i.severity === 'warning',
+    );
+
+    expect(drawerWarning).toBeDefined();
+  });
+
+  it('tv_niche ventilation warning suppressed when ventilation is true', () => {
+    const intentWithVentilation = makeIntent({
+      furniture_type: 'meuble_tv',
+      zones: [
+        {
+          module_id: 'tv_niche',
+          height_mm: 600,
+          config: { type: 'tv_niche', ventilation: true },
+        },
+      ],
+      space: {
+        width_mm: 1200,
+        height_mm: 600,
+        depth_mm: 400,
+        plinth_mm: 0,
+        wall_type: 'concrete',
+      },
+    });
+
+    const { issues: issuesOn } = generateLayout(intentWithVentilation);
+    expect(
+      issuesOn.find((i) => i.rule_id?.includes('TV_NICHE')),
+    ).toBeUndefined();
+  });
+
+  it('tv_niche ventilation warning fires when ventilation is false', () => {
+    const intentNoVentilation = makeIntent({
+      furniture_type: 'meuble_tv',
+      zones: [
+        {
+          module_id: 'tv_niche',
+          height_mm: 600,
+          config: { type: 'tv_niche', ventilation: false },
+        },
+      ],
+      space: {
+        width_mm: 1200,
+        height_mm: 600,
+        depth_mm: 400,
+        plinth_mm: 0,
+        wall_type: 'concrete',
+      },
+    });
+
+    const { issues: issuesOff } = generateLayout(intentNoVentilation);
+    expect(
+      issuesOff.find((i) => i.rule_id?.includes('TV_NICHE')),
+    ).toBeDefined();
+  });
+
+  it('shelf_adjustable fires warning for melamine over 800mm', () => {
+    const intent = makeIntent({
+      material_key: 'melamine',
+      zones: [
+        {
+          module_id: 'shelf_adjustable',
+          height_mm: 300,
+          config: { type: 'shelf_adjustable', count: 3, spacing_mm: 300 },
+        },
+      ],
+      space: {
+        width_mm: 900,
+        height_mm: 2000,
+        depth_mm: 300,
+        plinth_mm: 0,
+        wall_type: 'concrete',
+      },
+    });
+
+    const { issues } = generateLayout(intent);
+    expect(
+      issues.find((i) => i.rule_id?.includes('SHELF_ADJUSTABLE') && i.severity === 'warning'),
+    ).toBeDefined();
+  });
+
+  it('shelf_adjustable does not fire warning for cp_bouleau over 800mm', () => {
+    const intent = makeIntent({
+      material_key: 'cp_bouleau',
+      zones: [
+        {
+          module_id: 'shelf_adjustable',
+          height_mm: 300,
+          config: { type: 'shelf_adjustable', count: 3, spacing_mm: 300 },
+        },
+      ],
+      space: {
+        width_mm: 900,
+        height_mm: 2000,
+        depth_mm: 300,
+        plinth_mm: 0,
+        wall_type: 'concrete',
+      },
+    });
+
+    const { issues } = generateLayout(intent);
+    expect(
+      issues.find((i) => i.rule_id?.includes('SHELF_ADJUSTABLE') && i.severity === 'warning'),
+    ).toBeUndefined();
+  });
+
   // ---------- NEW: multicorps tests ----------
 
   it('1600mm mélaminé (maxSpan 55cm) → 2 corps', () => {

@@ -153,7 +153,7 @@ export function validateProject(
         { affected_part: door.id },
       ));
     }
-    if (weightKg > 25) {
+    if (weightKg > THRESHOLDS.SUSPENDED_PLACO_WARN_KG) {
       issues.push(issue(
         'error',
         true,
