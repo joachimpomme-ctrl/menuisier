@@ -1,0 +1,23 @@
+{
+  "furniture_type": "bibliotheque",
+  "material_key": "melamine",
+  "space": {
+    "width_mm": 1600,
+    "height_mm": 2400,
+    "depth_mm": 320,
+    "plinth_mm": 80,
+    "wall_type": "concrete"
+  },
+  "door_override": true,
+  "zones": [
+    {
+      "module_id": "shelf_adjustable",
+      "height_mm": 2320,
+      "config": {
+        "type": "shelf_adjustable",
+        "count": 4,
+        "spacing_mm": 300
+      }
+    }
+  ]
+}

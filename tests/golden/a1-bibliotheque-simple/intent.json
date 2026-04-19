@@ -1,0 +1,22 @@
+{
+  "furniture_type": "bibliotheque",
+  "material_key": "cp_bouleau",
+  "space": {
+    "width_mm": 1200,
+    "height_mm": 2200,
+    "depth_mm": 300,
+    "plinth_mm": 80,
+    "wall_type": "concrete"
+  },
+  "zones": [
+    {
+      "module_id": "shelf_adjustable",
+      "height_mm": 2120,
+      "config": {
+        "type": "shelf_adjustable",
+        "count": 4,
+        "spacing_mm": 300
+      }
+    }
+  ]
+}

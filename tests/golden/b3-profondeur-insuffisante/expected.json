@@ -1,0 +1,5206 @@
+{
+  "layout": {
+    "bodies": [
+      {
+        "body_id": "body_1",
+        "width_mm": 500,
+        "height_mm": 2200,
+        "depth_mm": 350,
+        "zones": [
+          {
+            "module_id": "hanging_rod_short",
+            "height_mm": 1272,
+            "config": {
+              "type": "hanging_rod_short"
+            }
+          },
+          {
+            "module_id": "shelf_adjustable",
+            "height_mm": 848,
+            "config": {
+              "type": "shelf_adjustable",
+              "count": 2,
+              "spacing_mm": 300
+            }
+          }
+        ],
+        "doors": {
+          "type": "hinged",
+          "count": 1,
+          "overlay": "full"
+        }
+      },
+      {
+        "body_id": "body_2",
+        "width_mm": 500,
+        "height_mm": 2200,
+        "depth_mm": 350,
+        "zones": [
+          {
+            "module_id": "hanging_rod_short",
+            "height_mm": 1272,
+            "config": {
+              "type": "hanging_rod_short"
+            }
+          },
+          {
+            "module_id": "shelf_adjustable",
+            "height_mm": 848,
+            "config": {
+              "type": "shelf_adjustable",
+              "count": 2,
+              "spacing_mm": 300
+            }
+          }
+        ],
+        "doors": {
+          "type": "hinged",
+          "count": 1,
+          "overlay": "full"
+        }
+      }
+    ]
+  },
+  "issues": [
+    {
+      "code": "LAY_DEPTH_MIN",
+      "severity": "error"
+    },
+    {
+      "code": "MOD_HANGING_ROD_SHORT_C0",
+      "severity": "error"
+    },
+    {
+      "code": "LAY_MULTI_BODY",
+      "severity": "info"
+    },
+    {
+      "code": "VAL_DEPTH_WARDROBE",
+      "severity": "error"
+    },
+    {
+      "code": "ERGO_ZONE_ACTIVE",
+      "severity": "info"
+    },
+    {
+      "code": "VAL_ROD_DEPTH",
+      "severity": "warning"
+    }
+  ],
+  "pieces": [
+    {
+      "id": "joue_001",
+      "qty": 1,
+      "locked": false,
+      "name": "Joue gauche",
+      "length_mm": 2200,
+      "width_mm": 350,
+      "thickness_mm": 18,
+      "type": "joue",
+      "body_id": "body_1",
+      "drilling": [
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 37,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 37,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 69,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 69,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 101,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 101,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 133,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 133,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 165,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 165,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 197,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 197,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 229,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 229,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 261,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 261,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 293,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 293,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 325,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 325,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 357,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 357,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 389,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 389,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 421,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 421,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 453,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 453,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 485,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 485,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 517,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 517,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 549,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 549,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 581,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 581,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 613,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 613,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 645,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 645,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 677,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 677,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 709,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 709,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 741,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 741,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 773,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 773,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 805,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 805,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 837,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 837,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 869,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 869,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 901,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 901,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 933,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 933,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 965,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 965,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 997,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 997,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1029,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1029,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1061,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1061,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1093,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1093,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1125,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1125,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1157,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1157,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1189,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1189,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1221,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1221,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1253,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1253,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1285,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1285,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1317,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1317,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1349,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1349,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1381,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1381,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1413,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1413,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1445,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1445,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1477,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1477,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1509,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1509,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1541,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1541,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1573,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1573,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1605,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1605,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1637,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1637,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1669,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1669,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1701,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1701,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1733,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1733,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1765,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1765,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1797,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1797,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1829,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1829,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1861,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1861,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1893,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1893,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1925,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1925,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1957,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1957,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1989,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1989,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2021,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2021,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2053,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2053,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2085,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2085,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2117,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2117,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2149,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2149,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 9,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 9,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 2191,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 2191,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 1352,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 1352,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        }
+      ],
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "joue_002",
+      "qty": 1,
+      "locked": false,
+      "name": "Joue droite",
+      "length_mm": 2200,
+      "width_mm": 350,
+      "thickness_mm": 18,
+      "type": "joue",
+      "body_id": "body_1",
+      "drilling": [
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 37,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 37,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 69,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 69,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 101,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 101,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 133,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 133,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 165,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 165,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 197,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 197,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 229,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 229,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 261,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 261,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 293,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 293,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 325,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 325,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 357,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 357,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 389,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 389,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 421,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 421,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 453,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 453,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 485,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 485,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 517,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 517,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 549,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 549,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 581,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 581,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 613,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 613,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 645,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 645,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 677,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 677,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 709,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 709,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 741,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 741,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 773,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 773,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 805,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 805,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 837,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 837,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 869,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 869,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 901,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 901,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 933,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 933,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 965,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 965,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 997,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 997,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1029,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1029,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1061,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1061,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1093,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1093,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1125,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1125,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1157,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1157,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1189,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1189,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1221,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1221,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1253,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1253,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1285,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1285,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1317,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1317,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1349,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1349,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1381,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1381,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1413,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1413,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1445,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1445,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1477,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1477,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1509,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1509,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1541,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1541,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1573,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1573,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1605,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1605,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1637,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1637,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1669,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1669,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1701,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1701,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1733,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1733,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1765,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1765,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1797,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1797,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1829,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1829,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1861,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1861,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1893,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1893,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1925,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1925,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1957,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1957,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1989,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1989,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2021,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2021,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2053,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2053,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2085,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2085,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2117,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2117,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2149,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2149,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 9,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 9,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 2191,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 2191,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 1352,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 1352,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        }
+      ],
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "tablette-fixe_003",
+      "qty": 1,
+      "locked": false,
+      "name": "Tablette fixe y=1352",
+      "length_mm": 464,
+      "width_mm": 345,
+      "thickness_mm": 18,
+      "type": "tablette-fixe",
+      "body_id": "body_1",
+      "position": {
+        "x_mm": 0,
+        "y_mm": 1352
+      },
+      "drilling": [
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        }
+      ],
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "dessus_004",
+      "qty": 1,
+      "locked": false,
+      "name": "Dessus",
+      "length_mm": 464,
+      "width_mm": 350,
+      "thickness_mm": 18,
+      "type": "dessus",
+      "body_id": "body_1",
+      "drilling": [
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        }
+      ],
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "dessous_005",
+      "qty": 1,
+      "locked": false,
+      "name": "Dessous",
+      "length_mm": 464,
+      "width_mm": 350,
+      "thickness_mm": 18,
+      "type": "dessous",
+      "body_id": "body_1",
+      "drilling": [
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        }
+      ],
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "fond_006",
+      "qty": 1,
+      "locked": false,
+      "name": "Fond",
+      "length_mm": 464,
+      "width_mm": 2164,
+      "thickness_mm": 5,
+      "type": "fond",
+      "body_id": "body_1"
+    },
+    {
+      "id": "tablette-reglable_007",
+      "qty": 1,
+      "locked": false,
+      "name": "Tablette réglable 1",
+      "length_mm": 464,
+      "width_mm": 345,
+      "thickness_mm": 18,
+      "type": "tablette-reglable",
+      "body_id": "body_1",
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "tablette-reglable_008",
+      "qty": 1,
+      "locked": false,
+      "name": "Tablette réglable 2",
+      "length_mm": 464,
+      "width_mm": 345,
+      "thickness_mm": 18,
+      "type": "tablette-reglable",
+      "body_id": "body_1",
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "porte_009",
+      "qty": 1,
+      "locked": false,
+      "name": "Porte",
+      "length_mm": 500,
+      "width_mm": 2200,
+      "thickness_mm": 18,
+      "type": "porte",
+      "body_id": "body_1",
+      "drilling": [
+        {
+          "type": "hinge_cup_35",
+          "x_mm": 22.5,
+          "y_mm": 100,
+          "diameter_mm": 35,
+          "depth_mm": 12,
+          "face": "back"
+        },
+        {
+          "type": "hinge_cup_35",
+          "x_mm": 22.5,
+          "y_mm": 2100,
+          "diameter_mm": 35,
+          "depth_mm": 12,
+          "face": "back"
+        },
+        {
+          "type": "hinge_cup_35",
+          "x_mm": 22.5,
+          "y_mm": 600,
+          "diameter_mm": 35,
+          "depth_mm": 12,
+          "face": "back"
+        },
+        {
+          "type": "hinge_cup_35",
+          "x_mm": 22.5,
+          "y_mm": 1100,
+          "diameter_mm": 35,
+          "depth_mm": 12,
+          "face": "back"
+        },
+        {
+          "type": "hinge_cup_35",
+          "x_mm": 22.5,
+          "y_mm": 1600,
+          "diameter_mm": 35,
+          "depth_mm": 12,
+          "face": "back"
+        }
+      ],
+      "edge_banding": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ]
+    },
+    {
+      "id": "joue_010",
+      "qty": 1,
+      "locked": false,
+      "name": "Joue gauche",
+      "length_mm": 2200,
+      "width_mm": 350,
+      "thickness_mm": 18,
+      "type": "joue",
+      "body_id": "body_2",
+      "drilling": [
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 37,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 37,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 69,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 69,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 101,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 101,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 133,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 133,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 165,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 165,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 197,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 197,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 229,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 229,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 261,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 261,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 293,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 293,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 325,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 325,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 357,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 357,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 389,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 389,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 421,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 421,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 453,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 453,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 485,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 485,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 517,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 517,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 549,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 549,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 581,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 581,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 613,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 613,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 645,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 645,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 677,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 677,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 709,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 709,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 741,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 741,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 773,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 773,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 805,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 805,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 837,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 837,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 869,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 869,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 901,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 901,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 933,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 933,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 965,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 965,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 997,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 997,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1029,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1029,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1061,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1061,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1093,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1093,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1125,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1125,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1157,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1157,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1189,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1189,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1221,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1221,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1253,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1253,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1285,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1285,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1317,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1317,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1349,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1349,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1381,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1381,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1413,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1413,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1445,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1445,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1477,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1477,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1509,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1509,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1541,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1541,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1573,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1573,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1605,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1605,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1637,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1637,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1669,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1669,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1701,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1701,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1733,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1733,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1765,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1765,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1797,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1797,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1829,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1829,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1861,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1861,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1893,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1893,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1925,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1925,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1957,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1957,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1989,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1989,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2021,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2021,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2053,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2053,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2085,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2085,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2117,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2117,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2149,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2149,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 9,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 9,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 2191,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 2191,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 1352,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 1352,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        }
+      ],
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "joue_011",
+      "qty": 1,
+      "locked": false,
+      "name": "Joue droite",
+      "length_mm": 2200,
+      "width_mm": 350,
+      "thickness_mm": 18,
+      "type": "joue",
+      "body_id": "body_2",
+      "drilling": [
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 37,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 37,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 69,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 69,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 101,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 101,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 133,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 133,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 165,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 165,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 197,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 197,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 229,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 229,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 261,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 261,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 293,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 293,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 325,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 325,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 357,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 357,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 389,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 389,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 421,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 421,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 453,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 453,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 485,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 485,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 517,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 517,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 549,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 549,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 581,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 581,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 613,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 613,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 645,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 645,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 677,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 677,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 709,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 709,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 741,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 741,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 773,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 773,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 805,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 805,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 837,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 837,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 869,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 869,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 901,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 901,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 933,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 933,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 965,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 965,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 997,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 997,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1029,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1029,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1061,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1061,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1093,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1093,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1125,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1125,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1157,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1157,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1189,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1189,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1221,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1221,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1253,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1253,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1285,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1285,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1317,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1317,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1349,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1349,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1381,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1381,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1413,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1413,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1445,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1445,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1477,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1477,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1509,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1509,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1541,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1541,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1573,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1573,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1605,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1605,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1637,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1637,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1669,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1669,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1701,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1701,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1733,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1733,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1765,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1765,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1797,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1797,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1829,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1829,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1861,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1861,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1893,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1893,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1925,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1925,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1957,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1957,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 1989,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 1989,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2021,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2021,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2053,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2053,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2085,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2085,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2117,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2117,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 37,
+          "y_mm": 2149,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "system_32",
+          "x_mm": 308,
+          "y_mm": 2149,
+          "diameter_mm": 5,
+          "depth_mm": 10,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 9,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 9,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 2191,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 2191,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 1352,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 308,
+          "y_mm": 1352,
+          "diameter_mm": 7,
+          "depth_mm": 0,
+          "face": "front"
+        }
+      ],
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "tablette-fixe_012",
+      "qty": 1,
+      "locked": false,
+      "name": "Tablette fixe y=1352",
+      "length_mm": 464,
+      "width_mm": 345,
+      "thickness_mm": 18,
+      "type": "tablette-fixe",
+      "body_id": "body_2",
+      "position": {
+        "x_mm": 0,
+        "y_mm": 1352
+      },
+      "drilling": [
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        }
+      ],
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "dessus_013",
+      "qty": 1,
+      "locked": false,
+      "name": "Dessus",
+      "length_mm": 464,
+      "width_mm": 350,
+      "thickness_mm": 18,
+      "type": "dessus",
+      "body_id": "body_2",
+      "drilling": [
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        }
+      ],
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "dessous_014",
+      "qty": 1,
+      "locked": false,
+      "name": "Dessous",
+      "length_mm": 464,
+      "width_mm": 350,
+      "thickness_mm": 18,
+      "type": "dessous",
+      "body_id": "body_2",
+      "drilling": [
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 37,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_left"
+        },
+        {
+          "type": "cam_15",
+          "x_mm": 427,
+          "y_mm": 0,
+          "diameter_mm": 5,
+          "depth_mm": 30,
+          "face": "edge_right"
+        }
+      ],
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "fond_015",
+      "qty": 1,
+      "locked": false,
+      "name": "Fond",
+      "length_mm": 464,
+      "width_mm": 2164,
+      "thickness_mm": 5,
+      "type": "fond",
+      "body_id": "body_2"
+    },
+    {
+      "id": "tablette-reglable_016",
+      "qty": 1,
+      "locked": false,
+      "name": "Tablette réglable 1",
+      "length_mm": 464,
+      "width_mm": 345,
+      "thickness_mm": 18,
+      "type": "tablette-reglable",
+      "body_id": "body_2",
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "tablette-reglable_017",
+      "qty": 1,
+      "locked": false,
+      "name": "Tablette réglable 2",
+      "length_mm": 464,
+      "width_mm": 345,
+      "thickness_mm": 18,
+      "type": "tablette-reglable",
+      "body_id": "body_2",
+      "edge_banding": [
+        "front"
+      ]
+    },
+    {
+      "id": "porte_018",
+      "qty": 1,
+      "locked": false,
+      "name": "Porte",
+      "length_mm": 500,
+      "width_mm": 2200,
+      "thickness_mm": 18,
+      "type": "porte",
+      "body_id": "body_2",
+      "drilling": [
+        {
+          "type": "hinge_cup_35",
+          "x_mm": 22.5,
+          "y_mm": 100,
+          "diameter_mm": 35,
+          "depth_mm": 12,
+          "face": "back"
+        },
+        {
+          "type": "hinge_cup_35",
+          "x_mm": 22.5,
+          "y_mm": 2100,
+          "diameter_mm": 35,
+          "depth_mm": 12,
+          "face": "back"
+        },
+        {
+          "type": "hinge_cup_35",
+          "x_mm": 22.5,
+          "y_mm": 600,
+          "diameter_mm": 35,
+          "depth_mm": 12,
+          "face": "back"
+        },
+        {
+          "type": "hinge_cup_35",
+          "x_mm": 22.5,
+          "y_mm": 1100,
+          "diameter_mm": 35,
+          "depth_mm": 12,
+          "face": "back"
+        },
+        {
+          "type": "hinge_cup_35",
+          "x_mm": 22.5,
+          "y_mm": 1600,
+          "diameter_mm": 35,
+          "depth_mm": 12,
+          "face": "back"
+        }
+      ],
+      "edge_banding": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ]
+    }
+  ],
+  "hardware": [
+    {
+      "id": "HW_031",
+      "name": "Charnière 35mm renforcée",
+      "quantity": 10,
+      "category": "hinge",
+      "reference": "charniere_35mm",
+      "unit_price_eur": 4.5
+    },
+    {
+      "id": "HW_032",
+      "name": "Poignée porte",
+      "quantity": 2,
+      "category": "handle",
+      "reference": "poignee_128mm",
+      "unit_price_eur": 5
+    },
+    {
+      "id": "HW_035",
+      "name": "Taquet Ø5mm",
+      "quantity": 16,
+      "category": "shelf_support",
+      "reference": "taquet_5mm",
+      "unit_price_eur": 0.15
+    },
+    {
+      "id": "HW_036",
+      "name": "Vis Confirmat 7×50mm",
+      "quantity": 64,
+      "category": "screw",
+      "reference": "confirmat_7x50",
+      "unit_price_eur": 0.08
+    },
+    {
+      "id": "HW_037",
+      "name": "Équerre anti-basculement",
+      "quantity": 2,
+      "category": "wall_mount",
+      "reference": "anti_tip",
+      "unit_price_eur": 3.5
+    },
+    {
+      "id": "HW_038",
+      "name": "Pied réglable h=80mm",
+      "quantity": 12,
+      "category": "strut",
+      "reference": "pied_reglable",
+      "unit_price_eur": 1.5
+    },
+    {
+      "id": "HW_041",
+      "name": "Tringle chromée Ø25mm ~960mm",
+      "quantity": 1,
+      "category": "rod",
+      "reference": "tringle_25mm",
+      "unit_price_eur": 8
+    },
+    {
+      "id": "HW_042",
+      "name": "Support tringle Ø25mm",
+      "quantity": 2,
+      "category": "rod",
+      "reference": "support_tringle_25",
+      "unit_price_eur": 2
+    },
+    {
+      "id": "HW_043",
+      "name": "Bande de chant 18mm",
+      "quantity": 25,
+      "category": "edge_band",
+      "reference": "bande_chant",
+      "unit_price_eur": 1.5
+    }
+  ],
+  "_ignore_paths": [
+    "pieces[*].id",
+    "hardware[*].id"
+  ]
+}
