@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-declare function require(name: string): any;
+declare function require(name: 'fs'): {
+  readFileSync(path: string, encoding: string): string;
+};
+declare function require(name: 'path'): {
+  resolve(...paths: string[]): string;
+};
 declare const process: { cwd(): string };
 
 const { readFileSync } = require('fs');

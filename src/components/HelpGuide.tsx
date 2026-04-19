@@ -80,7 +80,10 @@ export default function HelpGuide({ isOpen, onClose }: HelpGuideProps) {
 
   useEffect(() => {
     if (!isOpen) return;
-    setActiveSectionId(sections[0]?.id ?? '');
+    const timer = window.setTimeout(() => {
+      setActiveSectionId(sections[0]?.id ?? '');
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [isOpen, sections]);
 
   useEffect(() => {

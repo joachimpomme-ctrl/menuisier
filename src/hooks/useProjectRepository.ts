@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AppState, ProjectMeta, StoredProject } from '../types';
 import { LocalProjectRepository, StorageError, importFromJson } from '../lib/storage';
 import { normalizeProject } from '../lib/normalizeProject';
@@ -27,9 +27,9 @@ function ensureProject(repo: LocalProjectRepository): { id: string; state: AppSt
 }
 
 export function useProjectRepository(repo: LocalProjectRepository) {
-  const initial = useRef(ensureProject(repo));
-  const [projectId, setProjectId] = useState(initial.current.id);
-  const [state, setState] = useState<AppState>(initial.current.state);
+  const initial = useMemo(() => ensureProject(repo), [repo]);
+  const [projectId, setProjectId] = useState(() => initial.id);
+  const [state, setState] = useState<AppState>(() => initial.state);
   const [projects, setProjects] = useState<ProjectMeta[]>(repo.list());
   const [storageError, setStorageError] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);

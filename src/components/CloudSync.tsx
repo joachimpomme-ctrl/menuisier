@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import type { AppState, ProjectMeta } from '../types';
 import {
   getCloudUrl,
@@ -46,14 +46,7 @@ export default function CloudSync({
   const [success, setSuccess] = useState<string | null>(null);
   const urlRef = useRef<HTMLInputElement>(null);
 
-  // Load cloud projects when modal opens and URL is configured
-  useEffect(() => {
-    if (isOpen && configured) {
-      refreshCloud();
-    }
-  }, [isOpen, configured]);
-
-  const refreshCloud = async () => {
+  const refreshCloud = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -64,7 +57,16 @@ export default function CloudSync({
       setCloudProjects([]);
     }
     setLoading(false);
-  };
+  }, []);
+
+  // Load cloud projects when modal opens and URL is configured
+  useEffect(() => {
+    if (!isOpen || !configured) return;
+    const timer = window.setTimeout(() => {
+      void refreshCloud();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [isOpen, configured, refreshCloud]);
 
   const handleSaveUrl = () => {
     const trimmed = url.trim();

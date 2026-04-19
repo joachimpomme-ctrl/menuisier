@@ -61,7 +61,10 @@ describe('normalizeProject', () => {
 
   it('creates sharedBoundaries when missing', () => {
     const state = createInitialState();
-    delete (state as any).sharedBoundaries;
+    const stateWithoutShared = state as Omit<typeof state, 'sharedBoundaries'> & {
+      sharedBoundaries?: typeof state.sharedBoundaries;
+    };
+    delete stateWithoutShared.sharedBoundaries;
 
     const result = normalizeProject(state);
 

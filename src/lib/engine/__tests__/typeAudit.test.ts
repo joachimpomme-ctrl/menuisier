@@ -9,7 +9,13 @@ import { _resetCounter as resetLayout } from '../layout';
 import { _resetPartCounter as resetGeom } from '../geometry';
 import { _resetHwCounter as resetHw } from '../hardware';
 
-declare function require(name: string): any;
+declare function require(name: 'fs'): {
+  readFileSync(path: string, encoding: string): string;
+  writeFileSync(path: string, data: string): void;
+};
+declare function require(name: 'path'): {
+  resolve(...paths: string[]): string;
+};
 declare const process: { cwd(): string };
 
 const { readFileSync, writeFileSync } = require('fs');
