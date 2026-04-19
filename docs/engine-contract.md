@@ -83,15 +83,10 @@ Ces règles sont évaluées par `validateZones()` dans `src/lib/engine/layout.ts
 | `wine_rack` | `MOD_WINE_RACK_C0` | `warning` | `false` | `columns * rows > 30` | `Plus de 30 bouteilles (~40kg) : vérifier la structure porteuse` | `src/lib/knowledge/modules.ts` |
 | `bench_storage` | `MOD_BENCH_STORAGE_C0` | `warning` | `false` | `zone_height_mm < 420 || zone_height_mm > 480` | `Hauteur d'assise idéale : 420-480mm` | `src/lib/knowledge/modules.ts` |
 
-## 4. Limites connues
+## 4. Couverture golden et tâches aveugles
 
-Règles explicitement non couvertes dans ce premier lot :
+Règle impérative non couverte par les 5 cas golden actuels :
 
-- `RT_004` dans `src/lib/engine/validation.ts`
-- `VAL_SHELF_SPAN` dans `src/lib/engine/validation.ts`
+- `RT_004` dans `src/lib/engine/validation.ts` — flèche étagère après découpe effective des corps
 
-Ces règles impératives de flèche sont une tâche aveugle reconnue. Elles devront être couvertes par un ticket ultérieur avec un cas conçu pour dépasser `maxSpan18` après découpe effective des corps.
-
-## 5. Tâches aveugles golden
-
-Ces règles impératives de flèche sont une tâche aveugle reconnue. Elles devront être couvertes par un ticket ultérieur avec un cas conçu pour dépasser `maxSpan18` après découpe effective des corps.
+`VAL_SHELF_SPAN` a été supprimée au ticket 1.3 (doublon de `RT_004`). `RT_004` reste une tâche aveugle reconnue : elle devra être couverte par un ticket ultérieur avec un cas conçu pour dépasser `maxSpan18` après découpe effective des corps.

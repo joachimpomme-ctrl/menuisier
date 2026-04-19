@@ -63,13 +63,12 @@ Ces chemins sont supprimés de l'attendu et de la sortie réelle avant comparais
 | --- | --- | --- |
 | Aucun code bloquant attendu | `a1-bibliotheque-simple` | Cas nominal A1 |
 | `MOD_SHELF_ADJUSTABLE_C0` | `a2-bibliotheque-melamine-flechi` | `src/lib/knowledge/modules.ts` |
-| `LAY_DEPTH_MIN`, `VAL_DEPTH_WARDROBE`, `VAL_ROD_DEPTH` | `b3-profondeur-insuffisante` | `src/lib/engine/layout.ts`, `src/lib/engine/validation.ts` |
+| `LAY_DEPTH_MIN`, `VAL_ROD_DEPTH` | `b3-profondeur-insuffisante` | `src/lib/engine/layout.ts`, `src/lib/engine/validation.ts` |
 | `LAY_MULTI_BODY` | `b1-multi-corps-split` | `src/lib/engine/layout.ts` |
 | Sortie contents via `runPipeline()` | `e1-bibliotheque-livres` | `ProjectIntent.contents` |
 
 Règles explicitement non couvertes dans ce premier lot :
 
 - `RT_004` dans `src/lib/engine/validation.ts`
-- `VAL_SHELF_SPAN` dans `src/lib/engine/validation.ts`
 
-Ces règles impératives de flèche sont une tâche aveugle reconnue. Elles devront être couvertes par un ticket ultérieur avec un cas conçu pour dépasser `maxSpan18` après découpe effective des corps.
+`VAL_SHELF_SPAN` a été supprimée au ticket 1.3 (doublon de `RT_004`). `RT_004` reste une tâche aveugle reconnue : elle devra être couverte par un ticket ultérieur avec un cas conçu pour dépasser `maxSpan18` après découpe effective des corps.
