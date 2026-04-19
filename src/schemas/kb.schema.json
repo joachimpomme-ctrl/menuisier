@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://menuisier.local/schemas/kb.schema.json",
+  "title": "Menuisier normalized knowledge base",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "metadata",
+    "ergonomie",
+    "quincaillerie",
+    "conception",
+    "projets",
+    "regles_transversales"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["name", "version", "language", "status", "description"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "language": { "type": "string" },
+        "status": { "type": "string" },
+        "description": { "type": "string" },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "version", "size_keys"],
+            "properties": {
+              "id": { "type": "string" },
+              "version": { "type": "string" },
+              "size_keys": { "type": "number" }
+            },
+            "additionalProperties": true
+          }
+        },
+        "sources": { "type": "array", "items": { "type": "string" } },
+        "build_date": { "type": "string" },
+        "stats": { "type": "object", "additionalProperties": { "type": "number" } },
+        "normalization": { "type": "object", "additionalProperties": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "ergonomie": {
+      "type": "object",
+      "required": ["principes_generaux", "types_meubles", "objets_reference", "formulas"],
+      "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+    },
+    "quincaillerie": {
+      "type": "object",
+      "required": [
+        "charnieres_invisibles",
+        "coulisses_tiroir",
+        "taquets_etagere",
+        "assemblage_caisson",
+        "fixation_murale"
+      ],
+      "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+    },
+    "conception": {
+      "type": "object",
+      "required": [
+        "structure_caisson",
+        "fond_de_caisson",
+        "calcul_portes",
+        "calcul_tiroirs",
+        "tablettes"
+      ],
+      "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+    },
+    "projets": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/project" }
+    },
+    "regles_transversales": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/transversalRule" }
+    }
+  },
+  "$defs": {
+    "jsonValue": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "null" },
+        { "type": "array", "items": { "$ref": "#/$defs/jsonValue" } },
+        { "type": "object", "additionalProperties": { "$ref": "#/$defs/jsonValue" } }
+      ]
+    },
+    "project": {
+      "type": "object",
+      "required": [
+        "id",
+        "nom",
+        "icone",
+        "description",
+        "composants_obligatoires",
+        "composants_optionnels",
+        "dimensions_defaut",
+        "generation",
+        "contraintes",
+        "pieges_courants"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "nom": { "type": "string" },
+        "icone": { "type": "string" },
+        "description": { "type": "string" },
+        "composants_obligatoires": { "type": "array", "items": { "type": "string" } },
+        "composants_optionnels": { "type": "array", "items": { "type": "string" } },
+        "dimensions_defaut": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+        },
+        "generation": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+        },
+        "quincaillerie_associee": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+        },
+        "contraintes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["regle", "action"],
+            "properties": {
+              "regle": { "type": "string" },
+              "action": { "type": "string" },
+              "severite": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        },
+        "variantes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["nom"],
+            "properties": {
+              "nom": { "type": "string" }
+            },
+            "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+          }
+        },
+        "pieges_courants": { "type": "array", "items": { "type": "string" } },
+        "securite": { "$ref": "#/$defs/jsonValue" }
+      },
+      "additionalProperties": false
+    },
+    "transversalRule": {
+      "type": "object",
+      "required": ["id", "regle", "severite"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^RT_[0-9]{3}$" },
+        "regle": { "type": "string" },
+        "types_concernes": { "type": "array", "items": { "type": "string" } },
+        "materiaux_autorises": { "type": "array", "items": { "type": "string" } },
+        "seuils": { "type": "object", "additionalProperties": { "type": "number" } },
+        "unite": { "type": "string" },
+        "severite": { "enum": ["critique", "importante", "recommandation"] }
+      },
+      "additionalProperties": false
+    }
+  }
+}

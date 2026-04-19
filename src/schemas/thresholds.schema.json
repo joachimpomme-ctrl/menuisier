@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://menuisier.local/schemas/thresholds.schema.json",
+  "title": "Menuisier engine thresholds",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ANTI_TIP_HEIGHT_MM",
+    "WARDROBE_ROD_MIN_DEPTH_MM",
+    "DOOR_WEIGHT_REINFORCE_KG",
+    "SUSPENDED_PLACO_WARN_KG",
+    "SUSPENDED_MAX_KG",
+    "WINE_RACK_WARN_KG",
+    "ERGO_ZONE_LOW_MM",
+    "ERGO_ZONE_HIGH_MM",
+    "ENTRY_MAX_DEPTH_MM"
+  ],
+  "properties": {
+    "ANTI_TIP_HEIGHT_MM": { "type": "number", "exclusiveMinimum": 0 },
+    "WARDROBE_ROD_MIN_DEPTH_MM": { "type": "number", "exclusiveMinimum": 0 },
+    "DOOR_WEIGHT_REINFORCE_KG": { "type": "number", "exclusiveMinimum": 0 },
+    "SUSPENDED_PLACO_WARN_KG": { "type": "number", "exclusiveMinimum": 0 },
+    "SUSPENDED_MAX_KG": { "type": "number", "exclusiveMinimum": 0 },
+    "WINE_RACK_WARN_KG": { "type": "number", "exclusiveMinimum": 0 },
+    "ERGO_ZONE_LOW_MM": { "type": "number", "exclusiveMinimum": 0 },
+    "ERGO_ZONE_HIGH_MM": { "type": "number", "exclusiveMinimum": 0 },
+    "ENTRY_MAX_DEPTH_MM": { "type": "number", "exclusiveMinimum": 0 }
+  }
+}
