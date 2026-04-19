@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://menuisier.local/schemas/materials.schema.json",
+  "title": "Menuisier materials catalog",
+  "type": "object",
+  "minProperties": 1,
+  "additionalProperties": {
+    "type": "object",
+    "required": [
+      "name",
+      "short",
+      "density",
+      "flexMPa",
+      "thicknesses",
+      "defaultThickness",
+      "panels",
+      "maxSpan18",
+      "screwHolding",
+      "dowels",
+      "edgeBanding",
+      "edgeFinish",
+      "assembly",
+      "routing",
+      "finish",
+      "warnings",
+      "notes"
+    ],
+    "properties": {
+      "name": { "type": "string" },
+      "short": { "type": "string" },
+      "density": { "type": "number", "exclusiveMinimum": 0 },
+      "flexMPa": { "type": "number", "exclusiveMinimum": 0 },
+      "thicknesses": {
+        "type": "array",
+        "minItems": 1,
+        "items": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "defaultThickness": { "type": "number", "exclusiveMinimum": 0 },
+      "panels": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": ["w", "h", "defaultPrice"],
+          "properties": {
+            "w": { "type": "number", "exclusiveMinimum": 0 },
+            "h": { "type": "number", "exclusiveMinimum": 0 },
+            "defaultPrice": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "maxSpan18": { "type": "number", "exclusiveMinimum": 0 },
+      "screwHolding": { "type": "string" },
+      "dowels": { "type": "boolean" },
+      "edgeBanding": { "type": "boolean" },
+      "edgeFinish": { "type": "string" },
+      "assembly": { "type": "array", "items": { "type": "string" } },
+      "routing": { "type": "string" },
+      "finish": { "type": "array", "items": { "type": "string" } },
+      "warnings": { "type": "array", "items": { "type": "string" } },
+      "notes": { "type": "string" }
+    },
+    "additionalProperties": false
+  }
+}

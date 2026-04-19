@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://menuisier.local/schemas/module.schema.json",
+  "title": "Menuisier module catalog entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "icon",
+    "parameters",
+    "produces",
+    "structural_impact",
+    "constraints"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "icon": { "type": "string" },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/parameterDef" }
+    },
+    "produces": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parts", "hardware"],
+      "properties": {
+        "parts": { "type": "array", "items": { "type": "string" } },
+        "hardware": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "structural_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requires_fixed_shelf_above",
+        "requires_fixed_shelf_below",
+        "requires_back_panel",
+        "requires_separator",
+        "min_depth_mm",
+        "affects_load",
+        "incompatible_with",
+        "depends_on"
+      ],
+      "properties": {
+        "requires_fixed_shelf_above": { "type": "boolean" },
+        "requires_fixed_shelf_below": { "type": "boolean" },
+        "requires_back_panel": { "type": "boolean" },
+        "requires_separator": { "type": "boolean" },
+        "min_depth_mm": { "type": "number", "exclusiveMinimum": 0 },
+        "min_height_mm": { "type": "number", "exclusiveMinimum": 0 },
+        "affects_load": { "type": "boolean" },
+        "incompatible_with": { "type": "array", "items": { "type": "string" } },
+        "depends_on": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["condition", "severity", "blocking", "message"],
+        "properties": {
+          "condition": { "type": "string" },
+          "severity": { "enum": ["error", "warning", "suggestion", "info"] },
+          "blocking": { "type": "boolean" },
+          "message": { "type": "string" },
+          "suggestion": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "parameterDef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "default"],
+      "properties": {
+        "type": { "enum": ["integer", "boolean", "enum"] },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "default": {
+          "anyOf": [
+            { "type": "number" },
+            { "type": "boolean" },
+            { "type": "string" }
+          ]
+        },
+        "values": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
