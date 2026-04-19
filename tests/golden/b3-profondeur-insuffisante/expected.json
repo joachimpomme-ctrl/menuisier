@@ -64,27 +64,33 @@
   "issues": [
     {
       "code": "LAY_DEPTH_MIN",
-      "severity": "error"
+      "severity": "error",
+      "blocking": true
     },
     {
       "code": "MOD_HANGING_ROD_SHORT_C0",
-      "severity": "error"
+      "severity": "error",
+      "blocking": true
     },
     {
       "code": "LAY_MULTI_BODY",
-      "severity": "info"
+      "severity": "info",
+      "blocking": false
     },
     {
       "code": "VAL_DEPTH_WARDROBE",
-      "severity": "error"
+      "severity": "error",
+      "blocking": true
     },
     {
       "code": "ERGO_ZONE_ACTIVE",
-      "severity": "info"
+      "severity": "info",
+      "blocking": false
     },
     {
       "code": "VAL_ROD_DEPTH",
-      "severity": "warning"
+      "severity": "warning",
+      "blocking": false
     }
   ],
   "pieces": [

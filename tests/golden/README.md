@@ -36,7 +36,7 @@ Procédure :
 Le runner compare uniquement :
 
 - `layout`
-- `issues`, réduites à `{ code, severity }`
+- `issues`, réduites à `{ code, severity, blocking }`
 - `pieces`
 - `hardware`
 
@@ -54,6 +54,8 @@ Le premier lot n'asserte pas `production` ni `procurement`.
 ```
 
 Ces chemins sont supprimés de l'attendu et de la sortie réelle avant comparaison.
+
+**Limitation :** les chemins `_ignore_paths` ne supportent pas les clés contenant un point littéral. Un chemin comme `a.b[*].id` est interprété comme deux segments (`a` puis `b[*].id`), pas comme une clé `a.b`.
 
 ## Couverture et limites connues
 

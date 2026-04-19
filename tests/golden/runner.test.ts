@@ -68,6 +68,7 @@ function projectResult(intent: ProjectIntent): Omit<GoldenExpected, '_ignore_pat
     issues: result.validation.map((issue) => ({
       code: issue.rule_id ?? null,
       severity: issue.severity,
+      blocking: issue.blocking,
     })),
     pieces: result.parts,
     hardware: result.hardware,
@@ -77,6 +78,10 @@ function projectResult(intent: ProjectIntent): Omit<GoldenExpected, '_ignore_pat
 const cases = discoverCases();
 
 describe('golden V3 pipeline cases', () => {
+  it('discovers at least 5 golden test cases', () => {
+    expect(cases.length).toBeGreaterThanOrEqual(5);
+  });
+
   for (const dir of cases) {
     it(basename(dir), () => {
       const intent = readJson<ProjectIntent>(join(dir, 'intent.json'));
