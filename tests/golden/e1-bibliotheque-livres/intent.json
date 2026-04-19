@@ -1,0 +1,25 @@
+{
+  "furniture_type": "bibliotheque",
+  "material_key": "cp_bouleau",
+  "space": {
+    "width_mm": 1400,
+    "height_mm": 2200,
+    "depth_mm": 320,
+    "plinth_mm": 0,
+    "wall_type": "concrete"
+  },
+  "contents": [
+    {
+      "category": "books_pocket",
+      "quantity": 50
+    },
+    {
+      "category": "books_large",
+      "quantity": 10
+    },
+    {
+      "category": "books_bd",
+      "quantity": 30
+    }
+  ]
+}

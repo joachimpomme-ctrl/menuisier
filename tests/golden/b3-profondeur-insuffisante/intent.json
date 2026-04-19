@@ -1,0 +1,29 @@
+{
+  "furniture_type": "armoire",
+  "material_key": "cp_bouleau",
+  "space": {
+    "width_mm": 1000,
+    "height_mm": 2200,
+    "depth_mm": 350,
+    "plinth_mm": 80,
+    "wall_type": "concrete"
+  },
+  "zones": [
+    {
+      "module_id": "hanging_rod_short",
+      "height_mm": 1272,
+      "config": {
+        "type": "hanging_rod_short"
+      }
+    },
+    {
+      "module_id": "shelf_adjustable",
+      "height_mm": 848,
+      "config": {
+        "type": "shelf_adjustable",
+        "count": 2,
+        "spacing_mm": 300
+      }
+    }
+  ]
+}
