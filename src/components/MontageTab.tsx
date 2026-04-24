@@ -1,3 +1,4 @@
+import React from 'react';
 import type { AppState } from '../types';
 import { MATERIALS, BODY_COLORS } from '../data/materials';
 import { isSharedLeft, getDoorInfoFromPieces, getUsableHeight } from '../lib/helpers';
@@ -11,6 +12,7 @@ interface Props {
 const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
 
 export default function MontageTab({ state }: Props) {
+  const [showAll, setShowAll] = React.useState(false);
   const mat = MATERIALS[state.materialKey];
   const usableHeight = getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight);
   const thickness = state.panel.thickness;
@@ -293,13 +295,22 @@ export default function MontageTab({ state }: Props) {
           <div className={cardClass}>
             <h3 className="text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3">Quincaillerie - Liste d'achats</h3>
             <div className="space-y-1.5">
-              {items.map((item) => (
+              {(showAll ? items : items.slice(0, 3)).map((item) => (
                 <div key={item.label} className="flex items-center justify-between text-xs py-1.5 px-2 rounded-lg bg-stone-50">
                   <span className="text-stone-700">{item.label}</span>
                   <span className="font-mono font-semibold text-amber-700">{item.count} <span className="text-stone-400 font-normal">{item.unit}</span></span>
                 </div>
               ))}
             </div>
+            {items.length > 3 && (
+              <button
+                type="button"
+                onClick={() => setShowAll(v => !v)}
+                className="mt-2 text-[11px] text-amber-700 hover:text-amber-900 font-medium"
+              >
+                {showAll ? 'Réduire' : `Voir toutes les étapes (${items.length - 3} de plus)`}
+              </button>
+            )}
             <p className="text-[10px] text-stone-400 mt-3">Quantités estimées — prévoir 10-15 % de marge.</p>
           </div>
         );
