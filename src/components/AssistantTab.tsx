@@ -6,6 +6,7 @@ import { analyzeProject } from '../lib/projectAnalysis';
 import { buildAIContext } from '../lib/ai/buildContext';
 import { extractPatches, stripPatches, applyPatch } from '../lib/ai/aiPatch';
 import KnowledgeManager from './KnowledgeManager';
+import AdaptPanel from './AdaptPanel';
 import Tip from './Tip';
 import TIPS from '../data/tips';
 
@@ -312,6 +313,7 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
 
   return (
     <div>
+      <AdaptPanel state={state} onApplyState={onApplyState} />
       <div className={cardClass}>
         <div className="flex items-center justify-between mb-3">
           <Tip text={TIPS['assistant-ia']}>

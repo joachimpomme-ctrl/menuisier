@@ -34,6 +34,8 @@ export interface AIPatch {
   bodies?: {
     all?: Partial<{ width: number; depth: number }>;
     byName?: Array<{ name: string; width?: number; depth?: number }>;
+    /** Restructure to N equal-width bodies (pieces redistributed proportionally) */
+    count?: number;
   };
 }
 
@@ -91,6 +93,9 @@ function summarizePatch(p: AIPatch): string[] {
     if (p.panel.height != null) items.push(`H ${p.panel.height} cm`);
     if (items.length) lines.push('Panneau : ' + items.join(', '));
   }
+  if (p.bodies?.count != null) {
+    lines.push(`Structure : ${p.bodies.count} corps`);
+  }
   if (p.bodies?.all) {
     const items: string[] = [];
     if (p.bodies.all.width != null) items.push(`largeur ${p.bodies.all.width} cm`);
@@ -138,6 +143,24 @@ export function applyPatch(state: AppState, patch: AIPatch): AppState {
     if (typeof pa.height === 'number') next.panel.height = clamp(pa.height, 50, 500);
   }
 
+  if (patch.bodies?.count != null) {
+    const n = clamp(Math.round(patch.bodies.count), 1, 20);
+    const totalWidth = next.bodies.reduce((s, b) => s + b.width, 0);
+    const newWidth = Math.round((totalWidth / n) * 10) / 10;
+    const depth = next.bodies[0]?.depth ?? state.project.wallDepth;
+    const allPieces = next.bodies.flatMap(b => b.pieces);
+    next.bodies = Array.from({ length: n }, (_, i) => {
+      const piecesPerBody = Math.ceil(allPieces.length / n);
+      return {
+        id: next.bodies[i]?.id ?? `body-adapt-${i + 1}`,
+        name: `Corps ${i + 1}`,
+        width: newWidth,
+        depth,
+        pieces: allPieces.slice(i * piecesPerBody, (i + 1) * piecesPerBody),
+      };
+    });
+  }
+
   if (patch.bodies?.all) {
     const a = patch.bodies.all;
     next.bodies = next.bodies.map(b => ({
@@ -177,7 +200,7 @@ Si l'utilisateur te demande d'ajuster des paramètres concrets du projet (dimens
   "project": { "wallWidth": 280, "wallDepth": 35, "ceilingHeight": 240 },
   "panel": { "thickness": 1.9 },
   "material": "cp_bouleau",
-  "bodies": { "all": { "depth": 35 }, "byName": [{"name": "Corps 1", "width": 100}] }
+  "bodies": { "count": 3, "all": { "depth": 35 }, "byName": [{"name": "Corps 1", "width": 100}] }
 }
 \`\`\`
 
@@ -185,6 +208,7 @@ Règles :
 - N'inclus QUE les champs que tu veux modifier (les autres restent inchangés).
 - Matériaux valides : cp_bouleau, cp_peuplier, cp_okoume, mdf, melamine, osb.
 - Épaisseurs en cm (ex: 1.9 = 19 mm).
+- bodies.count : restructure le projet en N corps de largeur égale (redistribution approx. des pièces).
 - Inclus le bloc UNIQUEMENT si l'utilisateur demande explicitement un changement de paramètres. Pour une simple question, n'en mets pas.
 - Le bloc ne remplace pas ton explication : commente d'abord, puis propose le patch.
 `.trim();
