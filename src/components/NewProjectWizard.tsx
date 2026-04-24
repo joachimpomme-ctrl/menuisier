@@ -155,7 +155,7 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate, onV3, onBr
                'Décrire le projet'}
             </h3>
           </div>
-          <button onClick={onClose} className="text-[#9d9089] hover:text-[#695f56] w-7 h-7 flex items-center justify-center rounded-md hover:bg-[#faf8f4] transition-colors">×</button>
+          <button onClick={onClose} className="text-[#9d9089] hover:text-[#695f56] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-[#faf8f4] transition-colors" aria-label="Fermer">×</button>
         </div>
 
         <div className="flex-1 overflow-y-auto">

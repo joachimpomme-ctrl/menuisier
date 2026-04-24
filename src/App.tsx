@@ -33,9 +33,7 @@ const TABS: { key: TabKey; label: string; shortLabel: string }[] = [
   { key: 'plans',     label: 'Plans 2D',  shortLabel: 'Plans'   },
   { key: 'debit',     label: 'Débit',     shortLabel: 'Débit'   },
   { key: 'montage',   label: 'Montage',   shortLabel: 'Mont.'   },
-  { key: 'notice',    label: 'Notice',    shortLabel: 'Notice'  },
-  { key: 'validation',label: 'Contrôle', shortLabel: 'Ctrl'    },
-  { key: 'ia',        label: 'Assistant', shortLabel: 'IA'      },
+  { key: 'export',    label: 'Export',    shortLabel: 'Export'  },
 ];
 
 // Singleton repository — shared across renders
@@ -167,11 +165,71 @@ export default function App() {
   const hasErrors = validation.errors.length > 0;
 
   return (
-    <div className="min-h-screen min-h-dvh text-[#1c1714] bg-[#f5f1eb]">
-      <div className="max-w-3xl mx-auto px-4 pt-4 pb-24 sm:py-6">
+    <div className="min-h-screen min-h-dvh md:min-h-0 md:h-screen md:h-dvh text-[#1c1714] bg-[#f5f1eb] md:flex md:overflow-hidden">
 
-        {/* Header — 1 rangée */}
-        <div className="mb-4">
+      {/* ── Desktop Sidebar ── */}
+      <aside className="hidden md:flex md:flex-col w-56 flex-shrink-0 border-r border-[#e0d8ce] bg-white">
+        <div className="px-5 py-5 border-b border-[#e0d8ce]">
+          <div className="text-base font-bold text-[#1c1714]">Menuisier</div>
+          <div className="text-xs text-[#9d9089] mt-0.5">Conception de meuble</div>
+        </div>
+        <div className="px-5 py-4 border-b border-[#e0d8ce]">
+          <div className="text-[10px] uppercase tracking-widest text-[#9d9089] font-semibold mb-1">Projet actif</div>
+          <div className="text-sm font-semibold text-[#1c1714] truncate mb-2">{state.project.name}</div>
+          <div className="flex flex-wrap gap-1.5">
+            {totalCost > 0 && (
+              <span className="text-[11px] bg-[#e4f0e8] text-[#2f6144] rounded px-2 py-0.5 font-medium font-mono">
+                {totalCost.toFixed(0)} €
+              </span>
+            )}
+            <span className="text-[11px] bg-[#faf8f4] border border-[#e0d8ce] rounded px-2 py-0.5 font-mono">
+              {totalPieces} pcs
+            </span>
+          </div>
+        </div>
+        <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                tab === t.key || (t.key === 'export' && ['notice', 'validation', 'ia'].includes(tab))
+                  ? 'bg-[#f2ebe0] text-[#6b4c2a] font-semibold'
+                  : 'text-[#695f56] hover:bg-[#faf8f4] hover:text-[#1c1714]'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </nav>
+        <div className="px-4 py-4 border-t border-[#e0d8ce]">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowNewWizard(true)}
+              className="flex-1 text-xs px-3 py-2 rounded-lg bg-[#6b4c2a] text-white font-semibold hover:bg-[#5a3e22] transition-colors"
+            >
+              + Nouveau
+            </button>
+            <MoreMenu
+              onExport={() => exportToJson(state)}
+              onImport={() => importRef.current?.click()}
+              onPdf={handleExportPdf}
+              pdfLoading={pdfLoading}
+              onCloud={handleCloudOpen}
+              cloudConfigured={isCloudConfigured()}
+              onLibrary={() => setShowPartsLibrary(true)}
+              onHelp={() => setShowHelp(true)}
+              onProjects={() => setShowProjects(true)}
+            />
+          </div>
+        </div>
+      </aside>
+
+      <main className="md:flex-1 md:overflow-y-auto">
+      <div className="max-w-3xl mx-auto px-4 pt-4 pb-24 sm:py-6 md:px-6 md:pt-6 md:pb-12">
+
+        {/* Header — mobile only */}
+        <div className="mb-4 md:hidden">
           <div className="flex items-center justify-between gap-3 mb-2">
             {/* Left: label + project name */}
             <div className="min-w-0">
@@ -322,58 +380,79 @@ export default function App() {
           </div>
         ) : (
           <>
-            {/* Tab bar — underline style, no emoji */}
-            <div className="flex border-b border-[#e0d8ce] mb-5 overflow-x-auto hide-scrollbar">
-              {TABS.map((t) => {
-                const isValidation = t.key === 'validation';
-                const isActive = tab === t.key;
-
-                return (
-                  <button
-                    key={t.key}
-                    onClick={() => setTab(t.key)}
-                    className={`flex items-center gap-1.5 px-3 py-2.5 text-xs whitespace-nowrap flex-shrink-0 border-b-2 -mb-px transition-colors ${
-                      isActive
-                        ? 'border-[#6b4c2a] text-[#6b4c2a] font-semibold'
-                        : 'border-transparent text-[#695f56] hover:text-[#1c1714]'
-                    }`}
-                  >
-                    {isValidation && (
-                      <span
-                        className={`inline-block w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                          hasErrors ? 'bg-[#7a2424]' : 'bg-[#2f6144]'
-                        }`}
-                      />
-                    )}
-                    <span className="sm:hidden">{t.shortLabel}</span>
-                    <span className="hidden sm:inline">{t.label}</span>
-                    {isValidation && hasErrors && (
-                      <span className="text-[#7a2424]">({validation.errors.length})</span>
-                    )}
-                  </button>
-                );
-              })}
+            {/* Tab bar — mobile only (desktop uses sidebar nav) */}
+            <div className="relative mb-5 md:hidden">
+              <div className="flex border-b border-[#e0d8ce] overflow-x-auto hide-scrollbar">
+                {TABS.map((t) => {
+                  const isActive = tab === t.key || (t.key === 'export' && ['notice', 'validation', 'ia'].includes(tab));
+                  return (
+                    <button
+                      key={t.key}
+                      onClick={() => setTab(t.key)}
+                      className={`flex items-center gap-1.5 px-3 py-2.5 text-xs whitespace-nowrap flex-shrink-0 border-b-2 -mb-px transition-colors ${
+                        isActive
+                          ? 'border-[#6b4c2a] text-[#6b4c2a] font-semibold'
+                          : 'border-transparent text-[#695f56] hover:text-[#1c1714]'
+                      }`}
+                    >
+                      <span className="sm:hidden">{t.shortLabel}</span>
+                      <span className="hidden sm:inline">{t.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#f5f1eb] to-transparent pointer-events-none" />
             </div>
 
-            {/* Content */}
-            {tab === 'structure' && <StructureTab state={state} onChange={setState} allPanelDefs={allPanelDefs} />}
-            {tab === 'plans' && <PlanTab state={state} />}
-            {tab === 'debit' && (
-              <DebitTab
-                state={state}
-                onChange={setState}
-                allPieces={allPieces}
-                nesting={nesting}
-                nestingByPanel={nestingByPanel}
-                allPanelDefs={allPanelDefs}
-                cost={cost}
-                onPriceChange={handlePriceChange}
-                analysis={analysis}
-              />
-            )}
-            {tab === 'montage' && <MontageTab state={state} />}
-            {tab === 'notice' && <NoticeTab steps={steps} materialName={mat.name} thickness={state.panel.thickness} />}
-            {tab === 'validation' && <ValidationTab validation={validation} onGoToStructure={() => setTab('structure')} />}
+            {/* Content — key triggers fade animation on tab change */}
+            <div key={tab} className="tab-content-enter">
+              {tab === 'structure' && <StructureTab state={state} onChange={setState} allPanelDefs={allPanelDefs} />}
+              {tab === 'plans' && <PlanTab state={state} />}
+              {tab === 'debit' && (
+                <DebitTab
+                  state={state}
+                  onChange={setState}
+                  allPieces={allPieces}
+                  nesting={nesting}
+                  nestingByPanel={nestingByPanel}
+                  allPanelDefs={allPanelDefs}
+                  cost={cost}
+                  onPriceChange={handlePriceChange}
+                  analysis={analysis}
+                />
+              )}
+              {tab === 'montage' && <MontageTab state={state} />}
+              {tab === 'export' && (
+                <div className="space-y-3">
+                  <button
+                    onClick={() => setTab('notice' as TabKey)}
+                    className="w-full text-left rounded-xl border border-[#e0d8ce] bg-white px-4 py-3 text-sm font-medium text-[#695f56] hover:border-[#6b4c2a] hover:text-[#6b4c2a] transition-colors"
+                  >
+                    Notice PDF
+                  </button>
+                  <button
+                    onClick={() => setTab('validation' as TabKey)}
+                    className={`w-full text-left rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${
+                      hasErrors
+                        ? 'border-[#e8c8c8] bg-[#fae8e8] text-[#7a2424] hover:border-[#c89090]'
+                        : 'border-[#e0d8ce] bg-white text-[#695f56] hover:border-[#2f6144] hover:text-[#2f6144]'
+                    }`}
+                  >
+                    Contrôle qualité
+                    {hasErrors && <span className="ml-2 text-xs">({validation.errors.length} erreur{validation.errors.length > 1 ? 's' : ''})</span>}
+                  </button>
+                  <button
+                    onClick={() => setTab('ia' as TabKey)}
+                    className="w-full text-left rounded-xl border border-[#e0d8ce] bg-white px-4 py-3 text-sm font-medium text-[#695f56] hover:border-[#6b4c2a] hover:text-[#6b4c2a] transition-colors"
+                  >
+                    Assistant IA →
+                  </button>
+                </div>
+              )}
+              {tab === 'notice' && <NoticeTab steps={steps} materialName={mat.name} thickness={state.panel.thickness} />}
+              {tab === 'validation' && <ValidationTab validation={validation} onGoToStructure={() => setTab('structure')} />}
+            </div>
+            {/* AssistantTab stays mounted to preserve chat state */}
             <div style={{ display: tab === 'ia' ? 'block' : 'none' }}>
               <AssistantTab
                 state={state}
@@ -388,6 +467,7 @@ export default function App() {
           </>
         )}
       </div>
+      </main>
 
       {/* PWA Install Banner */}
       <InstallBanner />

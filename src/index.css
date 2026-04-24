@@ -136,3 +136,14 @@ input[type="number"] {
 ::selection {
   background: color-mix(in srgb, var(--accent) 18%, transparent);
 }
+
+/* Tab content transitions */
+.tab-content-enter {
+  animation: fadeIn 120ms ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+

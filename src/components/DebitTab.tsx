@@ -2,6 +2,21 @@ import type { AppState, PieceWithBody, NestingResult, PanelDef } from '../types'
 import type { CostEstimate } from '../lib/cost';
 import type { ProjectAnalysis } from '../lib/projectAnalysis';
 import { MATERIALS, PIECE_COLORS } from '../data/materials';
+
+const TYPE_SHAPES: Record<string, 'circle' | 'square' | 'diamond' | 'dash'> = {
+  joue: 'circle', fixe: 'square', reglable: 'diamond', fond: 'dash', tablette: 'diamond', autre: 'circle',
+};
+
+function TypeMarker({ type }: { type: string }) {
+  const color = (PIECE_COLORS as Record<string, string>)[type] || PIECE_COLORS.autre;
+  const shape = TYPE_SHAPES[type] || 'circle';
+  const size = 8;
+  if (shape === 'circle')  return <svg width={size} height={size} viewBox="0 0 8 8" className="flex-shrink-0"><circle cx="4" cy="4" r="3.5" fill={color}/></svg>;
+  if (shape === 'square')  return <svg width={size} height={size} viewBox="0 0 8 8" className="flex-shrink-0"><rect x="0.5" y="0.5" width="7" height="7" fill={color}/></svg>;
+  if (shape === 'diamond') return <svg width={size} height={size} viewBox="0 0 8 8" className="flex-shrink-0"><polygon points="4,0 8,4 4,8 0,4" fill={color}/></svg>;
+  if (shape === 'dash')    return <svg width={size} height={size} viewBox="0 0 8 8" className="flex-shrink-0"><rect x="0" y="3" width="8" height="2" fill={color}/></svg>;
+  return null;
+}
 import { generateCutListCsv, downloadCsv } from '../lib/csv';
 import { uid, parseNumber } from '../lib/helpers';
 import CostPanel from './CostPanel';
@@ -454,7 +469,7 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
               return (
                 <div key={i} className="flex items-center justify-between gap-2 text-xs py-1.5 px-2 rounded-lg hover:bg-stone-50">
                   <span className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: PIECE_COLORS[p.type] }} />
+                    <TypeMarker type={p.type} />
                     <span className="text-stone-700 truncate">{p.name}</span>
                     {p.standardPartId && (
                       <span className="ml-1 text-[9px] bg-amber-100 text-amber-700 px-1 rounded flex-shrink-0" title="Pièce standard (bibliothèque)">
