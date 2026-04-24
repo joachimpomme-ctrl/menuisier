@@ -267,7 +267,7 @@ function HomeScreen({ onNavigate, T }) {
           <Tag T={T} color="accent">CP bouleau 18 mm</Tag>
           <Tag T={T}>10 pièces</Tag>
           <Tag T={T}>3 panneaux</Tag>
-          <Tag T={T} color="success">218 €</Tag>
+          <Tag T={T} color="success">262 €</Tag>
         </div>
 
         {/* Tab bar */}
@@ -725,7 +725,7 @@ function DashboardScreen({ onNavigate, T }) {
           {[
             { label: 'Pièces',   val: '10',    sub: '2 corps'    },
             { label: 'Panneaux', val: '4',     sub: 'CP 18+8mm'  },
-            { label: 'Coût',     val: '218',   sub: 'EUR estimé' },
+            { label: 'Coût',     val: '262',   sub: 'EUR estimé' },
             { label: 'Étapes',   val: '12',    sub: 'de montage' },
           ].map((m, i) => (
             <div key={i} style={{
@@ -817,16 +817,19 @@ function DashboardScreen({ onNavigate, T }) {
             {/* Total */}
             <div style={{ background: T.accentLight, border: `1px solid ${T.border}`, borderRadius: 10, padding: '14px 16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>Total estimé</span>
-                <span style={{ fontSize: 24, fontWeight: 700, color: T.accent, fontFamily: T.mono }}>218 €</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>Estimation totale</span>
+                <span style={{ fontSize: 24, fontWeight: 700, color: T.accent, fontFamily: T.mono }}>262 €</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {[['Panneaux (4 pl.)', '254 €'], ['Quincaillerie', '—'], ['Outillage consommable', '~20 €']].map(([l, v], i) => (
+                {[['Panneaux (4 pl.)', '216 €'], ['Quincaillerie', '~28 €'], ['Outillage consommable', '~18 €']].map(([l, v], i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
                     <span style={{ color: T.text2 }}>{l}</span>
                     <span style={{ color: T.text2, fontFamily: T.mono }}>{v}</span>
                   </div>
                 ))}
+              </div>
+              <div style={{ marginTop: 10, fontSize: 10, color: T.text3, lineHeight: 1.5 }}>
+                Prix indicatifs GSB. Validez les tarifs locaux avant achat.
               </div>
             </div>
           </div>
@@ -966,7 +969,7 @@ function NewProjectScreen({ onNavigate, T }) {
               {/* Labels */}
               <text x="218" y="22" fontSize="7" fill={T.text3} fontFamily="DM Mono, monospace">2400mm</text>
               <text x="218" y="36" fontSize="7" fill={T.text3} fontFamily="DM Mono, monospace">12 pièces</text>
-              <text x="218" y="50" fontSize="7" fill={T.accent} fontFamily="DM Mono, monospace" fontWeight="600">~218 €</text>
+              <text x="218" y="50" fontSize="7" fill={T.accent} fontFamily="DM Mono, monospace" fontWeight="600">~262 €</text>
             </svg>
           </div>
           <div style={{ padding: '14px 20px 18px' }}>
@@ -1062,7 +1065,7 @@ const VARIANTS_DATA = [
   {
     title: 'Équilibré',
     desc: '2 corps en CP bouleau, penderie + étagères — le bon compromis.',
-    corps: 2, pieces: 14, cout: 218, etapes: 12, difficulte: 'Intermédiaire',
+    corps: 2, pieces: 14, cout: 262, etapes: 12, difficulte: 'Intermédiaire',
     shelves: [0.30, 0.55, 0.75],
     separator: true,
   },
