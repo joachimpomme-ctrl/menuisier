@@ -173,7 +173,7 @@ function Tag({ children, color = 'neutral', T }) {
   );
 }
 
-function Btn({ children, variant = 'ghost', onClick, full, small, T }) {
+function Btn({ children, variant = 'ghost', onClick, full, small, T, styleOverride }) {
   const variants = {
     primary: { bg: T.accent, color: T.accentText, border: 'transparent' },
     ghost:   { bg: 'transparent', color: T.text2, border: T.border },
@@ -189,6 +189,7 @@ function Btn({ children, variant = 'ghost', onClick, full, small, T }) {
       fontSize: small ? 12 : 13, fontWeight: 500, cursor: 'pointer',
       width: full ? '100%' : undefined,
       fontFamily: 'inherit', transition: 'opacity .12s',
+      ...styleOverride,
     }}
     onMouseEnter={e => e.currentTarget.style.opacity = '.8'}
     onMouseLeave={e => e.currentTarget.style.opacity = '1'}
@@ -1229,9 +1230,13 @@ function BriefIAScreen({ onNavigate, T }) {
               })}
             </div>
 
-            {hasContent && (
+            {hasContent ? (
               <div style={{ background: T.accentLight, borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.accent, fontWeight: 500 }}>
                 {totalItems} élément{totalItems > 1 ? 's' : ''} sélectionné{totalItems > 1 ? 's' : ''}
+              </div>
+            ) : (
+              <div style={{ background: T.warningLight, border: `1px solid ${T.warning}30`, borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.warning, fontWeight: 500 }}>
+                Ajoutez au moins un élément pour obtenir une proposition dimensionnée.
               </div>
             )}
           </div>
@@ -1421,9 +1426,17 @@ function BriefIAScreen({ onNavigate, T }) {
           <Btn T={T} variant="ghost" onClick={() => { setStep(s => s - 1); setShowVariants(false); }}>← Retour</Btn>
         )}
         <div style={{ flex: 1 }} />
+        {step === 1 && !hasContent && (
+          <button onClick={() => setStep(2)} style={{
+            background: 'none', border: 'none', fontSize: 11, color: T.text3,
+            textDecoration: 'underline dotted', cursor: 'pointer', padding: 0, fontFamily: 'inherit',
+          }}>Ignorer le contenu</button>
+        )}
         {step === 1 && (
-          <Btn T={T} variant="primary" small onClick={() => setStep(2)}>
-            {hasContent ? `Continuer (${totalItems} élément${totalItems > 1 ? 's' : ''})` : 'Continuer sans contenu'}
+          <Btn T={T} variant="primary" small
+            onClick={hasContent ? () => setStep(2) : undefined}
+            styleOverride={!hasContent ? { background: T.border, color: T.text3, cursor: 'default', pointerEvents: 'none' } : undefined}>
+            {hasContent ? `Continuer (${totalItems} élément${totalItems > 1 ? 's' : ''})` : `Continuer (0 éléments)`}
           </Btn>
         )}
         {step === 2 && (
