@@ -67,6 +67,7 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
   const [pdfs, setPdfs] = useState<UploadedPdf[]>([]);
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [showKnowledge, setShowKnowledge] = useState(false);
+  const [appliedPatches, setAppliedPatches] = useState<Set<string>>(new Set());
   const [kbVersion, setKbVersion] = useState(0);
   const endRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -462,15 +463,27 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
                             <li key={si}>• {s}</li>
                           ))}
                         </ul>
-                        <button
-                          onClick={() => {
-                            const next = applyPatch(state, pp.patch);
-                            onApplyState(next);
-                          }}
-                          className="text-xs px-3 py-1.5 rounded-lg bg-[#6b4c2a] text-white font-medium hover:bg-[#5a3e22] transition-colors"
-                        >
-                          Appliquer
-                        </button>
+                        {(() => {
+                          const key = `${i}-${pi}`;
+                          const applied = appliedPatches.has(key);
+                          return applied ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-[#2f6144] font-medium">✓ Appliqué</span>
+                              <span className="text-xs text-[#9d9089]">— voir l'onglet Structure</span>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                const next = applyPatch(state, pp.patch);
+                                onApplyState(next);
+                                setAppliedPatches(prev => new Set(prev).add(key));
+                              }}
+                              className="text-xs px-3 py-1.5 rounded-lg bg-[#6b4c2a] text-white font-medium hover:bg-[#5a3e22] transition-colors"
+                            >
+                              Appliquer
+                            </button>
+                          );
+                        })()}
                       </div>
                     ))}
                   </div>
