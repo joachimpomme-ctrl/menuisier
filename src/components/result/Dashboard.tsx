@@ -263,7 +263,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
               </span>
             </div>
             {prod.summary.difficulty && (
-              <p className="text-xs text-[#9d9089] mt-1">
+              <p className="text-xs text-[#9d9089] mt-1" title="Difficulté estimée du projet">
                 Difficulté : {DIFFICULTY_LABELS[prod.summary.difficulty] ?? prod.summary.difficulty}
                 {prod.summary.total_weight_kg ? ` · ${prod.summary.total_weight_kg} kg` : ''}
               </p>
@@ -364,7 +364,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
           onClick={onModify}
           className="px-4 py-2 text-sm border border-[#e0d8ce] rounded-lg text-[#695f56] hover:bg-[#faf8f4] hover:text-[#1c1714] transition-colors"
         >
-          Modifier
+          ← Reconfigurer
         </button>
         <button
           onClick={() => {
@@ -374,7 +374,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
           }}
           className="px-4 py-2 text-sm border border-[#e0d8ce] rounded-lg text-[#695f56] hover:bg-[#faf8f4] hover:text-[#1c1714] transition-colors"
         >
-          Éditeur classique
+          Modifier les pièces
         </button>
         <button
           onClick={handleExportPdf}
