@@ -1660,7 +1660,7 @@ function SettingsScreen({ T }) {
 }
 
 // ─── PHONE SHELL ──────────────────────────────────────────────────────────
-function PhoneShell({ children, activeScreen, onNavigate, T }) {
+function PhoneShell({ children, activeScreen, onNavigate, T, phase = 'idle' }) {
   return (
     <div style={{
       width: 390, height: 844,
@@ -1687,7 +1687,7 @@ function PhoneShell({ children, activeScreen, onNavigate, T }) {
         </div>
       </div>
       {/* Content */}
-      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', ...getScreenStyle(phase) }}>
         {children}
       </div>
       <TabBar activeScreen={activeScreen} onNavigate={onNavigate} T={T} />
@@ -1790,12 +1790,43 @@ function CompareView({ screen }) {
   );
 }
 
+// ─── SCREEN TRANSITION ───────────────────────────────────────────────────
+function useScreenTransition(screen) {
+  const [displayedScreen, setDisplayedScreen] = useState(screen);
+  const [phase, setPhase] = useState('idle');
+
+  useEffect(() => {
+    if (screen === displayedScreen) return;
+    setPhase('exit');
+    const t1 = setTimeout(() => {
+      setDisplayedScreen(screen);
+      setPhase('enter');
+      const t2 = setTimeout(() => setPhase('idle'), 150);
+      return () => clearTimeout(t2);
+    }, 120);
+    return () => clearTimeout(t1);
+  }, [screen]);
+
+  return { displayedScreen, phase };
+}
+
+function getScreenStyle(phase) {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) return {};
+  const base = { transition: 'opacity 150ms ease', willChange: 'opacity' };
+  if (phase === 'idle')  return { ...base, opacity: 1 };
+  if (phase === 'exit')  return { ...base, opacity: 0 };
+  if (phase === 'enter') return { ...base, opacity: 0 };
+  return base;
+}
+
 // ─── APP ROOT ────────────────────────────────────────────────────────
 function App() {
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const T = getTokens((tweaks || TWEAK_DEFAULTS).accent);
   const [screen, setScreen] = useState('dashboard');
   const [compare, setCompare] = useState(false);
+  const { displayedScreen, phase } = useScreenTransition(screen);
 
   const screenMap = {
     home:           <HomeScreen onNavigate={setScreen} T={T} />,
@@ -1816,8 +1847,8 @@ function App() {
       {compare ? (
         <CompareView screen={screen} />
       ) : (
-        <PhoneShell T={T} activeScreen={screen} onNavigate={setScreen}>
-          {screenMap[screen] || screenMap.home}
+        <PhoneShell T={T} activeScreen={screen} onNavigate={setScreen} phase={phase}>
+          {screenMap[displayedScreen] || screenMap.home}
         </PhoneShell>
       )}
 
