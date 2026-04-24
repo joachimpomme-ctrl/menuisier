@@ -200,6 +200,16 @@ function Divider({ T }) {
   return <div style={{ height: 1, background: T.border, margin: '0 -20px' }} />;
 }
 
+function CloseBtn({ onClick, T }) {
+  return (
+    <button onClick={onClick} style={{
+      width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: 8, flexShrink: 0,
+      color: T.text3, fontSize: 18, lineHeight: 1, fontFamily: 'inherit',
+    }}>×</button>
+  );
+}
+
 // ─── SCREEN: HOME ────────────────────────────────────────────────────────
 const TABS = [
   { key: 'structure', label: 'Structure' },
@@ -246,8 +256,8 @@ function HomeScreen({ onNavigate, T }) {
               }}>+ Nouveau</button>
             <button style={{
               background: 'transparent', border: `1px solid ${T.border}`, borderRadius: 8,
-              padding: '7px 11px', fontSize: 13, color: T.text2, cursor: 'pointer', fontFamily: 'inherit'
-            }}>···</button>
+              padding: '10px 14px', fontSize: 13, color: T.text2, cursor: 'pointer', fontFamily: 'inherit'
+            }} title="Options">···</button>
           </div>
         </div>
 
@@ -359,10 +369,7 @@ function WizardTypeScreen({ onNavigate, T }) {
             </div>
             <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Type de meuble</div>
           </div>
-          <button onClick={() => onNavigate('home')} style={{
-            background: 'transparent', border: 'none', color: T.text3,
-            fontSize: 20, cursor: 'pointer', lineHeight: 1, padding: 4
-          }}>×</button>
+          <CloseBtn onClick={() => onNavigate('home')} T={T} />
         </div>
         {/* Progress bar */}
         <div style={{ height: 2, background: T.border, borderRadius: 2, marginTop: 14 }}>
@@ -460,7 +467,7 @@ function WizardSpaceScreen({ onNavigate, T }) {
             <div style={{ fontSize: 11, color: T.text3, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>Étape 2 / 3</div>
             <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Espace &amp; matériau</div>
           </div>
-          <button onClick={() => onNavigate('home')} style={{ background: 'transparent', border: 'none', color: T.text3, fontSize: 20, cursor: 'pointer', padding: 4 }}>×</button>
+          <CloseBtn onClick={() => onNavigate('home')} T={T} />
         </div>
         <div style={{ height: 2, background: T.border, borderRadius: 2, marginTop: 14 }}>
           <div style={{ height: '100%', width: '66%', background: T.accent, borderRadius: 2 }} />
@@ -900,7 +907,7 @@ function DashboardScreen({ onNavigate, T }) {
 
       {/* ── Footer ── */}
       <div style={{ background: T.surface, borderTop: `1px solid ${T.border}`, padding: '12px 20px', display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
-        <Btn T={T} variant="ghost" small onClick={() => onNavigate('wizard-space')}>← Modifier</Btn>
+        <Btn T={T} variant="ghost" onClick={() => onNavigate('wizard-space')}>← Modifier</Btn>
         <Btn T={T} variant="muted" small>Éditeur avancé</Btn>
         <div style={{ flex: 1 }} />
         <Btn T={T} variant="primary" small>Exporter PDF</Btn>
@@ -920,7 +927,7 @@ function NewProjectScreen({ onNavigate, T }) {
             <div style={{ fontSize: 11, color: T.text3, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>Nouveau projet</div>
             <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Par où commencer ?</div>
           </div>
-          <button onClick={() => onNavigate('home')} style={{ background: 'transparent', border: 'none', color: T.text3, fontSize: 20, cursor: 'pointer', padding: 4 }}>×</button>
+          <CloseBtn onClick={() => onNavigate('home')} T={T} />
         </div>
       </div>
 
@@ -1168,7 +1175,7 @@ function BriefIAScreen({ onNavigate, T }) {
             </div>
             <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Que voulez-vous ranger ?</div>
           </div>
-          <button onClick={() => onNavigate('home')} style={{ background: 'transparent', border: 'none', color: T.text3, fontSize: 20, cursor: 'pointer', padding: 4 }}>×</button>
+          <CloseBtn onClick={() => onNavigate('home')} T={T} />
         </div>
         {/* Step indicators */}
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -1411,7 +1418,7 @@ function BriefIAScreen({ onNavigate, T }) {
       {/* Footer */}
       <div style={{ background: T.surface, borderTop: `1px solid ${T.border}`, padding: '12px 20px', display: 'flex', gap: 8, flexShrink: 0 }}>
         {step > 1 && !loading && (
-          <Btn T={T} variant="ghost" small onClick={() => { setStep(s => s - 1); setShowVariants(false); }}>← Retour</Btn>
+          <Btn T={T} variant="ghost" onClick={() => { setStep(s => s - 1); setShowVariants(false); }}>← Retour</Btn>
         )}
         <div style={{ flex: 1 }} />
         {step === 1 && (
