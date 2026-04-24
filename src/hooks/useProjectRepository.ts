@@ -75,17 +75,26 @@ export function useProjectRepository(repo: LocalProjectRepository) {
   }, [projectId, state, refreshProjects, safeRepoWrite, repo]);
 
   const createFromWizard = useCallback((newState: AppState) => {
-    if (safeRepoWrite(() => repo.save(projectId, state)) === undefined) return;
+    try {
+      repo.save(projectId, state);
+    } catch (err) {
+      setStorageError(err instanceof StorageError ? err.message : 'Erreur de stockage');
+      return;
+    }
     const normalized = normalizeProject(migrateState(newState));
     const newId = crypto.randomUUID();
-    if (safeRepoWrite(() => {
+    try {
       repo.save(newId, normalized);
       repo.setCurrentId(newId);
-    }) === undefined) return;
+    } catch (err) {
+      setStorageError(err instanceof StorageError ? err.message : 'Erreur de stockage');
+      return;
+    }
+    setStorageError(null);
     setProjectId(newId);
     setState(normalized);
     refreshProjects();
-  }, [projectId, state, refreshProjects, safeRepoWrite, repo]);
+  }, [projectId, state, refreshProjects, repo]);
 
   const duplicateProject = useCallback((id: string) => {
     const source = projects.find((p) => p.id === id);

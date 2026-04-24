@@ -4,6 +4,7 @@ import type { ProjectIntent } from '../lib/knowledge/types';
 import type { PipelineResult } from '../lib/engine/pipeline';
 import { MATERIALS } from '../data/materials';
 import { TEMPLATES } from '../data/templates';
+import { extractPatches, applyPatch } from '../lib/ai/aiPatch';
 import BriefIA from './wizard/BriefIA';
 
 interface Props {
@@ -14,9 +15,46 @@ interface Props {
   onBriefIAResult?: (intent: ProjectIntent, result: PipelineResult, materialKey: MaterialKey) => void;
 }
 
+function buildDescribePrompt(material: MaterialKey): string {
+  const mat = MATERIALS[material];
+  const templateList = TEMPLATES.map(t => `- "${t.id}" : ${t.description}`).join('\n');
+  return `Tu es un assistant menuiserie. L'utilisateur décrit un projet de meuble à créer.
+
+Tu dois :
+1. Choisir le modèle de base le plus adapté parmi :
+${templateList}
+
+2. Générer UN bloc apply avec le templateId et toutes les modifications à appliquer :
+
+\`\`\`apply
+{
+  "templateId": "bibliotheque",
+  "title": "Bibliothèque 3 corps 249 cm",
+  "project": { "wallWidth": 249, "wallDepth": 25.8, "ceilingHeight": 250 },
+  "panel": { "thickness": 1.8 },
+  "material": "${material}",
+  "bodies": { "count": 3, "all": { "depth": 25.8 } }
+}
+\`\`\`
+
+Matériau sélectionné : ${mat.name} (${mat.short}), épaisseur par défaut ${mat.defaultThickness}mm.
+
+Règles :
+- templateId est OBLIGATOIRE
+- Dimensions en cm (épaisseur ex: 1.8 = 18 mm)
+- N'inclus que les champs à modifier vs le modèle de base
+- bodies.count : restructure en N corps de largeur égale
+- Une ligne d'explication courte AVANT le bloc, rien après`.trim();
+}
+
 export default function NewProjectWizard({ isOpen, onClose, onCreate, onV3, onBriefIAResult }: Props) {
-  const [view, setView] = useState<'choice' | 'brief-ia' | 'modeles'>('choice');
+  const [view, setView] = useState<'choice' | 'brief-ia' | 'modeles' | 'describe'>('choice');
   const [selectedMaterial, setSelectedMaterial] = useState<MaterialKey>('cp_bouleau');
+
+  // describe view state
+  const [description, setDescription] = useState('');
+  const [descLoading, setDescLoading] = useState(false);
+  const [descError, setDescError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -41,6 +79,57 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate, onV3, onBr
     onClose();
   };
 
+  const handleDescribe = async () => {
+    if (!description.trim() || descLoading) return;
+    setDescLoading(true);
+    setDescError(null);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: buildDescribePrompt(selectedMaterial),
+          messages: [{ role: 'user', content: description.trim() }],
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
+
+      const patches = extractPatches(data.reply);
+      if (patches.length === 0) {
+        setDescError('Aucun modèle détecté. Reformule ta description (ex: "bibliothèque 240 cm de large, 3 corps").');
+        setDescLoading(false);
+        return;
+      }
+
+      const patch = patches[0];
+      const raw = JSON.parse(patch.raw) as { templateId?: string } & Record<string, unknown>;
+      const templateId = typeof raw.templateId === 'string' ? raw.templateId : 'bibliotheque';
+      const tpl = TEMPLATES.find(t => t.id === templateId) ?? TEMPLATES[0];
+      const baseState = tpl.create(selectedMaterial);
+      const finalState = applyPatch(baseState, patch.patch);
+      if (patch.patch.project?.name == null) {
+        finalState.project.name = tpl.name;
+      }
+
+      onCreate(finalState);
+      onClose();
+    } catch (err) {
+      setDescError(err instanceof Error ? err.message : 'Erreur inconnue');
+    }
+
+    setDescLoading(false);
+  };
+
+  const handleDescKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      handleDescribe();
+    }
+  };
+
   const inputClass = "w-full rounded-lg border border-[#e0d8ce] bg-white px-3 py-2 text-sm text-[#1c1714] focus:border-[#6b4c2a] focus:outline-none transition-colors";
 
   return (
@@ -60,7 +149,10 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate, onV3, onBr
               </button>
             )}
             <h3 className="text-[#1c1714] font-semibold text-sm">
-              {view === 'choice' ? 'Nouveau projet' : view === 'brief-ia' ? 'Brief IA' : 'Partir d\'un modèle'}
+              {view === 'choice' ? 'Nouveau projet' :
+               view === 'brief-ia' ? 'Brief IA' :
+               view === 'modeles' ? 'Partir d\'un modèle' :
+               'Décrire le projet'}
             </h3>
           </div>
           <button onClick={onClose} className="text-[#9d9089] hover:text-[#695f56] w-7 h-7 flex items-center justify-center rounded-md hover:bg-[#faf8f4] transition-colors">×</button>
@@ -77,7 +169,6 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate, onV3, onBr
               onClick={() => setView('brief-ia')}
               className="w-full text-left rounded-lg border-2 border-[#6b4c2a] hover:bg-[#faf8f4] transition-colors overflow-hidden"
             >
-              {/* Illustration header */}
               <div className="bg-[#f2ebe0] px-5 py-4 flex items-center gap-4">
                 <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
                   <rect x="6" y="8" width="36" height="26" rx="6" fill="#6b4c2a" opacity=".15"/>
@@ -92,7 +183,6 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate, onV3, onBr
                   <p className="text-[15px] font-bold text-[#1c1714] mt-0.5">Je décris ce que je range</p>
                 </div>
               </div>
-              {/* Body */}
               <div className="px-5 py-3">
                 <p className="text-xs text-[#695f56] mb-2">Décrivez votre besoin en quelques mots, l'IA propose 2–3 variantes adaptées.</p>
                 <div className="flex gap-2">
@@ -102,7 +192,27 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate, onV3, onBr
               </div>
             </button>
 
-            {/* Card 2 — Wizard classique */}
+            {/* Card 2 — Description précise IA */}
+            <button
+              onClick={() => setView('describe')}
+              className="w-full text-left rounded-lg border border-[#c8b89a] hover:border-[#6b4c2a] hover:bg-[#faf8f4] transition-colors overflow-hidden"
+            >
+              <div className="bg-[#fdf8f2] px-5 py-4 flex items-center gap-4">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                  <rect x="8" y="10" width="32" height="28" rx="5" fill="#f2ebe0"/>
+                  <rect x="8" y="10" width="32" height="28" rx="5" stroke="#6b4c2a" strokeWidth="1.5"/>
+                  <path d="M15 20h18M15 26h12M15 32h8" stroke="#6b4c2a" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="36" cy="12" r="7" fill="#6b4c2a"/>
+                  <path d="M33.5 12l1.5 1.5 3-3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <div>
+                  <p className="text-[15px] font-bold text-[#1c1714]">Je décris mon projet précisément</p>
+                  <p className="text-xs text-[#695f56] mt-0.5">Dimensions, nombre de corps, matériau… L'IA configure le projet.</p>
+                </div>
+              </div>
+            </button>
+
+            {/* Card 3 — Wizard classique */}
             {onV3 && (
               <button
                 onClick={() => { onClose(); onV3(); }}
@@ -152,6 +262,63 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate, onV3, onBr
               onBriefIAResult?.(intent, result, materialKey);
             }}
           />
+        )}
+
+        {/* ===== DESCRIBE VIEW ===== */}
+        {view === 'describe' && (
+          <div className="p-5 space-y-4">
+            <div>
+              <label className="text-xs font-medium text-[#695f56] mb-1.5 block">Matériau</label>
+              <select
+                className={inputClass}
+                value={selectedMaterial}
+                onChange={(e) => setSelectedMaterial(e.target.value as MaterialKey)}
+              >
+                {Object.entries(MATERIALS).map(([k, m]) => (
+                  <option key={k} value={k}>{m.name} — portée max {m.maxSpan18}cm</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-[#695f56] mb-1.5 block">
+                Description du projet
+              </label>
+              <textarea
+                value={description}
+                onChange={e => { setDescription(e.target.value); setDescError(null); }}
+                onKeyDown={handleDescKeyDown}
+                placeholder={"Exemples :\n• Bibliothèque 249×25.8×250 cm, 3 corps, mélaminé 18 mm\n• Armoire 200 cm avec penderie à gauche et étagères à droite\n• Meuble TV bas 180 cm, 2 niches centrales"}
+                rows={7}
+                className="w-full rounded-lg border border-[#e0d8ce] bg-white px-3 py-2.5 text-sm text-[#1c1714] placeholder-[#c4b8ac] focus:border-[#6b4c2a] focus:outline-none resize-y transition-colors"
+              />
+              <p className="text-xs text-[#b8a898] mt-1">Ctrl+Entrée pour envoyer</p>
+            </div>
+
+            {descError && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                {descError}
+              </div>
+            )}
+
+            <button
+              onClick={handleDescribe}
+              disabled={descLoading || !description.trim()}
+              className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#6b4c2a] px-4 py-3 text-sm font-semibold text-white hover:bg-[#5a3f24] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {descLoading ? (
+                <>
+                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Génération du projet…
+                </>
+              ) : (
+                <>
+                  <span>✦</span>
+                  Créer le projet
+                </>
+              )}
+            </button>
+          </div>
         )}
 
         {/* ===== MODÈLES VIEW ===== */}
