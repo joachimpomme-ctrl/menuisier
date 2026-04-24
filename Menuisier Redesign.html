@@ -19,6 +19,10 @@
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #c8bfb3; border-radius: 4px; }
+
+    /* Focus */
+    *:focus { outline: none; }
+    *:focus-visible { outline: 2px solid #6b4c2a; outline-offset: 2px; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -174,6 +178,7 @@ function Tag({ children, color = 'neutral', T }) {
 }
 
 function Btn({ children, variant = 'ghost', onClick, full, small, T, styleOverride }) {
+  const [focused, setFocused] = useState(false);
   const variants = {
     primary: { bg: T.accent, color: T.accentText, border: 'transparent' },
     ghost:   { bg: 'transparent', color: T.text2, border: T.border },
@@ -189,10 +194,14 @@ function Btn({ children, variant = 'ghost', onClick, full, small, T, styleOverri
       fontSize: small ? 12 : 13, fontWeight: 500, cursor: 'pointer',
       width: full ? '100%' : undefined,
       fontFamily: 'inherit', transition: 'opacity .12s',
+      outline: focused ? `2px solid ${T.accent}` : 'none',
+      outlineOffset: focused ? '2px' : '0',
       ...styleOverride,
     }}
     onMouseEnter={e => e.currentTarget.style.opacity = '.8'}
     onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+    onFocus={() => setFocused(true)}
+    onBlur={() => setFocused(false)}
     >{children}</button>
   );
 }
@@ -377,6 +386,7 @@ function HomeScreen({ onNavigate, T }) {
 // ─── SCREEN: WIZARD TYPE ─────────────────────────────────────────────────
 function WizardTypeScreen({ onNavigate, T }) {
   const [selected, setSelected] = useState(null);
+  const [focusedTA, setFocusedTA] = useState(false);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg }}>
@@ -431,11 +441,16 @@ function WizardTypeScreen({ onNavigate, T }) {
           </div>
           <textarea placeholder="Ex : Bibliothèque 280 cm de large, 240 sous plafond, pour livres et TV au centre…" style={{
             width: '100%', height: 72, resize: 'none',
-            border: `1px solid ${T.border}`, borderRadius: 8,
+            border: `1px solid ${focusedTA ? T.accent : T.border}`, borderRadius: 8,
             padding: '8px 10px', fontSize: 12, color: T.text,
             background: T.surfaceAlt, fontFamily: 'inherit',
             outline: 'none',
-          }} />
+            boxShadow: focusedTA ? `0 0 0 2px ${T.accent}33` : 'none',
+            transition: 'border-color .12s, box-shadow .12s',
+          }}
+          onFocus={() => setFocusedTA(true)}
+          onBlur={() => setFocusedTA(false)}
+          />
           <div style={{ marginTop: 8 }}>
             <Btn T={T} variant="muted" full small>Générer des propositions</Btn>
           </div>
@@ -454,15 +469,19 @@ function WizardTypeScreen({ onNavigate, T }) {
 
 // ─── SCREEN: WIZARD SPACE ─────────────────────────────────────────────────
 function Field({ label, unit, value, T }) {
+  const [focused, setFocused] = useState(false);
   return (
     <div>
       <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: T.text3, marginBottom: 5, letterSpacing: '0.02em' }}>{label}</label>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 0, border: `1px solid ${T.border}`, borderRadius: 8, background: T.surface, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 0, border: `1px solid ${focused ? T.accent : T.border}`, borderRadius: 8, background: T.surface, overflow: 'hidden', boxShadow: focused ? `0 0 0 2px ${T.accent}33` : 'none', transition: 'border-color .12s, box-shadow .12s' }}>
         <input type="number" defaultValue={value} style={{
           flex: 1, border: 'none', padding: '10px 12px', fontSize: 14,
           color: T.text, fontFamily: T.mono, background: 'transparent',
           outline: 'none', minWidth: 0,
-        }} />
+        }}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        />
         <div style={{ padding: '0 12px', color: T.text3, fontSize: 11, fontWeight: 500, borderLeft: `1px solid ${T.border}`, height: '100%', display: 'flex', alignItems: 'center' }}>{unit}</div>
       </div>
     </div>
@@ -1167,14 +1186,18 @@ function Counter({ value, onChange, T }) {
 }
 
 function MiniField({ label, value, unit, T }) {
+  const [focused, setFocused] = useState(false);
   return (
     <div>
       <label style={{ display: 'block', fontSize: 10, fontWeight: 600, color: T.text3, marginBottom: 5, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{label}</label>
-      <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden', background: T.surface }}>
+      <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${focused ? T.accent : T.border}`, borderRadius: 8, overflow: 'hidden', background: T.surface, boxShadow: focused ? `0 0 0 2px ${T.accent}33` : 'none', transition: 'border-color .12s, box-shadow .12s' }}>
         <input type="number" defaultValue={value} style={{
           flex: 1, border: 'none', padding: '9px 10px', fontSize: 15,
           color: T.text, fontFamily: T.mono, background: 'transparent', outline: 'none', minWidth: 0,
-        }} />
+        }}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        />
         <span style={{ padding: '0 10px', color: T.text3, fontSize: 11, borderLeft: `1px solid ${T.border}`, height: '100%', display: 'flex', alignItems: 'center' }}>{unit}</span>
       </div>
     </div>
