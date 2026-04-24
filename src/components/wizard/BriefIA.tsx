@@ -375,8 +375,8 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
                     <button
                       type="button"
                       onClick={() => changeCount(cat.key, -1)}
-                      disabled={!active}
-                      className="w-7 h-7 rounded-md border border-[#e0d8ce] text-[#695f56] hover:bg-[#faf8f4] disabled:opacity-30 text-sm font-bold flex items-center justify-center transition-colors"
+                      disabled={count === 0}
+                      className={`w-7 h-7 rounded-md border border-[#e0d8ce] text-[#695f56] text-sm font-bold flex items-center justify-center transition-colors ${count === 0 ? 'opacity-40 cursor-default' : 'hover:bg-[#faf8f4]'}`}
                     >−</button>
                     <span className="w-5 text-center font-mono tabular-nums text-sm text-[#1c1714]">
                       {count > 0 ? count : ''}
@@ -391,6 +391,12 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
               );
             })}
           </div>
+
+          {!hasContent && (
+            <p className="text-xs text-[#7a5020] bg-[#f5ead8] border border-[#e8d8b8] rounded-lg px-3 py-2">
+              Ajoutez au moins un type de contenu pour continuer.
+            </p>
+          )}
 
           <div className="flex gap-2 pt-2">
             <button type="button" onClick={onBack}
@@ -468,7 +474,7 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
 
           <div>
             <p className="text-xs uppercase tracking-widest text-[#9d9089] mb-2">Style</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {(['minimaliste', 'classique', 'artisanal'] as StylePref[]).map(s => (
                 <Chip key={s} label={s.charAt(0).toUpperCase() + s.slice(1)} selected={style === s} onClick={() => setStyle(s)} />
               ))}
@@ -477,7 +483,7 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
 
           <div>
             <p className="text-xs uppercase tracking-widest text-[#9d9089] mb-2">Budget</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {([
                 { key: 'serre', label: 'Serré' },
                 { key: 'standard', label: 'Standard' },
@@ -490,7 +496,7 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
 
           <div>
             <p className="text-xs uppercase tracking-widest text-[#9d9089] mb-2">Niveau</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {([
                 { key: 'debutant', label: 'Débutant' },
                 { key: 'confirme', label: 'Confirmé' },
