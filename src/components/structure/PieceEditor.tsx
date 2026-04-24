@@ -22,7 +22,7 @@ interface Props {
 function Field({ label, children, className = '' }: { label: string; children: React.ReactNode; className?: string }) {
   return (
     <div className={className}>
-      <span className="block text-[10px] font-medium text-stone-400 mb-0.5">{label}</span>
+      <span className="block text-[10px] font-medium text-[#9d9089] mb-0.5">{label}</span>
       {children}
     </div>
   );
@@ -100,7 +100,7 @@ export default function PieceEditor({
                   type="number"
                   step="1"
                   min={1}
-                  className={inputClass + " !py-1.5" + (p.thickness !== undefined ? " !border-amber-400 !bg-amber-50" : "")}
+                  className={inputClass + " !py-1.5" + (p.thickness !== undefined ? " !border-[#6b4c2a] !bg-[#f2ebe0]" : "")}
                   value={thicknessMm}
                   onChange={(e) => {
                     const mm = parseNumber(e.target.value, thicknessMm, 1);
@@ -186,25 +186,25 @@ export default function PieceEditor({
         ) : (
           /* ---- READ MODE: compact single line ---- */
           <div
-            className="flex-1 min-w-0 flex justify-between cursor-pointer hover:text-amber-700 transition-colors"
+            className="flex-1 min-w-0 flex justify-between cursor-pointer hover:text-[#6b4c2a] transition-colors"
             onClick={onStartEdit}
           >
             <span className="truncate">
               {p.name}
-              <span className="text-[10px] text-stone-400 ml-1.5">{pieceTypeLabel(p.type)}</span>
+              <span className="text-[10px] text-[#9d9089] ml-1.5">{pieceTypeLabel(p.type)}</span>
               {p.panelId && p.panelId !== 'default' && (
-                <span className="text-[9px] bg-sky-50 text-sky-600 border border-sky-200 rounded px-1 py-0 ml-1">
+                <span className="text-[9px] bg-[#e5eaf0] text-[#3a4a5c] border border-[#c8d4e0] rounded px-1 py-0 ml-1">
                   {allPanelDefs.find((pd) => pd.id === p.panelId)?.label ?? p.panelId}
                 </span>
               )}
             </span>
-            <span className="text-stone-500 text-xs font-mono ml-2 flex-shrink-0">
+            <span className="text-[#695f56] text-xs font-mono ml-2 flex-shrink-0">
               {p.length}×{p.width} ×{p.qty}
-              <span className={`ml-1 ${p.thickness !== undefined ? 'text-amber-600 font-semibold' : 'text-stone-400'}`}>
+              <span className={`ml-1 ${p.thickness !== undefined ? 'text-[#6b4c2a] font-semibold' : 'text-[#9d9089]'}`}>
                 ep.{thicknessMm}
               </span>
               {(p.posY !== undefined || p.posX !== undefined) && (
-                <span className="ml-1 text-sky-600">
+                <span className="ml-1 text-[#3a4a5c]">
                   {p.posY !== undefined && `H=${p.posY}`}
                   {p.posX !== undefined && (p.posY !== undefined ? ` X=${p.posX}` : `X=${p.posX}`)}
                 </span>
@@ -216,7 +216,7 @@ export default function PieceEditor({
         {editing && (
           <button
             onClick={onStopEdit}
-            className="text-xs text-emerald-600 hover:text-emerald-800 flex-shrink-0 transition-colors font-bold"
+            className="text-xs text-[#2f6144] hover:text-[#1e4530] flex-shrink-0 transition-colors font-bold"
             title="Valider"
           >
             ✓
@@ -224,7 +224,7 @@ export default function PieceEditor({
         )}
         <button
           onClick={onRemove}
-          className="text-xs text-stone-400 hover:text-red-500 flex-shrink-0 transition-colors"
+          className="text-xs text-[#9d9089] hover:text-[#7a2424] flex-shrink-0 transition-colors"
           title="Supprimer cette pièce"
         >
           ✕
