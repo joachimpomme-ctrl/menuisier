@@ -25,7 +25,7 @@
 <div id="root"></div>
 <script type="text/babel" src="tweaks-panel.jsx"></script>
 <script type="text/babel">
-const { useState, useCallback } = React;
+const { useState, useCallback, useRef, useEffect } = React;
 
 // ─── DESIGN TOKENS ─────────────────────────────────────────────────────────
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
@@ -1200,6 +1200,21 @@ function BriefIAScreen({ onNavigate, T }) {
   const totalItems = Object.values(counts).reduce((s, v) => s + v, 0);
   const hasContent = totalItems > 0;
 
+  const scrollRef = useRef(null);
+  const [atBottom, setAtBottom] = useState(false);
+
+  const handleScroll = useCallback((e) => {
+    const el = e.currentTarget;
+    setAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 8);
+  }, []);
+
+  useEffect(() => {
+    if (step === 1 && scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+      setAtBottom(false);
+    }
+  }, [step]);
+
   const handleGenerate = () => {
     setLoading(true);
     setStep(4);
@@ -1226,42 +1241,51 @@ function BriefIAScreen({ onNavigate, T }) {
       </div>
 
       {/* Step content */}
-      <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
+      <div style={{ flex: 1, overflow: step === 1 ? 'hidden' : 'auto', padding: step === 1 ? 0 : 20 }}>
 
         {/* STEP 1 — Contenu */}
         {step === 1 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <p style={{ fontSize: 12, color: T.text2, lineHeight: 1.6 }}>
-              Indiquez ce que vous souhaitez ranger — l'app dimensionne automatiquement les zones.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {CONTENT_CATS.map(cat => {
-                const val = counts[cat.id] || 0;
-                return (
-                  <div key={cat.id} style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '10px 14px', background: T.surface, border: `1px solid ${val > 0 ? T.accent : T.border}`,
-                    borderRadius: 10, gap: 10, transition: 'border-color .12s',
-                  }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: val > 0 ? 600 : 400, color: val > 0 ? T.text : T.text2 }}>{cat.label}</div>
-                      <div style={{ fontSize: 10, color: T.text3 }}>{cat.sub}</div>
-                    </div>
-                    <Counter value={val} onChange={v => setCounts(c => ({ ...c, [cat.id]: v }))} T={T} />
-                  </div>
-                );
-              })}
-            </div>
+          <div style={{ position: 'relative', height: '100%' }}>
+            <div ref={scrollRef} onScroll={handleScroll} style={{ height: '100%', overflow: 'auto', padding: 20 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <p style={{ fontSize: 12, color: T.text2, lineHeight: 1.6 }}>
+                  Indiquez ce que vous souhaitez ranger — l'app dimensionne automatiquement les zones.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {CONTENT_CATS.map(cat => {
+                    const val = counts[cat.id] || 0;
+                    return (
+                      <div key={cat.id} style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '10px 14px', background: T.surface, border: `1px solid ${val > 0 ? T.accent : T.border}`,
+                        borderRadius: 10, gap: 10, transition: 'border-color .12s',
+                      }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: val > 0 ? 600 : 400, color: val > 0 ? T.text : T.text2 }}>{cat.label}</div>
+                          <div style={{ fontSize: 10, color: T.text3 }}>{cat.sub}</div>
+                        </div>
+                        <Counter value={val} onChange={v => setCounts(c => ({ ...c, [cat.id]: v }))} T={T} />
+                      </div>
+                    );
+                  })}
+                </div>
 
-            {hasContent ? (
-              <div style={{ background: T.accentLight, borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.accent, fontWeight: 500 }}>
-                {totalItems} élément{totalItems > 1 ? 's' : ''} sélectionné{totalItems > 1 ? 's' : ''}
+                {hasContent ? (
+                  <div style={{ background: T.accentLight, borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.accent, fontWeight: 500 }}>
+                    {totalItems} élément{totalItems > 1 ? 's' : ''} sélectionné{totalItems > 1 ? 's' : ''}
+                  </div>
+                ) : (
+                  <div style={{ background: T.warningLight, border: `1px solid ${T.warning}30`, borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.warning, fontWeight: 500 }}>
+                    Ajoutez au moins un élément pour obtenir une proposition dimensionnée.
+                  </div>
+                )}
               </div>
-            ) : (
-              <div style={{ background: T.warningLight, border: `1px solid ${T.warning}30`, borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.warning, fontWeight: 500 }}>
-                Ajoutez au moins un élément pour obtenir une proposition dimensionnée.
-              </div>
-            )}
+            </div>
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0, height: 48,
+              background: `linear-gradient(to bottom, transparent, ${T.bg})`,
+              pointerEvents: 'none', opacity: atBottom ? 0 : 1, transition: 'opacity .25s',
+            }} />
           </div>
         )}
 
