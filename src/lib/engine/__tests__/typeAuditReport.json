@@ -251,6 +251,7 @@
       "hardwareCount": 7,
       "blockingErrors": [],
       "warnings": [
+        "Bloc tiroirs : Tiroirs > 800mm : coulisses renforcées recommandées",
         "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps"
       ],
       "hasJoues": true,
@@ -331,6 +332,7 @@
       "blockingErrors": [],
       "warnings": [
         "Penderie courte (chemises/vestes) : hauteur zone 371mm < recommandé 1100mm",
+        "Bloc tiroirs : Tiroirs > 800mm : coulisses renforcées recommandées",
         "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
         "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
       ],
@@ -446,6 +448,7 @@
       "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
+        "Bloc tiroirs : Tiroirs > 800mm : coulisses renforcées recommandées",
         "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps"
       ],
       "hasJoues": true,
@@ -561,6 +564,7 @@
       "hardwareCount": 5,
       "blockingErrors": [],
       "warnings": [
+        "Bloc tiroirs : Tiroirs > 800mm : coulisses renforcées recommandées",
         "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps",
         "Meuble d'entrée : profondeur 550mm > 400mm — vérifier la circulation (80cm min)"
       ],
@@ -732,6 +736,7 @@
       "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
+        "Bloc tiroirs : Tiroirs > 800mm : coulisses renforcées recommandées",
         "Largeur 1800mm > portée max 836mm (CP bouleau) → 3 corps"
       ],
       "hasJoues": true,
@@ -805,6 +810,7 @@
       "hardwareCount": 5,
       "blockingErrors": [],
       "warnings": [
+        "Bloc tiroirs : Tiroirs > 800mm : coulisses renforcées recommandées",
         "Largeur 1400mm > portée max 836mm (CP bouleau) → 2 corps"
       ],
       "hasJoues": true,
@@ -877,6 +883,7 @@
       "hardwareCount": 4,
       "blockingErrors": [],
       "warnings": [
+        "Bloc tiroirs : Tiroirs > 800mm : coulisses renforcées recommandées",
         "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps"
       ],
       "hasJoues": true,
@@ -1267,7 +1274,9 @@
       "partCount": 9,
       "hardwareCount": 5,
       "blockingErrors": [],
-      "warnings": [],
+      "warnings": [
+        "Banquette coffre : Hauteur d'assise idéale : 420-480mm"
+      ],
       "hasJoues": true,
       "hasTop": true,
       "hasBottom": true,
@@ -1439,6 +1448,7 @@
       "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
+        "Banquette coffre : Hauteur d'assise idéale : 420-480mm",
         "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
       ],
       "hasJoues": true,

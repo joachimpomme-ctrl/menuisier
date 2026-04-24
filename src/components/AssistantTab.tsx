@@ -50,13 +50,13 @@ function saveChat(projectId: string, messages: ChatMessage[]): void {
 
 interface UploadedImage {
   name: string;
-  data: string; // base64
-  mediaType: string; // image/jpeg, image/png, etc.
-  preview: string; // data URL for thumbnail
+  data: string;
+  mediaType: string;
+  preview: string;
 }
 
-const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
-const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
+const cardClass = "rounded-lg border border-[#e0d8ce] bg-white p-4 mb-4";
+const inputClass = "w-full rounded-lg border border-[#e0d8ce] bg-white px-3 py-2.5 text-sm text-[#1c1714] placeholder-[#9d9089] focus:border-[#6b4c2a] focus:outline-none transition-colors";
 
 export default function AssistantTab({ state, validation, allPieces, totalPieces: _totalPieces, panelCount: _panelCount, projectId, onApplyState }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>(() => loadChat(projectId));
@@ -78,12 +78,10 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Reload chat when switching projects
   useEffect(() => {
     setMessages(loadChat(projectId));
   }, [projectId]);
 
-  // Persist chat per project
   useEffect(() => {
     saveChat(projectId, messages);
   }, [projectId, messages]);
@@ -153,11 +151,9 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
     e.target.value = '';
   };
 
-  // kbVersion in deps ensures re-render when user adds/removes docs
   const kbDocs = listKnowledgeDocs();
   const kbDocCount = kbDocs.length + 0 * kbVersion;
 
-  // --- Build filtered user knowledge, capped at MAX_KNOWLEDGE_CHARS ---
   const buildFilteredUserKnowledge = (): string => {
     if (kbDocs.length === 0) return '';
 
@@ -178,11 +174,10 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
       const lo = (d.summary + d.name).toLowerCase();
       const mentionsMaterial = materialKeywords.some(kw => lo.includes(kw));
       const mentionsOther = allMats.some(m => lo.includes(m)) && !mentionsMaterial;
-      if (mentionsOther) continue; // skip docs about other materials
+      if (mentionsOther) continue;
 
-      // Truncate individual doc summary to fit budget
       const budget = MAX_KNOWLEDGE_CHARS - totalLen;
-      if (budget <= 100) break; // no room left
+      if (budget <= 100) break;
       const summary = d.summary.length > budget ? d.summary.slice(0, budget) + '…' : d.summary;
       parts.push(`[${d.name}] ${summary}`);
       totalLen += summary.length + d.name.length + 4;
@@ -203,7 +198,6 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
       extras.push(`${images.length} photo(s) jointes — analyse dimensions, assemblages, défauts.`);
     }
 
-    // Only include validation summary if there are issues
     if (validation.errors.length > 0 || validation.warnings.length > 0) {
       const items = [
         ...validation.errors.map(e => '❌ ' + e),
@@ -223,7 +217,6 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
     return aiContext.systemPrompt + (extras.length > 0 ? '\n\n' + extras.join('\n') : '');
   };
 
-  // --- Lot 5.1: Payload size warning ---
   const estimateTokens = (): number => {
     const systemTokens = Math.ceil(buildSystemPrompt().length / 4);
     const messagesTokens = Math.ceil(
@@ -253,10 +246,8 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
     try {
       const apiMessages = newMessages.map((m, i) => {
         if (m.role === 'user' && i === newMessages.length - 1) {
-          // Build multimodal content for the last user message
           const content: Array<Record<string, unknown>> = [];
 
-          // Add PDFs
           if (pdfs.length > 0) {
             pdfs.forEach(d => {
               content.push({
@@ -266,7 +257,6 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
             });
           }
 
-          // Add images
           if (images.length > 0) {
             images.forEach(img => {
               content.push({
@@ -276,10 +266,8 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
             });
           }
 
-          // Add text
           content.push({ type: 'text', text: m.content });
 
-          // If we have attachments, use multimodal format
           if (content.length > 1) {
             return { role: 'user' as const, content };
           }
@@ -327,11 +315,11 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
       <div className={cardClass}>
         <div className="flex items-center justify-between mb-3">
           <Tip text={TIPS['assistant-ia']}>
-            <h4 className="text-amber-700 font-semibold text-sm">Assistant IA — {mat.short}</h4>
+            <h4 className="text-[#6b4c2a] font-semibold text-sm">Assistant IA — {mat.short}</h4>
           </Tip>
           <div className="flex items-center gap-1.5">
             {attachCount > 0 && (
-              <span className="text-xs text-stone-500">{attachCount} pj</span>
+              <span className="text-xs text-[#9d9089]">{attachCount} pj</span>
             )}
             {messages.length > 0 && (
               <button
@@ -340,44 +328,49 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
                     setMessages([]);
                   }
                 }}
-                className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:bg-stone-100 hover:text-red-500 border border-stone-200 transition-colors"
+                className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9d9089] hover:bg-[#faf8f4] hover:text-[#7a2424] border border-[#e0d8ce] transition-colors"
                 title="Effacer l'historique"
               >
-                🗑
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M2 3h8M5 3V2h2v1M4 3v7h4V3H4z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </button>
             )}
-            {/* Camera button — mobile only uses capture */}
             <button
               onClick={() => cameraRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:bg-stone-100 border border-stone-200 transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9d9089] hover:bg-[#faf8f4] border border-[#e0d8ce] transition-colors"
               title="Prendre une photo"
             >
-              📷
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <rect x="1" y="3" width="12" height="9" rx="2" stroke="currentColor" strokeWidth="1.2"/>
+                <circle cx="7" cy="7.5" r="2.5" stroke="currentColor" strokeWidth="1.2"/>
+                <path d="M5 3l.8-1.5h2.4L9 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </button>
-            {/* Photo gallery */}
             <button
               onClick={() => photoRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:bg-stone-100 border border-stone-200 transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9d9089] hover:bg-[#faf8f4] border border-[#e0d8ce] transition-colors"
               title="Choisir une photo"
             >
-              🖼
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <rect x="1" y="2" width="12" height="10" rx="2" stroke="currentColor" strokeWidth="1.2"/>
+                <circle cx="4.5" cy="5" r="1" stroke="currentColor" strokeWidth="1.1"/>
+                <path d="M1 9l3-3 2.5 2.5L9 6l4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </button>
-            {/* PDF */}
             <button
               onClick={() => fileRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:bg-stone-100 border border-stone-200 transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9d9089] hover:bg-[#faf8f4] border border-[#e0d8ce] transition-colors font-medium"
               title="Ajouter un PDF"
             >
               PDF
             </button>
-            {/* Hidden file inputs */}
             <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleImage} />
             <input ref={photoRef} type="file" accept="image/*" multiple className="hidden" onChange={handleImage} />
             <input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={handlePdf} />
           </div>
         </div>
 
-        {/* Attachments preview */}
         {(pdfs.length > 0 || images.length > 0) && (
           <div className="flex flex-wrap gap-1.5 mb-3">
             {images.map((img, i) => (
@@ -385,53 +378,56 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
                 <img
                   src={img.preview}
                   alt={img.name}
-                  className="w-14 h-14 rounded-lg object-cover border border-stone-200"
+                  className="w-14 h-14 rounded-lg object-cover border border-[#e0d8ce]"
                 />
                 <button
                   onClick={() => setImages((imgs) => imgs.filter((_, j) => j !== i))}
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-stone-300 text-stone-500 hover:text-red-400 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-[#e0d8ce] text-[#9d9089] hover:text-[#7a2424] text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  x
+                  ×
                 </button>
               </div>
             ))}
             {pdfs.map((d, i) => (
-              <span key={`pdf-${i}`} className="text-xs bg-white rounded-lg px-2.5 py-1 text-stone-400 flex items-center gap-1.5 border border-stone-200 h-14">
-                📄 {d.name.length > 15 ? d.name.slice(0, 12) + '...' : d.name}
-                <button onClick={() => setPdfs((ds) => ds.filter((_, j) => j !== i))} className="text-stone-500 hover:text-red-400">x</button>
+              <span key={`pdf-${i}`} className="text-xs bg-[#faf8f4] rounded-lg px-2.5 py-1 text-[#695f56] flex items-center gap-1.5 border border-[#e0d8ce] h-14">
+                <svg width="12" height="14" viewBox="0 0 12 14" fill="none" className="flex-shrink-0">
+                  <rect x="1" y="1" width="10" height="12" rx="2" stroke="currentColor" strokeWidth="1.2"/>
+                  <path d="M3 5h6M3 8h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                </svg>
+                {d.name.length > 15 ? d.name.slice(0, 12) + '...' : d.name}
+                <button onClick={() => setPdfs((ds) => ds.filter((_, j) => j !== i))} className="text-[#9d9089] hover:text-[#7a2424]">×</button>
               </span>
             ))}
           </div>
         )}
 
-        <div className="text-xs text-stone-500 mb-3 flex items-center gap-1.5 flex-wrap">
+        <div className="text-xs text-[#9d9089] mb-3 flex items-center gap-1.5 flex-wrap">
           <span>Contexte : {mat.short} + validation ({validation.errors.length}e/{validation.warnings.length}w)</span>
           <button
             onClick={() => setShowKnowledge(true)}
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-100 hover:bg-amber-100 text-stone-600 hover:text-amber-700 border border-stone-200 transition-colors"
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#faf8f4] hover:bg-[#f2ebe0] text-[#695f56] hover:text-[#6b4c2a] border border-[#e0d8ce] transition-colors"
           >
-            📚 {kbDocCount} doc{kbDocCount > 1 ? 's' : ''}
+            KB {kbDocCount} doc{kbDocCount > 1 ? 's' : ''}
           </button>
           {images.length > 0 && <span>+ {images.length} photo{images.length > 1 ? 's' : ''}</span>}
           {pdfs.length > 0 && <span>+ {pdfs.length} PDF</span>}
         </div>
 
         {error && (
-          <div className="mb-3 text-xs text-red-400 bg-red-950/30 border border-red-900/30 rounded-lg px-3 py-2">
+          <div className="mb-3 text-xs text-[#7a2424] bg-[#fae8e8] border border-[#e8c8c8] rounded-lg px-3 py-2">
             {error}
           </div>
         )}
 
-        {/* Messages */}
-        <div className="rounded-xl bg-stone-50 p-4 mb-3 min-h-[200px] max-h-[400px] overflow-y-auto">
+        <div className="rounded-lg bg-[#faf8f4] p-4 mb-3 min-h-[200px] max-h-[400px] overflow-y-auto">
           {messages.length === 0 && (
-            <div className="text-stone-400 text-sm text-center py-8">
-              <div className="mb-3 text-stone-500">Exemples de questions :</div>
+            <div className="text-[#9d9089] text-sm text-center py-8">
+              <div className="mb-3 text-[#695f56]">Exemples de questions :</div>
               <div className="space-y-1">
                 {suggestions.map((q, i) => (
                   <button
                     key={i}
-                    className="block w-full text-left px-3 py-2 rounded-lg text-xs text-stone-500 hover:bg-white hover:text-amber-700 transition-colors"
+                    className="block w-full text-left px-3 py-2 rounded-lg text-xs text-[#695f56] hover:bg-white hover:text-[#6b4c2a] transition-colors"
                     onClick={() => setInput(q)}
                   >
                     {q}
@@ -445,21 +441,21 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
             const cleanContent = patches.length > 0 ? stripPatches(m.content) : m.content;
             return (
               <div key={i} className={`mb-3 ${m.role === 'user' ? 'text-right' : ''}`}>
-                <div className={`inline-block max-w-[85%] rounded-xl px-4 py-2.5 text-sm ${
+                <div className={`inline-block max-w-[85%] rounded-lg px-4 py-2.5 text-sm ${
                   m.role === 'user'
-                    ? 'bg-amber-600 text-white'
-                    : 'bg-white text-stone-700 border border-stone-200'
+                    ? 'bg-[#6b4c2a] text-white'
+                    : 'bg-[#f2ebe0] text-[#1c1714]'
                 }`}>
                   <div style={{ whiteSpace: 'pre-wrap' }}>{cleanContent}</div>
                 </div>
                 {patches.length > 0 && onApplyState && (
                   <div className="mt-2 space-y-2 text-left">
                     {patches.map((pp, pi) => (
-                      <div key={pi} className="inline-block max-w-[85%] rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-xs">
+                      <div key={pi} className="inline-block max-w-[85%] rounded-lg border border-[#e0d8ce] bg-[#f2ebe0] px-3 py-2 text-xs">
                         {pp.patch.title && (
-                          <div className="font-semibold text-amber-800 mb-1">⚙ {pp.patch.title}</div>
+                          <div className="font-semibold text-[#6b4c2a] mb-1">{pp.patch.title}</div>
                         )}
-                        <ul className="text-stone-700 space-y-0.5 mb-2">
+                        <ul className="text-[#695f56] space-y-0.5 mb-2">
                           {pp.summary.map((s, si) => (
                             <li key={si}>• {s}</li>
                           ))}
@@ -469,9 +465,9 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
                             const next = applyPatch(state, pp.patch);
                             onApplyState(next);
                           }}
-                          className="text-xs px-3 py-1.5 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 transition-colors"
+                          className="text-xs px-3 py-1.5 rounded-lg bg-[#6b4c2a] text-white font-medium hover:bg-[#5a3e22] transition-colors"
                         >
-                          ✓ Appliquer
+                          Appliquer
                         </button>
                       </div>
                     ))}
@@ -481,15 +477,14 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
             );
           })}
           {loading && (
-            <div className="text-stone-500 text-sm flex items-center gap-2">
-              <span className="inline-block w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+            <div className="text-[#695f56] text-sm flex items-center gap-2">
+              <span className="inline-block w-2 h-2 bg-[#6b4c2a] rounded-full animate-pulse" />
               Réflexion...
             </div>
           )}
           <div ref={endRef} />
         </div>
 
-        {/* Input */}
         <div className="flex gap-2 items-end">
           <div className="flex-1 flex flex-col gap-1">
             <input
@@ -506,7 +501,7 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
               disabled={loading}
             />
             {tokenWarningLevel !== 'none' && (
-              <span className={`text-[10px] leading-tight ${tokenWarningLevel === 'red' ? 'text-red-500' : 'text-amber-600'}`}>
+              <span className={`text-[10px] leading-tight ${tokenWarningLevel === 'red' ? 'text-[#7a2424]' : 'text-[#695f56]'}`}>
                 {tokenWarningLevel === 'red'
                   ? `~${Math.round(estimatedTokens / 1000)}k tokens — Payload trop volumineux, le résumé sera tronqué`
                   : `~${Math.round(estimatedTokens / 1000)}k tokens`}
@@ -516,14 +511,13 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
           <button
             onClick={send}
             disabled={loading || !input.trim()}
-            className="px-5 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-5 py-2 rounded-lg bg-[#6b4c2a] text-white text-sm font-medium hover:bg-[#5a3e22] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Envoyer
           </button>
         </div>
       </div>
 
-      {/* Knowledge Manager Modal — accessible directly from assistant */}
       <KnowledgeManager
         isOpen={showKnowledge}
         onClose={() => setShowKnowledge(false)}
