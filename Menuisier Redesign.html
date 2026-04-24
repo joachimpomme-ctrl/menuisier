@@ -610,7 +610,7 @@ function FacadeSVG({ T }) {
   const dimX = ml - 8;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="auto" style={{ display: 'block' }}>
       {/* Fill */}
       <rect x={ml} y={mt} width={fw} height={fh} fill={T.accentLight} rx="1"/>
       {/* Outer frame */}
@@ -628,17 +628,17 @@ function FacadeSVG({ T }) {
       <line x1={ml} y1={dimY} x2={ml + fw} y2={dimY} stroke={T.text3} strokeWidth="0.8"/>
       <line x1={ml} y1={dimY - 3} x2={ml} y2={dimY + 3} stroke={T.text3} strokeWidth="0.8"/>
       <line x1={ml + fw} y1={dimY - 3} x2={ml + fw} y2={dimY + 3} stroke={T.text3} strokeWidth="0.8"/>
-      <text x={ml + fw / 2} y={H - 1} textAnchor="middle" fontSize="8" fill={T.text3} fontFamily="DM Mono, monospace">2400 mm</text>
+      <text x={ml + fw / 2} y={H - 1} textAnchor="middle" fontSize="11" fill={T.text3} fontFamily="DM Mono, monospace">2400 mm</text>
 
       {/* Height dimension */}
       <line x1={dimX} y1={mt} x2={dimX} y2={mt + fh} stroke={T.text3} strokeWidth="0.8"/>
       <line x1={dimX - 3} y1={mt} x2={dimX + 3} y2={mt} stroke={T.text3} strokeWidth="0.8"/>
       <line x1={dimX - 3} y1={mt + fh} x2={dimX + 3} y2={mt + fh} stroke={T.text3} strokeWidth="0.8"/>
-      <text x={dimX - 3} y={mt + fh / 2} textAnchor="middle" fontSize="7" fill={T.text3} fontFamily="DM Mono, monospace" transform={`rotate(-90 ${dimX - 3} ${mt + fh / 2})`}>2320</text>
+      <text x={dimX - 3} y={mt + fh / 2} textAnchor="middle" fontSize="11" fill={T.text3} fontFamily="DM Mono, monospace" transform={`rotate(-90 ${dimX - 3} ${mt + fh / 2})`}>2320 mm</text>
 
       {/* Corps labels */}
-      <text x={ml + fw * 0.25} y={mt + 11} textAnchor="middle" fontSize="7.5" fill={T.accent} fontFamily="DM Mono, monospace" fontWeight="500">Corps 1</text>
-      <text x={ml + fw * 0.75} y={mt + 11} textAnchor="middle" fontSize="7.5" fill={T.accent} fontFamily="DM Mono, monospace" fontWeight="500">Corps 2</text>
+      <text x={ml + fw * 0.25} y={mt + 13} textAnchor="middle" fontSize="10" fill={T.accent} fontFamily="DM Mono, monospace" fontWeight="500">Corps 1</text>
+      <text x={ml + fw * 0.75} y={mt + 13} textAnchor="middle" fontSize="10" fill={T.accent} fontFamily="DM Mono, monospace" fontWeight="500">Corps 2</text>
     </svg>
   );
 }
@@ -742,17 +742,18 @@ function DashboardScreen({ onNavigate, T }) {
         {/* 4 key metrics */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0, borderTop: `1px solid ${T.border}`, marginLeft: -20, marginRight: -20 }}>
           {[
-            { label: 'Pièces',   val: '10',    sub: '2 corps'    },
-            { label: 'Panneaux', val: '4',     sub: 'CP 18+8mm'  },
-            { label: 'Coût',     val: '262',   sub: 'EUR estimé' },
-            { label: 'Étapes',   val: '12',    sub: 'de montage' },
+            { label: 'Pièces',   val: '10',  sub: '2 corps'      },
+            { label: 'Panneaux', val: '4',   sub: 'CP 18 + 8 mm' },
+            { label: 'Coût',     val: '262', sub: 'EUR estimé'   },
+            { label: 'Étapes',   val: '12',  sub: 'de montage'   },
           ].map((m, i) => (
             <div key={i} style={{
-              padding: '10px 12px', textAlign: 'center',
+              padding: '10px 8px', textAlign: 'center',
               borderRight: i < 3 ? `1px solid ${T.border}` : 'none',
             }}>
+              <div style={{ fontSize: 10, fontWeight: 600, color: T.text3, letterSpacing: '.05em', textTransform: 'uppercase', marginBottom: 2 }}>{m.label}</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: T.accent, fontFamily: T.mono, lineHeight: 1 }}>{m.val}</div>
-              <div style={{ fontSize: 9, color: T.text3, marginTop: 3, lineHeight: 1.2 }}>{m.label}<br/>{m.sub}</div>
+              <div style={{ fontSize: 11, color: T.text3, marginTop: 3, lineHeight: 1.3 }}>{m.sub}</div>
             </div>
           ))}
         </div>
@@ -780,9 +781,7 @@ function DashboardScreen({ onNavigate, T }) {
             {/* Façade cotée */}
             <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: '14px 16px' }}>
               <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>Vue de face — cotée</div>
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <FacadeSVG T={T} />
-              </div>
+              <FacadeSVG T={T} />
               <div style={{ display: 'flex', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
                 <div style={{ fontSize: 10, color: T.text3, fontFamily: T.mono }}>Prof. <span style={{ color: T.text, fontWeight: 600 }}>600 mm</span></div>
                 <div style={{ fontSize: 10, color: T.text3, fontFamily: T.mono }}>Mat. <span style={{ color: T.text, fontWeight: 600 }}>CP bouleau 18 mm</span></div>
