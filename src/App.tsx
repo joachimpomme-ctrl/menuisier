@@ -121,6 +121,8 @@ export default function App() {
   const handleCreateFromWizard = useCallback((newState: Parameters<typeof createFromWizard>[0]) => {
     createFromWizard(newState);
     setShowNewWizard(false);
+    setV3Mode(false);
+    setWizardStep(1);
   }, [createFromWizard]);
 
   const handleDuplicate = useCallback((id: string) => {

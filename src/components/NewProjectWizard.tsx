@@ -24,6 +24,7 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate, onV3, onBr
     const tpl = TEMPLATES.find(t => t.id === templateId);
     if (!tpl) return;
     onCreate(tpl.create(selectedMaterial));
+    onClose();
   };
 
   const handleBlank = () => {
@@ -37,6 +38,7 @@ export default function NewProjectWizard({ isOpen, onClose, onCreate, onV3, onBr
       costConfig: { panelPrice: p.defaultPrice },
       bodies: [],
     });
+    onClose();
   };
 
   const inputClass = "w-full rounded-lg border border-[#e0d8ce] bg-white px-3 py-2 text-sm text-[#1c1714] focus:border-[#6b4c2a] focus:outline-none transition-colors";
