@@ -19,8 +19,7 @@
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #c8bfb3; border-radius: 4px; }
-
-    /* Focus */
+    /* Focus visible global */
     *:focus { outline: none; }
     *:focus-visible { outline: 2px solid #6b4c2a; outline-offset: 2px; border-radius: 4px; }
   </style>
@@ -66,6 +65,37 @@ function getTokens(accent) {
     errorLight: '#fae8e8',
     mono:       "'DM Mono', monospace",
   };
+}
+
+// ─── SCREEN TRANSITION ─────────────────────────────────────────────────────
+function useScreenTransition(screen) {
+  const [displayedScreen, setDisplayedScreen] = useState(screen);
+  const [phase, setPhase] = useState('idle');
+
+  useEffect(() => {
+    if (screen === displayedScreen) return;
+    setPhase('exit');
+    const t1 = setTimeout(() => {
+      setDisplayedScreen(screen);
+      setPhase('enter');
+      const t2 = setTimeout(() => setPhase('idle'), 150);
+      return () => clearTimeout(t2);
+    }, 120);
+    return () => clearTimeout(t1);
+  }, [screen]);
+
+  return { displayedScreen, phase };
+}
+
+function getScreenStyle(phase) {
+  const reduced = typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) return {};
+  const base = { transition: 'opacity 150ms ease', willChange: 'opacity' };
+  if (phase === 'idle')  return { ...base, opacity: 1 };
+  if (phase === 'exit')  return { ...base, opacity: 0 };
+  if (phase === 'enter') return { ...base, opacity: 0 };
+  return base;
 }
 
 // ─── SVG ICONS (furniture silhouettes) ────────────────────────────────────
@@ -177,7 +207,7 @@ function Tag({ children, color = 'neutral', T }) {
   );
 }
 
-function Btn({ children, variant = 'ghost', onClick, full, small, T, styleOverride }) {
+function Btn({ children, variant = 'ghost', onClick, full, small, T }) {
   const [focused, setFocused] = useState(false);
   const variants = {
     primary: { bg: T.accent, color: T.accentText, border: 'transparent' },
@@ -196,7 +226,6 @@ function Btn({ children, variant = 'ghost', onClick, full, small, T, styleOverri
       fontFamily: 'inherit', transition: 'opacity .12s',
       outline: focused ? `2px solid ${T.accent}` : 'none',
       outlineOffset: focused ? '2px' : '0',
-      ...styleOverride,
     }}
     onMouseEnter={e => e.currentTarget.style.opacity = '.8'}
     onMouseLeave={e => e.currentTarget.style.opacity = '1'}
@@ -208,16 +237,6 @@ function Btn({ children, variant = 'ghost', onClick, full, small, T, styleOverri
 
 function Divider({ T }) {
   return <div style={{ height: 1, background: T.border, margin: '0 -20px' }} />;
-}
-
-function CloseBtn({ onClick, T }) {
-  return (
-    <button onClick={onClick} style={{
-      width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: 8, flexShrink: 0,
-      color: T.text3, fontSize: 18, lineHeight: 1, fontFamily: 'inherit',
-    }}>×</button>
-  );
 }
 
 // ─── SCREEN: HOME ────────────────────────────────────────────────────────
@@ -240,12 +259,6 @@ const PARTS = [
 
 function HomeScreen({ onNavigate, T }) {
   const [activeTab, setActiveTab] = useState('structure');
-  const tabBarRef = useRef(null);
-  const [atEnd, setAtEnd] = useState(false);
-  const handleTabScroll = (e) => {
-    const el = e.currentTarget;
-    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 4);
-  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg, overflow: 'hidden' }}>
@@ -270,8 +283,9 @@ function HomeScreen({ onNavigate, T }) {
               }}>+ Nouveau</button>
             <button style={{
               background: 'transparent', border: `1px solid ${T.border}`, borderRadius: 8,
-              padding: '10px 14px', fontSize: 13, color: T.text2, cursor: 'pointer', fontFamily: 'inherit'
-            }} title="Options">···</button>
+              padding: '10px 14px', fontSize: 13, color: T.text2, cursor: 'pointer', fontFamily: 'inherit',
+              minWidth: 44, minHeight: 44, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            }}>···</button>
           </div>
         </div>
 
@@ -284,24 +298,17 @@ function HomeScreen({ onNavigate, T }) {
         </div>
 
         {/* Tab bar */}
-        <div style={{ position: 'relative', marginLeft: -20, marginRight: -20 }}>
-          <div ref={tabBarRef} onScroll={handleTabScroll} style={{ display: 'flex', gap: 0, overflowX: 'auto', paddingLeft: 20, scrollbarWidth: 'none' }}>
-            {TABS.map(tab => (
-              <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
-                background: 'transparent', border: 'none', cursor: 'pointer',
-                padding: '8px 14px', fontSize: 12, fontWeight: activeTab === tab.key ? 600 : 400,
-                color: activeTab === tab.key ? T.accent : T.text2,
-                borderBottom: `2px solid ${activeTab === tab.key ? T.accent : 'transparent'}`,
-                whiteSpace: 'nowrap', fontFamily: 'inherit', transition: 'color .1s',
-                flexShrink: 0,
-              }}>{tab.label}</button>
-            ))}
-          </div>
-          <div style={{
-            position: 'absolute', top: 0, right: 0, bottom: 0, width: 32,
-            background: `linear-gradient(to right, transparent, ${T.surface})`,
-            pointerEvents: 'none', opacity: atEnd ? 0 : 1, transition: 'opacity .2s',
-          }} />
+        <div style={{ display: 'flex', gap: 0, overflowX: 'auto', marginLeft: -20, marginRight: -20, paddingLeft: 20 }}>
+          {TABS.map(tab => (
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
+              background: 'transparent', border: 'none', cursor: 'pointer',
+              padding: '8px 14px', fontSize: 12, fontWeight: activeTab === tab.key ? 600 : 400,
+              color: activeTab === tab.key ? T.accent : T.text2,
+              borderBottom: `2px solid ${activeTab === tab.key ? T.accent : 'transparent'}`,
+              whiteSpace: 'nowrap', fontFamily: 'inherit', transition: 'color .1s',
+              flexShrink: 0,
+            }}>{tab.label}</button>
+          ))}
         </div>
       </div>
 
@@ -364,7 +371,6 @@ function HomeScreen({ onNavigate, T }) {
             <Btn T={T} variant="primary" full onClick={() => onNavigate('brief-ia')}>Assistant IA →</Btn>
           </div>
         )}
-
         {activeTab !== 'structure' && activeTab !== 'export' && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 200, color: T.text3, fontSize: 13 }}>
             Onglet {TABS.find(t => t.key === activeTab)?.label}
@@ -386,7 +392,6 @@ function HomeScreen({ onNavigate, T }) {
 // ─── SCREEN: WIZARD TYPE ─────────────────────────────────────────────────
 function WizardTypeScreen({ onNavigate, T }) {
   const [selected, setSelected] = useState(null);
-  const [focusedTA, setFocusedTA] = useState(false);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg }}>
@@ -399,7 +404,12 @@ function WizardTypeScreen({ onNavigate, T }) {
             </div>
             <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Type de meuble</div>
           </div>
-          <CloseBtn onClick={() => onNavigate('home')} T={T} />
+          <button onClick={() => onNavigate('home')} style={{
+            background: 'transparent', border: 'none', color: T.text3,
+            fontSize: 20, cursor: 'pointer', lineHeight: 1,
+            width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>×</button>
         </div>
         {/* Progress bar */}
         <div style={{ height: 2, background: T.border, borderRadius: 2, marginTop: 14 }}>
@@ -441,16 +451,11 @@ function WizardTypeScreen({ onNavigate, T }) {
           </div>
           <textarea placeholder="Ex : Bibliothèque 280 cm de large, 240 sous plafond, pour livres et TV au centre…" style={{
             width: '100%', height: 72, resize: 'none',
-            border: `1px solid ${focusedTA ? T.accent : T.border}`, borderRadius: 8,
+            border: `1px solid ${T.border}`, borderRadius: 8,
             padding: '8px 10px', fontSize: 12, color: T.text,
             background: T.surfaceAlt, fontFamily: 'inherit',
             outline: 'none',
-            boxShadow: focusedTA ? `0 0 0 2px ${T.accent}33` : 'none',
-            transition: 'border-color .12s, box-shadow .12s',
-          }}
-          onFocus={() => setFocusedTA(true)}
-          onBlur={() => setFocusedTA(false)}
-          />
+          }} />
           <div style={{ marginTop: 8 }}>
             <Btn T={T} variant="muted" full small>Générer des propositions</Btn>
           </div>
@@ -469,19 +474,15 @@ function WizardTypeScreen({ onNavigate, T }) {
 
 // ─── SCREEN: WIZARD SPACE ─────────────────────────────────────────────────
 function Field({ label, unit, value, T }) {
-  const [focused, setFocused] = useState(false);
   return (
     <div>
       <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: T.text3, marginBottom: 5, letterSpacing: '0.02em' }}>{label}</label>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 0, border: `1px solid ${focused ? T.accent : T.border}`, borderRadius: 8, background: T.surface, overflow: 'hidden', boxShadow: focused ? `0 0 0 2px ${T.accent}33` : 'none', transition: 'border-color .12s, box-shadow .12s' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 0, border: `1px solid ${T.border}`, borderRadius: 8, background: T.surface, overflow: 'hidden' }}>
         <input type="number" defaultValue={value} style={{
           flex: 1, border: 'none', padding: '10px 12px', fontSize: 14,
           color: T.text, fontFamily: T.mono, background: 'transparent',
           outline: 'none', minWidth: 0,
-        }}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        />
+        }} />
         <div style={{ padding: '0 12px', color: T.text3, fontSize: 11, fontWeight: 500, borderLeft: `1px solid ${T.border}`, height: '100%', display: 'flex', alignItems: 'center' }}>{unit}</div>
       </div>
     </div>
@@ -506,7 +507,7 @@ function WizardSpaceScreen({ onNavigate, T }) {
             <div style={{ fontSize: 11, color: T.text3, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>Étape 2 / 3</div>
             <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Espace &amp; matériau</div>
           </div>
-          <CloseBtn onClick={() => onNavigate('home')} T={T} />
+          <button onClick={() => onNavigate('home')} style={{ background: 'transparent', border: 'none', color: T.text3, fontSize: 20, cursor: 'pointer', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>×</button>
         </div>
         <div style={{ height: 2, background: T.border, borderRadius: 2, marginTop: 14 }}>
           <div style={{ height: '100%', width: '66%', background: T.accent, borderRadius: 2 }} />
@@ -610,6 +611,7 @@ function Section({ title, badge, defaultOpen, children, T }) {
   );
 }
 
+// Type marker — forme + couleur (WCAG 1.4.1)
 function TypeMarker({ type, T }) {
   const size = 8;
   const markers = {
@@ -619,34 +621,17 @@ function TypeMarker({ type, T }) {
     Fond:     { shape: 'dash',    color: T.text3   },
   };
   const m = markers[type] || { shape: 'circle', color: T.text3 };
-
-  if (m.shape === 'circle') return (
-    <svg width={size} height={size} viewBox="0 0 8 8" style={{ flexShrink: 0 }}>
-      <circle cx="4" cy="4" r="3.5" fill={m.color} />
-    </svg>
-  );
-  if (m.shape === 'square') return (
-    <svg width={size} height={size} viewBox="0 0 8 8" style={{ flexShrink: 0 }}>
-      <rect x="0.5" y="0.5" width="7" height="7" fill={m.color} />
-    </svg>
-  );
-  if (m.shape === 'diamond') return (
-    <svg width={size} height={size} viewBox="0 0 8 8" style={{ flexShrink: 0 }}>
-      <polygon points="4,0 8,4 4,8 0,4" fill={m.color} />
-    </svg>
-  );
-  if (m.shape === 'dash') return (
-    <svg width={size} height={size} viewBox="0 0 8 8" style={{ flexShrink: 0 }}>
-      <rect x="0" y="3" width="8" height="2" fill={m.color} />
-    </svg>
-  );
+  if (m.shape === 'circle')  return <svg width={size} height={size} viewBox="0 0 8 8"><circle cx="4" cy="4" r="3.5" fill={m.color}/></svg>;
+  if (m.shape === 'square')  return <svg width={size} height={size} viewBox="0 0 8 8"><rect x="0.5" y="0.5" width="7" height="7" fill={m.color}/></svg>;
+  if (m.shape === 'diamond') return <svg width={size} height={size} viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4" fill={m.color}/></svg>;
+  if (m.shape === 'dash')    return <svg width={size} height={size} viewBox="0 0 8 8"><rect x="0" y="3" width="8" height="2" fill={m.color}/></svg>;
   return null;
 }
 
 // Facade SVG — cotée, 2 corps
 function FacadeSVG({ T }) {
-  const W = 320, H = 160;
-  const ml = 28, mr = 16, mt = 12, mb = 24;
+  const W = 320, H = 170;
+  const ml = 32, mr = 16, mt = 14, mb = 28;
   const fw = W - ml - mr, fh = H - mt - mb;
   // 2 corps de 1200mm, hauteur 2320mm — proportion 2400:2320 ≈ 1.034
   const cx = ml + fw / 2; // separator x
@@ -656,7 +641,7 @@ function FacadeSVG({ T }) {
   const dimX = ml - 8;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="auto" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
       {/* Fill */}
       <rect x={ml} y={mt} width={fw} height={fh} fill={T.accentLight} rx="1"/>
       {/* Outer frame */}
@@ -674,13 +659,13 @@ function FacadeSVG({ T }) {
       <line x1={ml} y1={dimY} x2={ml + fw} y2={dimY} stroke={T.text3} strokeWidth="0.8"/>
       <line x1={ml} y1={dimY - 3} x2={ml} y2={dimY + 3} stroke={T.text3} strokeWidth="0.8"/>
       <line x1={ml + fw} y1={dimY - 3} x2={ml + fw} y2={dimY + 3} stroke={T.text3} strokeWidth="0.8"/>
-      <text x={ml + fw / 2} y={H - 1} textAnchor="middle" fontSize="11" fill={T.text3} fontFamily="DM Mono, monospace">2400 mm</text>
+      <text x={ml + fw / 2} y={H - 1} textAnchor="middle" fontSize="10" fill={T.text3} fontFamily="DM Mono, monospace">2400 mm</text>
 
       {/* Height dimension */}
       <line x1={dimX} y1={mt} x2={dimX} y2={mt + fh} stroke={T.text3} strokeWidth="0.8"/>
       <line x1={dimX - 3} y1={mt} x2={dimX + 3} y2={mt} stroke={T.text3} strokeWidth="0.8"/>
       <line x1={dimX - 3} y1={mt + fh} x2={dimX + 3} y2={mt + fh} stroke={T.text3} strokeWidth="0.8"/>
-      <text x={dimX - 3} y={mt + fh / 2} textAnchor="middle" fontSize="11" fill={T.text3} fontFamily="DM Mono, monospace" transform={`rotate(-90 ${dimX - 3} ${mt + fh / 2})`}>2320 mm</text>
+      <text x={dimX - 3} y={mt + fh / 2} textAnchor="middle" fontSize="10" fill={T.text3} fontFamily="DM Mono, monospace" transform={`rotate(-90 ${dimX - 3} ${mt + fh / 2})`}>2320 mm</text>
 
       {/* Corps labels */}
       <text x={ml + fw * 0.25} y={mt + 13} textAnchor="middle" fontSize="10" fill={T.accent} fontFamily="DM Mono, monospace" fontWeight="500">Corps 1</text>
@@ -705,7 +690,7 @@ function PartsTable({ T }) {
           {PARTS.map((p, i) => (
             <tr key={i} style={{ borderBottom: `1px solid ${T.border}` }}>
               <td style={{ padding: '7px 8px 7px 10px', width: 8 }}>
-                <TypeMarker type={p.type} T={T} />
+                <span style={{ display: 'block', width: 8, height: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><TypeMarker type={p.type} T={T} /></span>
               </td>
               <td style={{ padding: '7px 8px', color: T.text, fontWeight: 500, whiteSpace: 'nowrap' }}>{p.name}</td>
               <td style={{ padding: '7px 8px', color: T.text2, fontFamily: T.mono, fontSize: 10, textAlign: 'right', whiteSpace: 'nowrap' }}>{p.l}×{p.w}</td>
@@ -720,7 +705,7 @@ function PartsTable({ T }) {
       <div style={{ display: 'flex', gap: 12, padding: '10px 8px 0', flexWrap: 'wrap' }}>
         {['Joue', 'Fixe', 'Réglable', 'Fond'].map(t => (
           <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <TypeMarker type={t} T={T} />
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 8, height: 8 }}><TypeMarker type={t} T={T} /></span>
             <span style={{ fontSize: 10, color: T.text3 }}>{t}</span>
           </div>
         ))}
@@ -788,18 +773,18 @@ function DashboardScreen({ onNavigate, T }) {
         {/* 4 key metrics */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0, borderTop: `1px solid ${T.border}`, marginLeft: -20, marginRight: -20 }}>
           {[
-            { label: 'Pièces',   val: '10',  sub: '2 corps'      },
-            { label: 'Panneaux', val: '4',   sub: 'CP 18 + 8 mm' },
-            { label: 'Coût',     val: '262', sub: 'EUR estimé'   },
-            { label: 'Étapes',   val: '12',  sub: 'de montage'   },
+            { label: 'Pièces',   val: '10',    sub: '2 corps'    },
+            { label: 'Panneaux', val: '4',     sub: 'CP 18+8mm'  },
+            { label: 'Coût',     val: '262',   sub: 'EUR estimé' },
+            { label: 'Étapes',   val: '12',    sub: 'de montage' },
           ].map((m, i) => (
             <div key={i} style={{
-              padding: '10px 8px', textAlign: 'center',
+              padding: '10px 12px', textAlign: 'center',
               borderRight: i < 3 ? `1px solid ${T.border}` : 'none',
             }}>
-              <div style={{ fontSize: 10, fontWeight: 600, color: T.text3, letterSpacing: '.05em', textTransform: 'uppercase', marginBottom: 2 }}>{m.label}</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '.05em', textTransform: 'uppercase', marginBottom: 2 }}>{m.label}</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: T.accent, fontFamily: T.mono, lineHeight: 1 }}>{m.val}</div>
-              <div style={{ fontSize: 11, color: T.text3, marginTop: 3, lineHeight: 1.3 }}>{m.sub}</div>
+              <div style={{ fontSize: 11, color: T.text3, marginTop: 4, lineHeight: 1.3 }}>{m.sub}</div>
             </div>
           ))}
         </div>
@@ -827,7 +812,9 @@ function DashboardScreen({ onNavigate, T }) {
             {/* Façade cotée */}
             <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: '14px 16px' }}>
               <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>Vue de face — cotée</div>
-              <FacadeSVG T={T} />
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <FacadeSVG T={T} />
+              </div>
               <div style={{ display: 'flex', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
                 <div style={{ fontSize: 10, color: T.text3, fontFamily: T.mono }}>Prof. <span style={{ color: T.text, fontWeight: 600 }}>600 mm</span></div>
                 <div style={{ fontSize: 10, color: T.text3, fontFamily: T.mono }}>Mat. <span style={{ color: T.text, fontWeight: 600 }}>CP bouleau 18 mm</span></div>
@@ -881,7 +868,7 @@ function DashboardScreen({ onNavigate, T }) {
             {/* Total */}
             <div style={{ background: T.accentLight, border: `1px solid ${T.border}`, borderRadius: 10, padding: '14px 16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>Estimation totale</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>Total estimé</span>
                 <span style={{ fontSize: 24, fontWeight: 700, color: T.accent, fontFamily: T.mono }}>262 €</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -891,9 +878,6 @@ function DashboardScreen({ onNavigate, T }) {
                     <span style={{ color: T.text2, fontFamily: T.mono }}>{v}</span>
                   </div>
                 ))}
-              </div>
-              <div style={{ marginTop: 10, fontSize: 10, color: T.text3, lineHeight: 1.5 }}>
-                Prix indicatifs GSB. Validez les tarifs locaux avant achat.
               </div>
             </div>
           </div>
@@ -975,7 +959,7 @@ function DashboardScreen({ onNavigate, T }) {
 
       {/* ── Footer ── */}
       <div style={{ background: T.surface, borderTop: `1px solid ${T.border}`, padding: '12px 20px', display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
-        <Btn T={T} variant="ghost" onClick={() => onNavigate('wizard-space')}>← Modifier</Btn>
+        <Btn T={T} variant="ghost" small onClick={() => onNavigate('wizard-space')}>← Modifier</Btn>
         <Btn T={T} variant="muted" small>Éditeur avancé</Btn>
         <div style={{ flex: 1 }} />
         <Btn T={T} variant="primary" small>Exporter PDF</Btn>
@@ -995,7 +979,7 @@ function NewProjectScreen({ onNavigate, T }) {
             <div style={{ fontSize: 11, color: T.text3, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>Nouveau projet</div>
             <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Par où commencer ?</div>
           </div>
-          <CloseBtn onClick={() => onNavigate('home')} T={T} />
+          <button onClick={() => onNavigate('home')} style={{ background: 'transparent', border: 'none', color: T.text3, fontSize: 20, cursor: 'pointer', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>×</button>
         </div>
       </div>
 
@@ -1104,31 +1088,6 @@ function NewProjectScreen({ onNavigate, T }) {
   );
 }
 
-function StepIndicator({ step, T }) {
-  const labels = ['Contenu', 'Espace', 'Préférences', 'Résultats'];
-  return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        {labels.map((_, i) => (
-          <React.Fragment key={i}>
-            <div style={{
-              width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
-              background: i < step ? T.accent : 'transparent',
-              border: i < step ? 'none' : `1.5px solid ${T.border}`,
-            }} />
-            {i < labels.length - 1 && (
-              <div style={{ flex: 1, height: 1, background: i < step - 1 ? T.accent : T.border }} />
-            )}
-          </React.Fragment>
-        ))}
-      </div>
-      <div style={{ textAlign: 'center', fontSize: 11, fontWeight: 500, color: T.text3, marginTop: 6 }}>
-        Étape {step} sur {labels.length} — {labels[step - 1]}
-      </div>
-    </div>
-  );
-}
-
 // ─── SCREEN: BRIEF IA ────────────────────────────────────────────────────
 
 const CONTENT_CATS = [
@@ -1186,18 +1145,14 @@ function Counter({ value, onChange, T }) {
 }
 
 function MiniField({ label, value, unit, T }) {
-  const [focused, setFocused] = useState(false);
   return (
     <div>
       <label style={{ display: 'block', fontSize: 10, fontWeight: 600, color: T.text3, marginBottom: 5, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{label}</label>
-      <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${focused ? T.accent : T.border}`, borderRadius: 8, overflow: 'hidden', background: T.surface, boxShadow: focused ? `0 0 0 2px ${T.accent}33` : 'none', transition: 'border-color .12s, box-shadow .12s' }}>
+      <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden', background: T.surface }}>
         <input type="number" defaultValue={value} style={{
           flex: 1, border: 'none', padding: '9px 10px', fontSize: 15,
           color: T.text, fontFamily: T.mono, background: 'transparent', outline: 'none', minWidth: 0,
-        }}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        />
+        }} />
         <span style={{ padding: '0 10px', color: T.text3, fontSize: 11, borderLeft: `1px solid ${T.border}`, height: '100%', display: 'flex', alignItems: 'center' }}>{unit}</span>
       </div>
     </div>
@@ -1240,20 +1195,10 @@ function MiniVariantSVG({ v, T }) {
 function BriefIAScreen({ onNavigate, T }) {
   const [step, setStep] = useState(1);
   const [counts, setCounts] = useState({});
-  const [style, setStyle] = useState(null);
-  const [budget, setBudget] = useState(null);
-  const [niveau, setNiveau] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [showVariants, setShowVariants] = useState(false);
-  const [chosen, setChosen] = useState(null);
-
-  const totalItems = Object.values(counts).reduce((s, v) => s + v, 0);
-  const hasContent = totalItems > 0;
-
   const scrollRef = useRef(null);
   const [atBottom, setAtBottom] = useState(false);
 
-  const handleScroll = useCallback((e) => {
+  const handleContentScroll = useCallback((e) => {
     const el = e.currentTarget;
     setAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 8);
   }, []);
@@ -1264,6 +1209,15 @@ function BriefIAScreen({ onNavigate, T }) {
       setAtBottom(false);
     }
   }, [step]);
+  const [style, setStyle] = useState(null);
+  const [budget, setBudget] = useState(null);
+  const [niveau, setNiveau] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showVariants, setShowVariants] = useState(false);
+  const [chosen, setChosen] = useState(null);
+
+  const totalItems = Object.values(counts).reduce((s, v) => s + v, 0);
+  const hasContent = totalItems > 0;
 
   const handleGenerate = () => {
     setLoading(true);
@@ -1273,6 +1227,8 @@ function BriefIAScreen({ onNavigate, T }) {
       setShowVariants(true);
     }, 2200);
   };
+
+  const STEP_LABELS = ['Contenu', 'Espace', 'Préférences', 'Résultats'];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg }}>
@@ -1285,59 +1241,78 @@ function BriefIAScreen({ onNavigate, T }) {
             </div>
             <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Que voulez-vous ranger ?</div>
           </div>
-          <CloseBtn onClick={() => onNavigate('home')} T={T} />
+          <button onClick={() => onNavigate('home')} style={{ background: 'transparent', border: 'none', color: T.text3, fontSize: 20, cursor: 'pointer', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>×</button>
         </div>
-        <StepIndicator step={step} T={T} />
+        {/* Step indicator compact */}
+        <div style={{ paddingTop: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+            {STEP_LABELS.map((_, i) => (
+              <React.Fragment key={i}>
+                <div style={{
+                  width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                  background: i < step ? T.accent : 'transparent',
+                  border: i < step ? 'none' : `1.5px solid ${T.border}`,
+                  transition: 'background .2s',
+                }} />
+                {i < STEP_LABELS.length - 1 && (
+                  <div style={{ flex: 1, height: 1.5, background: i < step - 1 ? T.accent : T.border, transition: 'background .2s' }} />
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+          <div style={{ fontSize: 11, color: T.text3, fontWeight: 500, marginTop: 7, textAlign: 'center' }}>
+            Étape {step} sur {STEP_LABELS.length} — {STEP_LABELS[step - 1]}
+          </div>
+        </div>
       </div>
 
       {/* Step content */}
-      <div style={{ flex: 1, overflow: step === 1 ? 'hidden' : 'auto', padding: step === 1 ? 0 : 20 }}>
+      {step === 1 ? (
+        <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
+          <div ref={scrollRef} onScroll={handleContentScroll} style={{ height: '100%', overflow: 'auto', padding: 20 }}>
 
         {/* STEP 1 — Contenu */}
         {step === 1 && (
-          <div style={{ position: 'relative', height: '100%' }}>
-            <div ref={scrollRef} onScroll={handleScroll} style={{ height: '100%', overflow: 'auto', padding: 20 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <p style={{ fontSize: 12, color: T.text2, lineHeight: 1.6 }}>
-                  Indiquez ce que vous souhaitez ranger — l'app dimensionne automatiquement les zones.
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {CONTENT_CATS.map(cat => {
-                    const val = counts[cat.id] || 0;
-                    return (
-                      <div key={cat.id} style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                        padding: '10px 14px', background: T.surface, border: `1px solid ${val > 0 ? T.accent : T.border}`,
-                        borderRadius: 10, gap: 10, transition: 'border-color .12s',
-                      }}>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: val > 0 ? 600 : 400, color: val > 0 ? T.text : T.text2 }}>{cat.label}</div>
-                          <div style={{ fontSize: 10, color: T.text3 }}>{cat.sub}</div>
-                        </div>
-                        <Counter value={val} onChange={v => setCounts(c => ({ ...c, [cat.id]: v }))} T={T} />
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {hasContent ? (
-                  <div style={{ background: T.accentLight, borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.accent, fontWeight: 500 }}>
-                    {totalItems} élément{totalItems > 1 ? 's' : ''} sélectionné{totalItems > 1 ? 's' : ''}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <p style={{ fontSize: 12, color: T.text2, lineHeight: 1.6 }}>
+              Indiquez ce que vous souhaitez ranger — l'app dimensionne automatiquement les zones.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {CONTENT_CATS.map(cat => {
+                const val = counts[cat.id] || 0;
+                return (
+                  <div key={cat.id} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '10px 14px', background: T.surface, border: `1px solid ${val > 0 ? T.accent : T.border}`,
+                    borderRadius: 10, gap: 10, transition: 'border-color .12s',
+                  }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: val > 0 ? 600 : 400, color: val > 0 ? T.text : T.text2 }}>{cat.label}</div>
+                      <div style={{ fontSize: 10, color: T.text3 }}>{cat.sub}</div>
+                    </div>
+                    <Counter value={val} onChange={v => setCounts(c => ({ ...c, [cat.id]: v }))} T={T} />
                   </div>
-                ) : (
-                  <div style={{ background: T.warningLight, border: `1px solid ${T.warning}30`, borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.warning, fontWeight: 500 }}>
-                    Ajoutez au moins un élément pour obtenir une proposition dimensionnée.
-                  </div>
-                )}
-              </div>
+                );
+              })}
             </div>
-            <div style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, height: 48,
-              background: `linear-gradient(to bottom, transparent, ${T.bg})`,
-              pointerEvents: 'none', opacity: atBottom ? 0 : 1, transition: 'opacity .25s',
-            }} />
+
+            {hasContent && (
+              <div style={{ background: T.accentLight, borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.accent, fontWeight: 500 }}>
+                {totalItems} élément{totalItems > 1 ? 's' : ''} sélectionné{totalItems > 1 ? 's' : ''}
+              </div>
+            )}
           </div>
         )}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: 56,
+            background: `linear-gradient(to bottom, transparent, ${T.bg})`,
+            pointerEvents: 'none', opacity: atBottom ? 0 : 1,
+            transition: 'opacity .25s ease',
+          }} />
+        </div>
+      </div>
+      ) : (
+        <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
 
         {/* STEP 2 — Espace */}
         {step === 2 && (
@@ -1515,26 +1490,52 @@ function BriefIAScreen({ onNavigate, T }) {
             )}
           </div>
         )}
-      </div>
+        </div>
+      )}
 
       {/* Footer */}
       <div style={{ background: T.surface, borderTop: `1px solid ${T.border}`, padding: '12px 20px', display: 'flex', gap: 8, flexShrink: 0 }}>
         {step > 1 && !loading && (
-          <Btn T={T} variant="ghost" onClick={() => { setStep(s => s - 1); setShowVariants(false); }}>← Retour</Btn>
+          <Btn T={T} variant="ghost" small onClick={() => { setStep(s => s - 1); setShowVariants(false); }}>← Retour</Btn>
         )}
         <div style={{ flex: 1 }} />
-        {step === 1 && !hasContent && (
-          <button onClick={() => setStep(2)} style={{
-            background: 'none', border: 'none', fontSize: 11, color: T.text3,
-            textDecoration: 'underline dotted', cursor: 'pointer', padding: 0, fontFamily: 'inherit',
-          }}>Ignorer le contenu</button>
-        )}
         {step === 1 && (
-          <Btn T={T} variant="primary" small
-            onClick={hasContent ? () => setStep(2) : undefined}
-            styleOverride={!hasContent ? { background: T.border, color: T.text3, cursor: 'default', pointerEvents: 'none' } : undefined}>
-            {hasContent ? `Continuer (${totalItems} élément${totalItems > 1 ? 's' : ''})` : `Continuer (0 éléments)`}
-          </Btn>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+            {!hasContent && (
+              <div style={{
+                background: T.warningLight, border: `1px solid ${T.warning}30`,
+                borderRadius: 8, padding: '9px 13px',
+                fontSize: 12, color: T.warning, lineHeight: 1.6,
+              }}>
+                Ajoutez au moins un élément pour obtenir une proposition dimensionnée.
+              </div>
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {!hasContent && (
+                <button onClick={() => setStep(2)} style={{
+                  background: 'transparent', border: 'none', padding: '6px 4px',
+                  fontSize: 11, color: T.text3, textDecoration: 'underline dotted',
+                  cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0,
+                }}>Ignorer</button>
+              )}
+              <div style={{ flex: 1 }}>
+                <button
+                  onClick={hasContent ? () => setStep(2) : undefined}
+                  style={{
+                    width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    background: hasContent ? T.accent : T.border,
+                    color: hasContent ? T.accentText : T.text3,
+                    border: 'none', borderRadius: 8,
+                    padding: '9px 16px', fontSize: 12, fontWeight: 600,
+                    cursor: hasContent ? 'pointer' : 'default',
+                    fontFamily: 'inherit', transition: 'background .15s, color .15s',
+                  }}
+                >
+                  {hasContent ? `Continuer (${totalItems} élément${totalItems > 1 ? 's' : ''})` : `Continuer (0 élément)`}
+                </button>
+              </div>
+            </div>
+          </div>
         )}
         {step === 2 && (
           <Btn T={T} variant="primary" small onClick={() => setStep(3)}>Continuer</Btn>
@@ -1554,113 +1555,47 @@ function BriefIAScreen({ onNavigate, T }) {
   );
 }
 
-// ─── PHONE SHELL ────────────────────────────────────────────────────────
-// ─── TAB BAR ──────────────────────────────────────────────────────────────
-const TAB_PARENT = {
-  'home':         'home',
-  'new-project':  'home',
-  'wizard-type':  'home',
-  'wizard-space': 'home',
-  'brief-ia':     'brief-ia',
-  'dashboard':    'dashboard',
-  'settings':     'settings',
-};
-
+// ─── TAB BAR ────────────────────────────────────────────────────────
 const TAB_ITEMS = [
-  {
-    key: 'home', label: 'Projets',
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-        <rect x="2" y="2" width="7.5" height="7.5" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
-        <rect x="12.5" y="2" width="7.5" height="7.5" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
-        <rect x="2" y="12.5" width="7.5" height="7.5" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
-        <rect x="12.5" y="12.5" width="7.5" height="7.5" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
-      </svg>
-    ),
-  },
-  {
-    key: 'brief-ia', label: 'Brief IA',
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-        <path d="M15 3l4 4M5 19l9-9.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M14.5 3.5l1-1a1.5 1.5 0 012 2l-1 1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-        <path d="M4 5l.8.8M4 7.5H3M5.5 3.5V2.5M6.8 6.8l.7-.7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-      </svg>
-    ),
-  },
-  {
-    key: 'dashboard', label: 'Résultat',
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-        <path d="M13.5 2H6a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-4.5-6z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
-        <path d="M13.5 2v5.5H18" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
-        <path d="M8 14l2 2 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    ),
-  },
-  {
-    key: 'settings', label: 'Réglages',
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-        <circle cx="11" cy="11" r="3" stroke="currentColor" strokeWidth="1.8"/>
-        <path d="M11 2.5v1.8M11 17.7v1.8M2.5 11h1.8M17.7 11h1.8M5.2 5.2l1.3 1.3M15.5 15.5l1.3 1.3M5.2 16.8l1.3-1.3M15.5 6.5l1.3-1.3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-      </svg>
-    ),
-  },
+  { key: 'home',      label: 'Projets',   icon: (c) => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> },
+  { key: 'brief-ia',  label: 'Brief IA',  icon: (c) => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.8 5.4-4.5 6.5V17H9.5v-1.5C6.8 14.4 5 12 5 9a7 7 0 0 1 7-7z"/><line x1="9.5" y1="20" x2="14.5" y2="20"/><line x1="9.5" y1="22" x2="14.5" y2="22"/></svg> },
+  { key: 'dashboard', label: 'Résultat',  icon: (c) => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg> },
+  { key: 'settings',  label: 'Réglages',  icon: (c) => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> },
 ];
 
+const PARENT_MAP = {
+  home: 'home', 'new-project': 'home', 'wizard-type': 'home', 'wizard-space': 'home',
+  'brief-ia': 'brief-ia', dashboard: 'dashboard', settings: 'settings',
+};
+
 function TabBar({ activeScreen, onNavigate, T }) {
-  const activeTab = TAB_PARENT[activeScreen] ?? 'home';
+  const activeParent = PARENT_MAP[activeScreen] || 'home';
   return (
     <div style={{
-      height: 76, background: T.surface,
-      borderTop: `1px solid ${T.border}`,
-      display: 'flex', alignItems: 'stretch',
-      flexShrink: 0,
+      background: T.surface, borderTop: `1px solid ${T.border}`,
+      display: 'flex', flexShrink: 0,
     }}>
-      <div style={{ display: 'flex', flex: 1, paddingBottom: 20 }}>
-        {TAB_ITEMS.map(tab => {
-          const active = activeTab === tab.key;
-          return (
-            <button
-              key={tab.key}
-              onClick={() => onNavigate(tab.key)}
-              style={{
-                flex: 1, display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center', gap: 4,
-                border: 'none', background: 'transparent', cursor: 'pointer',
-                color: active ? T.accent : T.text3,
-                fontFamily: 'DM Sans, sans-serif',
-                transition: 'color .1s ease',
-                minHeight: 44,
-                padding: 0,
-              }}
-            >
-              {tab.icon}
-              <span style={{ fontSize: 10, fontWeight: 500, lineHeight: 1 }}>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {TAB_ITEMS.map(tab => {
+        const isActive = activeParent === tab.key;
+        const color = isActive ? T.accent : T.text3;
+        return (
+          <button key={tab.key} onClick={() => onNavigate(tab.key)} style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', gap: 4, background: 'transparent', border: 'none',
+            cursor: 'pointer', padding: '10px 4px 14px', minHeight: 60,
+            color, transition: 'color .1s', fontFamily: 'inherit',
+          }}>
+            {tab.icon(color)}
+            <span style={{ fontSize: 10, fontWeight: isActive ? 600 : 400, lineHeight: 1 }}>{tab.label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-// ─── SETTINGS SCREEN ──────────────────────────────────────────────────────
-function SettingsScreen({ T }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-      <svg width="40" height="40" viewBox="0 0 22 22" fill="none" style={{ color: T.text3, opacity: .5 }}>
-        <circle cx="11" cy="11" r="3" stroke="currentColor" strokeWidth="1.8"/>
-        <path d="M11 2.5v1.8M11 17.7v1.8M2.5 11h1.8M17.7 11h1.8M5.2 5.2l1.3 1.3M15.5 15.5l1.3 1.3M5.2 16.8l1.3-1.3M15.5 6.5l1.3-1.3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-      </svg>
-      <p style={{ fontSize: 14, color: T.text3, fontWeight: 500 }}>Réglages — bientôt disponible</p>
-    </div>
-  );
-}
-
-// ─── PHONE SHELL ──────────────────────────────────────────────────────────
-function PhoneShell({ children, activeScreen, onNavigate, T, phase = 'idle' }) {
+// ─── PHONE SHELL ────────────────────────────────────────────────────────
+function PhoneShell({ children, T, activeScreen, onNavigate }) {
   return (
     <div style={{
       width: 390, height: 844,
@@ -1687,9 +1622,10 @@ function PhoneShell({ children, activeScreen, onNavigate, T, phase = 'idle' }) {
         </div>
       </div>
       {/* Content */}
-      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', ...getScreenStyle(phase) }}>
+      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {children}
       </div>
+      {/* Tab bar persistante */}
       <TabBar activeScreen={activeScreen} onNavigate={onNavigate} T={T} />
     </div>
   );
@@ -1741,7 +1677,6 @@ function CompareView({ screen }) {
     'brief-ia':     <BriefIAScreen onNavigate={() => {}} T={T} />,
     'wizard-space': <WizardSpaceScreen onNavigate={() => {}} T={T} />,
     dashboard:      <DashboardScreen onNavigate={() => {}} T={T} />,
-    settings:       <SettingsScreen T={T} />,
   });
 
   return (
@@ -1780,8 +1715,10 @@ function CompareView({ screen }) {
               <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', transform: 'scale(0.769)', transformOrigin: 'top left', width: '130%', height: '130%' }}>
                 {screenMap(T)[screen] || screenMap(T).home}
               </div>
-              {/* Tab bar (scaled version) */}
-              <TabBar activeScreen={screen} onNavigate={() => {}} T={T} />
+              {/* Home bar */}
+              <div style={{ height: 26, background: T.surface, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: 90, height: 3, background: T.text, borderRadius: 2, opacity: .2 }} />
+              </div>
             </div>
           </div>
         );
@@ -1790,43 +1727,102 @@ function CompareView({ screen }) {
   );
 }
 
-// ─── SCREEN TRANSITION ───────────────────────────────────────────────────
-function useScreenTransition(screen) {
-  const [displayedScreen, setDisplayedScreen] = useState(screen);
-  const [phase, setPhase] = useState('idle');
-
-  useEffect(() => {
-    if (screen === displayedScreen) return;
-    setPhase('exit');
-    const t1 = setTimeout(() => {
-      setDisplayedScreen(screen);
-      setPhase('enter');
-      const t2 = setTimeout(() => setPhase('idle'), 150);
-      return () => clearTimeout(t2);
-    }, 120);
-    return () => clearTimeout(t1);
-  }, [screen]);
-
-  return { displayedScreen, phase };
-}
-
-function getScreenStyle(phase) {
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduced) return {};
-  const base = { transition: 'opacity 150ms ease', willChange: 'opacity' };
-  if (phase === 'idle')  return { ...base, opacity: 1 };
-  if (phase === 'exit')  return { ...base, opacity: 0 };
-  if (phase === 'enter') return { ...base, opacity: 0 };
-  return base;
-}
-
 // ─── APP ROOT ────────────────────────────────────────────────────────
+
+function SettingsScreen({ T }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+      <div style={{ fontSize: 32, opacity: .15 }}>⚙</div>
+      <div style={{ fontSize: 14, fontWeight: 600, color: T.text2 }}>Réglages</div>
+      <div style={{ fontSize: 12, color: T.text3 }}>Bientôt disponible</div>
+    </div>
+  );
+}
+
+function useWindowWidth() {
+  const [width, setWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return width;
+}
+
+function DesktopSidebar({ screen, onNavigate, T }) {
+  const activeParent = PARENT_MAP[screen] || 'home';
+  const NAV = [
+    { key: 'home',      label: 'Projets',
+      icon: (c) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> },
+    { key: 'brief-ia',  label: 'Brief IA',
+      icon: (c) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.8 5.4-4.5 6.5V17H9.5v-1.5C6.8 14.4 5 12 5 9a7 7 0 0 1 7-7z"/><line x1="9.5" y1="20" x2="14.5" y2="20"/></svg> },
+    { key: 'dashboard', label: 'Résultat',
+      icon: (c) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg> },
+    { key: 'settings',  label: 'Réglages',
+      icon: (c) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> },
+  ];
+  return (
+    <div style={{
+      width: 220, flexShrink: 0, height: '100%',
+      background: T.surface, borderRight: `1px solid ${T.border}`,
+      display: 'flex', flexDirection: 'column',
+    }}>
+      {/* Logo */}
+      <div style={{ padding: '24px 20px 20px', borderBottom: `1px solid ${T.border}` }}>
+        <div style={{ fontSize: 16, fontWeight: 700, color: T.text, letterSpacing: '-.01em' }}>Menuisier</div>
+        <div style={{ fontSize: 11, color: T.text3, marginTop: 2 }}>Projet de menuiserie</div>
+      </div>
+
+      {/* Projet actif */}
+      <div style={{ padding: '14px 20px', borderBottom: `1px solid ${T.border}` }}>
+        <div style={{ fontSize: 10, fontWeight: 600, color: T.text3, letterSpacing: '.06em', textTransform: 'uppercase', marginBottom: 6 }}>Projet actif</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: T.text, marginBottom: 6 }}>Bibliothèque salon</div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <Tag T={T} color="accent">CP bouleau 18 mm</Tag>
+          <Tag T={T} color="success">262 €</Tag>
+        </div>
+      </div>
+
+      {/* Nav */}
+      <nav style={{ flex: 1, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {NAV.map(item => {
+          const isActive = activeParent === item.key;
+          return (
+            <button key={item.key} onClick={() => onNavigate(item.key)} style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '10px 12px', borderRadius: 8, border: 'none',
+              background: isActive ? T.accentLight : 'transparent',
+              color: isActive ? T.accent : T.text2,
+              cursor: 'pointer', fontFamily: 'inherit',
+              fontSize: 13, fontWeight: isActive ? 600 : 400,
+              transition: 'all .1s', width: '100%', textAlign: 'left',
+            }}>
+              {item.icon(isActive ? T.accent : T.text3)}
+              {item.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Footer sidebar */}
+      <div style={{ padding: '14px 20px', borderTop: `1px solid ${T.border}` }}>
+        <div style={{ fontSize: 10, color: T.text3, lineHeight: 1.5 }}>
+          Menuisier · Redesign<br />
+          <span style={{ fontFamily: "'DM Mono', monospace" }}>v2 · 2026</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const T = getTokens((tweaks || TWEAK_DEFAULTS).accent);
   const [screen, setScreen] = useState('dashboard');
-  const [compare, setCompare] = useState(false);
   const { displayedScreen, phase } = useScreenTransition(screen);
+  const [compare, setCompare] = useState(false);
+  const windowWidth = useWindowWidth();
+  const isDesktop = windowWidth >= 768;
 
   const screenMap = {
     home:           <HomeScreen onNavigate={setScreen} T={T} />,
@@ -1838,6 +1834,26 @@ function App() {
     settings:       <SettingsScreen T={T} />,
   };
 
+  if (isDesktop) {
+    return (
+      <div style={{ width: '100vw', height: '100vh', display: 'flex', background: T.bg, overflow: 'hidden' }}>
+        <DesktopSidebar screen={screen} onNavigate={setScreen} T={T} />
+        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', ...getScreenStyle(phase) }}>
+          {screenMap[displayedScreen] || screenMap.home}
+        </div>
+        <TweaksPanel>
+          <TweakSection label="Couleur d'accent" />
+          <TweakRadio
+            label="Accent"
+            value={tweaks.accent}
+            options={Object.keys(ACCENTS)}
+            onChange={(v) => setTweak('accent', v)}
+          />
+        </TweaksPanel>
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 24px 40px', minWidth: compare ? 1100 : 'auto' }}>
       <div style={{ marginBottom: 20, fontSize: 11, color: 'rgba(255,255,255,.3)', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'DM Sans, sans-serif' }}>
@@ -1847,8 +1863,10 @@ function App() {
       {compare ? (
         <CompareView screen={screen} />
       ) : (
-        <PhoneShell T={T} activeScreen={screen} onNavigate={setScreen} phase={phase}>
-          {screenMap[displayedScreen] || screenMap.home}
+        <PhoneShell T={T} activeScreen={screen} onNavigate={setScreen}>
+          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', ...getScreenStyle(phase) }}>
+            {screenMap[displayedScreen] || screenMap.home}
+          </div>
         </PhoneShell>
       )}
 
