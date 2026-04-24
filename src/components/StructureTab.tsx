@@ -9,6 +9,7 @@ import Glossary from './structure/Glossary';
 import WallSurveyDiagram from './structure/WallSurveyDiagram';
 import BodyCard from './structure/BodyCard';
 import PartsPicker from './library/PartsPicker';
+import { pieceTypeLabel } from './structure/Glossary';
 import { inputClass, cardClass, sectionTitle } from './structure/styles';
 
 interface Props {
@@ -21,6 +22,8 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
   const [editingPiece, setEditingPiece] = useState<string | null>(null);
   const [showPicker, setShowPicker] = useState(false);
   const [pickerBodyId, setPickerBodyId] = useState<string | null>(null);
+  const [batchType, setBatchType] = useState<PieceType>('tablette-fixe');
+  const [batchPanel, setBatchPanel] = useState<string>('default');
   const mat = MATERIALS[state.materialKey];
   const shared = state.sharedBoundaries ?? [];
 
@@ -66,6 +69,20 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
 
   const toggleSharing = (boundaryIdx: number, enabled: boolean) =>
     onChange(bodyActions.toggleSharing(state, boundaryIdx, enabled));
+
+  const batchAssignPanel = () => {
+    const next = {
+      ...state,
+      bodies: state.bodies.map(b => ({
+        ...b,
+        pieces: b.pieces.map(p => {
+          if (p.type !== batchType) return p;
+          return { ...p, panelId: batchPanel === 'default' ? undefined : batchPanel };
+        }),
+      })),
+    };
+    onChange(next);
+  };
 
   const totalPhysical = state.bodies.reduce((s, b) => s + b.width, 0);
 
@@ -265,6 +282,44 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
           )}
         </div>
       )}
+
+      {allPanelDefs.length > 1 && (() => {
+        const typesInProject = [...new Set(state.bodies.flatMap(b => b.pieces.map(p => p.type)))];
+        const countForType = state.bodies.reduce((n, b) => n + b.pieces.filter(p => p.type === batchType).reduce((s, p) => s + p.qty, 0), 0);
+        const currentType = typesInProject.includes(batchType) ? batchType : (typesInProject[0] ?? 'tablette-fixe');
+        if (currentType !== batchType && typesInProject.length > 0) setBatchType(currentType as PieceType);
+        return (
+          <div className={cardClass}>
+            <h3 className={sectionTitle}>Réassigner par type de pièce</h3>
+            <p className="text-xs text-[#9d9089] mb-3">Affecte toutes les pièces d'un type au même panneau en un clic.</p>
+            <div className="flex gap-2 flex-wrap items-end">
+              <div className="flex-1 min-w-[120px]">
+                <label className="text-xs text-[#695f56] mb-1 block">Type</label>
+                <select value={batchType} onChange={e => setBatchType(e.target.value as PieceType)} className={inputClass}>
+                  {typesInProject.map(t => (
+                    <option key={t} value={t}>{pieceTypeLabel(t)}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex-1 min-w-[120px]">
+                <label className="text-xs text-[#695f56] mb-1 block">Panneau cible</label>
+                <select value={batchPanel} onChange={e => setBatchPanel(e.target.value)} className={inputClass}>
+                  {allPanelDefs.map(pd => (
+                    <option key={pd.id} value={pd.id}>{pd.label}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                onClick={batchAssignPanel}
+                disabled={countForType === 0}
+                className="px-4 py-2 rounded-lg bg-[#6b4c2a] text-white text-xs font-medium hover:bg-[#5a3e22] disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+              >
+                Assigner {countForType > 0 ? `(${countForType} pcs)` : ''}
+              </button>
+            </div>
+          </div>
+        );
+      })()}
 
       {state.bodies.map((b, bi) => (
         <BodyCard
