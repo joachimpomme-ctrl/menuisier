@@ -1,5 +1,5 @@
 import type { AppState, Body, PanelDef, Piece, PieceType } from '../../types';
-import { MATERIALS, BODY_COLORS } from '../../data/materials';
+import { MATERIALS } from '../../data/materials';
 import { uid, isSharedLeft, getBodyInnerWidth } from '../../lib/helpers';
 import Tip from '../Tip';
 import TIPS from '../../data/tips';
@@ -62,41 +62,38 @@ export default function BodyCard({
       {/* Sharing toggle BEFORE this body (between bi-1 and bi) */}
       {bi > 0 && (
         <div className="flex items-center justify-center gap-2 py-2 -mt-2 mb-2">
-          <div className="flex-1 h-px bg-stone-200" />
+          <div className="flex-1 h-px bg-[#e0d8ce]" />
           <button
             onClick={() => toggleSharing(bi - 1, !(shared[bi - 1] ?? false))}
             className={`text-[11px] px-3 py-1.5 rounded-full border transition-all ${
               shared[bi - 1]
-                ? 'bg-blue-100 border-blue-300 text-blue-800 font-semibold shadow-sm'
-                : 'bg-white border-stone-200 text-stone-400 hover:border-blue-200 hover:text-blue-600'
+                ? 'bg-[#e5eaf0] border-[#b8c8d8] text-[#3a4a5c] font-semibold shadow-sm'
+                : 'bg-white border-[#e0d8ce] text-[#9d9089] hover:border-[#c8d4e0] hover:text-[#3a4a5c]'
             }`}
           >
-            {shared[bi - 1] ? '⚙ Joue commune ✓' : '⊕ Joue commune ?'}
+            {shared[bi - 1] ? 'Joue commune ✓' : '⊕ Joue commune ?'}
           </button>
-          <div className="flex-1 h-px bg-stone-200" />
+          <div className="flex-1 h-px bg-[#e0d8ce]" />
         </div>
       )}
 
-      <div
-        className={cardClass}
-        style={{ borderLeftWidth: '3px', borderLeftColor: BODY_COLORS[bi % BODY_COLORS.length] }}
-      >
+      <div className={cardClass}>
         <div className="flex items-center justify-between mb-3">
           <input
-            className="bg-transparent text-sm font-semibold text-stone-800 border-b border-transparent hover:border-stone-300 focus:border-amber-500 focus:outline-none transition-colors"
+            className="bg-transparent text-sm font-semibold text-[#1c1714] border-b border-transparent hover:border-[#e0d8ce] focus:border-[#6b4c2a] focus:outline-none transition-colors"
             value={b.name}
             onChange={(e) => updateBody(b.id, 'name', e.target.value)}
           />
           <div className="flex items-center gap-2">
             <button
               onClick={() => duplicateBody(b.id)}
-              className="text-xs text-stone-500 hover:text-amber-600 transition-colors"
+              className="text-xs text-[#695f56] hover:text-[#6b4c2a] transition-colors"
             >
               Dupliquer
             </button>
             <button
               onClick={() => removeBody(b.id)}
-              className="text-xs text-stone-500 hover:text-red-400 transition-colors"
+              className="text-xs text-[#695f56] hover:text-[#7a2424] transition-colors"
             >
               Supprimer
             </button>
@@ -105,21 +102,21 @@ export default function BodyCard({
 
         {/* Sharing indicators */}
         {sl && (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-2 text-xs text-blue-800">
+          <div className="bg-[#e5eaf0] border border-[#c8d4e0] rounded-lg p-3 mb-2 text-xs text-[#3a4a5c]">
             <div className="font-semibold mb-1">Joue gauche commune</div>
-            <p className="text-blue-700 leading-relaxed">
+            <p className="text-[#3a4a5c] leading-relaxed">
               Cette joue est portée par le corps
               &laquo;&thinsp;{state.bodies[bi - 1]?.name}&thinsp;&raquo; sous forme de panneau commun épaissi.
               Elle n'apparait pas dans la liste ci-dessous — c'est normal.
             </p>
-            <p className="text-blue-600 mt-1 font-mono text-[10px]">
+            <p className="text-[#4e6070] mt-1 font-mono text-[10px]">
               Profondeur : max({state.bodies[bi - 1]?.depth}, {b.depth}) = {Math.max(state.bodies[bi - 1]?.depth ?? 0, b.depth)} cm
             </p>
           </div>
         )}
         {sr && (
           <div className="flex flex-wrap gap-1.5 mb-2">
-            <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2 py-0.5 font-medium">
+            <span className="text-[10px] bg-[#e5eaf0] text-[#3a4a5c] border border-[#c8d4e0] rounded px-2 py-0.5 font-medium">
               Joue D commune avec {state.bodies[bi + 1]?.name}
             </span>
           </div>
@@ -130,14 +127,14 @@ export default function BodyCard({
           <NumberInput label="Profondeur" suffix="cm" value={b.depth} min={10} max={200} step={0.1} onChange={(v) => updateBody(b.id, 'depth', v)} tip={TIPS['corps-profondeur']} />
         </div>
 
-        <div className="text-xs text-stone-500 mb-3 flex items-center gap-1 flex-wrap">
+        <div className="text-xs text-[#695f56] mb-3 flex items-center gap-1 flex-wrap">
           <Tip text={sl
             ? "La joue gauche est commune avec le corps voisin, mais la largeur intérieure reste calculée avec une séparation structurelle complète."
             : TIPS['int-tablette']
           }>
             <span>
-              Int. tablette : <span className={`font-semibold ${sl ? 'text-blue-700' : ''}`}>{iw} cm</span>
-              {sl && <span className="text-[10px] text-blue-500 ml-1">(joue commune)</span>}
+              Int. tablette : <span className={`font-semibold ${sl ? 'text-[#3a4a5c]' : ''}`}>{iw} cm</span>
+              {sl && <span className="text-[10px] text-[#695f56] ml-1">(joue commune)</span>}
             </span>
           </Tip>
           <span className="mx-1">·</span>
@@ -165,7 +162,7 @@ export default function BodyCard({
         </div>
 
         {sl && (
-          <div className="text-[10px] text-blue-600 mt-1.5 px-1">
+          <div className="text-[10px] text-[#695f56] mt-1.5 px-1">
             Joues dans ce corps : {b.pieces.filter(p => p.type === 'joue').length} (+ 1 joue commune fournie par {state.bodies[bi - 1]?.name})
           </div>
         )}
@@ -176,24 +173,24 @@ export default function BodyCard({
         <div className="mt-3 flex flex-wrap gap-1 items-center">
           <button
             onClick={() => autoFillPieces(b.id)}
-            className="text-[11px] px-2 py-1 rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 font-semibold transition-colors"
+            className="text-[11px] px-2 py-1 rounded-lg bg-[#f2ebe0] text-[#6b4c2a] hover:bg-[#e8e0d4] font-semibold transition-colors"
           >
-            ⚡ Remplir auto
+            Remplir auto
           </button>
           <button
             onClick={() => openLibraryPicker(b.id)}
-            className="text-[11px] px-2 py-1 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 font-medium transition-colors"
+            className="text-[11px] px-2 py-1 rounded-lg bg-[#faf8f4] text-[#6b4c2a] hover:bg-[#f2ebe0] border border-[#e0d8ce] font-medium transition-colors"
             title="Ajouter depuis la bibliothèque"
           >
-            📚 Bibliothèque
+            Bibliothèque
           </button>
-          <button onClick={() => addPiece(b.id, 'joue')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Joue</button>
-          <button onClick={() => addPiece(b.id, 'tablette-fixe')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Tab. fixe</button>
-          <button onClick={() => addPiece(b.id, 'tablette-reglable')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Tab. réglable</button>
-          <button onClick={() => addPiece(b.id, 'separateur')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200 transition-colors">+ Séparateur</button>
-          <button onClick={() => addPiece(b.id, 'bandeau')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Bandeau</button>
-          <button onClick={() => addPiece(b.id, 'fond')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Fond</button>
-          <button onClick={() => addPiece(b.id, 'autre')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">+ Autre</button>
+          <button onClick={() => addPiece(b.id, 'joue')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-[#faf8f4] text-[#695f56] hover:bg-[#f0ebe4] transition-colors">+ Joue</button>
+          <button onClick={() => addPiece(b.id, 'tablette-fixe')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-[#faf8f4] text-[#695f56] hover:bg-[#f0ebe4] transition-colors">+ Tab. fixe</button>
+          <button onClick={() => addPiece(b.id, 'tablette-reglable')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-[#faf8f4] text-[#695f56] hover:bg-[#f0ebe4] transition-colors">+ Tab. réglable</button>
+          <button onClick={() => addPiece(b.id, 'separateur')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-[#e5eaf0] text-[#3a4a5c] hover:bg-[#d8e2ec] border border-[#c8d4e0] transition-colors">+ Séparateur</button>
+          <button onClick={() => addPiece(b.id, 'bandeau')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-[#faf8f4] text-[#695f56] hover:bg-[#f0ebe4] transition-colors">+ Bandeau</button>
+          <button onClick={() => addPiece(b.id, 'fond')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-[#faf8f4] text-[#695f56] hover:bg-[#f0ebe4] transition-colors">+ Fond</button>
+          <button onClick={() => addPiece(b.id, 'autre')} className="text-[11px] px-1.5 py-0.5 rounded-md bg-[#faf8f4] text-[#695f56] hover:bg-[#f0ebe4] transition-colors">+ Autre</button>
         </div>
 
         {/* Door Configurator */}
@@ -204,7 +201,7 @@ export default function BodyCard({
 }
 
 // ---------------------------------------------------------------------------
-// Filler suggestion (top-of-body gap → tasseau plafond + bandeau)
+// Filler suggestion — garder violet (distinction visuelle utile)
 // ---------------------------------------------------------------------------
 interface FillerProps {
   body: Body;
