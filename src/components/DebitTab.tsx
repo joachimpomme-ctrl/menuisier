@@ -8,8 +8,9 @@ const TYPE_SHAPES: Record<string, 'circle' | 'square' | 'diamond' | 'dash'> = {
 };
 
 function TypeMarker({ type }: { type: string }) {
-  const color = (PIECE_COLORS as Record<string, string>)[type] || PIECE_COLORS.autre;
-  const shape = TYPE_SHAPES[type] || 'circle';
+  const t = type.toLowerCase();
+  const color = (PIECE_COLORS as Record<string, string>)[t] || PIECE_COLORS.autre;
+  const shape = TYPE_SHAPES[t] || 'circle';
   const size = 8;
   if (shape === 'circle')  return <svg width={size} height={size} viewBox="0 0 8 8" className="flex-shrink-0"><circle cx="4" cy="4" r="3.5" fill={color}/></svg>;
   if (shape === 'square')  return <svg width={size} height={size} viewBox="0 0 8 8" className="flex-shrink-0"><rect x="0.5" y="0.5" width="7" height="7" fill={color}/></svg>;
@@ -469,7 +470,7 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
               return (
                 <div key={i} className="flex items-center justify-between gap-2 text-xs py-1.5 px-2 rounded-lg hover:bg-stone-50">
                   <span className="flex items-center gap-2 min-w-0 flex-1">
-                    <TypeMarker type={p.type} />
+                    <span className="flex-shrink-0 flex items-center justify-center w-2 h-2"><TypeMarker type={p.type} /></span>
                     <span className="text-stone-700 truncate">{p.name}</span>
                     {p.standardPartId && (
                       <span className="ml-1 text-[9px] bg-amber-100 text-amber-700 px-1 rounded flex-shrink-0" title="Pièce standard (bibliothèque)">
