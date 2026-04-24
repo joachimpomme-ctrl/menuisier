@@ -591,10 +591,37 @@ function Section({ title, badge, defaultOpen, children, T }) {
   );
 }
 
-// Type dot color
-function typeDot(type, T) {
-  const map = { Joue: T.accent, Fixe: T.text2, Réglable: T.success, Fond: T.text3 };
-  return map[type] || T.text3;
+function TypeMarker({ type, T }) {
+  const size = 8;
+  const markers = {
+    Joue:     { shape: 'circle',  color: T.accent  },
+    Fixe:     { shape: 'square',  color: T.text2   },
+    Réglable: { shape: 'diamond', color: T.success  },
+    Fond:     { shape: 'dash',    color: T.text3   },
+  };
+  const m = markers[type] || { shape: 'circle', color: T.text3 };
+
+  if (m.shape === 'circle') return (
+    <svg width={size} height={size} viewBox="0 0 8 8" style={{ flexShrink: 0 }}>
+      <circle cx="4" cy="4" r="3.5" fill={m.color} />
+    </svg>
+  );
+  if (m.shape === 'square') return (
+    <svg width={size} height={size} viewBox="0 0 8 8" style={{ flexShrink: 0 }}>
+      <rect x="0.5" y="0.5" width="7" height="7" fill={m.color} />
+    </svg>
+  );
+  if (m.shape === 'diamond') return (
+    <svg width={size} height={size} viewBox="0 0 8 8" style={{ flexShrink: 0 }}>
+      <polygon points="4,0 8,4 4,8 0,4" fill={m.color} />
+    </svg>
+  );
+  if (m.shape === 'dash') return (
+    <svg width={size} height={size} viewBox="0 0 8 8" style={{ flexShrink: 0 }}>
+      <rect x="0" y="3" width="8" height="2" fill={m.color} />
+    </svg>
+  );
+  return null;
 }
 
 // Facade SVG — cotée, 2 corps
@@ -659,7 +686,7 @@ function PartsTable({ T }) {
           {PARTS.map((p, i) => (
             <tr key={i} style={{ borderBottom: `1px solid ${T.border}` }}>
               <td style={{ padding: '7px 8px 7px 10px', width: 8 }}>
-                <span style={{ display: 'block', width: 6, height: 6, borderRadius: '50%', background: typeDot(p.type, T), flexShrink: 0 }} />
+                <TypeMarker type={p.type} T={T} />
               </td>
               <td style={{ padding: '7px 8px', color: T.text, fontWeight: 500, whiteSpace: 'nowrap' }}>{p.name}</td>
               <td style={{ padding: '7px 8px', color: T.text2, fontFamily: T.mono, fontSize: 10, textAlign: 'right', whiteSpace: 'nowrap' }}>{p.l}×{p.w}</td>
@@ -674,7 +701,7 @@ function PartsTable({ T }) {
       <div style={{ display: 'flex', gap: 12, padding: '10px 8px 0', flexWrap: 'wrap' }}>
         {['Joue', 'Fixe', 'Réglable', 'Fond'].map(t => (
           <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: typeDot(t, T), display: 'block' }} />
+            <TypeMarker type={t} T={T} />
             <span style={{ fontSize: 10, color: T.text3 }}>{t}</span>
           </div>
         ))}
