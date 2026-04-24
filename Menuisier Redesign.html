@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menuisier — Redesign</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #1c1814; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; }
+    #root { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c8bfb3; border-radius: 4px; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel">
+const { useState, useCallback } = React;
+
+// ─── DESIGN TOKENS ─────────────────────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "walnut",
+  "density": "comfortable"
+}/*EDITMODE-END*/;
+
+const ACCENTS = {
+  walnut:  { bg: '#6b4c2a', light: '#f2ebe0', text: '#ffffff', label: 'Noyer',   muted: '#8c6840' },
+  forest:  { bg: '#3d5e43', light: '#e4f0e6', text: '#ffffff', label: 'Forêt',   muted: '#527a58' },
+  slate:   { bg: '#3a4a5c', light: '#e5eaf0', text: '#ffffff', label: 'Ardoise', muted: '#4e6070' },
+};
+
+function getTokens(accent) {
+  const a = ACCENTS[accent] || ACCENTS.walnut;
+  return {
+    bg:         '#f5f1eb',
+    surface:    '#ffffff',
+    surfaceAlt: '#faf8f4',
+    border:     '#e0d8ce',
+    borderStrong: '#c8bfb3',
+    text:       '#1c1714',
+    text2:      '#695f56',
+    text3:      '#9d9089',
+    accent:     a.bg,
+    accentLight: a.light,
+    accentText:  a.text,
+    accentMuted: a.muted,
+    success:    '#2f6144',
+    successLight: '#e4f0e8',
+    warning:    '#7a5020',
+    warningLight: '#f5ead8',
+    error:      '#7a2424',
+    errorLight: '#fae8e8',
+    mono:       "'DM Mono', monospace",
+  };
+}
+
+// ─── SVG ICONS (furniture silhouettes) ────────────────────────────────────
+const FurnitureIcons = {
+  bibliotheque: () => (
+    <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="40" height="53">
+      <rect x="4" y="2" width="40" height="60" rx="1" stroke="currentColor" strokeWidth="2.5"/>
+      <line x1="4" y1="14" x2="44" y2="14" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="4" y1="28" x2="44" y2="28" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="4" y1="42" x2="44" y2="42" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="4" y1="56" x2="44" y2="56" stroke="currentColor" strokeWidth="1.5"/>
+    </svg>
+  ),
+  dressing: () => (
+    <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="40" height="53">
+      <rect x="4" y="2" width="40" height="60" rx="1" stroke="currentColor" strokeWidth="2.5"/>
+      <line x1="24" y1="2" x2="24" y2="62" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="6" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="26" y1="12" x2="42" y2="12" stroke="currentColor" strokeWidth="1.5"/>
+      <circle cx="21" cy="34" r="2" fill="currentColor" opacity=".5"/>
+      <circle cx="27" cy="34" r="2" fill="currentColor" opacity=".5"/>
+    </svg>
+  ),
+  meuble_tv: () => (
+    <svg viewBox="0 0 64 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="53" height="30">
+      <rect x="4" y="4" width="56" height="28" rx="1" stroke="currentColor" strokeWidth="2.5"/>
+      <line x1="4" y1="22" x2="60" y2="22" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="24" y1="4" x2="24" y2="22" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="44" y1="4" x2="44" y2="22" stroke="currentColor" strokeWidth="1.5"/>
+    </svg>
+  ),
+  commode: () => (
+    <svg viewBox="0 0 48 52" fill="none" xmlns="http://www.w3.org/2000/svg" width="40" height="43">
+      <rect x="4" y="2" width="40" height="48" rx="1" stroke="currentColor" strokeWidth="2.5"/>
+      <line x1="4" y1="16" x2="44" y2="16" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="4" y1="30" x2="44" y2="30" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="4" y1="44" x2="44" y2="44" stroke="currentColor" strokeWidth="1.5"/>
+      <circle cx="24" cy="9" r="2" fill="currentColor" opacity=".5"/>
+      <circle cx="24" cy="23" r="2" fill="currentColor" opacity=".5"/>
+      <circle cx="24" cy="37" r="2" fill="currentColor" opacity=".5"/>
+    </svg>
+  ),
+  placard: () => (
+    <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="40" height="53">
+      <rect x="4" y="2" width="40" height="60" rx="1" stroke="currentColor" strokeWidth="2.5"/>
+      <line x1="24" y1="2" x2="24" y2="62" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="4" y1="32" x2="44" y2="32" stroke="currentColor" strokeWidth="1.5"/>
+      <circle cx="21.5" cy="18" r="2" fill="currentColor" opacity=".5"/>
+      <circle cx="26.5" cy="18" r="2" fill="currentColor" opacity=".5"/>
+    </svg>
+  ),
+  cuisine_bas: () => (
+    <svg viewBox="0 0 64 42" fill="none" xmlns="http://www.w3.org/2000/svg" width="53" height="35">
+      <rect x="4" y="6" width="56" height="32" rx="1" stroke="currentColor" strokeWidth="2.5"/>
+      <rect x="4" y="2" width="56" height="5" rx="0.5" fill="currentColor" opacity=".15" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="34" y1="6" x2="34" y2="38" stroke="currentColor" strokeWidth="1.5"/>
+      <circle cx="20" cy="22" r="2" fill="currentColor" opacity=".5"/>
+      <circle cx="48" cy="22" r="2" fill="currentColor" opacity=".5"/>
+    </svg>
+  ),
+  bureau: () => (
+    <svg viewBox="0 0 64 52" fill="none" xmlns="http://www.w3.org/2000/svg" width="53" height="43">
+      <rect x="4" y="14" width="56" height="4" rx="0.5" fill="currentColor" opacity=".15" stroke="currentColor" strokeWidth="1.5"/>
+      <rect x="4" y="18" width="16" height="30" rx="1" stroke="currentColor" strokeWidth="2.5"/>
+      <line x1="4" y1="30" x2="20" y2="30" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="4" y1="42" x2="20" y2="42" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="24" y1="18" x2="24" y2="48" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="44" y1="18" x2="44" y2="48" stroke="currentColor" strokeWidth="1.5"/>
+    </svg>
+  ),
+  etagere: () => (
+    <svg viewBox="0 0 56 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="47" height="33">
+      <rect x="4" y="2" width="48" height="36" rx="1" stroke="currentColor" strokeWidth="2.5"/>
+      <line x1="4" y1="14" x2="52" y2="14" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="4" y1="26" x2="52" y2="26" stroke="currentColor" strokeWidth="1.5"/>
+    </svg>
+  ),
+};
+
+const FURNITURE_TYPES = [
+  { id: 'bibliotheque', name: 'Bibliothèque',      desc: 'Livres, objets déco'       },
+  { id: 'dressing',     name: 'Dressing',           desc: 'Vêtements, penderie'       },
+  { id: 'placard',      name: 'Placard',             desc: 'Rangement polyvalent'      },
+  { id: 'meuble_tv',    name: 'Meuble TV',           desc: 'Audiovisuel, câbles'       },
+  { id: 'commode',      name: 'Commode',             desc: 'Tiroirs, linge plié'       },
+  { id: 'cuisine_bas',  name: 'Cuisine',             desc: 'Caissons bas'              },
+  { id: 'bureau',       name: 'Bureau',              desc: 'Poste de travail'          },
+  { id: 'etagere',      name: 'Étagère',             desc: 'Murale ou sur pied'        },
+];
+
+// ─── SHARED COMPONENTS ────────────────────────────────────────────────────
+
+function Tag({ children, color = 'neutral', T }) {
+  const map = {
+    neutral: { bg: T.surfaceAlt, border: T.border, text: T.text2 },
+    accent:  { bg: T.accentLight, border: 'transparent', text: T.accent },
+    success: { bg: T.successLight, border: 'transparent', text: T.success },
+    warning: { bg: T.warningLight, border: 'transparent', text: T.warning },
+    error:   { bg: T.errorLight, border: 'transparent', text: T.error },
+  };
+  const c = map[color] || map.neutral;
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center',
+      background: c.bg, border: `1px solid ${c.border}`, color: c.text,
+      borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 500,
+      letterSpacing: '0.01em', whiteSpace: 'nowrap',
+    }}>{children}</span>
+  );
+}
+
+function Btn({ children, variant = 'ghost', onClick, full, small, T }) {
+  const variants = {
+    primary: { bg: T.accent, color: T.accentText, border: 'transparent' },
+    ghost:   { bg: 'transparent', color: T.text2, border: T.border },
+    muted:   { bg: T.surfaceAlt, color: T.text2, border: T.border },
+  };
+  const v = variants[variant] || variants.ghost;
+  return (
+    <button onClick={onClick} style={{
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+      background: v.bg, color: v.color,
+      border: `1px solid ${v.border}`, borderRadius: 8,
+      padding: small ? '6px 12px' : '9px 16px',
+      fontSize: small ? 12 : 13, fontWeight: 500, cursor: 'pointer',
+      width: full ? '100%' : undefined,
+      fontFamily: 'inherit', transition: 'opacity .12s',
+    }}
+    onMouseEnter={e => e.currentTarget.style.opacity = '.8'}
+    onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+    >{children}</button>
+  );
+}
+
+function Divider({ T }) {
+  return <div style={{ height: 1, background: T.border, margin: '0 -20px' }} />;
+}
+
+// ─── SCREEN: HOME ────────────────────────────────────────────────────────
+const TABS = [
+  { key: 'structure', label: 'Structure' },
+  { key: 'plans',     label: 'Plans 2D'  },
+  { key: 'debit',     label: 'Débit'     },
+  { key: 'montage',   label: 'Montage'   },
+  { key: 'notice',    label: 'Notice'    },
+  { key: 'controle',  label: 'Contrôle'  },
+  { key: 'ia',        label: 'Assistant' },
+];
+
+const PARTS = [
+  { name: 'Joue gauche',       l: 2320, w: 600, th: 18, qty: 1, type: 'Joue',     chant: 'AV' },
+  { name: 'Joue droite',       l: 2320, w: 600, th: 18, qty: 1, type: 'Joue',     chant: 'AV' },
+  { name: 'Tablette fixe haut',l: 1164, w: 582, th: 18, qty: 1, type: 'Fixe',     chant: 'AV, G, D' },
+  { name: 'Tablette fixe bas', l: 1164, w: 582, th: 18, qty: 1, type: 'Fixe',     chant: 'AV, G, D' },
+  { name: 'Tablette réglable', l: 1164, w: 582, th: 18, qty: 4, type: 'Réglable', chant: 'AV' },
+  { name: 'Fond',              l: 2284, w: 1200, th: 8, qty: 1, type: 'Fond',     chant: '—' },
+];
+
+function HomeScreen({ onNavigate, T }) {
+  const [activeTab, setActiveTab] = useState('structure');
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg, overflow: 'hidden' }}>
+      {/* Header */}
+      <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}`, padding: '14px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 11, color: T.text3, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 3 }}>
+              Projet actif
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: T.text, lineHeight: 1.2 }}>
+              Bibliothèque salon
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <button
+              onClick={() => onNavigate('new-project')}
+              style={{
+                background: T.accent, color: T.accentText, border: 'none',
+                borderRadius: 8, padding: '7px 13px', fontSize: 12, fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'inherit'
+              }}>+ Nouveau</button>
+            <button style={{
+              background: 'transparent', border: `1px solid ${T.border}`, borderRadius: 8,
+              padding: '7px 11px', fontSize: 13, color: T.text2, cursor: 'pointer', fontFamily: 'inherit'
+            }}>···</button>
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+          <Tag T={T} color="accent">CP bouleau 18 mm</Tag>
+          <Tag T={T}>10 pièces</Tag>
+          <Tag T={T}>3 panneaux</Tag>
+          <Tag T={T} color="success">218 €</Tag>
+        </div>
+
+        {/* Tab bar */}
+        <div style={{ display: 'flex', gap: 0, overflowX: 'auto', marginLeft: -20, marginRight: -20, paddingLeft: 20 }}>
+          {TABS.map(tab => (
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
+              background: 'transparent', border: 'none', cursor: 'pointer',
+              padding: '8px 14px', fontSize: 12, fontWeight: activeTab === tab.key ? 600 : 400,
+              color: activeTab === tab.key ? T.accent : T.text2,
+              borderBottom: `2px solid ${activeTab === tab.key ? T.accent : 'transparent'}`,
+              whiteSpace: 'nowrap', fontFamily: 'inherit', transition: 'color .1s',
+              flexShrink: 0,
+            }}>{tab.label}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
+        {activeTab === 'structure' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Body card */}
+            <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, overflow: 'hidden' }}>
+              <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${T.border}` }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>Corps unique</div>
+                  <div style={{ fontSize: 11, color: T.text3, fontFamily: T.mono, marginTop: 2 }}>
+                    1200 × 2320 × 600 mm
+                  </div>
+                </div>
+                <Tag T={T} color="accent">CP bouleau</Tag>
+              </div>
+
+              {/* Parts table */}
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                  <thead>
+                    <tr style={{ background: T.surfaceAlt }}>
+                      {['Nom', 'L', 'l', 'Ép.', 'Qté', 'Type', 'Chant'].map(h => (
+                        <th key={h} style={{ padding: '7px 10px', textAlign: 'left', fontWeight: 500, color: T.text3, fontSize: 11, whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {PARTS.map((p, i) => (
+                      <tr key={i} style={{ borderTop: `1px solid ${T.border}` }}>
+                        <td style={{ padding: '8px 10px', color: T.text, fontWeight: 500 }}>{p.name}</td>
+                        <td style={{ padding: '8px 10px', color: T.text2, fontFamily: T.mono, fontSize: 11 }}>{p.l}</td>
+                        <td style={{ padding: '8px 10px', color: T.text2, fontFamily: T.mono, fontSize: 11 }}>{p.w}</td>
+                        <td style={{ padding: '8px 10px', color: T.text2, fontFamily: T.mono, fontSize: 11 }}>{p.th}</td>
+                        <td style={{ padding: '8px 10px', color: T.text, fontWeight: 600 }}>{p.qty}</td>
+                        <td style={{ padding: '8px 10px', color: T.text3, fontSize: 11 }}>{p.type}</td>
+                        <td style={{ padding: '8px 10px', color: T.text3, fontFamily: T.mono, fontSize: 10 }}>{p.chant}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ padding: '10px 16px', borderTop: `1px solid ${T.border}`, display: 'flex', gap: 8 }}>
+                <Btn T={T} variant="muted" small>+ Ajouter une pièce</Btn>
+                <Btn T={T} variant="ghost" small>Dupliquer</Btn>
+              </div>
+            </div>
+
+            <Btn T={T} variant="muted" full>+ Ajouter un corps</Btn>
+          </div>
+        )}
+
+        {activeTab !== 'structure' && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 200, color: T.text3, fontSize: 13 }}>
+            Onglet {TABS.find(t => t.key === activeTab)?.label}
+          </div>
+        )}
+      </div>
+
+      {/* Bottom action */}
+      <div style={{ background: T.surface, borderTop: `1px solid ${T.border}`, padding: '12px 20px', display: 'flex', gap: 8 }}>
+        <Btn T={T} variant="muted" small>Exporter JSON</Btn>
+        <Btn T={T} variant="muted" small>Bibliothèque</Btn>
+        <div style={{ flex: 1 }} />
+        <Btn T={T} variant="primary" small>Exporter PDF</Btn>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN: WIZARD TYPE ─────────────────────────────────────────────────
+function WizardTypeScreen({ onNavigate, T }) {
+  const [selected, setSelected] = useState(null);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg }}>
+      {/* Header */}
+      <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}`, padding: '16px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: 11, color: T.text3, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>
+              Étape 1 / 3
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Type de meuble</div>
+          </div>
+          <button onClick={() => onNavigate('home')} style={{
+            background: 'transparent', border: 'none', color: T.text3,
+            fontSize: 20, cursor: 'pointer', lineHeight: 1, padding: 4
+          }}>×</button>
+        </div>
+        {/* Progress bar */}
+        <div style={{ height: 2, background: T.border, borderRadius: 2, marginTop: 14 }}>
+          <div style={{ height: '100%', width: '33%', background: T.accent, borderRadius: 2, transition: 'width .3s' }} />
+        </div>
+      </div>
+
+      {/* Grid */}
+      <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {FURNITURE_TYPES.map(ft => {
+            const Icon = FurnitureIcons[ft.id] || FurnitureIcons.etagere;
+            const isSelected = selected === ft.id;
+            return (
+              <button key={ft.id} onClick={() => setSelected(ft.id)} style={{
+                background: isSelected ? T.accentLight : T.surface,
+                border: `${isSelected ? 2 : 1}px solid ${isSelected ? T.accent : T.border}`,
+                borderRadius: 10, padding: '16px 12px', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
+                transition: 'all .12s', textAlign: 'center', fontFamily: 'inherit',
+              }}>
+                <div style={{ color: isSelected ? T.accent : T.text3, display: 'flex', alignItems: 'center', justifyContent: 'center', height: 48 }}>
+                  <Icon />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: isSelected ? T.accent : T.text, marginBottom: 2 }}>{ft.name}</div>
+                  <div style={{ fontSize: 11, color: T.text3 }}>{ft.desc}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* AI brief toggle */}
+        <div style={{ marginTop: 14, padding: '12px 16px', background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: T.text, marginBottom: 4 }}>Décrire librement</div>
+          <div style={{ fontSize: 11, color: T.text3, marginBottom: 10 }}>
+            Décrivez votre projet en langage naturel — l'assistant génère plusieurs propositions.
+          </div>
+          <textarea placeholder="Ex : Bibliothèque 280 cm de large, 240 sous plafond, pour livres et TV au centre…" style={{
+            width: '100%', height: 72, resize: 'none',
+            border: `1px solid ${T.border}`, borderRadius: 8,
+            padding: '8px 10px', fontSize: 12, color: T.text,
+            background: T.surfaceAlt, fontFamily: 'inherit',
+            outline: 'none',
+          }} />
+          <div style={{ marginTop: 8 }}>
+            <Btn T={T} variant="muted" full small>Générer des propositions</Btn>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer CTA */}
+      <div style={{ background: T.surface, borderTop: `1px solid ${T.border}`, padding: '12px 20px' }}>
+        <Btn T={T} variant="primary" full onClick={() => selected && onNavigate('wizard-space')}>
+          {selected ? `Continuer — ${FURNITURE_TYPES.find(f => f.id === selected)?.name}` : 'Sélectionner un type'}
+        </Btn>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN: WIZARD SPACE ─────────────────────────────────────────────────
+function Field({ label, unit, value, T }) {
+  return (
+    <div>
+      <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: T.text3, marginBottom: 5, letterSpacing: '0.02em' }}>{label}</label>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 0, border: `1px solid ${T.border}`, borderRadius: 8, background: T.surface, overflow: 'hidden' }}>
+        <input type="number" defaultValue={value} style={{
+          flex: 1, border: 'none', padding: '10px 12px', fontSize: 14,
+          color: T.text, fontFamily: T.mono, background: 'transparent',
+          outline: 'none', minWidth: 0,
+        }} />
+        <div style={{ padding: '0 12px', color: T.text3, fontSize: 11, fontWeight: 500, borderLeft: `1px solid ${T.border}`, height: '100%', display: 'flex', alignItems: 'center' }}>{unit}</div>
+      </div>
+    </div>
+  );
+}
+
+function WizardSpaceScreen({ onNavigate, T }) {
+  const [mat, setMat] = useState('cp_bouleau');
+  const MATS = [
+    { id: 'cp_bouleau',  name: 'Contre-plaqué bouleau', short: 'CP bouleau',  span: 80 },
+    { id: 'melamine',    name: 'Mélaminé particules',    short: 'Mélaminé',    span: 70 },
+    { id: 'mdf',         name: 'MDF',                    short: 'MDF',         span: 65 },
+    { id: 'cp_okoume',   name: 'Contre-plaqué okoumé',   short: 'CP okoumé',   span: 85 },
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg }}>
+      {/* Header */}
+      <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}`, padding: '16px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: 11, color: T.text3, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>Étape 2 / 3</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Espace &amp; matériau</div>
+          </div>
+          <button onClick={() => onNavigate('home')} style={{ background: 'transparent', border: 'none', color: T.text3, fontSize: 20, cursor: 'pointer', padding: 4 }}>×</button>
+        </div>
+        <div style={{ height: 2, background: T.border, borderRadius: 2, marginTop: 14 }}>
+          <div style={{ height: '100%', width: '66%', background: T.accent, borderRadius: 2 }} />
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+          {/* Dimensions */}
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>Dimensions disponibles</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <Field label="Largeur" unit="mm" value={2400} T={T} />
+              <Field label="Hauteur (plafond)" unit="mm" value={2500} T={T} />
+              <Field label="Profondeur" unit="mm" value={600} T={T} />
+              <Field label="Plinthe" unit="mm" value={80} T={T} />
+            </div>
+          </div>
+
+          {/* Wall type */}
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>Type de mur</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {['Béton', 'Brique creuse', 'Placo', 'Inconnu'].map((w, i) => (
+                <button key={w} style={{
+                  padding: '7px 14px', fontSize: 12, fontWeight: 500,
+                  border: `1px solid ${i === 0 ? T.accent : T.border}`,
+                  borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit',
+                  background: i === 0 ? T.accentLight : T.surface,
+                  color: i === 0 ? T.accent : T.text2,
+                }}>{w}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Material */}
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>Matériau</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {MATS.map(m => (
+                <button key={m.id} onClick={() => setMat(m.id)} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '10px 14px', border: `${mat === m.id ? 2 : 1}px solid ${mat === m.id ? T.accent : T.border}`,
+                  borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+                  background: mat === m.id ? T.accentLight : T.surface,
+                }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: mat === m.id ? T.accent : T.text }}>{m.name}</div>
+                  <div style={{ fontSize: 11, color: T.text3, fontFamily: T.mono }}>portée max {m.span} cm</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Auto-preview chip */}
+          <div style={{ background: T.accentLight, border: `1px solid ${T.border}`, borderRadius: 10, padding: '12px 16px' }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: T.accent, marginBottom: 6 }}>Aperçu automatique</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 12, color: T.text2 }}>
+              <div><span style={{ color: T.text3 }}>Corps : </span><span style={{ fontFamily: T.mono, fontWeight: 600, color: T.text }}>2</span></div>
+              <div><span style={{ color: T.text3 }}>Largeur/corps : </span><span style={{ fontFamily: T.mono, fontWeight: 600, color: T.text }}>1200 mm</span></div>
+              <div><span style={{ color: T.text3 }}>Pièces : </span><span style={{ fontFamily: T.mono, fontWeight: 600, color: T.text }}>10</span></div>
+              <div><span style={{ color: T.text3 }}>Étagères/corps : </span><span style={{ fontFamily: T.mono, fontWeight: 600, color: T.text }}>5</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ background: T.surface, borderTop: `1px solid ${T.border}`, padding: '12px 20px', display: 'flex', gap: 8 }}>
+        <Btn T={T} variant="ghost" onClick={() => onNavigate('wizard-type')}>← Retour</Btn>
+        <Btn T={T} variant="primary" full onClick={() => onNavigate('dashboard')}>Générer le projet</Btn>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN: DASHBOARD ────────────────────────────────────────────────────
+
+// Collapsible section with count badge and open/close chevron
+function Section({ title, badge, defaultOpen, children, T }) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  return (
+    <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, overflow: 'hidden' }}>
+      <button onClick={() => setOpen(o => !o)} style={{
+        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '13px 16px', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{title}</span>
+          {badge && <Tag T={T}>{badge}</Tag>}
+        </div>
+        <svg width="12" height="8" viewBox="0 0 12 8" style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .2s', flexShrink: 0 }}>
+          <path d="M1 1l5 5 5-5" stroke={T.text3} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        </svg>
+      </button>
+      {open && (
+        <div style={{ borderTop: `1px solid ${T.border}`, padding: '14px 16px' }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Type dot color
+function typeDot(type, T) {
+  const map = { Joue: T.accent, Fixe: T.text2, Réglable: T.success, Fond: T.text3 };
+  return map[type] || T.text3;
+}
+
+// Facade SVG — cotée, 2 corps
+function FacadeSVG({ T }) {
+  const W = 320, H = 160;
+  const ml = 28, mr = 16, mt = 12, mb = 24;
+  const fw = W - ml - mr, fh = H - mt - mb;
+  // 2 corps de 1200mm, hauteur 2320mm — proportion 2400:2320 ≈ 1.034
+  const cx = ml + fw / 2; // separator x
+  // shelves at ~30%, 52%, 70%, 84% of height
+  const shelves = [0.28, 0.50, 0.68, 0.82].map(r => mt + r * fh);
+  const dimY = H - 8;
+  const dimX = ml - 8;
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} style={{ display: 'block' }}>
+      {/* Fill */}
+      <rect x={ml} y={mt} width={fw} height={fh} fill={T.accentLight} rx="1"/>
+      {/* Outer frame */}
+      <rect x={ml} y={mt} width={fw} height={fh} stroke={T.accent} strokeWidth="2" fill="none" rx="1"/>
+      {/* Centre separator */}
+      <line x1={cx} y1={mt} x2={cx} y2={mt + fh} stroke={T.accentMuted} strokeWidth="1.5"/>
+      {/* Shelves */}
+      {shelves.map((sy, i) => (
+        <line key={i} x1={ml + 2} y1={sy} x2={ml + fw - 2} y2={sy} stroke={T.accentMuted} strokeWidth="1" strokeDasharray="0"/>
+      ))}
+      {/* Bottom plinth line */}
+      <line x1={ml} y1={mt + fh - 6} x2={ml + fw} y2={mt + fh - 6} stroke={T.accentMuted} strokeWidth="0.8" strokeDasharray="3 2"/>
+
+      {/* Width dimension */}
+      <line x1={ml} y1={dimY} x2={ml + fw} y2={dimY} stroke={T.text3} strokeWidth="0.8"/>
+      <line x1={ml} y1={dimY - 3} x2={ml} y2={dimY + 3} stroke={T.text3} strokeWidth="0.8"/>
+      <line x1={ml + fw} y1={dimY - 3} x2={ml + fw} y2={dimY + 3} stroke={T.text3} strokeWidth="0.8"/>
+      <text x={ml + fw / 2} y={H - 1} textAnchor="middle" fontSize="8" fill={T.text3} fontFamily="DM Mono, monospace">2400 mm</text>
+
+      {/* Height dimension */}
+      <line x1={dimX} y1={mt} x2={dimX} y2={mt + fh} stroke={T.text3} strokeWidth="0.8"/>
+      <line x1={dimX - 3} y1={mt} x2={dimX + 3} y2={mt} stroke={T.text3} strokeWidth="0.8"/>
+      <line x1={dimX - 3} y1={mt + fh} x2={dimX + 3} y2={mt + fh} stroke={T.text3} strokeWidth="0.8"/>
+      <text x={dimX - 3} y={mt + fh / 2} textAnchor="middle" fontSize="7" fill={T.text3} fontFamily="DM Mono, monospace" transform={`rotate(-90 ${dimX - 3} ${mt + fh / 2})`}>2320</text>
+
+      {/* Corps labels */}
+      <text x={ml + fw * 0.25} y={mt + 11} textAnchor="middle" fontSize="7.5" fill={T.accent} fontFamily="DM Mono, monospace" fontWeight="500">Corps 1</text>
+      <text x={ml + fw * 0.75} y={mt + 11} textAnchor="middle" fontSize="7.5" fill={T.accent} fontFamily="DM Mono, monospace" fontWeight="500">Corps 2</text>
+    </svg>
+  );
+}
+
+// Parts table with type color dot
+function PartsTable({ T }) {
+  return (
+    <div style={{ overflowX: 'auto', margin: '0 -4px' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+        <thead>
+          <tr style={{ background: T.surfaceAlt }}>
+            {['', 'Pièce', 'L × l', 'Ép.', 'Qté', 'Chant'].map((h, i) => (
+              <th key={i} style={{ padding: '6px 8px', textAlign: i < 2 ? 'left' : 'right', fontWeight: 500, color: T.text3, fontSize: 10, whiteSpace: 'nowrap', borderBottom: `1px solid ${T.border}` }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {PARTS.map((p, i) => (
+            <tr key={i} style={{ borderBottom: `1px solid ${T.border}` }}>
+              <td style={{ padding: '7px 8px 7px 10px', width: 8 }}>
+                <span style={{ display: 'block', width: 6, height: 6, borderRadius: '50%', background: typeDot(p.type, T), flexShrink: 0 }} />
+              </td>
+              <td style={{ padding: '7px 8px', color: T.text, fontWeight: 500, whiteSpace: 'nowrap' }}>{p.name}</td>
+              <td style={{ padding: '7px 8px', color: T.text2, fontFamily: T.mono, fontSize: 10, textAlign: 'right', whiteSpace: 'nowrap' }}>{p.l}×{p.w}</td>
+              <td style={{ padding: '7px 8px', color: T.text3, fontFamily: T.mono, fontSize: 10, textAlign: 'right' }}>{p.th}</td>
+              <td style={{ padding: '7px 8px', fontWeight: 700, color: T.text, textAlign: 'right', fontSize: 12 }}>{p.qty}</td>
+              <td style={{ padding: '7px 8px', color: T.text3, fontFamily: T.mono, fontSize: 9, textAlign: 'right' }}>{p.chant}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {/* Legend */}
+      <div style={{ display: 'flex', gap: 12, padding: '10px 8px 0', flexWrap: 'wrap' }}>
+        {['Joue', 'Fixe', 'Réglable', 'Fond'].map(t => (
+          <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: typeDot(t, T), display: 'block' }} />
+            <span style={{ fontSize: 10, color: T.text3 }}>{t}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Panel chips for shopping list
+function PanelChip({ label, qty, price, T }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '10px 14px', background: T.surfaceAlt, borderRadius: 8, border: `1px solid ${T.border}`,
+    }}>
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 500, color: T.text }}>{label}</div>
+        <div style={{ fontSize: 10, color: T.text3, fontFamily: T.mono, marginTop: 2 }}>{price} / panneau</div>
+      </div>
+      <div style={{ textAlign: 'right' }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: T.accent, fontFamily: T.mono, lineHeight: 1 }}>×{qty}</div>
+        <div style={{ fontSize: 10, color: T.text3, marginTop: 2 }}>panneaux</div>
+      </div>
+    </div>
+  );
+}
+
+const ASSEMBLY_STEPS = [
+  { n: 1, phase: 'Préparation',  text: 'Contrôler toutes les pièces, corriger les arêtes vives' },
+  { n: 2, phase: 'Préparation',  text: 'Poncer les tranches non chantées au grain 120 puis 180' },
+  { n: 3, phase: 'Assemblage',   text: 'Positionner les joues, tracer les emplacements des tablettes' },
+  { n: 4, phase: 'Assemblage',   text: 'Pré-percer et assembler la tablette basse (tourillons + colle)' },
+  { n: 5, phase: 'Assemblage',   text: 'Assembler la tablette haute, contrôler l\'équerre au grand équer' },
+  { n: 6, phase: 'Fond',         text: 'Clouer ou visser le fond, vérifier l\'aplomb du caisson' },
+];
+
+const HARDWARE = [
+  { cat: 'Fixation',   items: [{ name: 'Cheville acier Ø8×40', qty: 16 }, { name: 'Vis TF 4×40', qty: 32 }] },
+  { cat: 'Structure',  items: [{ name: 'Tourillon Ø8×30', qty: 24 }, { name: 'Tasseaux de liaison', qty: 4 }] },
+  { cat: 'Tablettes',  items: [{ name: 'Taquets Ø5 réglables', qty: 32 }] },
+];
+
+function DashboardScreen({ onNavigate, T }) {
+  const [activeSection, setActiveSection] = useState('pieces');
+
+  const NAV_SECTIONS = [
+    { key: 'pieces',   label: 'Pièces'     },
+    { key: 'courses',  label: 'Courses'    },
+    { key: 'montage',  label: 'Montage'    },
+    { key: 'details',  label: 'Détails'    },
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg, overflow: 'hidden' }}>
+
+      {/* ── Header compact ── */}
+      <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}`, padding: '14px 20px 0', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div>
+            <div style={{ fontSize: 11, color: T.text3, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 3 }}>Résultat</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Bibliothèque salon</div>
+          </div>
+          <Tag T={T} color="success">Intermédiaire</Tag>
+        </div>
+        {/* 4 key metrics */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0, borderTop: `1px solid ${T.border}`, marginLeft: -20, marginRight: -20 }}>
+          {[
+            { label: 'Pièces',   val: '10',    sub: '2 corps'    },
+            { label: 'Panneaux', val: '4',     sub: 'CP 18+8mm'  },
+            { label: 'Coût',     val: '218',   sub: 'EUR estimé' },
+            { label: 'Étapes',   val: '12',    sub: 'de montage' },
+          ].map((m, i) => (
+            <div key={i} style={{
+              padding: '10px 12px', textAlign: 'center',
+              borderRight: i < 3 ? `1px solid ${T.border}` : 'none',
+            }}>
+              <div style={{ fontSize: 20, fontWeight: 700, color: T.accent, fontFamily: T.mono, lineHeight: 1 }}>{m.val}</div>
+              <div style={{ fontSize: 9, color: T.text3, marginTop: 3, lineHeight: 1.2 }}>{m.label}<br/>{m.sub}</div>
+            </div>
+          ))}
+        </div>
+        {/* Section pills */}
+        <div style={{ display: 'flex', gap: 0, overflowX: 'auto', marginLeft: -20, marginRight: -20, paddingLeft: 20 }}>
+          {NAV_SECTIONS.map(s => (
+            <button key={s.key} onClick={() => setActiveSection(s.key)} style={{
+              background: 'transparent', border: 'none', cursor: 'pointer',
+              padding: '9px 14px', fontSize: 12,
+              fontWeight: activeSection === s.key ? 600 : 400,
+              color: activeSection === s.key ? T.accent : T.text2,
+              borderBottom: `2px solid ${activeSection === s.key ? T.accent : 'transparent'}`,
+              whiteSpace: 'nowrap', fontFamily: 'inherit', flexShrink: 0,
+            }}>{s.label}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Content ── */}
+      <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
+
+        {/* PIÈCES */}
+        {activeSection === 'pieces' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {/* Façade cotée */}
+            <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: '14px 16px' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>Vue de face — cotée</div>
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <FacadeSVG T={T} />
+              </div>
+              <div style={{ display: 'flex', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
+                <div style={{ fontSize: 10, color: T.text3, fontFamily: T.mono }}>Prof. <span style={{ color: T.text, fontWeight: 600 }}>600 mm</span></div>
+                <div style={{ fontSize: 10, color: T.text3, fontFamily: T.mono }}>Mat. <span style={{ color: T.text, fontWeight: 600 }}>CP bouleau 18 mm</span></div>
+                <div style={{ fontSize: 10, color: T.text3, fontFamily: T.mono }}>Plinthe <span style={{ color: T.text, fontWeight: 600 }}>80 mm</span></div>
+              </div>
+            </div>
+
+            {/* Débit */}
+            <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, overflow: 'hidden' }}>
+              <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>Liste de débit</span>
+                <Tag T={T}>10 pièces</Tag>
+              </div>
+              <div style={{ padding: '4px 8px 12px' }}>
+                <PartsTable T={T} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* COURSES */}
+        {activeSection === 'courses' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {/* Panels */}
+            <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: '14px 16px' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>Panneaux à acheter</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <PanelChip T={T} label="CP bouleau 18 mm — 250×125 cm" qty={3} price="72 €" />
+                <PanelChip T={T} label="CP bouleau 8 mm — 250×125 cm" qty={1} price="38 €" />
+              </div>
+            </div>
+
+            {/* Hardware grouped */}
+            <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: '14px 16px' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>Quincaillerie</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {HARDWARE.map((cat, ci) => (
+                  <div key={ci}>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: T.text3, marginBottom: 6, letterSpacing: '0.04em' }}>{cat.cat.toUpperCase()}</div>
+                    {cat.items.map((item, ii) => (
+                      <div key={ii} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '5px 0', borderBottom: `1px solid ${T.border}` }}>
+                        <span style={{ fontSize: 12, color: T.text }}>{item.name}</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: T.accent, fontFamily: T.mono }}>×{item.qty}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Total */}
+            <div style={{ background: T.accentLight, border: `1px solid ${T.border}`, borderRadius: 10, padding: '14px 16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>Total estimé</span>
+                <span style={{ fontSize: 24, fontWeight: 700, color: T.accent, fontFamily: T.mono }}>218 €</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {[['Panneaux (4 pl.)', '254 €'], ['Quincaillerie', '—'], ['Outillage consommable', '~20 €']].map(([l, v], i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+                    <span style={{ color: T.text2 }}>{l}</span>
+                    <span style={{ color: T.text2, fontFamily: T.mono }}>{v}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MONTAGE */}
+        {activeSection === 'montage' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* Phase grouping */}
+            {['Préparation', 'Assemblage', 'Fond'].map(phase => {
+              const steps = ASSEMBLY_STEPS.filter(s => s.phase === phase);
+              return (
+                <div key={phase} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, overflow: 'hidden' }}>
+                  <div style={{ padding: '10px 16px', borderBottom: `1px solid ${T.border}`, background: T.surfaceAlt }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: T.text3, letterSpacing: '0.07em', textTransform: 'uppercase' }}>{phase}</span>
+                  </div>
+                  <div style={{ padding: '4px 0' }}>
+                    {steps.map((s, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '10px 16px', borderBottom: i < steps.length - 1 ? `1px solid ${T.border}` : 'none' }}>
+                        <span style={{
+                          flexShrink: 0, width: 22, height: 22, borderRadius: 6,
+                          background: T.accentLight, color: T.accent,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 11, fontWeight: 700, fontFamily: T.mono,
+                        }}>{s.n}</span>
+                        <span style={{ fontSize: 12, color: T.text, lineHeight: 1.55 }}>{s.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            <div style={{ textAlign: 'center', padding: '8px 0' }}>
+              <span style={{ fontSize: 11, color: T.text3 }}>+ 6 étapes supplémentaires</span>
+            </div>
+          </div>
+        )}
+
+        {/* DÉTAILS */}
+        {activeSection === 'details' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* Validation OK */}
+            <div style={{ background: T.successLight, border: `1px solid ${T.success}20`, borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: T.success, flexShrink: 0, marginTop: 3 }} />
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: T.success, marginBottom: 3 }}>Validation réussie</div>
+                <div style={{ fontSize: 11, color: T.text2 }}>Aucune erreur bloquante. 1 avertissement non critique.</div>
+              </div>
+            </div>
+            {/* Warning */}
+            <div style={{ background: T.warningLight, border: `1px solid ${T.warning}25`, borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: T.warning, flexShrink: 0, marginTop: 3 }} />
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: T.warning, marginBottom: 3 }}>Portée étagères</div>
+                <div style={{ fontSize: 11, color: T.text2 }}>Portée 1164 mm en CP 18 mm : fléchissement possible à charge lourde. Envisager un séparateur central.</div>
+              </div>
+            </div>
+            {/* Hypothèses */}
+            <Section title="Hypothèses de calcul" badge="3" defaultOpen T={T}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                {[
+                  { key: 'Type de mur',     val: 'Béton supposé (non renseigné)',       verify: true  },
+                  { key: 'Jeu de montage',  val: '2 mm par côté (standard)',             verify: false },
+                  { key: 'Fond',            val: 'Rainure 5 mm dans joues et tablettes', verify: false },
+                ].map((h, i) => (
+                  <div key={i} style={{ padding: '9px 0', borderBottom: i < 2 ? `1px solid ${T.border}` : 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
+                      <span style={{ fontSize: 12, fontWeight: 500, color: T.text }}>{h.key}</span>
+                      {h.verify && <Tag T={T} color="warning">À vérifier</Tag>}
+                    </div>
+                    <span style={{ fontSize: 11, color: T.text2 }}>{h.val}</span>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          </div>
+        )}
+      </div>
+
+      {/* ── Footer ── */}
+      <div style={{ background: T.surface, borderTop: `1px solid ${T.border}`, padding: '12px 20px', display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+        <Btn T={T} variant="ghost" small onClick={() => onNavigate('wizard-space')}>← Modifier</Btn>
+        <Btn T={T} variant="muted" small>Éditeur avancé</Btn>
+        <div style={{ flex: 1 }} />
+        <Btn T={T} variant="primary" small>Exporter PDF</Btn>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN: NOUVEAU PROJET (choix de mode) ─────────────────────────────
+function NewProjectScreen({ onNavigate, T }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg }}>
+      {/* Header */}
+      <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}`, padding: '16px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: 11, color: T.text3, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>Nouveau projet</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Par où commencer ?</div>
+          </div>
+          <button onClick={() => onNavigate('home')} style={{ background: 'transparent', border: 'none', color: T.text3, fontSize: 20, cursor: 'pointer', padding: 4 }}>×</button>
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflow: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+        {/* Mode 1 — Brief IA */}
+        <button onClick={() => onNavigate('brief-ia')} style={{
+          background: T.surface, border: `2px solid ${T.accent}`, borderRadius: 14,
+          padding: 0, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
+          overflow: 'hidden', transition: 'all .15s',
+        }}>
+          <div style={{ background: T.accentLight, padding: '18px 20px 14px' }}>
+            {/* Illustration: content items → meuble */}
+            <svg viewBox="0 0 300 70" width="100%" height="60" style={{ display: 'block' }}>
+              {/* Items left */}
+              {[
+                { x: 10, y: 20, w: 36, h: 12, label: '20 livres' },
+                { x: 10, y: 38, w: 44, h: 12, label: '15 chemises' },
+                { x: 10, y: 56, w: 32, h: 12, label: '8 paires' },
+              ].map((it, i) => (
+                <g key={i}>
+                  <rect x={it.x} y={it.y} width={it.w} height={it.h} rx="2" fill={T.accentMuted} opacity=".4"/>
+                  <text x={it.x + it.w / 2} y={it.y + 8} textAnchor="middle" fontSize="7" fill={T.accent} fontFamily="DM Sans, sans-serif" fontWeight="600">{it.label}</text>
+                </g>
+              ))}
+              {/* Arrow */}
+              <line x1="68" y1="38" x2="110" y2="38" stroke={T.accent} strokeWidth="1.5"/>
+              <polygon points="112,38 107,35 107,41" fill={T.accent}/>
+              <text x="89" y="32" textAnchor="middle" fontSize="7.5" fill={T.text3} fontFamily="DM Sans, sans-serif">IA</text>
+              {/* Meuble right */}
+              <rect x="118" y="8" width="80" height="58" rx="1" fill={T.accentLight} stroke={T.accent} strokeWidth="1.5"/>
+              <line x1="118" y1="30" x2="198" y2="30" stroke={T.accentMuted} strokeWidth="1"/>
+              <line x1="118" y1="48" x2="198" y2="48" stroke={T.accentMuted} strokeWidth="1"/>
+              <line x1="158" y1="8" x2="158" y2="66" stroke={T.accentMuted} strokeWidth="0.8"/>
+              {/* Labels */}
+              <text x="218" y="22" fontSize="7" fill={T.text3} fontFamily="DM Mono, monospace">2400mm</text>
+              <text x="218" y="36" fontSize="7" fill={T.text3} fontFamily="DM Mono, monospace">12 pièces</text>
+              <text x="218" y="50" fontSize="7" fill={T.accent} fontFamily="DM Mono, monospace" fontWeight="600">~218 €</text>
+            </svg>
+          </div>
+          <div style={{ padding: '14px 20px 18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: T.text }}>Je décris ce que je range</div>
+              <Tag T={T} color="accent">Recommandé</Tag>
+            </div>
+            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.6, marginBottom: 10 }}>
+              Dites combien de chemises, livres, chaussures vous avez. L'app dimensionne automatiquement les zones et propose plusieurs variantes.
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <Tag T={T}>4 étapes guidées</Tag>
+              <Tag T={T}>Sans expertise</Tag>
+            </div>
+          </div>
+        </button>
+
+        {/* Mode 2 — Wizard classique */}
+        <button onClick={() => onNavigate('wizard-type')} style={{
+          background: T.surface, border: `1px solid ${T.border}`, borderRadius: 14,
+          padding: 0, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
+          overflow: 'hidden', transition: 'all .15s',
+        }}>
+          <div style={{ background: T.surfaceAlt, padding: '18px 20px 14px', borderBottom: `1px solid ${T.border}` }}>
+            <svg viewBox="0 0 300 60" width="100%" height="55" style={{ display: 'block' }}>
+              {/* Steps */}
+              {[
+                { x: 20,  label: 'Type',    sub: 'Bibliothèque' },
+                { x: 105, label: 'Espace',  sub: '2400×2500' },
+                { x: 190, label: 'Zones',   sub: '+ configurateur' },
+              ].map((s, i) => (
+                <g key={i}>
+                  <circle cx={s.x + 20} cy={22} r={14} fill={i === 0 ? T.accentLight : T.surfaceAlt} stroke={i === 0 ? T.accent : T.borderStrong} strokeWidth="1.2"/>
+                  <text x={s.x + 20} y={26} textAnchor="middle" fontSize="9" fill={i === 0 ? T.accent : T.text2} fontFamily="DM Mono, monospace" fontWeight="700">{i + 1}</text>
+                  <text x={s.x + 20} y={44} textAnchor="middle" fontSize="8" fill={T.text} fontFamily="DM Sans, sans-serif" fontWeight="600">{s.label}</text>
+                  <text x={s.x + 20} y={54} textAnchor="middle" fontSize="7" fill={T.text3} fontFamily="DM Sans, sans-serif">{s.sub}</text>
+                  {i < 2 && <line x1={s.x + 36} y1={22} x2={s.x + 83} y2={22} stroke={T.border} strokeWidth="1" strokeDasharray="3 2"/>}
+                </g>
+              ))}
+            </svg>
+          </div>
+          <div style={{ padding: '14px 20px 18px' }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: T.text, marginBottom: 6 }}>Je connais mes cotes</div>
+            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.6, marginBottom: 10 }}>
+              Choisissez le type de meuble, entrez vos dimensions, configurez les zones manuellement. Idéal si vous avez un plan précis.
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <Tag T={T}>Wizard 3 étapes</Tag>
+              <Tag T={T}>Contrôle total</Tag>
+            </div>
+          </div>
+        </button>
+
+        {/* Mode 3 — Blank / Template (tertiary) */}
+        <button onClick={() => onNavigate('home')} style={{
+          background: 'transparent', border: `1px solid ${T.border}`, borderRadius: 10,
+          padding: '12px 16px', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: T.text2 }}>Partir d'un modèle ou d'un projet vierge</div>
+            <div style={{ fontSize: 11, color: T.text3, marginTop: 2 }}>Bibliothèque standard, placard 2 portes, commodes…</div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke={T.text3} strokeWidth="1.5" strokeLinecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN: BRIEF IA ────────────────────────────────────────────────────
+
+const CONTENT_CATS = [
+  { id: 'livres',      label: 'Livres',          sub: 'poche & grand format' },
+  { id: 'chemises',    label: 'Chemises',         sub: 'suspendues'           },
+  { id: 'manteaux',    label: 'Manteaux',         sub: 'suspendus'            },
+  { id: 'pantalons',   label: 'Pantalons',        sub: 'pliés ou suspendus'   },
+  { id: 'chaussures',  label: 'Chaussures',       sub: 'paires'               },
+  { id: 'vaisselle',   label: 'Vaisselle',        sub: 'assiettes, bols'      },
+  { id: 'deco',        label: 'Objets déco',      sub: 'cadres, vases'        },
+  { id: 'multimedia',  label: 'Multimédia',       sub: 'câbles, appareils'    },
+  { id: 'jeux',        label: 'Jeux & loisirs',   sub: 'boîtes, jouets'       },
+  { id: 'linge',       label: 'Linge plié',       sub: 'T-shirts, pulls'      },
+];
+
+const VARIANTS_DATA = [
+  {
+    title: 'Compact économique',
+    desc: '1 corps, étagères réglables, matériau mélaminé — facile à réaliser.',
+    corps: 1, pieces: 8, cout: 145, etapes: 8, difficulte: 'Débutant',
+    shelves: [0.25, 0.48, 0.68, 0.84],
+  },
+  {
+    title: 'Équilibré',
+    desc: '2 corps en CP bouleau, penderie + étagères — le bon compromis.',
+    corps: 2, pieces: 14, cout: 218, etapes: 12, difficulte: 'Intermédiaire',
+    shelves: [0.30, 0.55, 0.75],
+    separator: true,
+  },
+  {
+    title: 'Capacité maximale',
+    desc: '3 corps, tiroirs + penderie + étagères — solution complète.',
+    corps: 3, pieces: 22, cout: 390, etapes: 18, difficulte: 'Avancé',
+    shelves: [0.28, 0.50, 0.70],
+    separator2: true,
+  },
+];
+
+function Counter({ value, onChange, T }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 0, border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden', background: T.surface }}>
+      <button onClick={() => onChange(Math.max(0, value - 1))} style={{
+        width: 30, height: 30, background: 'transparent', border: 'none', cursor: 'pointer',
+        fontSize: 16, color: value === 0 ? T.text3 : T.text, fontFamily: 'inherit',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>−</button>
+      <span style={{ width: 28, textAlign: 'center', fontSize: 13, fontWeight: 600, color: T.text, fontFamily: T.mono }}>{value}</span>
+      <button onClick={() => onChange(value + 1)} style={{
+        width: 30, height: 30, background: 'transparent', border: 'none', cursor: 'pointer',
+        fontSize: 16, color: T.text, fontFamily: 'inherit',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>+</button>
+    </div>
+  );
+}
+
+function MiniField({ label, value, unit, T }) {
+  return (
+    <div>
+      <label style={{ display: 'block', fontSize: 10, fontWeight: 600, color: T.text3, marginBottom: 5, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{label}</label>
+      <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden', background: T.surface }}>
+        <input type="number" defaultValue={value} style={{
+          flex: 1, border: 'none', padding: '9px 10px', fontSize: 15,
+          color: T.text, fontFamily: T.mono, background: 'transparent', outline: 'none', minWidth: 0,
+        }} />
+        <span style={{ padding: '0 10px', color: T.text3, fontSize: 11, borderLeft: `1px solid ${T.border}`, height: '100%', display: 'flex', alignItems: 'center' }}>{unit}</span>
+      </div>
+    </div>
+  );
+}
+
+function ChoiceChip({ label, sub, selected, onClick, T }) {
+  return (
+    <button onClick={onClick} style={{
+      padding: '9px 14px', border: `${selected ? 2 : 1}px solid ${selected ? T.accent : T.border}`,
+      borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+      background: selected ? T.accentLight : T.surface, transition: 'all .12s', flex: '1 1 0',
+    }}>
+      <div style={{ fontSize: 13, fontWeight: 600, color: selected ? T.accent : T.text }}>{label}</div>
+      {sub && <div style={{ fontSize: 10, color: T.text3, marginTop: 2 }}>{sub}</div>}
+    </button>
+  );
+}
+
+function MiniVariantSVG({ v, T }) {
+  const W = 80, H = 54, ml = 6, mr = 6, mt = 5, mb = 5;
+  const fw = W - ml - mr, fh = H - mt - mb;
+  const n = v.corps;
+  const sepX = n > 1 ? [ml + fw / n, n > 2 ? ml + fw * 2 / n : null].filter(Boolean) : [];
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H}>
+      <rect x={ml} y={mt} width={fw} height={fh} fill={T.accentLight} rx="1"/>
+      <rect x={ml} y={mt} width={fw} height={fh} stroke={T.accent} strokeWidth="1.5" fill="none" rx="1"/>
+      {sepX.map((sx, i) => (
+        <line key={i} x1={sx} y1={mt} x2={sx} y2={mt + fh} stroke={T.accentMuted} strokeWidth="1"/>
+      ))}
+      {v.shelves.map((r, i) => (
+        <line key={i} x1={ml + 2} y1={mt + r * fh} x2={ml + fw - 2} y2={mt + r * fh} stroke={T.accentMuted} strokeWidth="0.8"/>
+      ))}
+    </svg>
+  );
+}
+
+function BriefIAScreen({ onNavigate, T }) {
+  const [step, setStep] = useState(1);
+  const [counts, setCounts] = useState({});
+  const [style, setStyle] = useState(null);
+  const [budget, setBudget] = useState(null);
+  const [niveau, setNiveau] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showVariants, setShowVariants] = useState(false);
+  const [chosen, setChosen] = useState(null);
+
+  const totalItems = Object.values(counts).reduce((s, v) => s + v, 0);
+  const hasContent = totalItems > 0;
+
+  const handleGenerate = () => {
+    setLoading(true);
+    setStep(4);
+    setTimeout(() => {
+      setLoading(false);
+      setShowVariants(true);
+    }, 2200);
+  };
+
+  const STEP_LABELS = ['Contenu', 'Espace', 'Préférences', 'Résultats'];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg }}>
+      {/* Header */}
+      <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}`, padding: '14px 20px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div>
+            <div style={{ fontSize: 11, color: T.text3, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 3 }}>
+              Brief assisté
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>Que voulez-vous ranger ?</div>
+          </div>
+          <button onClick={() => onNavigate('home')} style={{ background: 'transparent', border: 'none', color: T.text3, fontSize: 20, cursor: 'pointer', padding: 4 }}>×</button>
+        </div>
+        {/* Step indicators */}
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {STEP_LABELS.map((l, i) => {
+            const n = i + 1;
+            const done = n < step;
+            const active = n === step;
+            return (
+              <React.Fragment key={n}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <div style={{
+                    width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                    background: done ? T.success : active ? T.accent : T.border,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 9, fontWeight: 700, color: (done || active) ? '#fff' : T.text3, fontFamily: T.mono,
+                  }}>{done ? '✓' : n}</div>
+                  <span style={{ fontSize: 10, fontWeight: active ? 600 : 400, color: active ? T.text : T.text3, whiteSpace: 'nowrap' }}>{l}</span>
+                </div>
+                {i < 3 && <div style={{ flex: 1, height: 1, background: done ? T.success : T.border, minWidth: 8 }} />}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Step content */}
+      <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
+
+        {/* STEP 1 — Contenu */}
+        {step === 1 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <p style={{ fontSize: 12, color: T.text2, lineHeight: 1.6 }}>
+              Indiquez ce que vous souhaitez ranger — l'app dimensionne automatiquement les zones.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {CONTENT_CATS.map(cat => {
+                const val = counts[cat.id] || 0;
+                return (
+                  <div key={cat.id} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '10px 14px', background: T.surface, border: `1px solid ${val > 0 ? T.accent : T.border}`,
+                    borderRadius: 10, gap: 10, transition: 'border-color .12s',
+                  }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: val > 0 ? 600 : 400, color: val > 0 ? T.text : T.text2 }}>{cat.label}</div>
+                      <div style={{ fontSize: 10, color: T.text3 }}>{cat.sub}</div>
+                    </div>
+                    <Counter value={val} onChange={v => setCounts(c => ({ ...c, [cat.id]: v }))} T={T} />
+                  </div>
+                );
+              })}
+            </div>
+
+            {hasContent && (
+              <div style={{ background: T.accentLight, borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.accent, fontWeight: 500 }}>
+                {totalItems} élément{totalItems > 1 ? 's' : ''} sélectionné{totalItems > 1 ? 's' : ''}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* STEP 2 — Espace */}
+        {step === 2 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <p style={{ fontSize: 12, color: T.text2, lineHeight: 1.6 }}>
+              Mesurez l'espace disponible. La largeur et la hauteur sont les dimensions clés.
+            </p>
+            {/* Diagram */}
+            <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: 16, display: 'flex', justifyContent: 'center' }}>
+              <svg viewBox="0 0 200 130" width="200" height="130">
+                {/* Floor */}
+                <line x1="20" y1="115" x2="180" y2="115" stroke={T.border} strokeWidth="2"/>
+                {/* Wall left */}
+                <line x1="20" y1="10" x2="20" y2="115" stroke={T.border} strokeWidth="2"/>
+                {/* Ceiling */}
+                <line x1="20" y1="10" x2="180" y2="10" stroke={T.border} strokeWidth="1.5" strokeDasharray="4 3"/>
+                {/* Width arrow */}
+                <line x1="20" y1="124" x2="180" y2="124" stroke={T.accent} strokeWidth="1.2"/>
+                <polygon points="17,124 23,121 23,127" fill={T.accent}/>
+                <polygon points="183,124 177,121 177,127" fill={T.accent}/>
+                <text x="100" y="132" textAnchor="middle" fontSize="9" fill={T.accent} fontFamily="DM Mono, monospace" fontWeight="600">Largeur</text>
+                {/* Height arrow */}
+                <line x1="10" y1="10" x2="10" y2="115" stroke={T.accentMuted} strokeWidth="1.2"/>
+                <polygon points="10,7 7,13 13,13" fill={T.accentMuted}/>
+                <polygon points="10,118 7,112 13,112" fill={T.accentMuted}/>
+                <text x="5" y="65" textAnchor="middle" fontSize="9" fill={T.accentMuted} fontFamily="DM Mono, monospace" transform="rotate(-90 5 65)" fontWeight="600">Hauteur</text>
+                {/* Depth cue */}
+                <rect x="60" y="30" width="100" height="70" fill={T.accentLight} stroke={T.accent} strokeWidth="1" rx="1"/>
+                <text x="110" y="70" textAnchor="middle" fontSize="8" fill={T.accent} fontFamily="DM Mono, monospace">meuble</text>
+                <line x1="160" y1="30" x2="175" y2="18" stroke={T.text3} strokeWidth="0.8" strokeDasharray="2 2"/>
+                <text x="177" y="17" textAnchor="start" fontSize="7" fill={T.text3} fontFamily="DM Mono, monospace">Prof.</text>
+              </svg>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <MiniField label="Largeur" value={2400} unit="mm" T={T} />
+              <MiniField label="Hauteur" value={2500} unit="mm" T={T} />
+              <MiniField label="Profondeur" value={600} unit="mm" T={T} />
+              <MiniField label="Plinthe" value={80} unit="mm" T={T} />
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 8 }}>Type de mur</div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {['Béton', 'Brique', 'Placo', 'Inconnu'].map((w, i) => (
+                  <button key={w} style={{
+                    padding: '7px 14px', fontSize: 12, fontWeight: i === 0 ? 600 : 400,
+                    border: `1px solid ${i === 0 ? T.accent : T.border}`, borderRadius: 8,
+                    background: i === 0 ? T.accentLight : T.surface, color: i === 0 ? T.accent : T.text2,
+                    cursor: 'pointer', fontFamily: 'inherit',
+                  }}>{w}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3 — Préférences */}
+        {step === 3 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <p style={{ fontSize: 12, color: T.text2, lineHeight: 1.6 }}>
+              Quelques préférences pour affiner les propositions.
+            </p>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 10 }}>Style</div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {[
+                  { id: 'minimal', label: 'Minimaliste', sub: 'Lignes épurées' },
+                  { id: 'classique', label: 'Classique', sub: 'Proportions équilibrées' },
+                  { id: 'artisan', label: 'Artisanal', sub: 'Bois naturel visible' },
+                ].map(s => (
+                  <ChoiceChip key={s.id} label={s.label} sub={s.sub} selected={style === s.id} onClick={() => setStyle(s.id)} T={T} />
+                ))}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 10 }}>Budget</div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {[
+                  { id: 'eco', label: 'Serré', sub: '< 200 €' },
+                  { id: 'std', label: 'Standard', sub: '200–400 €' },
+                  { id: 'prem', label: 'Premium', sub: '400 € +' },
+                ].map(b => (
+                  <ChoiceChip key={b.id} label={b.label} sub={b.sub} selected={budget === b.id} onClick={() => setBudget(b.id)} T={T} />
+                ))}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 10 }}>Niveau</div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {[
+                  { id: 'debut', label: 'Débutant', sub: 'Outils basiques' },
+                  { id: 'inter', label: 'Confirmé', sub: 'Scie circulaire' },
+                  { id: 'pro', label: 'Expert', sub: 'Atelier complet' },
+                ].map(n => (
+                  <ChoiceChip key={n.id} label={n.label} sub={n.sub} selected={niveau === n.id} onClick={() => setNiveau(n.id)} T={T} />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 4 — Résultats */}
+        {step === 4 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {loading ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, padding: '40px 0' }}>
+                {/* Animated loader */}
+                <div style={{ position: 'relative', width: 64, height: 64 }}>
+                  <svg viewBox="0 0 64 64" width="64" height="64">
+                    <circle cx="32" cy="32" r="26" stroke={T.border} strokeWidth="3" fill="none"/>
+                    <circle cx="32" cy="32" r="26" stroke={T.accent} strokeWidth="3" fill="none"
+                      strokeDasharray="40 124" strokeLinecap="round">
+                      <animateTransform attributeName="transform" type="rotate"
+                        from="0 32 32" to="360 32 32" dur="1s" repeatCount="indefinite"/>
+                    </circle>
+                  </svg>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: T.text, marginBottom: 6 }}>Calcul en cours…</div>
+                  <div style={{ fontSize: 12, color: T.text3 }}>Analyse du contenu, dimensionnement des zones,<br/>optimisation de la découpe</div>
+                </div>
+                {/* Progress steps */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
+                  {['Analyse du contenu à ranger', 'Dimensionnement des zones', 'Calcul des pièces', 'Optimisation découpe'].map((s, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, opacity: i < 2 ? 1 : 0.35 }}>
+                      <div style={{ width: 16, height: 16, borderRadius: '50%', background: i < 2 ? T.success : T.border, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {i < 2 && <span style={{ fontSize: 9, color: '#fff', fontWeight: 700 }}>✓</span>}
+                      </div>
+                      <span style={{ fontSize: 11, color: i < 2 ? T.text : T.text3 }}>{s}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : showVariants && (
+              <div>
+                <p style={{ fontSize: 12, color: T.text2, marginBottom: 14, lineHeight: 1.6 }}>
+                  3 propositions générées d'après votre contenu et vos préférences.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {VARIANTS_DATA.map((v, i) => (
+                    <div key={i} style={{
+                      background: chosen === i ? T.accentLight : T.surface,
+                      border: `${chosen === i ? 2 : 1}px solid ${chosen === i ? T.accent : T.border}`,
+                      borderRadius: 12, overflow: 'hidden', transition: 'all .15s',
+                    }}>
+                      <div style={{ padding: '14px 16px', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                        {/* Mini SVG */}
+                        <div style={{ flexShrink: 0, opacity: chosen === i ? 1 : 0.7 }}>
+                          <MiniVariantSVG v={v} T={T} />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: chosen === i ? T.accent : T.text, marginBottom: 4 }}>{v.title}</div>
+                          <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.5, marginBottom: 8 }}>{v.desc}</div>
+                          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: 10, color: T.text3, fontFamily: T.mono }}>{v.corps} corps · {v.pieces} pcs</span>
+                            <span style={{ fontSize: 10, fontWeight: 600, color: T.accent, fontFamily: T.mono }}>~{v.cout} €</span>
+                            <span style={{ fontSize: 10, color: T.text3 }}>{v.difficulte}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ borderTop: `1px solid ${T.border}`, padding: '10px 16px', display: 'flex', justifyContent: 'flex-end' }}>
+                        <button
+                          onClick={() => setChosen(i)}
+                          style={{
+                            padding: '7px 16px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                            fontFamily: 'inherit', border: 'none', transition: 'all .12s',
+                            background: chosen === i ? T.accent : T.surfaceAlt,
+                            color: chosen === i ? T.accentText : T.text2,
+                          }}
+                        >{chosen === i ? '✓ Sélectionnée' : 'Choisir'}</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div style={{ background: T.surface, borderTop: `1px solid ${T.border}`, padding: '12px 20px', display: 'flex', gap: 8, flexShrink: 0 }}>
+        {step > 1 && !loading && (
+          <Btn T={T} variant="ghost" small onClick={() => { setStep(s => s - 1); setShowVariants(false); }}>← Retour</Btn>
+        )}
+        <div style={{ flex: 1 }} />
+        {step === 1 && (
+          <Btn T={T} variant="primary" small onClick={() => setStep(2)}>
+            {hasContent ? `Continuer (${totalItems} élément${totalItems > 1 ? 's' : ''})` : 'Continuer sans contenu'}
+          </Btn>
+        )}
+        {step === 2 && (
+          <Btn T={T} variant="primary" small onClick={() => setStep(3)}>Continuer</Btn>
+        )}
+        {step === 3 && (
+          <Btn T={T} variant="primary" small onClick={handleGenerate}>
+            Générer les propositions
+          </Btn>
+        )}
+        {step === 4 && !loading && chosen !== null && (
+          <Btn T={T} variant="primary" small onClick={() => onNavigate('dashboard')}>
+            Continuer avec cette variante →
+          </Btn>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── PHONE SHELL ────────────────────────────────────────────────────────
+// ─── TAB BAR ──────────────────────────────────────────────────────────────
+const TAB_PARENT = {
+  'home':         'home',
+  'new-project':  'home',
+  'wizard-type':  'home',
+  'wizard-space': 'home',
+  'brief-ia':     'brief-ia',
+  'dashboard':    'dashboard',
+  'settings':     'settings',
+};
+
+const TAB_ITEMS = [
+  {
+    key: 'home', label: 'Projets',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <rect x="2" y="2" width="7.5" height="7.5" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
+        <rect x="12.5" y="2" width="7.5" height="7.5" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
+        <rect x="2" y="12.5" width="7.5" height="7.5" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
+        <rect x="12.5" y="12.5" width="7.5" height="7.5" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
+      </svg>
+    ),
+  },
+  {
+    key: 'brief-ia', label: 'Brief IA',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M15 3l4 4M5 19l9-9.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M14.5 3.5l1-1a1.5 1.5 0 012 2l-1 1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        <path d="M4 5l.8.8M4 7.5H3M5.5 3.5V2.5M6.8 6.8l.7-.7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
+    key: 'dashboard', label: 'Résultat',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M13.5 2H6a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-4.5-6z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+        <path d="M13.5 2v5.5H18" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+        <path d="M8 14l2 2 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    key: 'settings', label: 'Réglages',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <circle cx="11" cy="11" r="3" stroke="currentColor" strokeWidth="1.8"/>
+        <path d="M11 2.5v1.8M11 17.7v1.8M2.5 11h1.8M17.7 11h1.8M5.2 5.2l1.3 1.3M15.5 15.5l1.3 1.3M5.2 16.8l1.3-1.3M15.5 6.5l1.3-1.3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+];
+
+function TabBar({ activeScreen, onNavigate, T }) {
+  const activeTab = TAB_PARENT[activeScreen] ?? 'home';
+  return (
+    <div style={{
+      height: 76, background: T.surface,
+      borderTop: `1px solid ${T.border}`,
+      display: 'flex', alignItems: 'stretch',
+      flexShrink: 0,
+    }}>
+      <div style={{ display: 'flex', flex: 1, paddingBottom: 20 }}>
+        {TAB_ITEMS.map(tab => {
+          const active = activeTab === tab.key;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => onNavigate(tab.key)}
+              style={{
+                flex: 1, display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', gap: 4,
+                border: 'none', background: 'transparent', cursor: 'pointer',
+                color: active ? T.accent : T.text3,
+                fontFamily: 'DM Sans, sans-serif',
+                transition: 'color .1s ease',
+                minHeight: 44,
+                padding: 0,
+              }}
+            >
+              {tab.icon}
+              <span style={{ fontSize: 10, fontWeight: 500, lineHeight: 1 }}>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── SETTINGS SCREEN ──────────────────────────────────────────────────────
+function SettingsScreen({ T }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: T.bg, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+      <svg width="40" height="40" viewBox="0 0 22 22" fill="none" style={{ color: T.text3, opacity: .5 }}>
+        <circle cx="11" cy="11" r="3" stroke="currentColor" strokeWidth="1.8"/>
+        <path d="M11 2.5v1.8M11 17.7v1.8M2.5 11h1.8M17.7 11h1.8M5.2 5.2l1.3 1.3M15.5 15.5l1.3 1.3M5.2 16.8l1.3-1.3M15.5 6.5l1.3-1.3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+      </svg>
+      <p style={{ fontSize: 14, color: T.text3, fontWeight: 500 }}>Réglages — bientôt disponible</p>
+    </div>
+  );
+}
+
+// ─── PHONE SHELL ──────────────────────────────────────────────────────────
+function PhoneShell({ children, activeScreen, onNavigate, T }) {
+  return (
+    <div style={{
+      width: 390, height: 844,
+      background: T.surface,
+      borderRadius: 44,
+      overflow: 'hidden',
+      boxShadow: '0 0 0 10px #2a2520, 0 0 0 12px #1c1814, 0 40px 80px rgba(0,0,0,.6)',
+      display: 'flex', flexDirection: 'column',
+      position: 'relative',
+    }}>
+      {/* Status bar */}
+      <div style={{
+        height: 44, background: T.surface, display: 'flex', alignItems: 'flex-end',
+        justifyContent: 'space-between', padding: '0 28px 6px', flexShrink: 0,
+      }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: T.text, fontFamily: T.mono }}>9:41</span>
+        <div style={{ width: 80, height: 28, background: '#1c1814', borderRadius: '0 0 18px 18px', position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: 0 }} />
+        <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+          <svg width="16" height="12" viewBox="0 0 16 12"><path fill={T.text} d="M0 4h2v8H0zm3-2h2v10H3zm3-2h2v12H6zm3 4h2v6H9zm3-3h2v9h-2z" opacity=".6"/></svg>
+          <svg width="15" height="12" viewBox="0 0 15 12"><path fill={T.text} d="M7.5 2C4.5 2 1.9 3.4 0 5.5l1.5 1.5C2.9 5.3 5.1 4 7.5 4s4.6 1.3 6 3l1.5-1.5C13.1 3.4 10.5 2 7.5 2z" opacity=".6"/></svg>
+          <div style={{ width: 22, height: 11, border: `1.5px solid ${T.text}`, borderRadius: 3, display: 'flex', alignItems: 'center', padding: '1.5px', opacity: .6 }}>
+            <div style={{ width: '75%', height: '100%', background: T.text, borderRadius: 1 }} />
+          </div>
+        </div>
+      </div>
+      {/* Content */}
+      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        {children}
+      </div>
+      <TabBar activeScreen={activeScreen} onNavigate={onNavigate} T={T} />
+    </div>
+  );
+}
+
+// ─── NAV PILLS ────────────────────────────────────────────────────────
+function NavPills({ screen, onNavigate, compare, onToggleCompare, T }) {
+  const screens = [
+    { key: 'home',         label: 'Espace travail' },
+    { key: 'new-project',  label: '+ Nouveau projet' },
+    { key: 'brief-ia',     label: 'Brief IA' },
+    { key: 'dashboard',    label: 'Résultat' },
+  ];
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', marginTop: 24 }}>
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+        {screens.map(s => (
+          <button key={s.key} onClick={() => onNavigate(s.key)} style={{
+            padding: '6px 14px', borderRadius: 20,
+            background: screen === s.key ? 'rgba(255,255,255,.25)' : 'rgba(255,255,255,.08)',
+            color: screen === s.key ? '#fff' : 'rgba(255,255,255,.5)',
+            border: `1px solid ${screen === s.key ? 'rgba(255,255,255,.35)' : 'transparent'}`,
+            fontSize: 11, fontWeight: 500, cursor: 'pointer',
+            fontFamily: 'DM Sans, sans-serif', transition: 'all .15s',
+          }}>{s.label}</button>
+        ))}
+      </div>
+      <button onClick={onToggleCompare} style={{
+        padding: '6px 16px', borderRadius: 20,
+        background: compare ? 'rgba(255,255,255,.9)' : 'rgba(255,255,255,.08)',
+        color: compare ? '#1c1814' : 'rgba(255,255,255,.5)',
+        border: 'none', fontSize: 11, fontWeight: 600, cursor: 'pointer',
+        fontFamily: 'DM Sans, sans-serif', transition: 'all .15s',
+        letterSpacing: '0.02em',
+      }}>
+        {compare ? '✕ Quitter la comparaison' : '◫  Comparer les 3 couleurs'}
+      </button>
+    </div>
+  );
+}
+
+// ─── COMPARE VIEW ────────────────────────────────────────────────────────
+function CompareView({ screen }) {
+  const accentKeys = Object.keys(ACCENTS);
+  const screenMap = (T) => ({
+    home:           <HomeScreen onNavigate={() => {}} T={T} />,
+    'new-project':  <NewProjectScreen onNavigate={() => {}} T={T} />,
+    'wizard-type':  <WizardTypeScreen onNavigate={() => {}} T={T} />,
+    'brief-ia':     <BriefIAScreen onNavigate={() => {}} T={T} />,
+    'wizard-space': <WizardSpaceScreen onNavigate={() => {}} T={T} />,
+    dashboard:      <DashboardScreen onNavigate={() => {}} T={T} />,
+    settings:       <SettingsScreen T={T} />,
+  });
+
+  return (
+    <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start', justifyContent: 'center', flexWrap: 'wrap' }}>
+      {accentKeys.map(key => {
+        const T = getTokens(key);
+        return (
+          <div key={key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,.7)',
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <span style={{ width: 10, height: 10, borderRadius: '50%', background: T.accent, display: 'inline-block' }} />
+              {ACCENTS[key].label}
+            </div>
+            <div style={{
+              width: 300, height: 648,
+              background: T.surface,
+              borderRadius: 34,
+              overflow: 'hidden',
+              boxShadow: '0 0 0 8px #2a2520, 0 0 0 9px #1c1814, 0 24px 60px rgba(0,0,0,.5)',
+              display: 'flex', flexDirection: 'column',
+            }}>
+              {/* Mini status bar */}
+              <div style={{ height: 34, background: T.surface, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', padding: '0 22px 5px', flexShrink: 0 }}>
+                <span style={{ fontSize: 10, fontWeight: 600, color: T.text, fontFamily: T.mono }}>9:41</span>
+                <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                  <svg width="12" height="9" viewBox="0 0 16 12"><path fill={T.text} d="M0 4h2v8H0zm3-2h2v10H3zm3-2h2v12H6zm3 4h2v6H9zm3-3h2v9h-2z" opacity=".5"/></svg>
+                  <div style={{ width: 17, height: 8, border: `1.5px solid ${T.text}`, borderRadius: 2, opacity: .5, display: 'flex', alignItems: 'center', padding: 1 }}>
+                    <div style={{ width: '75%', height: '100%', background: T.text, borderRadius: 1 }} />
+                  </div>
+                </div>
+              </div>
+              {/* Scaled screen content */}
+              <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', transform: 'scale(0.769)', transformOrigin: 'top left', width: '130%', height: '130%' }}>
+                {screenMap(T)[screen] || screenMap(T).home}
+              </div>
+              {/* Tab bar (scaled version) */}
+              <TabBar activeScreen={screen} onNavigate={() => {}} T={T} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── APP ROOT ────────────────────────────────────────────────────────
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const T = getTokens((tweaks || TWEAK_DEFAULTS).accent);
+  const [screen, setScreen] = useState('dashboard');
+  const [compare, setCompare] = useState(false);
+
+  const screenMap = {
+    home:           <HomeScreen onNavigate={setScreen} T={T} />,
+    'new-project':  <NewProjectScreen onNavigate={setScreen} T={T} />,
+    'wizard-type':  <WizardTypeScreen onNavigate={setScreen} T={T} />,
+    'wizard-space': <WizardSpaceScreen onNavigate={setScreen} T={T} />,
+    dashboard:      <DashboardScreen onNavigate={setScreen} T={T} />,
+    'brief-ia':     <BriefIAScreen onNavigate={setScreen} T={T} />,
+    settings:       <SettingsScreen T={T} />,
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 24px 40px', minWidth: compare ? 1100 : 'auto' }}>
+      <div style={{ marginBottom: 20, fontSize: 11, color: 'rgba(255,255,255,.3)', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'DM Sans, sans-serif' }}>
+        Menuisier — Redesign Direction
+      </div>
+
+      {compare ? (
+        <CompareView screen={screen} />
+      ) : (
+        <PhoneShell T={T} activeScreen={screen} onNavigate={setScreen}>
+          {screenMap[screen] || screenMap.home}
+        </PhoneShell>
+      )}
+
+      <NavPills
+        screen={screen}
+        onNavigate={setScreen}
+        compare={compare}
+        onToggleCompare={() => setCompare(c => !c)}
+        T={T}
+      />
+
+      <TweaksPanel>
+        <TweakSection label="Couleur d'accent" />
+        <TweakRadio
+          label="Accent"
+          value={tweaks.accent}
+          options={Object.keys(ACCENTS)}
+          onChange={(v) => setTweak('accent', v)}
+        />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
