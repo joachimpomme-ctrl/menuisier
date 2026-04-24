@@ -139,10 +139,10 @@ input[type="number"] {
 
 /* Tab content transitions */
 .tab-content-enter {
-  animation: fadeIn 120ms ease forwards;
+  animation: tabFadeIn 120ms ease forwards;
 }
 
-@keyframes fadeIn {
+@keyframes tabFadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
