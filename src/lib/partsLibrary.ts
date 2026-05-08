@@ -206,6 +206,38 @@ export function exportLibrary(): string {
   return JSON.stringify(loadLibrary(), null, 2);
 }
 
+/**
+ * Export the full library as CSV (UTF-8 with BOM, semicolon-separated for Excel FR).
+ * Colonnes : id, nom, catégorie, L×l×ép (mm), matériau, marchand, ref, URL, prix, devise, lot, dernière MAJ.
+ */
+export function exportLibraryCsv(): string {
+  const lib = loadLibrary();
+  const headers = [
+    'id', 'nom', 'categorie',
+    'longueur_mm', 'largeur_mm', 'epaisseur_mm',
+    'materiau', 'marchand', 'reference', 'url',
+    'prix', 'devise', 'qte_lot',
+    'image_url', 'derniere_maj', 'notes',
+  ];
+  const escape = (v: unknown): string => {
+    if (v === undefined || v === null) return '';
+    const s = String(v);
+    if (s.includes(';') || s.includes('"') || s.includes('\n') || s.includes('\r')) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  };
+  const rows = lib.parts.map((p) => [
+    p.id, p.name, p.category,
+    p.length_mm ?? '', p.width_mm ?? '', p.thickness_mm ?? '',
+    p.material_key ?? '', p.merchant ?? '', p.merchant_ref ?? '', p.url ?? '',
+    p.price_eur ?? '', p.currency ?? '', p.pack_qty ?? '',
+    p.image_url ?? '', p.last_checked_at ?? '', p.notes ?? '',
+  ].map(escape).join(';'));
+  // BOM for Excel UTF-8 detection
+  return '﻿' + headers.join(';') + '\n' + rows.join('\n') + '\n';
+}
+
 /** Import a library from JSON string. Merges with existing (deduplicates by ID). */
 export function importLibrary(json: string): number {
   const imported = JSON.parse(json) as UserPartsLibrary;

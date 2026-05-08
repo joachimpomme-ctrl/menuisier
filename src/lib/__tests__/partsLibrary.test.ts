@@ -7,6 +7,7 @@ import {
   updatePart,
   deletePart,
   exportLibrary,
+  exportLibraryCsv,
   importLibrary,
   resetLibrary,
 } from '../partsLibrary';
@@ -69,6 +70,54 @@ describe('partsLibrary', () => {
     expect(deleted).toBe(true);
     expect(getAllParts()).toHaveLength(initial);
     expect(getPart(created.id)).toBeNull();
+  });
+
+  it('persists merchant info (URL, ref, prix) and hardware categories', () => {
+    resetLibrary();
+    const created = addPart({
+      name: 'Charnière invisible 35mm',
+      category: 'hinge',
+      merchant: 'Leroy Merlin',
+      merchant_ref: 'REF-12345',
+      url: 'https://www.leroymerlin.fr/produits/charniere-12345.html',
+      price_eur: 4.95,
+      currency: 'EUR',
+      pack_qty: 2,
+      image_url: 'https://media.leroymerlin.fr/12345.jpg',
+      last_checked_at: '2026-05-08T12:00:00.000Z',
+      notes: 'Ouverture 110°',
+    });
+    const found = getPart(created.id)!;
+    expect(found.category).toBe('hinge');
+    expect(found.merchant).toBe('Leroy Merlin');
+    expect(found.merchant_ref).toBe('REF-12345');
+    expect(found.price_eur).toBe(4.95);
+    expect(found.pack_qty).toBe(2);
+    // Hardware peut ne pas avoir de dimensions
+    expect(found.length_mm).toBeUndefined();
+  });
+
+  it('exportLibraryCsv: en-têtes + ligne échappée pour points-virgules', () => {
+    resetLibrary();
+    addPart({
+      name: 'Tablette test; avec virgule',
+      category: 'shelf',
+      length_mm: 800,
+      width_mm: 300,
+      thickness_mm: 18,
+      merchant: 'Castorama',
+      url: 'https://example.com/p',
+      price_eur: 12.5,
+      currency: 'EUR',
+    });
+    const csv = exportLibraryCsv();
+    // BOM en tête
+    expect(csv.charCodeAt(0)).toBe(0xFEFF);
+    expect(csv).toContain('id;nom;categorie');
+    // Le nom contenant ';' doit être quoté
+    expect(csv).toContain('"Tablette test; avec virgule"');
+    // Le prix s'affiche
+    expect(csv).toContain(';12.5;EUR;');
   });
 
   it('export/import round-trip', () => {

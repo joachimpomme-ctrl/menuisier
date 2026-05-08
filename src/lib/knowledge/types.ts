@@ -355,6 +355,7 @@ export interface ProjectStateV3 extends AppState {
 // ---------------------------------------------------------------------------
 
 export type StandardPartCategory =
+  // Panneaux découpables (dimensions L×l×ép obligatoires)
   | 'shelf'
   | 'side_panel'
   | 'door'
@@ -362,7 +363,24 @@ export type StandardPartCategory =
   | 'back_panel'
   | 'top_bottom'
   | 'divider'
-  | 'custom';
+  | 'custom'
+  // Quincaillerie (dimensions optionnelles, pas découpées)
+  | 'hinge'
+  | 'slide'
+  | 'screw'
+  | 'dowel'
+  | 'handle'
+  | 'bracket'
+  | 'edge_band'
+  | 'foot';
+
+/** True si la catégorie est un panneau découpable (dimensions L×l×ép pertinentes). */
+export function isPanelCategory(c: StandardPartCategory): boolean {
+  return (
+    c === 'shelf' || c === 'side_panel' || c === 'door' || c === 'drawer_front' ||
+    c === 'back_panel' || c === 'top_bottom' || c === 'divider' || c === 'custom'
+  );
+}
 
 export interface PreDrilling {
   type: DrillingOp['type'];
@@ -372,17 +390,40 @@ export interface PreDrilling {
 
 export type PartSource = 'generated' | 'user' | 'template';
 
-export interface StandardPart {
+/** Données marchand optionnelles attachables à n'importe quelle StandardPart. */
+export interface MerchantInfo {
+  /** Nom du marchand (ex: "Leroy Merlin", "Castorama", "Manomano"). */
+  merchant?: string;
+  /** Référence article chez le marchand (SKU/EAN). */
+  merchant_ref?: string;
+  /** URL de la fiche produit. */
+  url?: string;
+  /** Prix unitaire de vente (devise : currency, par défaut EUR). */
+  price_eur?: number;
+  /** Devise ISO 4217 (par défaut "EUR"). */
+  currency?: string;
+  /** Quantité par lot (ex: boîte de 100 vis = 100). 1 par défaut. */
+  pack_qty?: number;
+  /** URL de l'image principale du produit (référence distante, pas téléchargée). */
+  image_url?: string;
+  /** ISO datetime du dernier rafraîchissement des données marchand. */
+  last_checked_at?: string;
+}
+
+export interface StandardPart extends MerchantInfo {
   id: string;
   name: string;
   category: StandardPartCategory;
-  length_mm: number;
-  width_mm: number;
-  thickness_mm: number;
+  /** Longueur en mm. Obligatoire pour les panneaux, optionnel pour quincaillerie. */
+  length_mm?: number;
+  width_mm?: number;
+  thickness_mm?: number;
   material_key?: MaterialKey;
   edge_banding?: EdgeBandingSide[];
   pre_drilling?: PreDrilling[];
   source: PartSource;
+  /** Notes libres (descriptif technique, observations utilisateur). */
+  notes?: string;
 }
 
 export interface UserPartsLibrary {

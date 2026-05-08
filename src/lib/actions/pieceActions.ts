@@ -1,5 +1,6 @@
 import type { AppState, PanelDef, Piece, PieceType } from '../../types';
 import type { StandardPart } from '../knowledge/types';
+import { isPanelCategory } from '../knowledge/types';
 import { getBodyInnerWidth } from '../helpers';
 import { createPiece, detectPieceType, generateStandardPieces, applySharedBoundary } from '../domain';
 import { uid } from '../helpers';
@@ -13,6 +14,15 @@ const STANDARD_PART_TYPE_MAP: Record<StandardPart['category'], PieceType> = {
   top_bottom: 'tablette-fixe',
   divider: 'separateur',
   custom: 'autre',
+  // Hardware (catégories non découpables) — non insérables comme Piece, mappées par défaut à 'autre'
+  hinge: 'autre',
+  slide: 'autre',
+  screw: 'autre',
+  dowel: 'autre',
+  handle: 'autre',
+  bracket: 'autre',
+  edge_band: 'autre',
+  foot: 'autre',
 };
 
 export function updatePiece(
@@ -140,6 +150,16 @@ export function addPieceFromLibrary(
 ): AppState {
   const body = state.bodies.find((b) => b.id === bodyId);
   if (!body) return state;
+
+  // La quincaillerie n'est pas insérable comme Piece (pas de dimensions découpables).
+  if (!isPanelCategory(standardPart.category)) return state;
+  if (
+    standardPart.length_mm === undefined ||
+    standardPart.width_mm === undefined ||
+    standardPart.thickness_mm === undefined
+  ) {
+    return state;
+  }
 
   const piece: Piece = {
     id: uid(),
