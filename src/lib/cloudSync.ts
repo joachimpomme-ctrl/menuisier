@@ -195,3 +195,51 @@ export async function pullFromCloud(id: string): Promise<{ id: string; state: Ap
   const state = await cloudLoad(id);
   return { id, state };
 }
+
+// ---------------------------------------------------------------------------
+// Cloud sync — bibliothèque de pièces (StandardPart catalog)
+// ---------------------------------------------------------------------------
+
+export interface CloudLibrary {
+  json: string | null;
+  updatedAt: string | null;
+}
+
+/** Charge la bibliothèque de pièces depuis le cloud (Apps Script `loadLibrary`). */
+export async function cloudLoadLibrary(): Promise<CloudLibrary> {
+  const url = getCloudUrl();
+  if (!url) throw new Error('Cloud non configuré');
+
+  const res = await cloudFetch(`${url}?action=loadLibrary`, { redirect: 'follow' });
+  if (!res.ok) throw new Error(`Erreur cloud: ${res.status}`);
+
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+
+  return {
+    json: data.json ?? null,
+    updatedAt: data.updatedAt ?? null,
+  };
+}
+
+/** Sauvegarde la bibliothèque de pièces dans le cloud (Apps Script `saveLibrary`). */
+export async function cloudSaveLibrary(libraryJson: string): Promise<{ updatedAt: string }> {
+  const url = getCloudUrl();
+  if (!url) throw new Error('Cloud non configuré');
+
+  const res = await cloudFetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      action: 'saveLibrary',
+      json: libraryJson,
+    }),
+    redirect: 'follow',
+  });
+
+  if (!res.ok) throw new Error(`Erreur cloud: ${res.status}`);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+
+  return { updatedAt: String(data.updatedAt ?? new Date().toISOString()) };
+}

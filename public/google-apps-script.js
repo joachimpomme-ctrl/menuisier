@@ -13,6 +13,7 @@
 // =============================================================================
 
 const SHEET_NAME = 'Projets';
+const LIBRARY_SHEET_NAME = 'Catalogue';
 
 function getOrCreateSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -25,6 +26,25 @@ function getOrCreateSheet() {
   return sheet;
 }
 
+function getOrCreateLibrarySheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(LIBRARY_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(LIBRARY_SHEET_NAME);
+    sheet.appendRow(['key', 'updatedAt', 'json']);
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function findLibraryRow(sheet) {
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === 'library') return i + 1;
+  }
+  return -1;
+}
+
 function findRow(sheet, id) {
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
@@ -33,10 +53,22 @@ function findRow(sheet, id) {
   return -1;
 }
 
-// --- GET : list all projects or load one ---
+// --- GET : list all projects, load one, or load the parts library ---
 function doGet(e) {
-  const sheet = getOrCreateSheet();
   const action = (e && e.parameter && e.parameter.action) || 'list';
+
+  if (action === 'loadLibrary') {
+    const sheet = getOrCreateLibrarySheet();
+    const row = findLibraryRow(sheet);
+    if (row === -1) return json({ json: null, updatedAt: null });
+    const values = sheet.getRange(row, 1, 1, 3).getValues()[0];
+    return json({
+      json: values[2] || null,
+      updatedAt: values[1] || null,
+    });
+  }
+
+  const sheet = getOrCreateSheet();
 
   if (action === 'load') {
     const id = e.parameter.id;
@@ -67,9 +99,8 @@ function doGet(e) {
   return json({ projects: projects });
 }
 
-// --- POST : save or delete a project ---
+// --- POST : save / delete a project, or save the parts library ---
 function doPost(e) {
-  const sheet = getOrCreateSheet();
   let body;
   try {
     body = JSON.parse(e.postData.contents);
@@ -78,6 +109,21 @@ function doPost(e) {
   }
 
   const action = body.action || 'save';
+
+  if (action === 'saveLibrary') {
+    const librarySheet = getOrCreateLibrarySheet();
+    const now = new Date().toISOString();
+    const jsonStr = body.json || '{}';
+    const row = findLibraryRow(librarySheet);
+    if (row > 0) {
+      librarySheet.getRange(row, 1, 1, 3).setValues([['library', now, jsonStr]]);
+    } else {
+      librarySheet.appendRow(['library', now, jsonStr]);
+    }
+    return json({ ok: true, updatedAt: now });
+  }
+
+  const sheet = getOrCreateSheet();
 
   if (action === 'delete') {
     const id = body.id;

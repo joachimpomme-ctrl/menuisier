@@ -1,7 +1,9 @@
-import { useState, useRef, useMemo } from 'react';
-import type { StandardPart, StandardPartCategory } from '../../lib/knowledge/types';
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
+import type { StandardPart, StandardPartCategory, UserPartsLibrary } from '../../lib/knowledge/types';
 import {
   getAllParts,
+  getLibrary,
+  replaceLibrary,
   addPart,
   updatePart,
   deletePart,
@@ -11,7 +13,26 @@ import {
   resetLibrary,
 } from '../../lib/partsLibrary';
 import { scrapeProductFromUrl } from '../../lib/scrapeProduct';
+import { isCloudConfigured, cloudLoadLibrary, cloudSaveLibrary } from '../../lib/cloudSync';
 import PartForm from './PartForm';
+
+type SyncState =
+  | { kind: 'idle' }
+  | { kind: 'pulling' }
+  | { kind: 'pushing' }
+  | { kind: 'synced'; at: string }
+  | { kind: 'error'; msg: string }
+  | { kind: 'offline' };
+
+function formatRelativeTime(iso: string): string {
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return '—';
+  const diff = Date.now() - t;
+  if (diff < 60_000) return 'à l’instant';
+  if (diff < 3_600_000) return `il y a ${Math.floor(diff / 60_000)} min`;
+  if (diff < 86_400_000) return `il y a ${Math.floor(diff / 3_600_000)} h`;
+  return new Date(iso).toLocaleDateString('fr-FR');
+}
 
 interface Props {
   isOpen: boolean;
@@ -74,9 +95,95 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
   const [filterMerchant, setFilterMerchant] = useState<string>('');
   const [filterCategory, setFilterCategory] = useState<string>('');
   const [searchText, setSearchText] = useState<string>('');
+  const [syncState, setSyncState] = useState<SyncState>({ kind: 'idle' });
   const importRef = useRef<HTMLInputElement>(null);
+  const pushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastPushedJsonRef = useRef<string | null>(null);
+
+  const cloudOn = isCloudConfigured();
 
   const refresh = () => setParts(getAllParts());
+
+  // -------- Cloud sync : pull on open, debounced push on change --------
+
+  const pushLibrary = useCallback(async () => {
+    if (!isCloudConfigured()) return;
+    const lib = getLibrary();
+    const json = JSON.stringify(lib);
+    if (json === lastPushedJsonRef.current) return; // pas de delta
+    setSyncState({ kind: 'pushing' });
+    try {
+      const res = await cloudSaveLibrary(json);
+      lastPushedJsonRef.current = json;
+      setSyncState({ kind: 'synced', at: res.updatedAt });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'sync KO';
+      setSyncState({ kind: 'error', msg });
+    }
+  }, []);
+
+  const queuePush = useCallback(() => {
+    if (!isCloudConfigured()) return;
+    if (pushTimerRef.current) clearTimeout(pushTimerRef.current);
+    pushTimerRef.current = setTimeout(() => {
+      pushTimerRef.current = null;
+      void pushLibrary();
+    }, 800);
+  }, [pushLibrary]);
+
+  // Pull au montage
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!isCloudConfigured()) {
+      setSyncState({ kind: 'offline' });
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setSyncState({ kind: 'pulling' });
+      try {
+        const cloud = await cloudLoadLibrary();
+        if (cancelled) return;
+        const local = getLibrary();
+        if (cloud.json) {
+          const cloudLib = JSON.parse(cloud.json) as UserPartsLibrary;
+          const cloudUpdated = new Date(cloudLib.updated_at ?? 0).getTime();
+          const localUpdated = new Date(local.updated_at ?? 0).getTime();
+          if (cloudUpdated > localUpdated) {
+            replaceLibrary(cloudLib);
+            lastPushedJsonRef.current = JSON.stringify(cloudLib);
+            setParts(cloudLib.parts);
+          } else {
+            lastPushedJsonRef.current = JSON.stringify(local);
+          }
+        } else {
+          // Premier sync : push le local
+          lastPushedJsonRef.current = null;
+          await pushLibrary();
+          return;
+        }
+        const at = cloud.updatedAt ?? new Date().toISOString();
+        setSyncState({ kind: 'synced', at });
+      } catch (err) {
+        if (cancelled) return;
+        const msg = err instanceof Error ? err.message : 'pull KO';
+        setSyncState({ kind: 'error', msg });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, pushLibrary]);
+
+  // Cleanup debounce timer
+  useEffect(() => {
+    return () => {
+      if (pushTimerRef.current) {
+        clearTimeout(pushTimerRef.current);
+        pushTimerRef.current = null;
+      }
+    };
+  }, []);
 
   // Listes uniques pour les filtres
   const merchants = useMemo(() => {
@@ -105,6 +212,7 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
     setAdding(false);
     setPrefill(null);
     refresh();
+    queuePush();
   };
 
   const handleUpdate = (data: Omit<StandardPart, 'id' | 'source'>) => {
@@ -112,6 +220,7 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
       updatePart(editing.id, data);
       setEditing(null);
       refresh();
+      queuePush();
     }
   };
 
@@ -119,6 +228,7 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
     if (!confirm('Supprimer cette pièce de la bibliothèque ?')) return;
     deletePart(id);
     refresh();
+    queuePush();
   };
 
   const handleExportJson = () => {
@@ -137,6 +247,7 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
       const count = importLibrary(text);
       setImportMsg(`${count} pièce${count > 1 ? 's' : ''} importée${count > 1 ? 's' : ''}`);
       refresh();
+      queuePush();
     } catch {
       setImportMsg('Erreur d\'import');
     }
@@ -148,6 +259,7 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
     if (!confirm('Réinitialiser la bibliothèque ? Toutes tes pièces personnalisées seront perdues.')) return;
     resetLibrary();
     refresh();
+    queuePush();
   };
 
   const handleScrape = async () => {
@@ -205,7 +317,16 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
     refresh();
     setRefreshMsg(`${ok} OK, ${errs} erreur${errs > 1 ? 's' : ''}.`);
     setRefreshBusy(false);
+    queuePush();
     setTimeout(() => setRefreshMsg(null), 5000);
+  };
+
+  const handleManualSync = async () => {
+    if (pushTimerRef.current) {
+      clearTimeout(pushTimerRef.current);
+      pushTimerRef.current = null;
+    }
+    await pushLibrary();
   };
 
   if (!isOpen) return null;
@@ -225,9 +346,34 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#EFE8DD]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#EFE8DD] gap-3">
           <h3 className="text-base font-semibold text-[#0E0D0C]">Ma bibliothèque de pièces</h3>
-          <button onClick={onClose} className="text-[#9A968F] hover:text-[#0E0D0C] text-2xl leading-none px-2">×</button>
+          <div className="flex items-center gap-2 ml-auto">
+            {cloudOn && (
+              <button
+                onClick={handleManualSync}
+                disabled={syncState.kind === 'pushing' || syncState.kind === 'pulling'}
+                className="text-[11px] px-2 py-1 rounded-md border border-[#EFE8DD] hover:bg-[#FFFCF7] disabled:opacity-50 flex items-center gap-1.5"
+                title="Forcer la synchronisation cloud"
+              >
+                {syncState.kind === 'pulling' && <span className="text-[#3B5FFF]">⟳ Récupération…</span>}
+                {syncState.kind === 'pushing' && <span className="text-[#3B5FFF]">⟳ Envoi…</span>}
+                {syncState.kind === 'synced' && (
+                  <span className="text-[#0E5A3D]">☁ Synchro {formatRelativeTime(syncState.at)}</span>
+                )}
+                {syncState.kind === 'error' && (
+                  <span className="text-[#A52E16]" title={syncState.msg}>⚠ Erreur sync</span>
+                )}
+                {syncState.kind === 'idle' && <span className="text-[#9A968F]">☁ Cloud</span>}
+              </button>
+            )}
+            {!cloudOn && (
+              <span className="text-[11px] text-[#9A968F]" title="Active la sync cloud dans le menu ⋯">
+                ☁ local seulement
+              </span>
+            )}
+            <button onClick={onClose} className="text-[#9A968F] hover:text-[#0E0D0C] text-2xl leading-none px-2">×</button>
+          </div>
         </div>
 
         {/* Scrape URL */}

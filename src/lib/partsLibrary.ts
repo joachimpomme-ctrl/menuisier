@@ -268,5 +268,22 @@ export function resetLibrary(): void {
   saveLibrary(lib);
 }
 
+/** Get the raw library (parts + metadata). Used by cloud sync. */
+export function getLibrary(): UserPartsLibrary {
+  return loadLibrary();
+}
+
+/**
+ * Replace the whole library (used after a cloud pull). Preserves nothing local —
+ * caller is responsible for merging strategy upstream.
+ */
+export function replaceLibrary(lib: UserPartsLibrary): void {
+  if (!lib || !Array.isArray(lib.parts)) {
+    throw new Error('Bibliothèque invalide');
+  }
+  // updated_at est conservé tel quel pour permettre le « last-write-wins »
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(lib));
+}
+
 // Re-export types for convenience
 export type { StandardPart, StandardPartCategory, EdgeBandingSide, MaterialKey };
