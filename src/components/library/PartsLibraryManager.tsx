@@ -1,14 +1,16 @@
-import { useState, useRef } from 'react';
-import type { StandardPart } from '../../lib/knowledge/types';
+import { useState, useRef, useMemo } from 'react';
+import type { StandardPart, StandardPartCategory } from '../../lib/knowledge/types';
 import {
   getAllParts,
   addPart,
   updatePart,
   deletePart,
   exportLibrary,
+  exportLibraryCsv,
   importLibrary,
   resetLibrary,
 } from '../../lib/partsLibrary';
+import { scrapeProductFromUrl } from '../../lib/scrapeProduct';
 import PartForm from './PartForm';
 
 interface Props {
@@ -16,7 +18,7 @@ interface Props {
   onClose: () => void;
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
+const CATEGORY_LABELS: Record<StandardPartCategory, string> = {
   shelf: 'Tablette',
   side_panel: 'Joue',
   door: 'Porte',
@@ -25,20 +27,83 @@ const CATEGORY_LABELS: Record<string, string> = {
   top_bottom: 'Dessus/dessous',
   divider: 'Séparateur',
   custom: 'Autre',
+  hinge: 'Charnière',
+  slide: 'Glissière',
+  screw: 'Vis',
+  dowel: 'Tourillon',
+  handle: 'Poignée',
+  bracket: 'Équerre',
+  edge_band: 'Chant',
+  foot: 'Pied',
 };
+
+function downloadFile(content: string, filename: string, mime: string) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function formatPrice(p: StandardPart): string {
+  if (p.price_eur === undefined) return '—';
+  const currency = p.currency ?? 'EUR';
+  const symbol = currency === 'EUR' ? '€' : currency;
+  return `${p.price_eur.toFixed(2)} ${symbol}`;
+}
+
+function formatDims(p: StandardPart): string {
+  const dims = [p.length_mm, p.width_mm, p.thickness_mm].filter((d) => d !== undefined);
+  if (dims.length === 0) return '—';
+  return dims.map((d) => d).join('×');
+}
 
 export default function PartsLibraryManager({ isOpen, onClose }: Props) {
   const [parts, setParts] = useState<StandardPart[]>(() => getAllParts());
   const [editing, setEditing] = useState<StandardPart | null>(null);
   const [adding, setAdding] = useState(false);
+  const [prefill, setPrefill] = useState<Partial<StandardPart> | null>(null);
   const [importMsg, setImportMsg] = useState('');
+  const [scrapeUrl, setScrapeUrl] = useState('');
+  const [scrapeBusy, setScrapeBusy] = useState(false);
+  const [scrapeError, setScrapeError] = useState<string | null>(null);
+  const [refreshBusy, setRefreshBusy] = useState(false);
+  const [refreshMsg, setRefreshMsg] = useState<string | null>(null);
+  const [filterMerchant, setFilterMerchant] = useState<string>('');
+  const [filterCategory, setFilterCategory] = useState<string>('');
+  const [searchText, setSearchText] = useState<string>('');
   const importRef = useRef<HTMLInputElement>(null);
 
   const refresh = () => setParts(getAllParts());
 
+  // Listes uniques pour les filtres
+  const merchants = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of parts) {
+      if (p.merchant) set.add(p.merchant);
+    }
+    return Array.from(set).sort();
+  }, [parts]);
+
+  const visibleParts = useMemo(() => {
+    return parts.filter((p) => {
+      if (filterMerchant && p.merchant !== filterMerchant) return false;
+      if (filterCategory && p.category !== filterCategory) return false;
+      if (searchText) {
+        const q = searchText.toLowerCase();
+        const haystack = `${p.name} ${p.merchant ?? ''} ${p.merchant_ref ?? ''} ${p.notes ?? ''}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [parts, filterMerchant, filterCategory, searchText]);
+
   const handleAdd = (data: Omit<StandardPart, 'id' | 'source'>) => {
     addPart(data);
     setAdding(false);
+    setPrefill(null);
     refresh();
   };
 
@@ -51,18 +116,17 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
   };
 
   const handleDelete = (id: string) => {
+    if (!confirm('Supprimer cette pièce de la bibliothèque ?')) return;
     deletePart(id);
     refresh();
   };
 
-  const handleExport = () => {
-    const blob = new Blob([exportLibrary()], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'pieces-standard.json';
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleExportJson = () => {
+    downloadFile(exportLibrary(), 'pieces-standard.json', 'application/json');
+  };
+
+  const handleExportCsv = () => {
+    downloadFile(exportLibraryCsv(), 'pieces-standard.csv', 'text/csv;charset=utf-8');
   };
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,45 +145,159 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
   };
 
   const handleReset = () => {
+    if (!confirm('Réinitialiser la bibliothèque ? Toutes tes pièces personnalisées seront perdues.')) return;
     resetLibrary();
     refresh();
   };
 
+  const handleScrape = async () => {
+    const url = scrapeUrl.trim();
+    if (!url) return;
+    setScrapeBusy(true);
+    setScrapeError(null);
+    try {
+      const part = await scrapeProductFromUrl(url);
+      // Préremplit le formulaire avec les données scrapées
+      setPrefill(part);
+      setAdding(true);
+      setEditing(null);
+      setScrapeUrl('');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Échec du scrape';
+      setScrapeError(msg);
+    } finally {
+      setScrapeBusy(false);
+    }
+  };
+
+  const handleRefreshPrices = async () => {
+    const candidates = parts.filter((p) => !!p.url);
+    if (candidates.length === 0) {
+      setRefreshMsg('Aucune pièce avec URL — rien à rafraîchir.');
+      setTimeout(() => setRefreshMsg(null), 3000);
+      return;
+    }
+    if (!confirm(`Rafraîchir ${candidates.length} pièce${candidates.length > 1 ? 's' : ''} ? Cela peut prendre quelques secondes et coûte ~${(candidates.length * 0.01).toFixed(2)}€ d'API.`)) {
+      return;
+    }
+    setRefreshBusy(true);
+    setRefreshMsg(`Rafraîchissement 0/${candidates.length}…`);
+    let ok = 0;
+    let errs = 0;
+    for (let i = 0; i < candidates.length; i++) {
+      const p = candidates[i];
+      setRefreshMsg(`Rafraîchissement ${i + 1}/${candidates.length}…`);
+      try {
+        const fresh = await scrapeProductFromUrl(p.url!);
+        const updates: Partial<StandardPart> = {};
+        if (fresh.price_eur !== undefined) updates.price_eur = fresh.price_eur;
+        if (fresh.currency) updates.currency = fresh.currency;
+        if (fresh.image_url) updates.image_url = fresh.image_url;
+        if (fresh.merchant) updates.merchant = fresh.merchant;
+        if (fresh.merchant_ref) updates.merchant_ref = fresh.merchant_ref;
+        updates.last_checked_at = new Date().toISOString();
+        updatePart(p.id, updates);
+        ok++;
+      } catch {
+        errs++;
+      }
+    }
+    refresh();
+    setRefreshMsg(`${ok} OK, ${errs} erreur${errs > 1 ? 's' : ''}.`);
+    setRefreshBusy(false);
+    setTimeout(() => setRefreshMsg(null), 5000);
+  };
+
   if (!isOpen) return null;
 
+  const closeForm = () => {
+    setAdding(false);
+    setEditing(null);
+    setPrefill(null);
+  };
+
+  const formInitial = editing ?? (prefill as StandardPart | null) ?? undefined;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div
-        className="bg-white rounded-xl shadow-xl w-full max-w-xl max-h-[85vh] flex flex-col mx-4"
+        className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-          <h3 className="text-base font-semibold">Ma bibliothèque de pièces</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg">×</button>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#EFE8DD]">
+          <h3 className="text-base font-semibold text-[#0E0D0C]">Ma bibliothèque de pièces</h3>
+          <button onClick={onClose} className="text-[#9A968F] hover:text-[#0E0D0C] text-2xl leading-none px-2">×</button>
+        </div>
+
+        {/* Scrape URL */}
+        <div className="px-5 py-3 border-b border-[#EFE8DD] bg-[#FFFCF7]">
+          <label className="block text-[11px] uppercase tracking-widest text-[#9A968F] font-semibold mb-1.5">
+            Importer depuis une fiche produit
+          </label>
+          <div className="flex gap-2 flex-wrap">
+            <input
+              type="url"
+              value={scrapeUrl}
+              onChange={(e) => setScrapeUrl(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !scrapeBusy) handleScrape(); }}
+              className="flex-1 min-w-[240px] border border-[#EFE8DD] rounded-lg px-3 py-2 text-sm bg-white text-[#0E0D0C] placeholder-[#9A968F] focus:border-[#3B5FFF] focus:outline-none focus:ring-2 focus:ring-[#3B5FFF]/20"
+              placeholder="https://www.leroymerlin.fr/produits/..."
+              disabled={scrapeBusy}
+            />
+            <button
+              onClick={handleScrape}
+              disabled={scrapeBusy || !scrapeUrl.trim()}
+              className="text-sm px-4 py-2 bg-[#3B5FFF] text-white rounded-lg hover:bg-[#1E3FCC] font-semibold disabled:opacity-50 whitespace-nowrap"
+            >
+              {scrapeBusy ? 'Analyse…' : 'Analyser'}
+            </button>
+          </div>
+          {scrapeError && (
+            <div className="mt-2 text-xs text-[#A52E16] bg-[#FFE4DC] border border-[#FF6B4A] rounded px-2.5 py-1.5">
+              {scrapeError}
+            </div>
+          )}
+          <p className="text-[11px] text-[#9A968F] mt-1.5">
+            Colle l'URL d'un produit (Leroy Merlin, Castorama, Manomano…). L'IA extrait nom, prix, dimensions, référence.
+          </p>
         </div>
 
         {/* Toolbar */}
-        <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-2 flex-wrap">
+        <div className="px-5 py-3 border-b border-[#EFE8DD] flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => { setAdding(true); setEditing(null); }}
-            className="text-xs px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            onClick={() => { setAdding(true); setEditing(null); setPrefill(null); }}
+            className="text-xs px-3 py-1.5 bg-[#3B5FFF] text-white rounded-lg hover:bg-[#1E3FCC] font-semibold"
           >
-            + Ajouter
+            + Saisie manuelle
           </button>
           <button
-            onClick={handleExport}
-            className="text-xs px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50"
+            onClick={handleExportJson}
+            className="text-xs px-3 py-1.5 border border-[#EFE8DD] text-[#54514E] rounded-lg hover:bg-[#FFFCF7]"
           >
-            Exporter
+            Export JSON
+          </button>
+          <button
+            onClick={handleExportCsv}
+            className="text-xs px-3 py-1.5 border border-[#EFE8DD] text-[#54514E] rounded-lg hover:bg-[#FFFCF7]"
+          >
+            Export CSV
           </button>
           <button
             onClick={() => importRef.current?.click()}
-            className="text-xs px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="text-xs px-3 py-1.5 border border-[#EFE8DD] text-[#54514E] rounded-lg hover:bg-[#FFFCF7]"
           >
-            Importer
+            Importer JSON
           </button>
           <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
+          <button
+            onClick={handleRefreshPrices}
+            disabled={refreshBusy}
+            className="text-xs px-3 py-1.5 border border-[#3B5FFF] text-[#3B5FFF] rounded-lg hover:bg-[#E5EAFF] disabled:opacity-50"
+            title="Re-scrape les pièces avec une URL pour mettre à jour leur prix"
+          >
+            {refreshBusy ? 'Rafraîchissement…' : 'Rafraîchir prix'}
+          </button>
           <button
             onClick={handleReset}
             className="text-xs px-3 py-1.5 border border-[#FF6B4A] text-[#FF6B4A] rounded-lg hover:bg-[#FFE4DC] ml-auto"
@@ -127,57 +305,167 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
             Réinitialiser
           </button>
           {importMsg && (
-            <span className="text-xs text-green-600">{importMsg}</span>
+            <span className="text-xs text-[#0E5A3D]">{importMsg}</span>
+          )}
+          {refreshMsg && (
+            <span className="text-xs text-[#54514E] w-full mt-1">{refreshMsg}</span>
+          )}
+        </div>
+
+        {/* Filters */}
+        <div className="px-5 py-2.5 border-b border-[#EFE8DD] flex items-center gap-2 flex-wrap text-xs bg-white">
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Recherche (nom, marchand, ref, notes)"
+            className="flex-1 min-w-[180px] border border-[#EFE8DD] rounded-lg px-2.5 py-1.5 bg-white text-[#0E0D0C] placeholder-[#9A968F] focus:border-[#3B5FFF] focus:outline-none focus:ring-2 focus:ring-[#3B5FFF]/20"
+          />
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="border border-[#EFE8DD] rounded-lg px-2 py-1.5 bg-white text-[#0E0D0C]"
+          >
+            <option value="">Toutes catégories</option>
+            <optgroup label="Panneaux">
+              <option value="shelf">Tablette</option>
+              <option value="side_panel">Joue</option>
+              <option value="door">Porte</option>
+              <option value="drawer_front">Façade tiroir</option>
+              <option value="back_panel">Fond</option>
+              <option value="top_bottom">Dessus/dessous</option>
+              <option value="divider">Séparateur</option>
+              <option value="custom">Autre panneau</option>
+            </optgroup>
+            <optgroup label="Quincaillerie">
+              <option value="hinge">Charnière</option>
+              <option value="slide">Glissière</option>
+              <option value="screw">Vis</option>
+              <option value="dowel">Tourillon</option>
+              <option value="handle">Poignée</option>
+              <option value="bracket">Équerre</option>
+              <option value="edge_band">Chant</option>
+              <option value="foot">Pied</option>
+            </optgroup>
+          </select>
+          <select
+            value={filterMerchant}
+            onChange={(e) => setFilterMerchant(e.target.value)}
+            className="border border-[#EFE8DD] rounded-lg px-2 py-1.5 bg-white text-[#0E0D0C]"
+            disabled={merchants.length === 0}
+          >
+            <option value="">Tous marchands</option>
+            {merchants.map((m) => (
+              <option key={m} value={m}>{m}</option>
+            ))}
+          </select>
+          {(filterCategory || filterMerchant || searchText) && (
+            <button
+              onClick={() => { setFilterCategory(''); setFilterMerchant(''); setSearchText(''); }}
+              className="text-[#3B5FFF] hover:text-[#1E3FCC] underline"
+            >
+              Réinitialiser filtres
+            </button>
           )}
         </div>
 
         {/* Form (add/edit) */}
         {(adding || editing) && (
-          <div className="px-5 py-4 border-b border-gray-100 bg-gray-50">
+          <div className="px-5 py-4 border-b border-[#EFE8DD] bg-[#FFFCF7]">
+            {prefill && adding && (
+              <div className="mb-3 text-xs bg-[#E5EAFF] border border-[#3B5FFF] text-[#3B5FFF] rounded px-2.5 py-1.5">
+                ✨ Données extraites depuis l'URL — vérifie et complète si besoin avant d'ajouter.
+              </div>
+            )}
             <PartForm
-              initial={editing ?? undefined}
+              initial={formInitial}
               onSave={editing ? handleUpdate : handleAdd}
-              onCancel={() => { setAdding(false); setEditing(null); }}
+              onCancel={closeForm}
             />
           </div>
         )}
 
         {/* List */}
         <div className="flex-1 overflow-y-auto px-5 py-3">
-          {parts.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-8">Bibliothèque vide</p>
+          {visibleParts.length === 0 ? (
+            <p className="text-sm text-[#9A968F] text-center py-8">
+              {parts.length === 0 ? 'Bibliothèque vide' : 'Aucune pièce ne correspond aux filtres'}
+            </p>
           ) : (
             <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="border-b border-gray-200 text-left text-gray-500">
-                  <th className="py-1.5 pr-2 font-medium">Nom</th>
-                  <th className="py-1.5 pr-2 font-medium">Dim.</th>
-                  <th className="py-1.5 pr-2 font-medium">Cat.</th>
-                  <th className="py-1.5 font-medium w-20"></th>
+              <thead className="sticky top-0 bg-white">
+                <tr className="border-b border-[#EFE8DD] text-left text-[#54514E] text-xs uppercase tracking-widest">
+                  <th className="py-2 pr-2 font-semibold w-10"></th>
+                  <th className="py-2 pr-2 font-semibold">Nom</th>
+                  <th className="py-2 pr-2 font-semibold">Cat.</th>
+                  <th className="py-2 pr-2 font-semibold tabular-nums">Dim.</th>
+                  <th className="py-2 pr-2 font-semibold">Marchand</th>
+                  <th className="py-2 pr-2 font-semibold tabular-nums text-right">Prix</th>
+                  <th className="py-2 font-semibold w-20"></th>
                 </tr>
               </thead>
               <tbody>
-                {parts.map((p) => (
-                  <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-1.5 pr-2">
-                      <span className="truncate block max-w-[200px]">{p.name}</span>
+                {visibleParts.map((p) => (
+                  <tr key={p.id} className="border-b border-[#EFE8DD] hover:bg-[#FFFCF7]">
+                    <td className="py-2 pr-2">
+                      {p.image_url ? (
+                        <img
+                          src={p.image_url}
+                          alt=""
+                          className="h-8 w-8 rounded border border-[#EFE8DD] object-cover"
+                          loading="lazy"
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }}
+                        />
+                      ) : (
+                        <div className="h-8 w-8 rounded border border-[#EFE8DD] bg-[#FFFCF7]" aria-hidden />
+                      )}
                     </td>
-                    <td className="py-1.5 pr-2 tabular-nums text-gray-500 text-xs whitespace-nowrap">
-                      {p.length_mm}×{p.width_mm}×{p.thickness_mm}
+                    <td className="py-2 pr-2">
+                      <div className="flex flex-col">
+                        <span className="text-[#0E0D0C] truncate max-w-[260px]" title={p.name}>{p.name}</span>
+                        {p.merchant_ref && (
+                          <span className="text-[10px] text-[#9A968F] font-mono">{p.merchant_ref}</span>
+                        )}
+                      </div>
                     </td>
-                    <td className="py-1.5 pr-2 text-gray-400 text-xs">
-                      {CATEGORY_LABELS[p.category] ?? p.category}
+                    <td className="py-2 pr-2 text-[#54514E] text-xs">
+                      {CATEGORY_LABELS[p.category]}
                     </td>
-                    <td className="py-1.5 text-right whitespace-nowrap">
+                    <td className="py-2 pr-2 tabular-nums text-[#54514E] text-xs whitespace-nowrap">
+                      {formatDims(p)}
+                    </td>
+                    <td className="py-2 pr-2 text-[#54514E] text-xs">
+                      {p.url ? (
+                        <a
+                          href={p.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#3B5FFF] hover:text-[#1E3FCC] hover:underline"
+                          title={p.url}
+                        >
+                          {p.merchant ?? 'Lien'} ↗
+                        </a>
+                      ) : (
+                        p.merchant ?? '—'
+                      )}
+                    </td>
+                    <td className="py-2 pr-2 tabular-nums text-right text-xs text-[#0E0D0C] font-medium whitespace-nowrap">
+                      {formatPrice(p)}
+                      {p.pack_qty && p.pack_qty > 1 && (
+                        <span className="block text-[10px] text-[#9A968F]">/ lot {p.pack_qty}</span>
+                      )}
+                    </td>
+                    <td className="py-2 text-right whitespace-nowrap">
                       <button
-                        onClick={() => { setEditing(p); setAdding(false); }}
-                        className="text-xs text-blue-500 hover:text-blue-700 mr-2"
+                        onClick={() => { setEditing(p); setAdding(false); setPrefill(null); }}
+                        className="text-xs text-[#3B5FFF] hover:text-[#1E3FCC] mr-2"
                       >
                         Modifier
                       </button>
                       <button
                         onClick={() => handleDelete(p.id)}
                         className="text-xs text-[#FF6B4A] hover:text-[#A52E16]"
+                        aria-label="Supprimer"
                       >
                         ×
                       </button>
@@ -190,8 +478,11 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-gray-200 text-xs text-gray-400">
-          {parts.length} pièce{parts.length !== 1 ? 's' : ''} en bibliothèque
+        <div className="px-5 py-3 border-t border-[#EFE8DD] text-xs text-[#9A968F] flex items-center justify-between">
+          <span>
+            {visibleParts.length} pièce{visibleParts.length !== 1 ? 's' : ''} affichée{visibleParts.length !== 1 ? 's' : ''}
+            {visibleParts.length !== parts.length && ` sur ${parts.length}`}
+          </span>
         </div>
       </div>
     </div>
