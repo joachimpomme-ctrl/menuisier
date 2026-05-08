@@ -215,6 +215,7 @@ export default function App() {
               + Nouveau
             </button>
             <MoreMenu
+              direction="up"
               onExport={() => exportToJson(state)}
               onImport={() => importRef.current?.click()}
               onPdf={handleExportPdf}
