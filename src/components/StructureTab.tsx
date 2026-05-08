@@ -102,17 +102,17 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
             <option key={k} value={k}>{m.name}</option>
           ))}
         </select>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-[#695f56] mb-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-[#54514E] mb-2">
           <Tip text={TIPS['densite']}><span>{mat.density} kg/m³</span></Tip>
           <Tip text={TIPS['flexMPa']}><span>{mat.flexMPa} MPa</span></Tip>
           <Tip text={TIPS['portee-max']}><span>Portée max {mat.maxSpan18} cm</span></Tip>
           <Tip text={TIPS['vis']}><span>Vis: {mat.screwHolding}</span></Tip>
         </div>
-        <p className="text-xs text-[#695f56]">{mat.notes}</p>
+        <p className="text-xs text-[#54514E]">{mat.notes}</p>
         {mat.warnings.length > 0 && (
           <div className="mt-2 space-y-1">
             {mat.warnings.map((w, i) => (
-              <p key={i} className="text-xs text-[#695f56]">⚠ {w}</p>
+              <p key={i} className="text-xs text-[#54514E]">⚠ {w}</p>
             ))}
           </div>
         )}
@@ -130,7 +130,7 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
           <NumberInput label="Plinthe hauteur" suffix="cm" value={state.project.plinthHeight} min={0} max={50} step={0.1} onChange={(v) => updateProject('plinthHeight', v)} tip={TIPS['hauteur-plinthe']} />
           <NumberInput label="Plinthe profondeur" suffix="cm" value={state.project.plinthDepth} min={0} max={20} step={0.1} onChange={(v) => updateProject('plinthDepth', v)} tip={TIPS['profondeur-plinthe']} />
         </div>
-        <p className="text-[10px] text-[#9d9089] mt-2">Plinthe = 0 si votre meuble n'est pas contre un mur avec plinthe</p>
+        <p className="text-[10px] text-[#9A968F] mt-2">Plinthe = 0 si votre meuble n'est pas contre un mur avec plinthe</p>
       </div>
 
       {/* Épaisseur & charge */}
@@ -188,20 +188,20 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                     onClick={() => setLoad(key)}
                     className={`flex-1 text-left px-3 py-2.5 rounded-lg border transition-all ${
                       isActive
-                        ? 'bg-[#f2ebe0] border-[#6b4c2a] shadow-sm'
-                        : 'bg-white border-[#e0d8ce] hover:border-[#c8bfb3]'
+                        ? 'bg-[#E5EAFF] border-[#3B5FFF] shadow-sm'
+                        : 'bg-white border-[#EFE8DD] hover:border-[#9A968F]'
                     }`}
                   >
-                    <div className={`text-sm font-semibold ${isActive ? 'text-[#6b4c2a]' : 'text-[#1c1714]'}`}>{val.label}</div>
-                    <div className="text-[10px] text-[#9d9089] mt-0.5">{val.desc}</div>
-                    <div className={`text-[10px] mt-1 font-mono ${isActive ? 'text-[#6b4c2a] font-semibold' : 'text-[#9d9089]'}`}>{rec} mm</div>
+                    <div className={`text-sm font-semibold ${isActive ? 'text-[#3B5FFF]' : 'text-[#0E0D0C]'}`}>{val.label}</div>
+                    <div className="text-[10px] text-[#9A968F] mt-0.5">{val.desc}</div>
+                    <div className={`text-[10px] mt-1 font-mono ${isActive ? 'text-[#3B5FFF] font-semibold' : 'text-[#9A968F]'}`}>{rec} mm</div>
                   </button>
                 );
               })}
             </div>
 
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs text-[#695f56]">Épaisseur :</span>
+              <span className="text-xs text-[#54514E]">Épaisseur :</span>
               <div className="flex gap-1 flex-wrap">
                 {availableThicknesses
                   .filter(t => t >= 10)
@@ -211,8 +211,8 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                       onClick={() => updateThickness(t / 10)}
                       className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all font-mono ${
                         thicknessMm === t
-                          ? 'bg-[#f2ebe0] border-[#6b4c2a] text-[#6b4c2a] font-bold shadow-sm'
-                          : 'bg-white border-[#e0d8ce] text-[#695f56] hover:border-[#c8bfb3] hover:text-[#6b4c2a]'
+                          ? 'bg-[#E5EAFF] border-[#3B5FFF] text-[#3B5FFF] font-bold shadow-sm'
+                          : 'bg-white border-[#EFE8DD] text-[#54514E] hover:border-[#9A968F] hover:text-[#3B5FFF]'
                       }`}
                     >
                       {t}mm
@@ -221,19 +221,19 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
               </div>
             </div>
 
-            <div className="text-[10px] text-[#695f56] space-y-1 mt-2 bg-[#faf8f4] rounded-lg px-3 py-2">
+            <div className="text-[10px] text-[#54514E] space-y-1 mt-2 bg-[#FFFCF7] rounded-lg px-3 py-2">
               <div>
-                Épaisseur : <span className="font-semibold text-[#6b4c2a]">{thicknessMm} mm</span>
+                Épaisseur : <span className="font-semibold text-[#3B5FFF]">{thicknessMm} mm</span>
                 {' · '}Portée max tablette : <span className="font-semibold">~{maxSpan} cm</span>
                 {' · '}Largeur intérieure : corps − 2×{thicknessMm}mm de joues
               </div>
               {isUnderThick && (
-                <div className="text-[#695f56] font-medium">
+                <div className="text-[#54514E] font-medium">
                   Pour une charge {loadLabels[currentLoad].label.toLowerCase()}, {recMm} mm est recommandé en {mat.short}
                 </div>
               )}
               {thicknessMm >= 22 && (
-                <div className="text-[#9d9089]">
+                <div className="text-[#9A968F]">
                   Épaisseur renforcée — poids plus élevé, prévoir fixation murale solide
                 </div>
               )}
@@ -251,14 +251,14 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
           {state.bodies.length > 1 && (
             <button
               onClick={autoFillBodyWidths}
-              className="text-xs px-3 py-2 rounded-lg bg-white text-[#6b4c2a] border border-[#e0d8ce] hover:bg-[#f2ebe0] font-medium transition-colors"
+              className="text-xs px-3 py-2 rounded-lg bg-white text-[#3B5FFF] border border-[#EFE8DD] hover:bg-[#E5EAFF] font-medium transition-colors"
             >
               Remplir la largeur
             </button>
           )}
           <button
             onClick={addBody}
-            className="text-xs px-4 py-2 rounded-lg bg-[#6b4c2a] text-white font-medium hover:bg-[#5a3e22] transition-colors"
+            className="text-xs px-4 py-2 rounded-lg bg-[#3B5FFF] text-white font-medium hover:bg-[#1E3FCC] transition-colors"
           >
             + Ajouter un corps
           </button>
@@ -266,17 +266,17 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
       </div>
 
       {state.bodies.length > 1 && (
-        <div className="text-[10px] text-[#9d9089] -mt-1 mb-2 px-1">
+        <div className="text-[10px] text-[#9A968F] -mt-1 mb-2 px-1">
           Largeur physique totale : <span className="font-semibold">{totalPhysical.toFixed(1)} cm</span>
           {' / '}
           cible mur : <span className="font-semibold">{state.project.wallWidth.toFixed(1)} cm</span>
           {Math.abs(totalPhysical - state.project.wallWidth) > 0.05 && (
-            <span className="text-[#695f56] ml-1">
+            <span className="text-[#54514E] ml-1">
               (écart {Math.abs(state.project.wallWidth - totalPhysical).toFixed(1)} cm)
             </span>
           )}
           {shared.some(Boolean) && (
-            <span className="text-[#695f56] ml-1">
+            <span className="text-[#54514E] ml-1">
               (joues communes fusionnées en épaisseur double aux jonctions)
             </span>
           )}
@@ -291,10 +291,10 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
         return (
           <div className={cardClass}>
             <h3 className={sectionTitle}>Réassigner par type de pièce</h3>
-            <p className="text-xs text-[#9d9089] mb-3">Affecte toutes les pièces d'un type au même panneau en un clic.</p>
+            <p className="text-xs text-[#9A968F] mb-3">Affecte toutes les pièces d'un type au même panneau en un clic.</p>
             <div className="flex gap-2 flex-wrap items-end">
               <div className="flex-1 min-w-[120px]">
-                <label className="text-xs text-[#695f56] mb-1 block">Type</label>
+                <label className="text-xs text-[#54514E] mb-1 block">Type</label>
                 <select value={batchType} onChange={e => setBatchType(e.target.value as PieceType)} className={inputClass}>
                   {typesInProject.map(t => (
                     <option key={t} value={t}>{pieceTypeLabel(t)}</option>
@@ -302,7 +302,7 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
                 </select>
               </div>
               <div className="flex-1 min-w-[120px]">
-                <label className="text-xs text-[#695f56] mb-1 block">Panneau cible</label>
+                <label className="text-xs text-[#54514E] mb-1 block">Panneau cible</label>
                 <select value={batchPanel} onChange={e => setBatchPanel(e.target.value)} className={inputClass}>
                   {allPanelDefs.map(pd => (
                     <option key={pd.id} value={pd.id}>{pd.label}</option>
@@ -312,7 +312,7 @@ export default function StructureTab({ state, onChange, allPanelDefs }: Props) {
               <button
                 onClick={batchAssignPanel}
                 disabled={countForType === 0}
-                className="px-4 py-2 rounded-lg bg-[#6b4c2a] text-white text-xs font-medium hover:bg-[#5a3e22] disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                className="px-4 py-2 rounded-lg bg-[#3B5FFF] text-white text-xs font-medium hover:bg-[#1E3FCC] disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
               >
                 Assigner {countForType > 0 ? `(${countForType} pcs)` : ''}
               </button>

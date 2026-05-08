@@ -10,10 +10,10 @@ interface Props {
 
 type ViewMode = 'face' | 'dessus' | 'cote';
 
-const cardClass = "rounded-2xl border border-stone-200 bg-white p-4 mb-4";
+const cardClass = "rounded-2xl border border-[#EFE8DD] bg-white p-4 mb-4";
 
 /** Dimension arrow helper */
-function DimLine({ x1, y1, x2, y2, label, offset = 14, color = '#78716c', fontSize = 8 }: {
+function DimLine({ x1, y1, x2, y2, label, offset = 14, color = '#9A968F', fontSize = 8 }: {
   x1: number; y1: number; x2: number; y2: number; label: string; offset?: number; color?: string; fontSize?: number;
 }) {
   const isH = Math.abs(y1 - y2) < 1;
@@ -78,9 +78,9 @@ export default function PlanTab({ state }: Props) {
 
     return (
       <svg width={SVG_W} height={svgH} viewBox={`0 0 ${SVG_W} ${svgH}`} className="rounded-lg">
-        <rect width={SVG_W} height={svgH} fill="#faf8f5" rx="8" />
+        <rect width={SVG_W} height={svgH} fill="#FFFCF7" rx="8" />
         {/* Floor line */}
-        <line x1={M - 10} y1={M + maxH * scale} x2={SVG_W - M + 10} y2={M + maxH * scale} stroke="#d6cfc7" strokeWidth="1" strokeDasharray="6,3" />
+        <line x1={M - 10} y1={M + maxH * scale} x2={SVG_W - M + 10} y2={M + maxH * scale} stroke="#EFE8DD" strokeWidth="1" strokeDasharray="6,3" />
 
         {bodies.map((b, bi) => {
           const bx = offX;
@@ -135,8 +135,8 @@ export default function PlanTab({ state }: Props) {
 
               {/* Plinthe cutouts */}
               {state.project.plinthHeight > 0 && <>
-                <rect x={bx} y={M + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#faf8f5" stroke="#a8a29e" strokeWidth="0.5" strokeDasharray="2,2" />
-                <rect x={bx + bw - tw} y={M + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#faf8f5" stroke="#a8a29e" strokeWidth="0.5" strokeDasharray="2,2" />
+                <rect x={bx} y={M + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#FFFCF7" stroke="#9A968F" strokeWidth="0.5" strokeDasharray="2,2" />
+                <rect x={bx + bw - tw} y={M + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#FFFCF7" stroke="#9A968F" strokeWidth="0.5" strokeDasharray="2,2" />
               </>}
 
               {/* Fixed shelves — with H labels when posY is set */}
@@ -246,7 +246,7 @@ export default function PlanTab({ state }: Props) {
                 const x1 = sl ? bx : bx + tw;
                 return (
                   <DimLine x1={x1} y1={M + bh} x2={bx + bw - tw} y2={M + bh}
-                    label={`${iw}`} offset={32} color={sl ? "#3b82f6" : "#a8a29e"} fontSize={7} />
+                    label={`${iw}`} offset={32} color={sl ? "#3b82f6" : "#9A968F"} fontSize={7} />
                 );
               })()}
 
@@ -260,7 +260,7 @@ export default function PlanTab({ state }: Props) {
         <DimLine x1={M - 5} y1={M} x2={M - 5} y2={M + maxH * scale} label={`${maxH}`} offset={-30} />
 
         {/* Thickness annotation */}
-        <text x={SVG_W - M + 5} y={M + 15} fill="#a8a29e" fontSize="7" fontFamily="system-ui">ép. {th * 10} mm</text>
+        <text x={SVG_W - M + 5} y={M + 15} fill="#9A968F" fontSize="7" fontFamily="system-ui">ép. {th * 10} mm</text>
       </svg>
     );
   };
@@ -273,10 +273,10 @@ export default function PlanTab({ state }: Props) {
 
     return (
       <svg width={SVG_W} height={svgH} viewBox={`0 0 ${SVG_W} ${svgH}`} className="rounded-lg">
-        <rect width={SVG_W} height={svgH} fill="#faf8f5" rx="8" />
+        <rect width={SVG_W} height={svgH} fill="#FFFCF7" rx="8" />
         {/* Wall line */}
-        <line x1={M - 10} y1={M} x2={SVG_W - M + 10} y2={M} stroke="#d6cfc7" strokeWidth="1.5" />
-        <text x={M - 10} y={M - 5} fill="#a8a29e" fontSize="7" fontFamily="system-ui">MUR</text>
+        <line x1={M - 10} y1={M} x2={SVG_W - M + 10} y2={M} stroke="#EFE8DD" strokeWidth="1.5" />
+        <text x={M - 10} y={M - 5} fill="#9A968F" fontSize="7" fontFamily="system-ui">MUR</text>
 
         {bodies.map((b, bi) => {
           const bx = offX;
@@ -315,7 +315,7 @@ export default function PlanTab({ state }: Props) {
   // --- SIDE VIEW ---
   const renderSide = () => {
     const body = bodies[0];
-    if (!body) return <p className="text-stone-400 text-sm text-center py-8">Aucun corps à afficher</p>;
+    if (!body) return <p className="text-[#9A968F] text-sm text-center py-8">Aucun corps à afficher</p>;
 
     const depth = body.depth;
     const height = maxH;
@@ -338,10 +338,10 @@ export default function PlanTab({ state }: Props) {
 
     return (
       <svg width={SVG_W} height={svgH} viewBox={`0 0 ${SVG_W} ${svgH}`} className="rounded-lg">
-        <rect width={SVG_W} height={svgH} fill="#faf8f5" rx="8" />
+        <rect width={SVG_W} height={svgH} fill="#FFFCF7" rx="8" />
         {/* Wall */}
-        <line x1={bx} y1={M - 5} x2={bx} y2={M + bh + 5} stroke="#d6cfc7" strokeWidth="1.5" />
-        <text x={bx - 5} y={M - 8} textAnchor="end" fill="#a8a29e" fontSize="7" fontFamily="system-ui">MUR</text>
+        <line x1={bx} y1={M - 5} x2={bx} y2={M + bh + 5} stroke="#EFE8DD" strokeWidth="1.5" />
+        <text x={bx - 5} y={M - 8} textAnchor="end" fill="#9A968F" fontSize="7" fontFamily="system-ui">MUR</text>
 
         {/* Side joue */}
         <rect x={bx} y={M} width={bd} height={bh} fill={PIECE_COLORS.joue} opacity=".08" stroke={PIECE_COLORS.joue} strokeWidth="1" rx="1" />
@@ -360,7 +360,7 @@ export default function PlanTab({ state }: Props) {
         {state.project.plinthHeight > 0 && (
           <rect x={bx} y={M + bh - state.project.plinthHeight * scale}
             width={state.project.plinthDepth * scale} height={state.project.plinthHeight * scale}
-            fill="#faf8f5" stroke="#a8a29e" strokeWidth="0.5" strokeDasharray="2,2" />
+            fill="#FFFCF7" stroke="#9A968F" strokeWidth="0.5" strokeDasharray="2,2" />
         )}
 
         {/* Height dim */}
@@ -368,7 +368,7 @@ export default function PlanTab({ state }: Props) {
         {/* Depth dim */}
         <DimLine x1={bx} y1={M + bh} x2={bx + bd} y2={M + bh} label={`${depth}`} offset={18} />
         {/* Thickness annotation */}
-        <text x={bx + bd / 2} y={M - 8} textAnchor="middle" fill="#78716c" fontSize="8" fontFamily="system-ui" fontWeight="500">{body.name} — vue de côté</text>
+        <text x={bx + bd / 2} y={M - 8} textAnchor="middle" fill="#9A968F" fontSize="8" fontFamily="system-ui" fontWeight="500">{body.name} — vue de côté</text>
       </svg>
     );
   };
@@ -377,13 +377,13 @@ export default function PlanTab({ state }: Props) {
     <div>
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <Tip text="Plans 2D cotés de votre meuble. Vue de face, vue de dessus et vue de côté avec toutes les dimensions en cm.">
-          <span className="text-sm text-stone-500">{mat.short} {th * 10} mm — Plans cotés</span>
+          <span className="text-sm text-[#54514E]">{mat.short} {th * 10} mm — Plans cotés</span>
         </Tip>
         <div className="flex gap-1">
           {(['face', 'dessus', 'cote'] as ViewMode[]).map(v => (
             <button key={v} onClick={() => setView(v)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                view === v ? 'bg-amber-600 text-white' : 'bg-white text-stone-500 border border-stone-200 hover:bg-stone-50'
+                view === v ? 'bg-[#3B5FFF] text-white' : 'bg-white text-[#54514E] border border-[#EFE8DD] hover:bg-[#FFFCF7]'
               }`}>
               {v === 'face' ? 'Face' : v === 'dessus' ? 'Dessus' : 'Côté'}
             </button>
@@ -396,12 +396,12 @@ export default function PlanTab({ state }: Props) {
         <div className="flex gap-1 mb-3 overflow-x-auto hide-scrollbar">
           <button onClick={() => setSelectedBody(null)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex-shrink-0 ${
-              !selectedBody ? 'bg-amber-100 text-amber-700 border border-amber-300' : 'bg-white text-stone-400 border border-stone-200'
+              !selectedBody ? 'bg-[#E5EAFF] text-[#3B5FFF] border border-[#3B5FFF]' : 'bg-white text-[#9A968F] border border-[#EFE8DD]'
             }`}>Tous</button>
           {state.bodies.map((b, i) => (
             <button key={b.id} onClick={() => setSelectedBody(b.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex-shrink-0 ${
-                selectedBody === b.id ? 'bg-amber-100 text-amber-700 border border-amber-300' : 'bg-white text-stone-400 border border-stone-200'
+                selectedBody === b.id ? 'bg-[#E5EAFF] text-[#3B5FFF] border border-[#3B5FFF]' : 'bg-white text-[#9A968F] border border-[#EFE8DD]'
               }`}>
               <span className="w-2 h-2 rounded-full inline-block mr-1" style={{ backgroundColor: BODY_COLORS[i % BODY_COLORS.length] }} />
               {b.name}
@@ -420,8 +420,8 @@ export default function PlanTab({ state }: Props) {
 
       {/* Legend */}
       <div className={cardClass}>
-        <h4 className="text-xs font-semibold text-stone-500 mb-2">Légende</h4>
-        <div className="flex flex-wrap gap-3 text-xs text-stone-500">
+        <h4 className="text-xs font-semibold text-[#54514E] mb-2">Légende</h4>
+        <div className="flex flex-wrap gap-3 text-xs text-[#54514E]">
           {[
             { type: 'joue', label: 'Joue (montant)' },
             { type: 'tablette-fixe', label: 'Tablette fixe' },
@@ -440,11 +440,11 @@ export default function PlanTab({ state }: Props) {
             </span>
           ))}
           <span className="flex items-center gap-1">
-            <span className="w-3 h-0 border-t border-dashed border-stone-400" />
+            <span className="w-3 h-0 border-t border-dashed border-[#9A968F]" />
             Réglable
           </span>
         </div>
-        <p className="text-[10px] text-stone-400 mt-2">Toutes les dimensions en cm. Plan non contractuel — vérifier sur chantier.</p>
+        <p className="text-[10px] text-[#9A968F] mt-2">Toutes les dimensions en cm. Plan non contractuel — vérifier sur chantier.</p>
       </div>
     </div>
   );

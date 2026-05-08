@@ -53,24 +53,24 @@ export default function MoreMenu({ onExport, onImport, onPdf, pdfLoading, onClou
         aria-label="Plus d'options"
         aria-expanded={open}
         onClick={() => setOpen((current) => toggleMoreMenu(current))}
-        className="text-xs px-3 py-1.5 rounded-lg border border-[#e0d8ce] bg-white text-[#695f56] hover:text-[#1c1714] hover:border-[#c8bfb3] whitespace-nowrap transition-colors"
+        className="text-xs px-3 py-1.5 rounded-lg border border-[#EFE8DD] bg-white text-[#54514E] hover:text-[#0E0D0C] hover:border-[#9A968F] whitespace-nowrap transition-colors"
       >
         ···
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 min-w-48 rounded-lg border border-[#e0d8ce] bg-white shadow-md z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-1 min-w-48 rounded-lg border border-[#EFE8DD] bg-white shadow-md z-50 overflow-hidden">
           <button
             type="button"
             onClick={() => { onProjects(); close(); }}
-            className="block w-full px-3 py-2.5 text-left text-sm text-[#1c1714] hover:bg-[#faf8f4] border-b border-[#f0ebe4]"
+            className="block w-full px-3 py-2.5 text-left text-sm text-[#0E0D0C] hover:bg-[#FFFCF7] border-b border-[#FFFCF7]"
           >
             Mes projets
           </button>
           <button
             type="button"
             onClick={() => { onLibrary(); close(); }}
-            className="block w-full px-3 py-2.5 text-left text-sm text-[#1c1714] hover:bg-[#faf8f4] border-b border-[#f0ebe4]"
+            className="block w-full px-3 py-2.5 text-left text-sm text-[#0E0D0C] hover:bg-[#FFFCF7] border-b border-[#FFFCF7]"
           >
             Bibliothèque de pièces
           </button>
@@ -78,35 +78,35 @@ export default function MoreMenu({ onExport, onImport, onPdf, pdfLoading, onClou
             type="button"
             onClick={() => { onPdf(); close(); }}
             disabled={pdfLoading}
-            className="block w-full px-3 py-2.5 text-left text-sm text-[#1c1714] hover:bg-[#faf8f4] border-b border-[#f0ebe4] disabled:opacity-50"
+            className="block w-full px-3 py-2.5 text-left text-sm text-[#0E0D0C] hover:bg-[#FFFCF7] border-b border-[#FFFCF7] disabled:opacity-50"
           >
             {pdfLoading ? 'Génération PDF…' : 'Exporter PDF'}
           </button>
           <button
             type="button"
             onClick={() => { onCloud(); close(); }}
-            className={`block w-full px-3 py-2.5 text-left text-sm hover:bg-[#faf8f4] border-b border-[#f0ebe4] ${cloudConfigured ? 'text-[#3a4a5c]' : 'text-[#1c1714]'}`}
+            className={`block w-full px-3 py-2.5 text-left text-sm hover:bg-[#FFFCF7] border-b border-[#FFFCF7] ${cloudConfigured ? 'text-[#3a4a5c]' : 'text-[#0E0D0C]'}`}
           >
             {cloudConfigured ? 'Sync cloud (configuré)' : 'Configurer sync cloud'}
           </button>
           <button
             type="button"
             onClick={() => { onExport(); close(); }}
-            className="block w-full px-3 py-2.5 text-left text-sm text-[#695f56] hover:bg-[#faf8f4] border-b border-[#f0ebe4]"
+            className="block w-full px-3 py-2.5 text-left text-sm text-[#54514E] hover:bg-[#FFFCF7] border-b border-[#FFFCF7]"
           >
             Exporter JSON
           </button>
           <button
             type="button"
             onClick={() => { onImport(); close(); }}
-            className="block w-full px-3 py-2.5 text-left text-sm text-[#695f56] hover:bg-[#faf8f4] border-b border-[#f0ebe4]"
+            className="block w-full px-3 py-2.5 text-left text-sm text-[#54514E] hover:bg-[#FFFCF7] border-b border-[#FFFCF7]"
           >
             Importer un projet
           </button>
           <button
             type="button"
             onClick={() => { onHelp(); close(); }}
-            className="block w-full px-3 py-2.5 text-left text-sm text-[#695f56] hover:bg-[#faf8f4]"
+            className="block w-full px-3 py-2.5 text-left text-sm text-[#54514E] hover:bg-[#FFFCF7]"
           >
             Aide
           </button>

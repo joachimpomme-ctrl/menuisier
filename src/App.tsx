@@ -27,6 +27,7 @@ import type { MaterialKey } from './types';
 import PartsLibraryManager from './components/library/PartsLibraryManager';
 import MoreMenu from './components/MoreMenu';
 import HelpGuide from './components/HelpGuide';
+import Logo from './components/Logo';
 
 const TABS: { key: TabKey; label: string; shortLabel: string }[] = [
   { key: 'structure', label: 'Structure', shortLabel: 'Struct.' },
@@ -165,24 +166,27 @@ export default function App() {
   const hasErrors = validation.errors.length > 0;
 
   return (
-    <div className="min-h-screen min-h-dvh md:min-h-0 md:h-screen md:h-dvh text-[#1c1714] bg-[#f5f1eb] md:flex md:overflow-hidden">
+    <div className="min-h-screen min-h-dvh md:min-h-0 md:h-screen md:h-dvh text-[#0E0D0C] bg-[#FFFCF7] md:flex md:overflow-hidden">
 
       {/* ── Desktop Sidebar ── */}
-      <aside className="hidden md:flex md:flex-col w-56 flex-shrink-0 border-r border-[#e0d8ce] bg-white">
-        <div className="px-5 py-5 border-b border-[#e0d8ce]">
-          <div className="text-base font-bold text-[#1c1714]">Menuisier</div>
-          <div className="text-xs text-[#9d9089] mt-0.5">Conception de meuble</div>
+      <aside className="hidden md:flex md:flex-col w-56 flex-shrink-0 border-r border-[#EFE8DD] bg-white">
+        <div className="px-5 py-5 border-b border-[#EFE8DD] flex items-center gap-2.5">
+          <Logo size={32} />
+          <div>
+            <div className="text-base font-bold text-[#0E0D0C] leading-tight">Menuisier</div>
+            <div className="text-xs text-[#9A968F]">Conception de meuble</div>
+          </div>
         </div>
-        <div className="px-5 py-4 border-b border-[#e0d8ce]">
-          <div className="text-[10px] uppercase tracking-widest text-[#9d9089] font-semibold mb-1">Projet actif</div>
-          <div className="text-sm font-semibold text-[#1c1714] truncate mb-2">{state.project.name}</div>
+        <div className="px-5 py-4 border-b border-[#EFE8DD]">
+          <div className="text-[10px] uppercase tracking-widest text-[#9A968F] font-semibold mb-1">Projet actif</div>
+          <div className="text-sm font-semibold text-[#0E0D0C] truncate mb-2">{state.project.name}</div>
           <div className="flex flex-wrap gap-1.5">
             {totalCost > 0 && (
-              <span className="text-[11px] bg-[#e4f0e8] text-[#2f6144] rounded px-2 py-0.5 font-medium font-mono">
+              <span className="text-[11px] bg-[#DEF7EC] text-[#0E5A3D] rounded px-2 py-0.5 font-medium font-mono">
                 {totalCost.toFixed(0)} €
               </span>
             )}
-            <span className="text-[11px] bg-[#faf8f4] border border-[#e0d8ce] rounded px-2 py-0.5 font-mono">
+            <span className="text-[11px] bg-[#FFFCF7] border border-[#EFE8DD] rounded px-2 py-0.5 font-mono">
               {totalPieces} pcs
             </span>
           </div>
@@ -194,19 +198,19 @@ export default function App() {
               onClick={() => setTab(t.key)}
               className={`w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                 tab === t.key || (t.key === 'export' && ['notice', 'validation', 'ia'].includes(tab))
-                  ? 'bg-[#f2ebe0] text-[#6b4c2a] font-semibold'
-                  : 'text-[#695f56] hover:bg-[#faf8f4] hover:text-[#1c1714]'
+                  ? 'bg-[#E5EAFF] text-[#3B5FFF] font-semibold'
+                  : 'text-[#54514E] hover:bg-[#FFFCF7] hover:text-[#0E0D0C]'
               }`}
             >
               {t.label}
             </button>
           ))}
         </nav>
-        <div className="px-4 py-4 border-t border-[#e0d8ce]">
+        <div className="px-4 py-4 border-t border-[#EFE8DD]">
           <div className="flex gap-2">
             <button
               onClick={() => setShowNewWizard(true)}
-              className="flex-1 text-xs px-3 py-2 rounded-lg bg-[#6b4c2a] text-white font-semibold hover:bg-[#5a3e22] transition-colors"
+              className="flex-1 text-xs px-3 py-2 rounded-lg bg-[#3B5FFF] text-white font-semibold hover:bg-[#1E3FCC] transition-colors"
             >
               + Nouveau
             </button>
@@ -231,21 +235,24 @@ export default function App() {
         {/* Header — mobile only */}
         <div className="mb-4 md:hidden">
           <div className="flex items-center justify-between gap-3 mb-2">
-            {/* Left: label + project name */}
-            <div className="min-w-0">
-              <p className="text-[11px] uppercase tracking-widest text-[#9d9089] leading-none mb-0.5">
-                Projet actif
-              </p>
-              <h1 className="text-base font-semibold text-[#1c1714] truncate leading-tight">
-                {state.project.name}
-              </h1>
+            {/* Left: logo + label + project name */}
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Logo size={36} />
+              <div className="min-w-0">
+                <p className="text-[11px] uppercase tracking-widest text-[#9A968F] leading-none mb-0.5">
+                  Projet actif
+                </p>
+                <h1 className="text-base font-semibold text-[#0E0D0C] truncate leading-tight">
+                  {state.project.name}
+                </h1>
+              </div>
             </div>
 
             {/* Right: + Nouveau + ··· */}
             <div className="flex items-center gap-1.5 flex-shrink-0">
               <button
                 onClick={() => setShowNewWizard(true)}
-                className="text-xs px-3 py-1.5 rounded-lg bg-[#6b4c2a] text-white font-semibold hover:bg-[#5a3e22] active:scale-95 transition-all whitespace-nowrap"
+                className="text-xs px-3 py-1.5 rounded-lg bg-[#3B5FFF] text-white font-semibold hover:bg-[#1E3FCC] active:scale-95 transition-all whitespace-nowrap"
               >
                 + Nouveau
               </button>
@@ -266,40 +273,40 @@ export default function App() {
 
           {/* Stats row */}
           <div className="flex items-center gap-1.5 flex-wrap text-xs">
-            <span className="bg-[#f2ebe0] text-[#6b4c2a] border border-[#e0d8ce] rounded px-2 py-px font-medium">
+            <span className="bg-[#E5EAFF] text-[#3B5FFF] border border-[#EFE8DD] rounded px-2 py-px font-medium">
               {mat.short} {state.panel.thickness * 10}mm
             </span>
-            <span className="bg-[#faf8f4] border border-[#e0d8ce] rounded px-2 py-px font-mono tabular-nums">
+            <span className="bg-[#FFFCF7] border border-[#EFE8DD] rounded px-2 py-px font-mono tabular-nums">
               {totalPieces} pcs
             </span>
-            <span className="bg-[#faf8f4] border border-[#e0d8ce] rounded px-2 py-px font-mono tabular-nums">
+            <span className="bg-[#FFFCF7] border border-[#EFE8DD] rounded px-2 py-px font-mono tabular-nums">
               {totalPanelCount} pan.
             </span>
             {totalCost > 0 && (
-              <span className="bg-[#e4f0e8] text-[#2f6144] border border-[#c8ddd0] rounded px-2 py-px font-mono tabular-nums font-medium">
+              <span className="bg-[#DEF7EC] text-[#0E5A3D] border border-[#5DD4A0] rounded px-2 py-px font-mono tabular-nums font-medium">
                 {totalCost.toFixed(0)} €
               </span>
             )}
             {hasErrors && (
-              <span className="bg-[#fae8e8] text-[#7a2424] border border-[#e8c8c8] rounded px-2 py-px font-medium">
+              <span className="bg-[#FFE4DC] text-[#A52E16] border border-[#FF6B4A] rounded px-2 py-px font-medium">
                 {validation.errors.length} err.
               </span>
             )}
           </div>
 
           {importError && (
-            <div className="mt-2 text-xs text-[#7a2424] bg-[#fae8e8] border border-[#e8c8c8] rounded-lg px-3 py-2">
+            <div className="mt-2 text-xs text-[#A52E16] bg-[#FFE4DC] border border-[#FF6B4A] rounded-lg px-3 py-2">
               {importError}
             </div>
           )}
 
           {storageError && (
-            <div className="mt-2 text-xs text-[#7a2424] bg-[#fae8e8] border border-[#e8c8c8] rounded-lg px-3 py-2 flex items-start gap-2">
+            <div className="mt-2 text-xs text-[#A52E16] bg-[#FFE4DC] border border-[#FF6B4A] rounded-lg px-3 py-2 flex items-start gap-2">
               <span className="font-semibold shrink-0">Stockage :</span>
               <span className="flex-1">{storageError}</span>
               <button
                 onClick={() => setStorageError(null)}
-                className="shrink-0 text-[#7a2424] hover:text-[#5a1a1a] font-bold"
+                className="shrink-0 text-[#A52E16] hover:text-[#FF6B4A] font-bold"
                 aria-label="Fermer"
               >
                 ×
@@ -310,12 +317,12 @@ export default function App() {
 
         {/* V3 Wizard */}
         {v3Mode ? (
-          <div className="bg-white rounded-xl border border-[#e0d8ce] p-5 shadow-sm">
+          <div className="bg-white rounded-xl border border-[#EFE8DD] p-5 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs text-[#9d9089]">Étape {wizardStep}/4</span>
+              <span className="text-xs text-[#9A968F]">Étape {wizardStep}/4</span>
               <button
                 onClick={() => setV3Mode(false)}
-                className="text-xs text-[#9d9089] hover:text-[#695f56]"
+                className="text-xs text-[#9A968F] hover:text-[#54514E]"
               >
                 ✕ Fermer
               </button>
@@ -382,7 +389,7 @@ export default function App() {
           <>
             {/* Tab bar — mobile only (desktop uses sidebar nav) */}
             <div className="relative mb-5 md:hidden">
-              <div className="flex border-b border-[#e0d8ce] overflow-x-auto hide-scrollbar">
+              <div className="flex border-b border-[#EFE8DD] overflow-x-auto hide-scrollbar">
                 {TABS.map((t) => {
                   const isActive = tab === t.key || (t.key === 'export' && ['notice', 'validation', 'ia'].includes(tab));
                   return (
@@ -391,8 +398,8 @@ export default function App() {
                       onClick={() => setTab(t.key)}
                       className={`flex items-center gap-1.5 px-3 py-2.5 text-xs whitespace-nowrap flex-shrink-0 border-b-2 -mb-px transition-colors ${
                         isActive
-                          ? 'border-[#6b4c2a] text-[#6b4c2a] font-semibold'
-                          : 'border-transparent text-[#695f56] hover:text-[#1c1714]'
+                          ? 'border-[#3B5FFF] text-[#3B5FFF] font-semibold'
+                          : 'border-transparent text-[#54514E] hover:text-[#0E0D0C]'
                       }`}
                     >
                       <span className="sm:hidden">{t.shortLabel}</span>
@@ -401,7 +408,7 @@ export default function App() {
                   );
                 })}
               </div>
-              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#f5f1eb] to-transparent pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#FFFCF7] to-transparent pointer-events-none" />
             </div>
 
             {/* Content — key triggers fade animation on tab change */}
@@ -412,41 +419,41 @@ export default function App() {
                     <StructureTab state={state} onChange={setState} allPanelDefs={allPanelDefs} />
                   </div>
                   <aside className="hidden md:block w-72 flex-shrink-0">
-                    <div className="sticky top-6 rounded-xl border border-[#e0d8ce] bg-white p-5 space-y-4">
+                    <div className="sticky top-6 rounded-xl border border-[#EFE8DD] bg-white p-5 space-y-4">
                       <div>
-                        <div className="text-[10px] uppercase tracking-widest text-[#9d9089] font-semibold mb-1">Projet</div>
-                        <div className="text-sm font-semibold text-[#1c1714] truncate">{state.project.name}</div>
-                        <div className="text-xs text-[#695f56] mt-0.5">{mat.name} — {state.panel.thickness * 10} mm</div>
+                        <div className="text-[10px] uppercase tracking-widest text-[#9A968F] font-semibold mb-1">Projet</div>
+                        <div className="text-sm font-semibold text-[#0E0D0C] truncate">{state.project.name}</div>
+                        <div className="text-xs text-[#54514E] mt-0.5">{mat.name} — {state.panel.thickness * 10} mm</div>
                       </div>
-                      <div className="border-t border-[#e0d8ce] pt-4 space-y-2">
-                        <div className="text-[10px] uppercase tracking-widest text-[#9d9089] font-semibold mb-2">Dimensions</div>
+                      <div className="border-t border-[#EFE8DD] pt-4 space-y-2">
+                        <div className="text-[10px] uppercase tracking-widest text-[#9A968F] font-semibold mb-2">Dimensions</div>
                         {state.bodies.map((b) => (
-                          <div key={b.id} className="text-xs text-[#695f56] flex justify-between">
+                          <div key={b.id} className="text-xs text-[#54514E] flex justify-between">
                             <span className="truncate mr-2">{b.name}</span>
-                            <span className="font-mono text-[#1c1714] flex-shrink-0">{b.width} × {b.depth} cm</span>
+                            <span className="font-mono text-[#0E0D0C] flex-shrink-0">{b.width} × {b.depth} cm</span>
                           </div>
                         ))}
                       </div>
-                      <div className="border-t border-[#e0d8ce] pt-4 flex gap-4">
+                      <div className="border-t border-[#EFE8DD] pt-4 flex gap-4">
                         <div className="text-center">
-                          <div className="text-lg font-bold text-[#6b4c2a] font-mono">{state.bodies.length}</div>
-                          <div className="text-[10px] text-[#9d9089]">corps</div>
+                          <div className="text-lg font-bold text-[#3B5FFF] font-mono">{state.bodies.length}</div>
+                          <div className="text-[10px] text-[#9A968F]">corps</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-lg font-bold text-[#6b4c2a] font-mono">{totalPieces}</div>
-                          <div className="text-[10px] text-[#9d9089]">pièces</div>
+                          <div className="text-lg font-bold text-[#3B5FFF] font-mono">{totalPieces}</div>
+                          <div className="text-[10px] text-[#9A968F]">pièces</div>
                         </div>
                         {totalCost > 0 && (
                           <div className="text-center">
-                            <div className="text-lg font-bold text-[#6b4c2a] font-mono">{totalCost.toFixed(0)} €</div>
-                            <div className="text-[10px] text-[#9d9089]">estimé</div>
+                            <div className="text-lg font-bold text-[#3B5FFF] font-mono">{totalCost.toFixed(0)} €</div>
+                            <div className="text-[10px] text-[#9A968F]">estimé</div>
                           </div>
                         )}
                       </div>
                       <button
                         onClick={handleExportPdf}
                         disabled={pdfLoading}
-                        className="w-full rounded-lg bg-[#6b4c2a] text-white text-xs font-semibold px-4 py-2.5 hover:bg-[#5a3e22] transition-colors disabled:opacity-50"
+                        className="w-full rounded-lg bg-[#3B5FFF] text-white text-xs font-semibold px-4 py-2.5 hover:bg-[#1E3FCC] transition-colors disabled:opacity-50"
                       >
                         {pdfLoading ? 'Génération…' : 'Générer PDF'}
                       </button>
@@ -473,7 +480,7 @@ export default function App() {
                 <div className="space-y-3">
                   <button
                     onClick={() => setTab('notice' as TabKey)}
-                    className="w-full text-left rounded-xl border border-[#e0d8ce] bg-white px-4 py-3 text-sm font-medium text-[#695f56] hover:border-[#6b4c2a] hover:text-[#6b4c2a] transition-colors"
+                    className="w-full text-left rounded-xl border border-[#EFE8DD] bg-white px-4 py-3 text-sm font-medium text-[#54514E] hover:border-[#3B5FFF] hover:text-[#3B5FFF] transition-colors"
                   >
                     Notice PDF
                   </button>
@@ -481,8 +488,8 @@ export default function App() {
                     onClick={() => setTab('validation' as TabKey)}
                     className={`w-full text-left rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${
                       hasErrors
-                        ? 'border-[#e8c8c8] bg-[#fae8e8] text-[#7a2424] hover:border-[#c89090]'
-                        : 'border-[#e0d8ce] bg-white text-[#695f56] hover:border-[#2f6144] hover:text-[#2f6144]'
+                        ? 'border-[#FF6B4A] bg-[#FFE4DC] text-[#A52E16] hover:border-[#A52E16]'
+                        : 'border-[#EFE8DD] bg-white text-[#54514E] hover:border-[#0E5A3D] hover:text-[#0E5A3D]'
                     }`}
                   >
                     Contrôle qualité
@@ -490,7 +497,7 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setTab('ia' as TabKey)}
-                    className="w-full text-left rounded-xl border border-[#e0d8ce] bg-white px-4 py-3 text-sm font-medium text-[#695f56] hover:border-[#6b4c2a] hover:text-[#6b4c2a] transition-colors"
+                    className="w-full text-left rounded-xl border border-[#EFE8DD] bg-white px-4 py-3 text-sm font-medium text-[#54514E] hover:border-[#3B5FFF] hover:text-[#3B5FFF] transition-colors"
                   >
                     Assistant IA →
                   </button>

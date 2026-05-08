@@ -67,14 +67,14 @@ export default function StepSpace({ furnitureType, initial, onBack, onNext }: Pr
   return (
     <div>
       <div className="mb-5">
-        <p className="text-[11px] uppercase tracking-widest text-[#9d9089] mb-1">Étape 2 / 3</p>
-        <h3 className="text-base font-semibold text-[#1c1714]">Dimensions et matériau</h3>
+        <p className="text-[11px] uppercase tracking-widest text-[#9A968F] mb-1">Étape 2 / 3</p>
+        <h3 className="text-base font-semibold text-[#0E0D0C]">Dimensions et matériau</h3>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
         {(Object.entries(RANGES) as [DimKey, (typeof RANGES)[DimKey]][]).map(([key, range]) => (
           <div key={key}>
-            <label className="block text-xs font-medium text-[#695f56] mb-1">{range.label}</label>
+            <label className="block text-xs font-medium text-[#54514E] mb-1">{range.label}</label>
             <input
               type="number"
               value={dims[key]}
@@ -83,17 +83,17 @@ export default function StepSpace({ furnitureType, initial, onBack, onNext }: Pr
               onChange={(e) => handleDim(key, e.target.value)}
               className={`w-full border rounded-lg px-3 py-2 text-sm font-mono tabular-nums focus:outline-none transition-colors ${
                 errors[key]
-                  ? 'border-[#e8c8c8] bg-[#fae8e8] focus:border-[#7a2424]'
-                  : 'border-[#e0d8ce] bg-white focus:border-[#6b4c2a]'
+                  ? 'border-[#FF6B4A] bg-[#FFE4DC] focus:border-[#A52E16]'
+                  : 'border-[#EFE8DD] bg-white focus:border-[#3B5FFF]'
               }`}
             />
-            {errors[key] && <p className="text-xs text-[#7a2424] mt-1">{errors[key]}</p>}
+            {errors[key] && <p className="text-xs text-[#A52E16] mt-1">{errors[key]}</p>}
           </div>
         ))}
       </div>
 
       <div className="mb-6">
-        <label className="block text-xs font-medium text-[#695f56] mb-2">Type de mur</label>
+        <label className="block text-xs font-medium text-[#54514E] mb-2">Type de mur</label>
         <div className="flex flex-wrap gap-2">
           {WALL_OPTIONS.map((opt) => (
             <button
@@ -102,8 +102,8 @@ export default function StepSpace({ furnitureType, initial, onBack, onNext }: Pr
               onClick={() => setDims((prev) => ({ ...prev, wall_type: opt.value }))}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
                 dims.wall_type === opt.value
-                  ? 'border-2 border-[#6b4c2a] bg-[#f2ebe0] text-[#6b4c2a] font-medium'
-                  : 'border-[#e0d8ce] bg-white text-[#695f56] hover:border-[#c8bfb3]'
+                  ? 'border-2 border-[#3B5FFF] bg-[#E5EAFF] text-[#3B5FFF] font-medium'
+                  : 'border-[#EFE8DD] bg-white text-[#54514E] hover:border-[#9A968F]'
               }`}
             >
               {opt.label}
@@ -113,11 +113,11 @@ export default function StepSpace({ furnitureType, initial, onBack, onNext }: Pr
       </div>
 
       <div className="mb-6">
-        <label className="block text-xs font-medium text-[#695f56] mb-1">Matériau</label>
+        <label className="block text-xs font-medium text-[#54514E] mb-1">Matériau</label>
         <select
           value={materialKey}
           onChange={(e) => setMaterialKey(e.target.value as MaterialKey)}
-          className="w-full border border-[#e0d8ce] rounded-lg px-3 py-2 text-sm text-[#1c1714] focus:border-[#6b4c2a] focus:outline-none transition-colors"
+          className="w-full border border-[#EFE8DD] rounded-lg px-3 py-2 text-sm text-[#0E0D0C] focus:border-[#3B5FFF] focus:outline-none transition-colors"
         >
           {MATERIAL_ENTRIES.map(([key, mat]) => (
             <option key={key} value={key}>
@@ -130,14 +130,14 @@ export default function StepSpace({ furnitureType, initial, onBack, onNext }: Pr
       <div className="flex justify-between">
         <button
           onClick={onBack}
-          className="px-4 py-2 text-sm border border-[#e0d8ce] rounded-lg text-[#695f56] hover:bg-[#faf8f4] transition-colors"
+          className="px-4 py-2 text-sm border border-[#EFE8DD] rounded-lg text-[#54514E] hover:bg-[#FFFCF7] transition-colors"
         >
           ← Retour
         </button>
         <button
           onClick={() => valid && onNext(dims, materialKey)}
           disabled={!valid}
-          className="px-4 py-2 text-sm bg-[#6b4c2a] text-white rounded-lg hover:bg-[#5a3e22] disabled:opacity-40 transition-colors"
+          className="px-4 py-2 text-sm bg-[#3B5FFF] text-white rounded-lg hover:bg-[#1E3FCC] disabled:opacity-40 transition-colors"
         >
           Suivant →
         </button>

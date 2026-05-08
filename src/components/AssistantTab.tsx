@@ -56,8 +56,8 @@ interface UploadedImage {
   preview: string;
 }
 
-const cardClass = "rounded-lg border border-[#e0d8ce] bg-white p-4 mb-4";
-const inputClass = "w-full rounded-lg border border-[#e0d8ce] bg-white px-3 py-2.5 text-sm text-[#1c1714] placeholder-[#9d9089] focus:border-[#6b4c2a] focus:outline-none transition-colors";
+const cardClass = "rounded-lg border border-[#EFE8DD] bg-white p-4 mb-4";
+const inputClass = "w-full rounded-lg border border-[#EFE8DD] bg-white px-3 py-2.5 text-sm text-[#0E0D0C] placeholder-[#9A968F] focus:border-[#3B5FFF] focus:outline-none transition-colors";
 
 export default function AssistantTab({ state, validation, allPieces, totalPieces: _totalPieces, panelCount: _panelCount, projectId, onApplyState }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>(() => loadChat(projectId));
@@ -318,11 +318,11 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
       <div className={cardClass}>
         <div className="flex items-center justify-between mb-3">
           <Tip text={TIPS['assistant-ia']}>
-            <h4 className="text-[#6b4c2a] font-semibold text-sm">Assistant IA — {mat.short}</h4>
+            <h4 className="text-[#3B5FFF] font-semibold text-sm">Assistant IA — {mat.short}</h4>
           </Tip>
           <div className="flex items-center gap-1.5">
             {attachCount > 0 && (
-              <span className="text-xs text-[#9d9089]">{attachCount} pj</span>
+              <span className="text-xs text-[#9A968F]">{attachCount} pj</span>
             )}
             {messages.length > 0 && (
               <button
@@ -331,7 +331,7 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
                     setMessages([]);
                   }
                 }}
-                className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9d9089] hover:bg-[#faf8f4] hover:text-[#7a2424] border border-[#e0d8ce] transition-colors"
+                className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9A968F] hover:bg-[#FFFCF7] hover:text-[#A52E16] border border-[#EFE8DD] transition-colors"
                 title="Effacer l'historique"
               >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -341,7 +341,7 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
             )}
             <button
               onClick={() => cameraRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9d9089] hover:bg-[#faf8f4] border border-[#e0d8ce] transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9A968F] hover:bg-[#FFFCF7] border border-[#EFE8DD] transition-colors"
               title="Prendre une photo"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -352,7 +352,7 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
             </button>
             <button
               onClick={() => photoRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9d9089] hover:bg-[#faf8f4] border border-[#e0d8ce] transition-colors"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9A968F] hover:bg-[#FFFCF7] border border-[#EFE8DD] transition-colors"
               title="Choisir une photo"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -363,7 +363,7 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
             </button>
             <button
               onClick={() => fileRef.current?.click()}
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9d9089] hover:bg-[#faf8f4] border border-[#e0d8ce] transition-colors font-medium"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-white text-[#9A968F] hover:bg-[#FFFCF7] border border-[#EFE8DD] transition-colors font-medium"
               title="Ajouter un PDF"
             >
               PDF
@@ -381,34 +381,34 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
                 <img
                   src={img.preview}
                   alt={img.name}
-                  className="w-14 h-14 rounded-lg object-cover border border-[#e0d8ce]"
+                  className="w-14 h-14 rounded-lg object-cover border border-[#EFE8DD]"
                 />
                 <button
                   onClick={() => setImages((imgs) => imgs.filter((_, j) => j !== i))}
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-[#e0d8ce] text-[#9d9089] hover:text-[#7a2424] text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-[#EFE8DD] text-[#9A968F] hover:text-[#A52E16] text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   ×
                 </button>
               </div>
             ))}
             {pdfs.map((d, i) => (
-              <span key={`pdf-${i}`} className="text-xs bg-[#faf8f4] rounded-lg px-2.5 py-1 text-[#695f56] flex items-center gap-1.5 border border-[#e0d8ce] h-14">
+              <span key={`pdf-${i}`} className="text-xs bg-[#FFFCF7] rounded-lg px-2.5 py-1 text-[#54514E] flex items-center gap-1.5 border border-[#EFE8DD] h-14">
                 <svg width="12" height="14" viewBox="0 0 12 14" fill="none" className="flex-shrink-0">
                   <rect x="1" y="1" width="10" height="12" rx="2" stroke="currentColor" strokeWidth="1.2"/>
                   <path d="M3 5h6M3 8h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
                 </svg>
                 {d.name.length > 15 ? d.name.slice(0, 12) + '...' : d.name}
-                <button onClick={() => setPdfs((ds) => ds.filter((_, j) => j !== i))} className="text-[#9d9089] hover:text-[#7a2424]">×</button>
+                <button onClick={() => setPdfs((ds) => ds.filter((_, j) => j !== i))} className="text-[#9A968F] hover:text-[#A52E16]">×</button>
               </span>
             ))}
           </div>
         )}
 
-        <div className="text-xs text-[#9d9089] mb-3 flex items-center gap-1.5 flex-wrap">
+        <div className="text-xs text-[#9A968F] mb-3 flex items-center gap-1.5 flex-wrap">
           <span>Contexte : {mat.short} + validation ({validation.errors.length}e/{validation.warnings.length}w)</span>
           <button
             onClick={() => setShowKnowledge(true)}
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#faf8f4] hover:bg-[#f2ebe0] text-[#695f56] hover:text-[#6b4c2a] border border-[#e0d8ce] transition-colors"
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#FFFCF7] hover:bg-[#E5EAFF] text-[#54514E] hover:text-[#3B5FFF] border border-[#EFE8DD] transition-colors"
           >
             KB {kbDocCount} doc{kbDocCount > 1 ? 's' : ''}
           </button>
@@ -417,20 +417,20 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
         </div>
 
         {error && (
-          <div className="mb-3 text-xs text-[#7a2424] bg-[#fae8e8] border border-[#e8c8c8] rounded-lg px-3 py-2">
+          <div className="mb-3 text-xs text-[#A52E16] bg-[#FFE4DC] border border-[#FF6B4A] rounded-lg px-3 py-2">
             {error}
           </div>
         )}
 
-        <div className="rounded-lg bg-[#faf8f4] p-4 mb-3 min-h-[200px] max-h-[400px] overflow-y-auto">
+        <div className="rounded-lg bg-[#FFFCF7] p-4 mb-3 min-h-[200px] max-h-[400px] overflow-y-auto">
           {messages.length === 0 && (
-            <div className="text-[#9d9089] text-sm text-center py-8">
-              <div className="mb-3 text-[#695f56]">Exemples de questions :</div>
+            <div className="text-[#9A968F] text-sm text-center py-8">
+              <div className="mb-3 text-[#54514E]">Exemples de questions :</div>
               <div className="space-y-1">
                 {suggestions.map((q, i) => (
                   <button
                     key={i}
-                    className="block w-full text-left px-3 py-2 rounded-lg text-xs text-[#695f56] hover:bg-white hover:text-[#6b4c2a] transition-colors"
+                    className="block w-full text-left px-3 py-2 rounded-lg text-xs text-[#54514E] hover:bg-white hover:text-[#3B5FFF] transition-colors"
                     onClick={() => setInput(q)}
                   >
                     {q}
@@ -446,19 +446,19 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
               <div key={i} className={`mb-3 ${m.role === 'user' ? 'text-right' : ''}`}>
                 <div className={`inline-block max-w-[85%] rounded-lg px-4 py-2.5 text-sm ${
                   m.role === 'user'
-                    ? 'bg-[#6b4c2a] text-white'
-                    : 'bg-[#f2ebe0] text-[#1c1714]'
+                    ? 'bg-[#3B5FFF] text-white'
+                    : 'bg-[#E5EAFF] text-[#0E0D0C]'
                 }`}>
                   <div style={{ whiteSpace: 'pre-wrap' }}>{cleanContent}</div>
                 </div>
                 {patches.length > 0 && onApplyState && (
                   <div className="mt-2 space-y-2 text-left">
                     {patches.map((pp, pi) => (
-                      <div key={pi} className="inline-block max-w-[85%] rounded-lg border border-[#e0d8ce] bg-[#f2ebe0] px-3 py-2 text-xs">
+                      <div key={pi} className="inline-block max-w-[85%] rounded-lg border border-[#EFE8DD] bg-[#E5EAFF] px-3 py-2 text-xs">
                         {pp.patch.title && (
-                          <div className="font-semibold text-[#6b4c2a] mb-1">{pp.patch.title}</div>
+                          <div className="font-semibold text-[#3B5FFF] mb-1">{pp.patch.title}</div>
                         )}
-                        <ul className="text-[#695f56] space-y-0.5 mb-2">
+                        <ul className="text-[#54514E] space-y-0.5 mb-2">
                           {pp.summary.map((s, si) => (
                             <li key={si}>• {s}</li>
                           ))}
@@ -468,8 +468,8 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
                           const applied = appliedPatches.has(key);
                           return applied ? (
                             <div className="flex items-center gap-2">
-                              <span className="text-xs text-[#2f6144] font-medium">✓ Appliqué</span>
-                              <span className="text-xs text-[#9d9089]">— voir l'onglet Structure</span>
+                              <span className="text-xs text-[#0E5A3D] font-medium">✓ Appliqué</span>
+                              <span className="text-xs text-[#9A968F]">— voir l'onglet Structure</span>
                             </div>
                           ) : (
                             <button
@@ -478,7 +478,7 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
                                 onApplyState(next);
                                 setAppliedPatches(prev => new Set(prev).add(key));
                               }}
-                              className="text-xs px-3 py-1.5 rounded-lg bg-[#6b4c2a] text-white font-medium hover:bg-[#5a3e22] transition-colors"
+                              className="text-xs px-3 py-1.5 rounded-lg bg-[#3B5FFF] text-white font-medium hover:bg-[#1E3FCC] transition-colors"
                             >
                               Appliquer
                             </button>
@@ -492,8 +492,8 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
             );
           })}
           {loading && (
-            <div className="text-[#695f56] text-sm flex items-center gap-2">
-              <span className="inline-block w-2 h-2 bg-[#6b4c2a] rounded-full animate-pulse" />
+            <div className="text-[#54514E] text-sm flex items-center gap-2">
+              <span className="inline-block w-2 h-2 bg-[#3B5FFF] rounded-full animate-pulse" />
               Réflexion...
             </div>
           )}
@@ -516,7 +516,7 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
               disabled={loading}
             />
             {tokenWarningLevel !== 'none' && (
-              <span className={`text-[10px] leading-tight ${tokenWarningLevel === 'red' ? 'text-[#7a2424]' : 'text-[#695f56]'}`}>
+              <span className={`text-[10px] leading-tight ${tokenWarningLevel === 'red' ? 'text-[#A52E16]' : 'text-[#54514E]'}`}>
                 {tokenWarningLevel === 'red'
                   ? `~${Math.round(estimatedTokens / 1000)}k tokens — Payload trop volumineux, le résumé sera tronqué`
                   : `~${Math.round(estimatedTokens / 1000)}k tokens`}
@@ -526,7 +526,7 @@ export default function AssistantTab({ state, validation, allPieces, totalPieces
           <button
             onClick={send}
             disabled={loading || !input.trim()}
-            className="px-5 py-2 rounded-lg bg-[#6b4c2a] text-white text-sm font-medium hover:bg-[#5a3e22] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-5 py-2 rounded-lg bg-[#3B5FFF] text-white text-sm font-medium hover:bg-[#1E3FCC] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Envoyer
           </button>

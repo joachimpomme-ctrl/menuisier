@@ -9,13 +9,13 @@ export const M = 40;
 
 const ZONE_COLORS: Record<VisualHint['type'], string> = {
   shelves: '#dbeafe',
-  drawers: '#fef3c7',
+  drawers: '#FFF4D6',
   hanging_rod: '#f3e8ff',
   tv_niche: '#e0e7ff',
   wine_rack: '#fce7f3',
   shoe_rack: '#d1fae5',
   bench: '#e5e7eb',
-  generic: '#f5f5f4',
+  generic: '#FFFCF7',
 };
 
 export function computeFacadeScale(
@@ -62,7 +62,7 @@ function DimLine({
   y2,
   label,
   offset = 14,
-  color = '#78716c',
+  color = '#9A968F',
   fontSize = 7,
 }: {
   x1: number;
@@ -135,7 +135,7 @@ function renderZoneHint(
       width={width}
       height={height}
       fill={color}
-      stroke="#a8a29e"
+      stroke="#9A968F"
       strokeWidth="0.4"
       opacity={zone.visualHint.type === 'bench' ? 0.85 : 0.75}
       rx="1"
@@ -168,7 +168,7 @@ function renderZoneHint(
         const top = y + (height * i) / count;
         const drawerH = height / count;
         elements.push(
-          <rect key={`drawer-${i}`} x={x} y={top} width={width} height={drawerH} fill="none" stroke="#b45309" strokeWidth="0.8" />,
+          <rect key={`drawer-${i}`} x={x} y={top} width={width} height={drawerH} fill="none" stroke="#A52E16" strokeWidth="0.8" />,
         );
         elements.push(
           <rect
@@ -177,7 +177,7 @@ function renderZoneHint(
             y={top + drawerH / 2 - 1}
             width={10}
             height={2}
-            fill="#92400e"
+            fill="#1E3FCC"
             rx="1"
           />,
         );
@@ -268,7 +268,7 @@ function renderZoneHint(
           y={y + height / 2}
           textAnchor="middle"
           dominantBaseline="middle"
-          fill="#57534e"
+          fill="#54514E"
           fontSize="8"
           fontFamily="system-ui"
           fontWeight="600"
@@ -290,8 +290,8 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
   return (
     <div className="space-y-3">
       <div className="overflow-x-auto">
-        <svg width="100%" viewBox={`0 0 ${SVG_W} ${svgH}`} preserveAspectRatio="xMidYMid meet" className="rounded-lg bg-[#faf8f5]">
-          <rect width={SVG_W} height={svgH} fill="#faf8f5" rx="8" />
+        <svg width="100%" viewBox={`0 0 ${SVG_W} ${svgH}`} preserveAspectRatio="xMidYMid meet" className="rounded-lg bg-[#FFFCF7]">
+          <rect width={SVG_W} height={svgH} fill="#FFFCF7" rx="8" />
 
           {model.bodies.map((body) => {
             const bodyX = getFacadeBodyX(body, scale);
@@ -306,7 +306,7 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
 
             return (
               <g key={body.bodyId}>
-                <rect x={bodyX} y={bodyY} width={bodyW} height={bodyH} fill="none" stroke="#78716c" strokeWidth="1" />
+                <rect x={bodyX} y={bodyY} width={bodyW} height={bodyH} fill="none" stroke="#9A968F" strokeWidth="1" />
 
                 {model.plinthHeight_mm > 0 && (
                   <rect
@@ -314,8 +314,8 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
                     y={facadeYToSvg(model.plinthHeight_mm, scale, svgH)}
                     width={bodyW}
                     height={model.plinthHeight_mm * scale}
-                    fill="#e7e5e4"
-                    stroke="#a8a29e"
+                    fill="#EFE8DD"
+                    stroke="#9A968F"
                     strokeWidth="0.5"
                   />
                 )}
@@ -337,7 +337,7 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
                       x2={bodyRight}
                       y1={shelfY}
                       y2={shelfY}
-                      stroke="#92400e"
+                      stroke="#1E3FCC"
                       strokeWidth="1.5"
                     />
                   );
@@ -351,10 +351,10 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
                       width={bodyW - 2}
                       height={doorH - 2}
                       fill="rgba(180,180,180,0.15)"
-                      stroke="#78716c"
+                      stroke="#9A968F"
                       strokeWidth="0.5"
                     />
-                    <circle cx={bodyX + bodyW - 10} cy={doorMidY} r="2.3" fill="#78716c" />
+                    <circle cx={bodyX + bodyW - 10} cy={doorMidY} r="2.3" fill="#9A968F" />
                   </g>
                 )}
 
@@ -366,7 +366,7 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
                       width={bodyW / 2 - 2}
                       height={doorH - 2}
                       fill="rgba(180,180,180,0.15)"
-                      stroke="#78716c"
+                      stroke="#9A968F"
                       strokeWidth="0.5"
                     />
                     <rect
@@ -375,11 +375,11 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
                       width={bodyW / 2 - 2}
                       height={doorH - 2}
                       fill="rgba(180,180,180,0.15)"
-                      stroke="#78716c"
+                      stroke="#9A968F"
                       strokeWidth="0.5"
                     />
-                    <circle cx={bodyX + bodyW / 2 - 8} cy={doorMidY} r="2.3" fill="#78716c" />
-                    <circle cx={bodyX + bodyW / 2 + 8} cy={doorMidY} r="2.3" fill="#78716c" />
+                    <circle cx={bodyX + bodyW / 2 - 8} cy={doorMidY} r="2.3" fill="#9A968F" />
+                    <circle cx={bodyX + bodyW / 2 + 8} cy={doorMidY} r="2.3" fill="#9A968F" />
                   </g>
                 )}
               </g>
@@ -442,7 +442,7 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
       {hasFacadeWarnings(model) && (
         <div className="mt-3 space-y-1">
           {model.warnings.map((warning, index) => (
-            <p key={index} className="text-xs text-amber-600 bg-amber-50 rounded px-2 py-1">
+            <p key={index} className="text-xs text-[#3B5FFF] bg-[#E5EAFF] rounded px-2 py-1">
               ⚠ {warning}
             </p>
           ))}

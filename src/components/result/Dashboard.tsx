@@ -40,10 +40,10 @@ const NON_FABRICABLE_TYPES: Record<string, { label: string; explanation: string 
 };
 
 const PART_TYPE_DOT: Record<string, string> = {
-  joue:               'bg-[#6b4c2a]',
-  tablette_fixe:      'bg-[#9d9089]',
-  tablette_reglable:  'bg-[#2f6144]',
-  fond:               'bg-[#c8bfb3]',
+  joue:               'bg-[#3B5FFF]',
+  tablette_fixe:      'bg-[#9A968F]',
+  tablette_reglable:  'bg-[#0E5A3D]',
+  fond:               'bg-[#9A968F]',
 };
 
 type DashTab = 'pieces' | 'courses' | 'montage' | 'details';
@@ -69,13 +69,13 @@ function ChevronIcon({ open }: { open: boolean }) {
 function Accordion({ title, defaultOpen, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen ?? false);
   return (
-    <div className="border border-[#e0d8ce] rounded-lg overflow-hidden">
+    <div className="border border-[#EFE8DD] rounded-lg overflow-hidden">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-[#1c1714] hover:bg-[#faf8f4]"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-[#0E0D0C] hover:bg-[#FFFCF7]"
       >
         {title}
-        <span className="text-[#9d9089]"><ChevronIcon open={open} /></span>
+        <span className="text-[#9A968F]"><ChevronIcon open={open} /></span>
       </button>
       {open && <div className="px-4 pb-4">{children}</div>}
     </div>
@@ -138,7 +138,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
   return (
     <div className="space-y-4">
       {/* Metrics grid */}
-      <div className="grid grid-cols-4 gap-px bg-[#e0d8ce] rounded-lg overflow-hidden border border-[#e0d8ce]">
+      <div className="grid grid-cols-4 gap-px bg-[#EFE8DD] rounded-lg overflow-hidden border border-[#EFE8DD]">
         {[
           { label: 'Pièces',  value: totalPieces,                          unit: '' },
           { label: 'Panneaux',value: totalPanels,                           unit: '' },
@@ -146,38 +146,38 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
           { label: 'Étapes',  value: totalSteps,                            unit: '' },
         ].map(({ label, value }) => (
           <div key={label} className="bg-white px-3 py-3 text-center">
-            <p className="text-[9px] uppercase tracking-widest text-[#9d9089] mb-1">{label}</p>
-            <p className="text-xl font-bold font-mono tabular-nums text-[#6b4c2a] leading-none">{value}</p>
+            <p className="text-[9px] uppercase tracking-widest text-[#9A968F] mb-1">{label}</p>
+            <p className="text-xl font-bold font-mono tabular-nums text-[#3B5FFF] leading-none">{value}</p>
           </div>
         ))}
       </div>
 
       {/* Non-fabricable warning */}
       {NON_FABRICABLE_TYPES[intent.furniture_type] && (
-        <div className="rounded-lg bg-[#fae8e8] border-2 border-[#e8c8c8] p-4">
-          <h3 className="font-bold text-[#7a2424] text-sm mb-2 flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-[#7a2424] flex-shrink-0" />
+        <div className="rounded-lg bg-[#FFE4DC] border-2 border-[#FF6B4A] p-4">
+          <h3 className="font-bold text-[#A52E16] text-sm mb-2 flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-[#A52E16] flex-shrink-0" />
             Type non supporté par le moteur V3 — aperçu uniquement
           </h3>
-          <p className="text-sm text-[#7a2424] leading-relaxed">
+          <p className="text-sm text-[#A52E16] leading-relaxed">
             {NON_FABRICABLE_TYPES[intent.furniture_type].explanation}
           </p>
-          <p className="text-xs text-[#7a2424] mt-2 italic">
+          <p className="text-xs text-[#A52E16] mt-2 italic">
             Ne pas utiliser cette liste de pièces pour une fabrication réelle.
           </p>
         </div>
       )}
 
       {/* Internal tab navigation */}
-      <div className="flex border-b border-[#e0d8ce] overflow-x-auto hide-scrollbar">
+      <div className="flex border-b border-[#EFE8DD] overflow-x-auto hide-scrollbar">
         {DASH_TABS.map((t) => (
           <button
             key={t.key}
             onClick={() => setDashTab(t.key)}
             className={`px-4 py-2.5 text-xs whitespace-nowrap flex-shrink-0 border-b-2 -mb-px transition-colors ${
               dashTab === t.key
-                ? 'border-[#6b4c2a] text-[#6b4c2a] font-semibold'
-                : 'border-transparent text-[#695f56] hover:text-[#1c1714]'
+                ? 'border-[#3B5FFF] text-[#3B5FFF] font-semibold'
+                : 'border-transparent text-[#54514E] hover:text-[#0E0D0C]'
             }`}
           >
             {t.label}
@@ -189,48 +189,48 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
       {dashTab === 'pieces' && (
         <div className="space-y-4">
           {/* Facade 2D — hero */}
-          <div className="bg-white rounded-lg border border-[#e0d8ce] p-4">
-            <p className="text-[11px] uppercase tracking-widest text-[#9d9089] mb-3">Vue façade</p>
+          <div className="bg-white rounded-lg border border-[#EFE8DD] p-4">
+            <p className="text-[11px] uppercase tracking-widest text-[#9A968F] mb-3">Vue façade</p>
             <Facade2DView model={facade2DModel} />
           </div>
 
           {/* Parts table */}
-          <div className="bg-white rounded-lg border border-[#e0d8ce] overflow-hidden">
-            <div className="px-4 py-3 border-b border-[#e0d8ce] bg-[#faf8f4]">
-              <p className="text-[11px] uppercase tracking-widest text-[#9d9089]">
+          <div className="bg-white rounded-lg border border-[#EFE8DD] overflow-hidden">
+            <div className="px-4 py-3 border-b border-[#EFE8DD] bg-[#FFFCF7]">
+              <p className="text-[11px] uppercase tracking-widest text-[#9A968F]">
                 Tableau de débit — {totalPieces} pièces
               </p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-[#e0d8ce] text-left">
-                    <th className="py-2 px-3 font-medium text-[#695f56]">Nom</th>
-                    <th className="py-2 px-3 font-medium text-[#695f56]">L mm</th>
-                    <th className="py-2 px-3 font-medium text-[#695f56]">l mm</th>
-                    <th className="py-2 px-3 font-medium text-[#695f56]">Ép.</th>
-                    <th className="py-2 px-3 font-medium text-[#695f56]">Qté</th>
-                    <th className="py-2 px-3 font-medium text-[#695f56]">Type</th>
-                    <th className="py-2 px-3 font-medium text-[#695f56]">Chant</th>
+                  <tr className="border-b border-[#EFE8DD] text-left">
+                    <th className="py-2 px-3 font-medium text-[#54514E]">Nom</th>
+                    <th className="py-2 px-3 font-medium text-[#54514E]">L mm</th>
+                    <th className="py-2 px-3 font-medium text-[#54514E]">l mm</th>
+                    <th className="py-2 px-3 font-medium text-[#54514E]">Ép.</th>
+                    <th className="py-2 px-3 font-medium text-[#54514E]">Qté</th>
+                    <th className="py-2 px-3 font-medium text-[#54514E]">Type</th>
+                    <th className="py-2 px-3 font-medium text-[#54514E]">Chant</th>
                   </tr>
                 </thead>
                 <tbody>
                   {result.parts.map((part) => {
-                    const dotClass = PART_TYPE_DOT[part.type] ?? 'bg-[#c8bfb3]';
+                    const dotClass = PART_TYPE_DOT[part.type] ?? 'bg-[#9A968F]';
                     return (
-                      <tr key={part.id} className="border-b border-[#f0ebe4] hover:bg-[#faf8f4]">
-                        <td className="py-2 px-3 text-[#1c1714]">{part.name}</td>
-                        <td className="py-2 px-3 font-mono tabular-nums text-[#1c1714]">{part.length_mm}</td>
-                        <td className="py-2 px-3 font-mono tabular-nums text-[#1c1714]">{part.width_mm}</td>
-                        <td className="py-2 px-3 font-mono tabular-nums text-[#695f56]">{part.thickness_mm}</td>
-                        <td className="py-2 px-3 font-mono tabular-nums text-[#1c1714]">{part.qty}</td>
+                      <tr key={part.id} className="border-b border-[#FFFCF7] hover:bg-[#FFFCF7]">
+                        <td className="py-2 px-3 text-[#0E0D0C]">{part.name}</td>
+                        <td className="py-2 px-3 font-mono tabular-nums text-[#0E0D0C]">{part.length_mm}</td>
+                        <td className="py-2 px-3 font-mono tabular-nums text-[#0E0D0C]">{part.width_mm}</td>
+                        <td className="py-2 px-3 font-mono tabular-nums text-[#54514E]">{part.thickness_mm}</td>
+                        <td className="py-2 px-3 font-mono tabular-nums text-[#0E0D0C]">{part.qty}</td>
                         <td className="py-2 px-3">
                           <span className="flex items-center gap-1.5">
                             <span className={`inline-block w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotClass}`} />
-                            <span className="text-[#695f56]">{part.type}</span>
+                            <span className="text-[#54514E]">{part.type}</span>
                           </span>
                         </td>
-                        <td className="py-2 px-3 text-[#9d9089]">
+                        <td className="py-2 px-3 text-[#9A968F]">
                           {part.edge_banding && part.edge_banding.length > 0
                             ? part.edge_banding.length === 4
                               ? '4 côtés'
@@ -255,15 +255,15 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
           <ShoppingListView list={prod.shopping_list} />
           <HardwareDetail items={result.hardware} />
           {/* Total recap */}
-          <div className="bg-[#f2ebe0] rounded-lg border border-[#e0d8ce] px-4 py-4">
+          <div className="bg-[#E5EAFF] rounded-lg border border-[#EFE8DD] px-4 py-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-[#695f56] font-medium">Total estimé</span>
-              <span className="text-2xl font-bold font-mono tabular-nums text-[#6b4c2a]">
+              <span className="text-sm text-[#54514E] font-medium">Total estimé</span>
+              <span className="text-2xl font-bold font-mono tabular-nums text-[#3B5FFF]">
                 {prod.shopping_list.estimated_cost_eur} €
               </span>
             </div>
             {prod.summary.difficulty && (
-              <p className="text-xs text-[#9d9089] mt-1" title="Difficulté estimée du projet">
+              <p className="text-xs text-[#9A968F] mt-1" title="Difficulté estimée du projet">
                 Difficulté : {DIFFICULTY_LABELS[prod.summary.difficulty] ?? prod.summary.difficulty}
                 {prod.summary.total_weight_kg ? ` · ${prod.summary.total_weight_kg} kg` : ''}
               </p>
@@ -272,7 +272,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
         </div>
       )}
       {dashTab === 'courses' && !prod && (
-        <p className="text-sm text-[#695f56] py-4">Aucune liste de courses générée.</p>
+        <p className="text-sm text-[#54514E] py-4">Aucune liste de courses générée.</p>
       )}
 
       {/* Tab: Montage */}
@@ -287,7 +287,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
         </div>
       )}
       {dashTab === 'montage' && !prod && (
-        <p className="text-sm text-[#695f56] py-4">Aucune notice de montage générée.</p>
+        <p className="text-sm text-[#54514E] py-4">Aucune notice de montage générée.</p>
       )}
 
       {/* Tab: Détails */}
@@ -295,39 +295,39 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
         <div className="space-y-3">
           {/* Validation banner */}
           {blockingIssues.length === 0 && warnings.length === 0 ? (
-            <div className="flex items-center gap-2 bg-[#e4f0e8] border border-[#c8ddd0] rounded-lg px-4 py-3">
-              <span className="inline-block w-2 h-2 rounded-full bg-[#2f6144] flex-shrink-0" />
-              <span className="text-sm text-[#2f6144] font-medium">Validation réussie — aucun problème détecté</span>
+            <div className="flex items-center gap-2 bg-[#DEF7EC] border border-[#5DD4A0] rounded-lg px-4 py-3">
+              <span className="inline-block w-2 h-2 rounded-full bg-[#0E5A3D] flex-shrink-0" />
+              <span className="text-sm text-[#0E5A3D] font-medium">Validation réussie — aucun problème détecté</span>
             </div>
           ) : (
             <>
               {blockingIssues.length > 0 && (
-                <div className="bg-[#fae8e8] border border-[#e8c8c8] rounded-lg p-4">
+                <div className="bg-[#FFE4DC] border border-[#FF6B4A] rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="inline-block w-2 h-2 rounded-full bg-[#7a2424] flex-shrink-0" />
-                    <h3 className="font-semibold text-[#7a2424] text-sm">Erreurs bloquantes</h3>
+                    <span className="inline-block w-2 h-2 rounded-full bg-[#A52E16] flex-shrink-0" />
+                    <h3 className="font-semibold text-[#A52E16] text-sm">Erreurs bloquantes</h3>
                   </div>
-                  <ul className="text-sm text-[#7a2424] space-y-1 ml-4">
+                  <ul className="text-sm text-[#A52E16] space-y-1 ml-4">
                     {blockingIssues.map((issue) => (
                       <li key={issue.id}>
                         {issue.message}
-                        {issue.suggestion && <span className="text-[#9d9089]"> — {issue.suggestion}</span>}
+                        {issue.suggestion && <span className="text-[#9A968F]"> — {issue.suggestion}</span>}
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
               {warnings.length > 0 && (
-                <div className="bg-[#f5ead8] border border-[#e8d8b8] rounded-lg p-4">
+                <div className="bg-[#FFE4DC] border border-[#e8d8b8] rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="inline-block w-2 h-2 rounded-full bg-[#7a5020] flex-shrink-0" />
-                    <h3 className="font-semibold text-[#7a5020] text-sm">Avertissements</h3>
+                    <span className="inline-block w-2 h-2 rounded-full bg-[#A52E16] flex-shrink-0" />
+                    <h3 className="font-semibold text-[#A52E16] text-sm">Avertissements</h3>
                   </div>
-                  <ul className="text-sm text-[#7a5020] space-y-1 ml-4">
+                  <ul className="text-sm text-[#A52E16] space-y-1 ml-4">
                     {warnings.map((issue) => (
                       <li key={issue.id}>
                         {issue.message}
-                        {issue.suggestion && <span className="text-[#9d9089]"> — {issue.suggestion}</span>}
+                        {issue.suggestion && <span className="text-[#9A968F]"> — {issue.suggestion}</span>}
                       </li>
                     ))}
                   </ul>
@@ -344,14 +344,14 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
           )}
 
           {/* Note débit */}
-          <p className="text-xs text-[#9d9089] italic">
+          <p className="text-xs text-[#9A968F] italic">
             Plans de coupe accessibles via l'éditeur classique (onglet Débit).
           </p>
 
           {/* Dimensions */}
-          <div className="bg-[#faf8f4] border border-[#e0d8ce] rounded-lg px-4 py-3">
-            <p className="text-[11px] uppercase tracking-widest text-[#9d9089] mb-2">Dimensions nettes</p>
-            <p className="font-mono tabular-nums text-sm text-[#1c1714]">
+          <div className="bg-[#FFFCF7] border border-[#EFE8DD] rounded-lg px-4 py-3">
+            <p className="text-[11px] uppercase tracking-widest text-[#9A968F] mb-2">Dimensions nettes</p>
+            <p className="font-mono tabular-nums text-sm text-[#0E0D0C]">
               {space.width_mm} × {space.height_mm} × {space.depth_mm} mm
             </p>
           </div>
@@ -359,10 +359,10 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
       )}
 
       {/* Actions */}
-      <div className="flex flex-wrap gap-2 pt-2 border-t border-[#e0d8ce]">
+      <div className="flex flex-wrap gap-2 pt-2 border-t border-[#EFE8DD]">
         <button
           onClick={onModify}
-          className="px-4 py-2 text-sm border border-[#e0d8ce] rounded-lg text-[#695f56] hover:bg-[#faf8f4] hover:text-[#1c1714] transition-colors"
+          className="px-4 py-2 text-sm border border-[#EFE8DD] rounded-lg text-[#54514E] hover:bg-[#FFFCF7] hover:text-[#0E0D0C] transition-colors"
         >
           ← Reconfigurer
         </button>
@@ -372,7 +372,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
               onClassicEditor(pipelineResultToAppState(result, materialKey));
             }
           }}
-          className="px-4 py-2 text-sm border border-[#e0d8ce] rounded-lg text-[#695f56] hover:bg-[#faf8f4] hover:text-[#1c1714] transition-colors"
+          className="px-4 py-2 text-sm border border-[#EFE8DD] rounded-lg text-[#54514E] hover:bg-[#FFFCF7] hover:text-[#0E0D0C] transition-colors"
         >
           Modifier les pièces
         </button>
@@ -384,7 +384,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
               ? 'Export PDF désactivé : la liste de pièces n\'est pas fabricable pour ce type de meuble'
               : undefined
           }
-          className="px-4 py-2 text-sm bg-[#6b4c2a] text-white rounded-lg hover:bg-[#5a3e22] disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
+          className="px-4 py-2 text-sm bg-[#3B5FFF] text-white rounded-lg hover:bg-[#1E3FCC] disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
         >
           {pdfLoading ? 'Génération…' : 'Exporter PDF'}
         </button>

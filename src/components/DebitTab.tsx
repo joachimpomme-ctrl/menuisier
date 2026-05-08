@@ -50,7 +50,7 @@ interface Props {
   analysis: ProjectAnalysis;
 }
 
-const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
+const cardClass = "rounded-2xl border border-[#EFE8DD] bg-white  p-4 mb-4";
 
 const strategyLabels: Record<string, string> = {
   'shelf-height-desc': 'Étagère (hauteur)',
@@ -75,19 +75,19 @@ function PanelBinDiagram({ bin, binIndex, panelDef, kerf }: {
   return (
     <div className={cardClass}>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-medium text-stone-400">Panneau {binIndex + 1}</span>
-        <span className="text-xs text-stone-500">{binEfficiency.toFixed(0)}% · {bin.pl.length} pièces</span>
+        <span className="text-xs font-medium text-[#9A968F]">Panneau {binIndex + 1}</span>
+        <span className="text-xs text-[#54514E]">{binEfficiency.toFixed(0)}% · {bin.pl.length} pièces</span>
       </div>
       <div className="overflow-x-auto">
         <svg width={SVG_WIDTH} height={svgHeight} className="rounded-lg">
-          <rect width={SVG_WIDTH} height={svgHeight} fill="#f5f0eb" rx="8" />
+          <rect width={SVG_WIDTH} height={svgHeight} fill="#FFFCF7" rx="8" />
           {Array.from({ length: Math.floor(panelDef.width / 10) + 1 }, (_, i) => (
-            <line key={`v${i}`} x1={MARGIN + i * 10 * scale} y1={MARGIN} x2={MARGIN + i * 10 * scale} y2={svgHeight - MARGIN} stroke="#d6cfc7" strokeWidth=".5" />
+            <line key={`v${i}`} x1={MARGIN + i * 10 * scale} y1={MARGIN} x2={MARGIN + i * 10 * scale} y2={svgHeight - MARGIN} stroke="#EFE8DD" strokeWidth=".5" />
           ))}
           {Array.from({ length: Math.floor(panelDef.height / 10) + 1 }, (_, i) => (
-            <line key={`h${i}`} x1={MARGIN} y1={MARGIN + i * 10 * scale} x2={SVG_WIDTH - MARGIN} y2={MARGIN + i * 10 * scale} stroke="#d6cfc7" strokeWidth=".5" />
+            <line key={`h${i}`} x1={MARGIN} y1={MARGIN + i * 10 * scale} x2={SVG_WIDTH - MARGIN} y2={MARGIN + i * 10 * scale} stroke="#EFE8DD" strokeWidth=".5" />
           ))}
-          <rect x={MARGIN} y={MARGIN} width={panelDef.width * scale} height={panelDef.height * scale} fill="none" stroke="#a8a29e" strokeWidth="2" rx="2" />
+          <rect x={MARGIN} y={MARGIN} width={panelDef.width * scale} height={panelDef.height * scale} fill="none" stroke="#9A968F" strokeWidth="2" rx="2" />
           {bin.pl.map((p, j) => {
             const px = MARGIN + p.x * scale;
             const py = MARGIN + p.y * scale;
@@ -116,7 +116,7 @@ function PanelBinDiagram({ bin, binIndex, panelDef, kerf }: {
   );
 }
 
-const inputClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-colors";
+const inputClass = "w-full rounded-xl border border-[#EFE8DD] bg-white px-3 py-2.5 text-sm text-[#0E0D0C] placeholder-[#9A968F] focus:border-[#3B5FFF] focus:outline-none focus:ring-2 focus:ring-[#3B5FFF]/20 transition-colors";
 
 export default function DebitTab({ state, onChange, allPieces, nesting: _nesting, nestingByPanel, allPanelDefs, cost, onPriceChange, analysis }: Props) {
   const mat = MATERIALS[state.materialKey];
@@ -170,13 +170,13 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
     <div>
       {/* Panneaux config */}
       <div className={cardClass}>
-        <h4 className="text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3">Panneaux</h4>
+        <h4 className="text-[#3B5FFF] font-semibold text-xs uppercase tracking-widest mb-3">Panneaux</h4>
 
         {/* Main panel */}
         <div className="mb-3">
-          <div className="text-xs font-medium text-stone-600 mb-1.5">Panneau principal : <span className="text-amber-700 font-semibold">{mat.short} {state.panel.thickness * 10}mm</span></div>
+          <div className="text-xs font-medium text-[#54514E] mb-1.5">Panneau principal : <span className="text-[#3B5FFF] font-semibold">{mat.short} {state.panel.thickness * 10}mm</span></div>
           <div className="flex items-center gap-2 flex-wrap">
-            <label className="text-[10px] text-stone-400">Format :</label>
+            <label className="text-[10px] text-[#9A968F]">Format :</label>
             <input
               type="number"
               step="1"
@@ -186,7 +186,7 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
               onChange={(e) => updatePanel('width', parseNumber(e.target.value, state.panel.width, 10))}
               title="Largeur (cm)"
             />
-            <span className="text-[10px] text-stone-400">x</span>
+            <span className="text-[10px] text-[#9A968F]">x</span>
             <input
               type="number"
               step="1"
@@ -196,8 +196,8 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
               onChange={(e) => updatePanel('height', parseNumber(e.target.value, state.panel.height, 10))}
               title="Hauteur (cm)"
             />
-            <span className="text-[10px] text-stone-400">cm</span>
-            <label className="text-[10px] text-stone-400 ml-2">Prix :</label>
+            <span className="text-[10px] text-[#9A968F]">cm</span>
+            <label className="text-[10px] text-[#9A968F] ml-2">Prix :</label>
             <input
               type="number"
               step="1"
@@ -207,7 +207,7 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
               onChange={(e) => onPriceChange(parseNumber(e.target.value, state.costConfig.panelPrice, 0))}
               title="Prix par panneau (EUR)"
             />
-            <span className="text-[10px] text-stone-400">EUR</span>
+            <span className="text-[10px] text-[#9A968F]">EUR</span>
           </div>
           <div className="mt-2 flex gap-1.5 flex-wrap">
             {mat.panels.map((p, i) => (
@@ -215,8 +215,8 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
                 key={i}
                 className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-all ${
                   state.panel.width === p.w && state.panel.height === p.h
-                    ? 'bg-amber-100 border-amber-300 text-amber-800 font-semibold'
-                    : 'bg-white text-stone-500 hover:text-amber-700 hover:bg-amber-50 border-stone-200 hover:border-amber-200'
+                    ? 'bg-[#E5EAFF] border-[#3B5FFF] text-[#3B5FFF] font-semibold'
+                    : 'bg-white text-[#54514E] hover:text-[#3B5FFF] hover:bg-[#E5EAFF] border-[#EFE8DD] hover:border-[#3B5FFF]'
                 }`}
                 onClick={() => onChange({
                   ...state,
@@ -232,10 +232,10 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
 
         {/* Extra panels */}
         {(state.extraPanels ?? []).length > 0 && (
-          <div className="border-t border-stone-100 pt-3 mb-3">
+          <div className="border-t border-[#EFE8DD] pt-3 mb-3">
             {(state.extraPanels ?? []).map((ep, i) => (
-              <div key={ep.id} className="flex items-center gap-2 mb-2 p-2 bg-stone-50 rounded-xl border border-stone-200">
-                <span className="text-[10px] text-stone-400 flex-shrink-0">#{i + 1}</span>
+              <div key={ep.id} className="flex items-center gap-2 mb-2 p-2 bg-[#FFFCF7] rounded-xl border border-[#EFE8DD]">
+                <span className="text-[10px] text-[#9A968F] flex-shrink-0">#{i + 1}</span>
                 <input
                   className={inputClass + " !py-1.5 w-24"}
                   value={ep.label}
@@ -251,7 +251,7 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
                   onChange={(e) => updateExtraPanel(ep.id, 'width', parseNumber(e.target.value, ep.width, 10))}
                   title="Largeur (cm)"
                 />
-                <span className="text-[10px] text-stone-400">x</span>
+                <span className="text-[10px] text-[#9A968F]">x</span>
                 <input
                   type="number"
                   step="1"
@@ -261,7 +261,7 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
                   onChange={(e) => updateExtraPanel(ep.id, 'height', parseNumber(e.target.value, ep.height, 10))}
                   title="Hauteur (cm)"
                 />
-                <span className="text-[10px] text-stone-400">ep.</span>
+                <span className="text-[10px] text-[#9A968F]">ep.</span>
                 <input
                   type="number"
                   step="0.1"
@@ -271,7 +271,7 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
                   onChange={(e) => updateExtraPanel(ep.id, 'thickness', parseNumber(e.target.value, ep.thickness, 0.1))}
                   title="Epaisseur (cm)"
                 />
-                <span className="text-[10px] text-stone-400">cm</span>
+                <span className="text-[10px] text-[#9A968F]">cm</span>
                 <input
                   type="number"
                   step="1"
@@ -281,10 +281,10 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
                   onChange={(e) => updateExtraPanel(ep.id, 'price', parseNumber(e.target.value, ep.price, 0))}
                   title="Prix EUR/panneau"
                 />
-                <span className="text-[10px] text-stone-400">EUR</span>
+                <span className="text-[10px] text-[#9A968F]">EUR</span>
                 <button
                   onClick={() => removeExtraPanel(ep.id)}
-                  className="text-xs text-stone-400 hover:text-red-500 transition-colors flex-shrink-0 ml-1"
+                  className="text-xs text-[#9A968F] hover:text-[#FF6B4A] transition-colors flex-shrink-0 ml-1"
                   title="Supprimer ce panneau"
                 >
                   x
@@ -300,22 +300,22 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
             <button
               key={i}
               onClick={() => addExtraPanel(preset.def)}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-500 hover:text-amber-700 hover:bg-amber-50 border border-stone-200 hover:border-amber-200 transition-all"
+              className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-[#54514E] hover:text-[#3B5FFF] hover:bg-[#E5EAFF] border border-[#EFE8DD] hover:border-[#3B5FFF] transition-all"
             >
               + {preset.label}
             </button>
           ))}
           <button
             onClick={() => addExtraPanel()}
-            className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-stone-400 hover:text-stone-600 border border-dashed border-stone-300 hover:border-stone-400 transition-all"
+            className="text-[11px] px-2.5 py-1.5 rounded-lg bg-white text-[#9A968F] hover:text-[#54514E] border border-dashed border-[#EFE8DD] hover:border-[#9A968F] transition-all"
           >
             + Personnalise
           </button>
         </div>
 
         {/* Kerf */}
-        <div className="mt-3 pt-3 border-t border-stone-100 flex items-center gap-2">
-          <Tip text={TIPS['trait-scie']}><label className="text-xs text-stone-500 whitespace-nowrap">Trait de scie (kerf) :</label></Tip>
+        <div className="mt-3 pt-3 border-t border-[#EFE8DD] flex items-center gap-2">
+          <Tip text={TIPS['trait-scie']}><label className="text-xs text-[#54514E] whitespace-nowrap">Trait de scie (kerf) :</label></Tip>
           <input
             type="number"
             step="0.1"
@@ -325,7 +325,7 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
             value={state.kerf}
             onChange={(e) => updateKerf(parseNumber(e.target.value, state.kerf, 0, 5))}
           />
-          <span className="text-[10px] text-stone-400">mm</span>
+          <span className="text-[10px] text-[#9A968F]">mm</span>
         </div>
       </div>
 
@@ -333,31 +333,31 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
       <div className={cardClass}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
           <div>
-            <div className="text-2xl font-bold text-amber-700">{totalPanelCount}</div>
-            <Tip text={TIPS['panneaux-total']}><div className="text-xs text-stone-500">panneaux</div></Tip>
+            <div className="text-2xl font-bold text-[#3B5FFF]">{totalPanelCount}</div>
+            <Tip text={TIPS['panneaux-total']}><div className="text-xs text-[#54514E]">panneaux</div></Tip>
           </div>
           <div>
-            <div className={`text-2xl font-bold ${totalEfficiency > 70 ? 'text-emerald-400' : totalEfficiency > 50 ? 'text-yellow-400' : 'text-red-400'}`}>
+            <div className={`text-2xl font-bold ${totalEfficiency > 70 ? 'text-[#5DD4A0]' : totalEfficiency > 50 ? 'text-[#FFD23F]' : 'text-[#FF6B4A]'}`}>
               {totalEfficiency.toFixed(1)}%
             </div>
-            <Tip text={TIPS['rendement']}><div className="text-xs text-stone-500">rendement</div></Tip>
+            <Tip text={TIPS['rendement']}><div className="text-xs text-[#54514E]">rendement</div></Tip>
           </div>
           <div>
-            <div className="text-2xl font-bold text-stone-400">{(totalUsedArea / 10000).toFixed(2)}</div>
-            <Tip text={TIPS['surface-utile']}><div className="text-xs text-stone-500">m² utile</div></Tip>
+            <div className="text-2xl font-bold text-[#9A968F]">{(totalUsedArea / 10000).toFixed(2)}</div>
+            <Tip text={TIPS['surface-utile']}><div className="text-xs text-[#54514E]">m² utile</div></Tip>
           </div>
           <div>
-            <div className="text-2xl font-bold text-stone-500">{(totalWasteArea / 10000).toFixed(2)}</div>
-            <Tip text={TIPS['surface-chute']}><div className="text-xs text-stone-500">m² chute</div></Tip>
+            <div className="text-2xl font-bold text-[#54514E]">{(totalWasteArea / 10000).toFixed(2)}</div>
+            <Tip text={TIPS['surface-chute']}><div className="text-xs text-[#54514E]">m² chute</div></Tip>
           </div>
         </div>
         {totalCost > 0 && (
-          <div className="mt-3 pt-3 border-t border-stone-200 text-center">
-            <span className="text-lg font-bold text-emerald-600">{totalCost.toFixed(0)} €</span>
-            <span className="text-xs text-stone-400 ml-2">coût total panneaux</span>
+          <div className="mt-3 pt-3 border-t border-[#EFE8DD] text-center">
+            <span className="text-lg font-bold text-[#0E5A3D]">{totalCost.toFixed(0)} €</span>
+            <span className="text-xs text-[#9A968F] ml-2">coût total panneaux</span>
           </div>
         )}
-        <div className="mt-3 pt-3 border-t border-stone-200 flex items-center justify-between text-xs text-stone-500">
+        <div className="mt-3 pt-3 border-t border-[#EFE8DD] flex items-center justify-between text-xs text-[#54514E]">
           <Tip text={TIPS['trait-scie']}><span>trait {state.kerf} mm</span></Tip>
           {hasMultiplePanels && (
             <span>{nestingByPanel.length} types de panneaux</span>
@@ -367,11 +367,11 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
 
       {/* Unplaced pieces warning */}
       {allUnplaced.length > 0 && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 mb-4">
-          <Tip text={TIPS['piece-non-placable']}><h4 className="text-red-600 font-semibold text-sm mb-2">Pièces non placables</h4></Tip>
-          <p className="text-xs text-red-500 mb-2">Ces pièces dépassent les dimensions du panneau :</p>
+        <div className="rounded-xl border border-[#FF6B4A] bg-[#FFE4DC] p-4 mb-4">
+          <Tip text={TIPS['piece-non-placable']}><h4 className="text-[#FF6B4A] font-semibold text-sm mb-2">Pièces non placables</h4></Tip>
+          <p className="text-xs text-[#FF6B4A] mb-2">Ces pièces dépassent les dimensions du panneau :</p>
           {allUnplaced.map((p, i) => (
-            <div key={i} className="text-xs text-red-400 py-0.5">
+            <div key={i} className="text-xs text-[#FF6B4A] py-0.5">
               {p.name} ({p.length}×{p.width} cm) — {p.bodyName}
             </div>
           ))}
@@ -401,22 +401,22 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
             {/* Group header (only show if multiple panels) */}
             {hasMultiplePanels && (
               <div className="flex items-center gap-2 mb-3 mt-6">
-                <div className="flex-1 h-px bg-stone-200" />
+                <div className="flex-1 h-px bg-[#EFE8DD]" />
                 <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${
                   isDefault
-                    ? 'bg-amber-50 text-amber-700 border-amber-200'
+                    ? 'bg-[#E5EAFF] text-[#3B5FFF] border-[#3B5FFF]'
                     : 'bg-sky-50 text-sky-700 border-sky-200'
                 }`}>
                   {panelDef.label} — {panelDef.width}×{panelDef.height} cm, ép. {panelDef.thickness * 10}mm
                   {' · '}{groupNesting.metrics.panelCount} pan.
                   {panelDef.price > 0 && ` · ${(panelDef.price * groupNesting.metrics.panelCount).toFixed(0)} €`}
                 </span>
-                <div className="flex-1 h-px bg-stone-200" />
+                <div className="flex-1 h-px bg-[#EFE8DD]" />
               </div>
             )}
 
             {!hasMultiplePanels && (
-              <div className="mt-3 mb-2 text-xs text-stone-500 flex justify-between">
+              <div className="mt-3 mb-2 text-xs text-[#54514E] flex justify-between">
                 <span>{mat.short} · {panelDef.width}×{panelDef.height} cm</span>
                 <span>Stratégie : {strategyLabels[groupNesting.strategy] ?? groupNesting.strategy}</span>
               </div>
@@ -439,11 +439,11 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
       {/* Cut list */}
       <div className={cardClass}>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-amber-700 font-semibold text-xs uppercase tracking-widest">Liste de coupe</h4>
+          <h4 className="text-[#3B5FFF] font-semibold text-xs uppercase tracking-widest">Liste de coupe</h4>
           <div className="flex gap-1.5">
             <button
               type="button"
-              className="text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"
+              className="text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-[#3B5FFF] bg-[#E5EAFF] text-[#3B5FFF] hover:bg-[#D7DFFF] transition-colors"
               onClick={async () => {
                 const { generateCutListPdf } = await import('../lib/pdf');
                 generateCutListPdf(state, analysis);
@@ -453,7 +453,7 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
             </button>
             <button
               type="button"
-              className="text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-stone-300 bg-stone-50 text-stone-600 hover:bg-stone-100 transition-colors"
+              className="text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-[#EFE8DD] bg-[#FFFCF7] text-[#54514E] hover:bg-[#EFE8DD] transition-colors"
               onClick={() => downloadCsv(generateCutListCsv(allPieces, allPanelDefs, state), `${state.project.name}-debit.csv`)}
             >
               CSV
@@ -468,21 +468,21 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
                 ? allPanelDefs.find((pd) => pd.id === p.panelId)?.label
                 : null;
               return (
-                <div key={i} className="flex items-center justify-between gap-2 text-xs py-1.5 px-2 rounded-lg hover:bg-stone-50">
+                <div key={i} className="flex items-center justify-between gap-2 text-xs py-1.5 px-2 rounded-lg hover:bg-[#FFFCF7]">
                   <span className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="flex-shrink-0 flex items-center justify-center w-2 h-2"><TypeMarker type={p.type} /></span>
-                    <span className="text-stone-700 truncate">{p.name}</span>
+                    <span className="text-[#0E0D0C] truncate">{p.name}</span>
                     {p.standardPartId && (
-                      <span className="ml-1 text-[9px] bg-amber-100 text-amber-700 px-1 rounded flex-shrink-0" title="Pièce standard (bibliothèque)">
+                      <span className="ml-1 text-[9px] bg-[#E5EAFF] text-[#3B5FFF] px-1 rounded flex-shrink-0" title="Pièce standard (bibliothèque)">
                         STD
                       </span>
                     )}
-                    <span className="text-stone-400 hidden sm:inline flex-shrink-0">{p.bodyName}</span>
+                    <span className="text-[#9A968F] hidden sm:inline flex-shrink-0">{p.bodyName}</span>
                     {panelLabel && (
                       <span className="text-[9px] bg-sky-50 text-sky-600 border border-sky-200 rounded px-1 py-0 flex-shrink-0">{panelLabel}</span>
                     )}
                   </span>
-                  <span className="font-mono text-stone-500 flex-shrink-0">{p.length}×{p.width} ×{p.qty}</span>
+                  <span className="font-mono text-[#54514E] flex-shrink-0">{p.length}×{p.width} ×{p.qty}</span>
                 </div>
               );
             })}

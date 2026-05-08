@@ -69,9 +69,9 @@ export default function Glossary() {
         className="w-full flex items-center justify-between"
       >
         <h3 className={sectionTitle + " mb-0"}>Lexique des pièces</h3>
-        <span className="text-xs text-stone-400">{open ? '▲ Fermer' : '▼ Ouvrir'}</span>
+        <span className="text-xs text-[#9A968F]">{open ? '▲ Fermer' : '▼ Ouvrir'}</span>
       </button>
-      <p className="text-[10px] text-stone-400 mt-1">
+      <p className="text-[10px] text-[#9A968F] mt-1">
         {open ? "Chaque type de pièce a un rôle précis dans le meuble." : "Que sont les joues, tablettes fixes, etc. ? Cliquez pour comprendre."}
       </p>
 
@@ -85,20 +85,20 @@ export default function Glossary() {
               />
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-semibold text-stone-800">{g.icon} {g.label}</span>
-                  <span className="text-[10px] text-stone-400 font-mono bg-stone-100 px-1.5 py-0.5 rounded">{g.type}</span>
+                  <span className="text-sm font-semibold text-[#0E0D0C]">{g.icon} {g.label}</span>
+                  <span className="text-[10px] text-[#9A968F] font-mono bg-[#EFE8DD] px-1.5 py-0.5 rounded">{g.type}</span>
                 </div>
-                <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">{g.desc}</p>
-                <p className="text-[10px] text-amber-700 mt-0.5 leading-relaxed">💡 {g.illustration}</p>
+                <p className="text-xs text-[#54514E] mt-0.5 leading-relaxed">{g.desc}</p>
+                <p className="text-[10px] text-[#3B5FFF] mt-0.5 leading-relaxed">💡 {g.illustration}</p>
               </div>
             </div>
           ))}
 
           {/* Mini-schéma anatomie */}
-          <div className="bg-stone-50 border border-stone-200 rounded-xl p-3 mt-3">
-            <p className="text-[10px] font-semibold text-stone-600 mb-2">ANATOMIE D'UN CORPS (vue de face)</p>
+          <div className="bg-[#FFFCF7] border border-[#EFE8DD] rounded-xl p-3 mt-3">
+            <p className="text-[10px] font-semibold text-[#54514E] mb-2">ANATOMIE D'UN CORPS (vue de face)</p>
             <svg viewBox="0 0 200 160" className="w-full max-w-[280px] mx-auto" style={{ height: 160 }}>
-              <rect x="10" y="5" width="180" height="150" fill="none" stroke="#d6d3d1" strokeWidth="1" strokeDasharray="4,2" />
+              <rect x="10" y="5" width="180" height="150" fill="none" stroke="#EFE8DD" strokeWidth="1" strokeDasharray="4,2" />
               <rect x="15" y="10" width="12" height="140" fill="#3b82f6" opacity=".3" stroke="#3b82f6" strokeWidth="1" rx="1" />
               <rect x="173" y="10" width="12" height="140" fill="#3b82f6" opacity=".3" stroke="#3b82f6" strokeWidth="1" rx="1" />
               <rect x="27" y="12" width="146" height="8" fill="#10b981" opacity=".4" stroke="#10b981" strokeWidth="1" rx="1" />

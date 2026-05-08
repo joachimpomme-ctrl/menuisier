@@ -48,7 +48,7 @@ export default function PartsPicker({ isOpen, onClose, onSelect }: PartsPickerPr
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Rechercher une pièce..."
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#3B5FFF] focus:outline-none focus:ring-2 focus:ring-[#3B5FFF]/20"
           />
         </div>
 
@@ -83,7 +83,7 @@ export default function PartsPicker({ isOpen, onClose, onSelect }: PartsPickerPr
                           onSelect(part);
                           onClose();
                         }}
-                        className="text-xs px-2.5 py-1 rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 font-medium"
+                        className="text-xs px-2.5 py-1 rounded-lg bg-[#E5EAFF] text-[#3B5FFF] hover:bg-[#3B5FFF] font-medium"
                       >
                         Utiliser
                       </button>

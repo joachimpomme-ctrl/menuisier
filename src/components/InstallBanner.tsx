@@ -58,16 +58,16 @@ export default function InstallBanner() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
-      <div className="mx-4 mb-4 rounded-xl border border-amber-700/50 bg-white/95  shadow-xl shadow-stone-300/50 px-4 py-3 flex items-center gap-3">
+      <div className="mx-4 mb-4 rounded-xl border border-[#3B5FFF]/50 bg-white/95  shadow-xl shadow-[#EFE8DD]/50 px-4 py-3 flex items-center gap-3">
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-amber-700">Installer l'app</div>
+          <div className="text-sm font-medium text-[#3B5FFF]">Installer l'app</div>
           {deferredPrompt ? (
-            <div className="text-xs text-stone-500 mt-0.5">
+            <div className="text-xs text-[#54514E] mt-0.5">
               Ajoutez Menuisier sur votre écran d'accueil pour un accès rapide
             </div>
           ) : (
-            <div className="text-xs text-stone-500 mt-0.5">
-              Tapez <span className="inline-flex items-center mx-0.5 text-stone-400">
+            <div className="text-xs text-[#54514E] mt-0.5">
+              Tapez <span className="inline-flex items-center mx-0.5 text-[#9A968F]">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
               </span> puis « Sur l'écran d'accueil »
             </div>
@@ -76,14 +76,14 @@ export default function InstallBanner() {
         {deferredPrompt && (
           <button
             onClick={install}
-            className="text-xs px-4 py-2 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 transition-colors flex-shrink-0"
+            className="text-xs px-4 py-2 rounded-lg bg-[#3B5FFF] text-white font-medium hover:bg-[#1E3FCC] transition-colors flex-shrink-0"
           >
             Installer
           </button>
         )}
         <button
           onClick={dismiss}
-          className="text-stone-500 hover:text-stone-400 text-lg flex-shrink-0 px-1"
+          className="text-[#54514E] hover:text-[#9A968F] text-lg flex-shrink-0 px-1"
         >
           x
         </button>

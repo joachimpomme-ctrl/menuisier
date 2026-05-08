@@ -122,7 +122,7 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
           <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
           <button
             onClick={handleReset}
-            className="text-xs px-3 py-1.5 border border-red-200 text-red-500 rounded-lg hover:bg-red-50 ml-auto"
+            className="text-xs px-3 py-1.5 border border-[#FF6B4A] text-[#FF6B4A] rounded-lg hover:bg-[#FFE4DC] ml-auto"
           >
             Réinitialiser
           </button>
@@ -177,7 +177,7 @@ export default function PartsLibraryManager({ isOpen, onClose }: Props) {
                       </button>
                       <button
                         onClick={() => handleDelete(p.id)}
-                        className="text-xs text-red-400 hover:text-red-600"
+                        className="text-xs text-[#FF6B4A] hover:text-[#A52E16]"
                       >
                         ×
                       </button>

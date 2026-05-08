@@ -137,10 +137,10 @@ function ProgressBar({ step, total }: { step: number; total: number }) {
             <div
               className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-semibold flex-shrink-0 transition-colors ${
                 done
-                  ? 'bg-[#2f6144] text-white'
+                  ? 'bg-[#0E5A3D] text-white'
                   : active
-                  ? 'bg-[#6b4c2a] text-white'
-                  : 'bg-[#e0d8ce] text-[#9d9089]'
+                  ? 'bg-[#3B5FFF] text-white'
+                  : 'bg-[#EFE8DD] text-[#9A968F]'
               }`}
             >
               {done ? (
@@ -150,7 +150,7 @@ function ProgressBar({ step, total }: { step: number; total: number }) {
               ) : num}
             </div>
             {num < total && (
-              <div className={`flex-1 h-px mx-1 ${done ? 'bg-[#2f6144]' : 'bg-[#e0d8ce]'}`} />
+              <div className={`flex-1 h-px mx-1 ${done ? 'bg-[#0E5A3D]' : 'bg-[#EFE8DD]'}`} />
             )}
           </div>
         );
@@ -165,25 +165,25 @@ function SpaceDiagram() {
   return (
     <svg viewBox="0 0 200 130" className="w-full max-w-[220px] mx-auto" fill="none">
       {/* Furniture body */}
-      <rect x="40" y="20" width="100" height="90" rx="2" fill="#f2ebe0" stroke="#6b4c2a" strokeWidth="1.5"/>
+      <rect x="40" y="20" width="100" height="90" rx="2" fill="#E5EAFF" stroke="#3B5FFF" strokeWidth="1.5"/>
       {/* Shelves */}
-      <line x1="40" y1="50" x2="140" y2="50" stroke="#6b4c2a" strokeWidth="1" opacity=".5"/>
-      <line x1="40" y1="80" x2="140" y2="80" stroke="#6b4c2a" strokeWidth="1" opacity=".5"/>
+      <line x1="40" y1="50" x2="140" y2="50" stroke="#3B5FFF" strokeWidth="1" opacity=".5"/>
+      <line x1="40" y1="80" x2="140" y2="80" stroke="#3B5FFF" strokeWidth="1" opacity=".5"/>
       {/* Width arrow */}
-      <line x1="40" y1="120" x2="140" y2="120" stroke="#9d9089" strokeWidth="1"/>
-      <path d="M40 118v4M140 118v4" stroke="#9d9089" strokeWidth="1"/>
-      <path d="M45 120l-6-2v4l6-2zM135 120l6-2v4l-6-2z" fill="#9d9089"/>
-      <text x="90" y="128" textAnchor="middle" fontSize="9" fill="#695f56" fontFamily="'DM Mono', monospace">Largeur</text>
+      <line x1="40" y1="120" x2="140" y2="120" stroke="#9A968F" strokeWidth="1"/>
+      <path d="M40 118v4M140 118v4" stroke="#9A968F" strokeWidth="1"/>
+      <path d="M45 120l-6-2v4l6-2zM135 120l6-2v4l-6-2z" fill="#9A968F"/>
+      <text x="90" y="128" textAnchor="middle" fontSize="9" fill="#54514E" fontFamily="'DM Mono', monospace">Largeur</text>
       {/* Height arrow */}
-      <line x1="155" y1="20" x2="155" y2="110" stroke="#9d9089" strokeWidth="1"/>
-      <path d="M153 20h4M153 110h4" stroke="#9d9089" strokeWidth="1"/>
-      <path d="M155 25l-2-6h4l-2 6zM155 105l-2 6h4l-2-6z" fill="#9d9089"/>
-      <text x="170" y="68" textAnchor="middle" fontSize="9" fill="#695f56" fontFamily="'DM Mono', monospace" transform="rotate(90 170 68)">Hauteur</text>
+      <line x1="155" y1="20" x2="155" y2="110" stroke="#9A968F" strokeWidth="1"/>
+      <path d="M153 20h4M153 110h4" stroke="#9A968F" strokeWidth="1"/>
+      <path d="M155 25l-2-6h4l-2 6zM155 105l-2 6h4l-2-6z" fill="#9A968F"/>
+      <text x="170" y="68" textAnchor="middle" fontSize="9" fill="#54514E" fontFamily="'DM Mono', monospace" transform="rotate(90 170 68)">Hauteur</text>
       {/* Depth indicator */}
-      <path d="M40 20L20 5" stroke="#9d9089" strokeWidth="1" strokeDasharray="3 2"/>
-      <path d="M140 20L120 5" stroke="#9d9089" strokeWidth="1" strokeDasharray="3 2"/>
-      <path d="M120 5L20 5" stroke="#9d9089" strokeWidth="1" strokeDasharray="3 2"/>
-      <text x="70" y="11" textAnchor="middle" fontSize="9" fill="#695f56" fontFamily="'DM Mono', monospace">Profondeur</text>
+      <path d="M40 20L20 5" stroke="#9A968F" strokeWidth="1" strokeDasharray="3 2"/>
+      <path d="M140 20L120 5" stroke="#9A968F" strokeWidth="1" strokeDasharray="3 2"/>
+      <path d="M120 5L20 5" stroke="#9A968F" strokeWidth="1" strokeDasharray="3 2"/>
+      <text x="70" y="11" textAnchor="middle" fontSize="9" fill="#54514E" fontFamily="'DM Mono', monospace">Profondeur</text>
     </svg>
   );
 }
@@ -197,8 +197,8 @@ function Chip({ label, selected, onClick }: { label: string; selected: boolean; 
       onClick={onClick}
       className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${
         selected
-          ? 'border-2 border-[#6b4c2a] bg-[#f2ebe0] text-[#6b4c2a] font-semibold'
-          : 'border border-[#e0d8ce] text-[#695f56] hover:border-[#c8bfb3] hover:bg-[#faf8f4]'
+          ? 'border-2 border-[#3B5FFF] bg-[#E5EAFF] text-[#3B5FFF] font-semibold'
+          : 'border border-[#EFE8DD] text-[#54514E] hover:border-[#9A968F] hover:bg-[#FFFCF7]'
       }`}
     >
       {label}
@@ -222,11 +222,11 @@ function VariantCard({
   return (
     <div
       className={`rounded-lg border transition-colors ${
-        selected ? 'border-2 border-[#6b4c2a]' : 'border border-[#e0d8ce] hover:border-[#c8bfb3]'
+        selected ? 'border-2 border-[#3B5FFF]' : 'border border-[#EFE8DD] hover:border-[#9A968F]'
       }`}
     >
       {/* SVG preview */}
-      <div className="bg-[#faf8f4] rounded-t-lg px-4 py-3 border-b border-[#e0d8ce]">
+      <div className="bg-[#FFFCF7] rounded-t-lg px-4 py-3 border-b border-[#EFE8DD]">
         <div className="h-20 overflow-hidden">
           <Facade2DView model={facade2D} />
         </div>
@@ -234,15 +234,15 @@ function VariantCard({
       {/* Info */}
       <div className="px-4 py-3">
         <div className="flex items-start justify-between gap-2 mb-1">
-          <p className="text-sm font-semibold text-[#1c1714]">{variant.label}</p>
+          <p className="text-sm font-semibold text-[#0E0D0C]">{variant.label}</p>
           {prod && (
-            <span className="font-mono tabular-nums text-sm font-bold text-[#6b4c2a]">
+            <span className="font-mono tabular-nums text-sm font-bold text-[#3B5FFF]">
               {prod.shopping_list.estimated_cost_eur} €
             </span>
           )}
         </div>
-        <p className="text-xs text-[#695f56] mb-2">{variant.description}</p>
-        <div className="flex items-center gap-3 text-[11px] text-[#9d9089] font-mono tabular-nums">
+        <p className="text-xs text-[#54514E] mb-2">{variant.description}</p>
+        <div className="flex items-center gap-3 text-[11px] text-[#9A968F] font-mono tabular-nums">
           <span>{totalPieces} pcs</span>
           {prod && <span>{prod.summary.difficulty}</span>}
           <span>{variant.intent.space.depth_mm} mm</span>
@@ -255,8 +255,8 @@ function VariantCard({
           onClick={onSelect}
           className={`w-full py-2 rounded-lg text-sm font-semibold transition-colors ${
             selected
-              ? 'bg-[#6b4c2a] text-white'
-              : 'border border-[#e0d8ce] text-[#695f56] hover:bg-[#faf8f4]'
+              ? 'bg-[#3B5FFF] text-white'
+              : 'border border-[#EFE8DD] text-[#54514E] hover:bg-[#FFFCF7]'
           }`}
         >
           {selected ? 'Sélectionné' : 'Choisir'}
@@ -343,7 +343,7 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
     onChoose(v.intent, v.result, v.materialKey);
   };
 
-  const inputClass = "w-full rounded-lg border border-[#e0d8ce] bg-white px-3 py-2 text-sm text-[#1c1714] font-mono tabular-nums focus:border-[#6b4c2a] focus:outline-none transition-colors";
+  const inputClass = "w-full rounded-lg border border-[#EFE8DD] bg-white px-3 py-2 text-sm text-[#0E0D0C] font-mono tabular-nums focus:border-[#3B5FFF] focus:outline-none transition-colors";
 
   return (
     <div className="p-5 space-y-5">
@@ -353,8 +353,8 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
       {step === 1 && (
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-semibold text-[#1c1714] mb-1">Qu'est-ce que vous rangez ?</h4>
-            <p className="text-xs text-[#695f56]">Sélectionnez les catégories et ajustez les quantités.</p>
+            <h4 className="text-sm font-semibold text-[#0E0D0C] mb-1">Qu'est-ce que vous rangez ?</h4>
+            <p className="text-xs text-[#54514E]">Sélectionnez les catégories et ajustez les quantités.</p>
           </div>
 
           <div className="space-y-2">
@@ -365,10 +365,10 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
                 <div
                   key={cat.key}
                   className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-colors ${
-                    active ? 'border-[#6b4c2a] bg-[#f2ebe0]' : 'border-[#e0d8ce] bg-white'
+                    active ? 'border-[#3B5FFF] bg-[#E5EAFF]' : 'border-[#EFE8DD] bg-white'
                   }`}
                 >
-                  <span className={`text-sm ${active ? 'text-[#6b4c2a] font-medium' : 'text-[#695f56]'}`}>
+                  <span className={`text-sm ${active ? 'text-[#3B5FFF] font-medium' : 'text-[#54514E]'}`}>
                     {cat.label}
                   </span>
                   <div className="flex items-center gap-2">
@@ -376,15 +376,15 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
                       type="button"
                       onClick={() => changeCount(cat.key, -1)}
                       disabled={count === 0}
-                      className={`w-7 h-7 rounded-md border border-[#e0d8ce] text-[#695f56] text-sm font-bold flex items-center justify-center transition-colors ${count === 0 ? 'opacity-40 cursor-default' : 'hover:bg-[#faf8f4]'}`}
+                      className={`w-7 h-7 rounded-md border border-[#EFE8DD] text-[#54514E] text-sm font-bold flex items-center justify-center transition-colors ${count === 0 ? 'opacity-40 cursor-default' : 'hover:bg-[#FFFCF7]'}`}
                     >−</button>
-                    <span className="w-5 text-center font-mono tabular-nums text-sm text-[#1c1714]">
+                    <span className="w-5 text-center font-mono tabular-nums text-sm text-[#0E0D0C]">
                       {count > 0 ? count : ''}
                     </span>
                     <button
                       type="button"
                       onClick={() => changeCount(cat.key, +1)}
-                      className="w-7 h-7 rounded-md border border-[#e0d8ce] text-[#695f56] hover:bg-[#faf8f4] text-sm font-bold flex items-center justify-center transition-colors bg-white"
+                      className="w-7 h-7 rounded-md border border-[#EFE8DD] text-[#54514E] hover:bg-[#FFFCF7] text-sm font-bold flex items-center justify-center transition-colors bg-white"
                     >+</button>
                   </div>
                 </div>
@@ -393,18 +393,18 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
           </div>
 
           {!hasContent && (
-            <p className="text-xs text-[#7a5020] bg-[#f5ead8] border border-[#e8d8b8] rounded-lg px-3 py-2">
+            <p className="text-xs text-[#A52E16] bg-[#FFE4DC] border border-[#e8d8b8] rounded-lg px-3 py-2">
               Ajoutez au moins un type de contenu pour continuer.
             </p>
           )}
 
           <div className="flex gap-2 pt-2">
             <button type="button" onClick={onBack}
-              className="px-4 py-2 text-sm text-[#695f56] border border-[#e0d8ce] rounded-lg hover:bg-[#faf8f4] transition-colors">
+              className="px-4 py-2 text-sm text-[#54514E] border border-[#EFE8DD] rounded-lg hover:bg-[#FFFCF7] transition-colors">
               Retour
             </button>
             <button type="button" onClick={() => setStep(2)} disabled={!hasContent}
-              className="flex-1 px-4 py-2 text-sm font-semibold bg-[#6b4c2a] text-white rounded-lg hover:bg-[#5a3e22] disabled:opacity-40 transition-colors">
+              className="flex-1 px-4 py-2 text-sm font-semibold bg-[#3B5FFF] text-white rounded-lg hover:bg-[#1E3FCC] disabled:opacity-40 transition-colors">
               Suivant
             </button>
           </div>
@@ -415,8 +415,8 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
       {step === 2 && (
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-semibold text-[#1c1714] mb-1">Dimensions de l'espace</h4>
-            <p className="text-xs text-[#695f56]">Mesurez votre mur ou niche en millimètres.</p>
+            <h4 className="text-sm font-semibold text-[#0E0D0C] mb-1">Dimensions de l'espace</h4>
+            <p className="text-xs text-[#54514E]">Mesurez votre mur ou niche en millimètres.</p>
           </div>
 
           <SpaceDiagram />
@@ -429,7 +429,7 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
               { label: 'Plinthe mm', value: plinth, set: setPlinth },
             ].map(({ label, value, set }) => (
               <div key={label}>
-                <label className="text-[11px] text-[#9d9089] mb-1 block">{label}</label>
+                <label className="text-[11px] text-[#9A968F] mb-1 block">{label}</label>
                 <input
                   type="number"
                   min={0}
@@ -443,7 +443,7 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
           </div>
 
           <div>
-            <p className="text-xs font-medium text-[#695f56] mb-2">Type de mur</p>
+            <p className="text-xs font-medium text-[#54514E] mb-2">Type de mur</p>
             <div className="flex flex-wrap gap-2">
               {WALL_TYPES.map(wt => (
                 <Chip key={wt.key} label={wt.label} selected={wallType === wt.key} onClick={() => setWallType(wt.key)} />
@@ -453,11 +453,11 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
 
           <div className="flex gap-2 pt-1">
             <button type="button" onClick={() => setStep(1)}
-              className="px-4 py-2 text-sm text-[#695f56] border border-[#e0d8ce] rounded-lg hover:bg-[#faf8f4] transition-colors">
+              className="px-4 py-2 text-sm text-[#54514E] border border-[#EFE8DD] rounded-lg hover:bg-[#FFFCF7] transition-colors">
               Retour
             </button>
             <button type="button" onClick={() => setStep(3)} disabled={width < 100 || height < 100}
-              className="flex-1 px-4 py-2 text-sm font-semibold bg-[#6b4c2a] text-white rounded-lg hover:bg-[#5a3e22] disabled:opacity-40 transition-colors">
+              className="flex-1 px-4 py-2 text-sm font-semibold bg-[#3B5FFF] text-white rounded-lg hover:bg-[#1E3FCC] disabled:opacity-40 transition-colors">
               Suivant
             </button>
           </div>
@@ -468,12 +468,12 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
       {step === 3 && (
         <div className="space-y-5">
           <div>
-            <h4 className="text-sm font-semibold text-[#1c1714] mb-1">Vos préférences</h4>
-            <p className="text-xs text-[#695f56]">Ces choix orientent les matériaux et la complexité.</p>
+            <h4 className="text-sm font-semibold text-[#0E0D0C] mb-1">Vos préférences</h4>
+            <p className="text-xs text-[#54514E]">Ces choix orientent les matériaux et la complexité.</p>
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-widest text-[#9d9089] mb-2">Style</p>
+            <p className="text-xs uppercase tracking-widest text-[#9A968F] mb-2">Style</p>
             <div className="grid grid-cols-3 gap-2">
               {(['minimaliste', 'classique', 'artisanal'] as StylePref[]).map(s => (
                 <Chip key={s} label={s.charAt(0).toUpperCase() + s.slice(1)} selected={style === s} onClick={() => setStyle(s)} />
@@ -482,7 +482,7 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-widest text-[#9d9089] mb-2">Budget</p>
+            <p className="text-xs uppercase tracking-widest text-[#9A968F] mb-2">Budget</p>
             <div className="grid grid-cols-3 gap-2">
               {([
                 { key: 'serre', label: 'Serré' },
@@ -495,7 +495,7 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-widest text-[#9d9089] mb-2">Niveau</p>
+            <p className="text-xs uppercase tracking-widest text-[#9A968F] mb-2">Niveau</p>
             <div className="grid grid-cols-3 gap-2">
               {([
                 { key: 'debutant', label: 'Débutant' },
@@ -509,11 +509,11 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
 
           <div className="flex gap-2 pt-1">
             <button type="button" onClick={() => setStep(2)}
-              className="px-4 py-2 text-sm text-[#695f56] border border-[#e0d8ce] rounded-lg hover:bg-[#faf8f4] transition-colors">
+              className="px-4 py-2 text-sm text-[#54514E] border border-[#EFE8DD] rounded-lg hover:bg-[#FFFCF7] transition-colors">
               Retour
             </button>
             <button type="button" onClick={handleNextFromStep3}
-              className="flex-1 px-4 py-2 text-sm font-semibold bg-[#6b4c2a] text-white rounded-lg hover:bg-[#5a3e22] transition-colors">
+              className="flex-1 px-4 py-2 text-sm font-semibold bg-[#3B5FFF] text-white rounded-lg hover:bg-[#1E3FCC] transition-colors">
               Générer les variantes
             </button>
           </div>
@@ -524,22 +524,22 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
       {step === 4 && (
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-semibold text-[#1c1714] mb-1">Choisissez une variante</h4>
-            <p className="text-xs text-[#695f56]">Basé sur vos réponses — vous pourrez ajuster après.</p>
+            <h4 className="text-sm font-semibold text-[#0E0D0C] mb-1">Choisissez une variante</h4>
+            <p className="text-xs text-[#54514E]">Basé sur vos réponses — vous pourrez ajuster après.</p>
           </div>
 
           {/* Loading animation */}
           {generating && (
             <div className="flex flex-col items-center gap-4 py-6">
               <svg viewBox="0 0 40 40" className="w-10 h-10 animate-spin" fill="none">
-                <circle cx="20" cy="20" r="16" stroke="#e0d8ce" strokeWidth="4"/>
-                <path d="M20 4a16 16 0 0 1 16 16" stroke="#6b4c2a" strokeWidth="4" strokeLinecap="round"/>
+                <circle cx="20" cy="20" r="16" stroke="#EFE8DD" strokeWidth="4"/>
+                <path d="M20 4a16 16 0 0 1 16 16" stroke="#3B5FFF" strokeWidth="4" strokeLinecap="round"/>
               </svg>
               <div className="space-y-1 text-left w-full max-w-xs">
                 {GEN_STEPS.map((s, i) => (
                   <div key={i} className={`flex items-center gap-2 text-xs transition-opacity ${genSteps.length > i ? 'opacity-100' : 'opacity-20'}`}>
-                    <span className={`inline-block w-1.5 h-1.5 rounded-full flex-shrink-0 ${genSteps.length > i + 1 ? 'bg-[#2f6144]' : 'bg-[#6b4c2a]'}`} />
-                    <span className="text-[#695f56]">{s}</span>
+                    <span className={`inline-block w-1.5 h-1.5 rounded-full flex-shrink-0 ${genSteps.length > i + 1 ? 'bg-[#0E5A3D]' : 'bg-[#3B5FFF]'}`} />
+                    <span className="text-[#54514E]">{s}</span>
                   </div>
                 ))}
               </div>
@@ -562,14 +562,14 @@ export default function BriefIA({ onBack, onChoose }: BriefIAProps) {
 
               <div className="flex gap-2 pt-1">
                 <button type="button" onClick={() => { setStep(3); setVariants([]); }}
-                  className="px-4 py-2 text-sm text-[#695f56] border border-[#e0d8ce] rounded-lg hover:bg-[#faf8f4] transition-colors">
+                  className="px-4 py-2 text-sm text-[#54514E] border border-[#EFE8DD] rounded-lg hover:bg-[#FFFCF7] transition-colors">
                   Retour
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirm}
                   disabled={selectedIdx === null}
-                  className="flex-1 px-4 py-2 text-sm font-semibold bg-[#6b4c2a] text-white rounded-lg hover:bg-[#5a3e22] disabled:opacity-40 transition-colors"
+                  className="flex-1 px-4 py-2 text-sm font-semibold bg-[#3B5FFF] text-white rounded-lg hover:bg-[#1E3FCC] disabled:opacity-40 transition-colors"
                 >
                   Confirmer et voir le projet
                 </button>

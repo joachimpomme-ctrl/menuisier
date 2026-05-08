@@ -10,9 +10,9 @@ export default function AssemblyGuide({ steps }: Props) {
   return (
     <ol className="space-y-4">
       {steps.map((step) => (
-        <li key={step.step_number} className="border-l-2 border-amber-300 pl-4">
+        <li key={step.step_number} className="border-l-2 border-[#3B5FFF] pl-4">
           <h4 className="font-semibold text-sm">
-            <span className="text-amber-600">{step.step_number}.</span> {step.title}
+            <span className="text-[#3B5FFF]">{step.step_number}.</span> {step.title}
           </h4>
           <ul className="mt-1 space-y-0.5">
             {step.instructions.map((instr, i) => (

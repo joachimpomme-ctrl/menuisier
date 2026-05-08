@@ -672,10 +672,10 @@ const CL_PAGE_W = 297; // A4 landscape width mm
 const CL_PAGE_H = 210; // A4 landscape height mm
 const CL_MARGIN = 15;
 
-const CL_HEADER_BG: [number, number, number] = hexToRgb('#78350f'); // amber-900
+const CL_HEADER_BG: [number, number, number] = hexToRgb('#3B5FFF'); // accent (cobalt)
 const CL_HEADER_TXT: [number, number, number] = [255, 255, 255];
-const CL_ALT_ROW: [number, number, number] = [255, 251, 235]; // amber-50
-const CL_TOTAL_BG: [number, number, number] = hexToRgb('#92400e'); // amber-800
+const CL_ALT_ROW: [number, number, number] = hexToRgb('#E5EAFF'); // accent-light
+const CL_TOTAL_BG: [number, number, number] = hexToRgb('#1E3FCC'); // accent-dark
 
 function clFooters(doc: jsPDF, extra: string): void {
   const total = doc.getNumberOfPages();

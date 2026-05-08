@@ -74,10 +74,10 @@ export default function DoorConfigurator({ body, bodyIndex, state, onChange }: P
   // ---- No doors yet: simple add button ----
   if (!config) {
     return (
-      <div className="mt-3 pt-3 border-t border-stone-100">
+      <div className="mt-3 pt-3 border-t border-[#EFE8DD]">
         <button
           onClick={() => { applyDoors({ count: 1, poseType: 'enveloppante', position: 'pleine' }); setExpanded(true); }}
-          className="text-xs text-amber-600 hover:text-amber-800 font-medium transition-colors"
+          className="text-xs text-[#3B5FFF] hover:text-[#1E3FCC] font-medium transition-colors"
         >
           + Ajouter des portes
         </button>
@@ -90,7 +90,7 @@ export default function DoorConfigurator({ body, bodyIndex, state, onChange }: P
   // ---- Collapsed view: compact summary ----
   if (!expanded) {
     return (
-      <div className="mt-3 pt-3 border-t border-stone-100">
+      <div className="mt-3 pt-3 border-t border-[#EFE8DD]">
         <div className="flex items-center justify-between gap-2 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2">
           <div className="flex items-center gap-2 flex-wrap text-xs text-orange-800 min-w-0">
             <span className="font-semibold">🚪 {config.count} porte{config.count > 1 ? 's' : ''}</span>
@@ -115,7 +115,7 @@ export default function DoorConfigurator({ body, bodyIndex, state, onChange }: P
             </button>
             <button
               onClick={() => applyDoors(undefined)}
-              className="text-[10px] text-stone-400 hover:text-red-500 transition-colors px-1"
+              className="text-[10px] text-[#9A968F] hover:text-[#FF6B4A] transition-colors px-1"
               title="Retirer les portes"
             >
               ✕
@@ -132,19 +132,19 @@ export default function DoorConfigurator({ body, bodyIndex, state, onChange }: P
     .sort((a, b) => (a.posY ?? 0) - (b.posY ?? 0));
 
   return (
-    <div className="mt-3 pt-3 border-t border-stone-100">
+    <div className="mt-3 pt-3 border-t border-[#EFE8DD]">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Portes</span>
+        <span className="text-xs font-semibold text-[#3B5FFF] uppercase tracking-wider">Portes</span>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setExpanded(false)}
-            className="text-[10px] text-stone-500 hover:text-stone-700 transition-colors"
+            className="text-[10px] text-[#54514E] hover:text-[#0E0D0C] transition-colors"
           >
             Replier
           </button>
           <button
             onClick={() => applyDoors(undefined)}
-            className="text-[10px] text-stone-400 hover:text-red-500 transition-colors"
+            className="text-[10px] text-[#9A968F] hover:text-[#FF6B4A] transition-colors"
           >
             Retirer les portes
           </button>
@@ -154,20 +154,20 @@ export default function DoorConfigurator({ body, bodyIndex, state, onChange }: P
       <div className="flex gap-2 mb-2">
         <button
           onClick={() => applyDoors({ ...config, count: 1 })}
-          className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${config.count === 1 ? 'bg-amber-100 border-amber-300 text-amber-800 font-semibold' : 'bg-white border-stone-200 text-stone-500 hover:border-amber-200'}`}
+          className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${config.count === 1 ? 'bg-[#E5EAFF] border-[#3B5FFF] text-[#3B5FFF] font-semibold' : 'bg-white border-[#EFE8DD] text-[#54514E] hover:border-[#3B5FFF]'}`}
         >
           1 porte
         </button>
         <button
           onClick={() => applyDoors({ ...config, count: 2 })}
-          className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${config.count === 2 ? 'bg-amber-100 border-amber-300 text-amber-800 font-semibold' : 'bg-white border-stone-200 text-stone-500 hover:border-amber-200'}`}
+          className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${config.count === 2 ? 'bg-[#E5EAFF] border-[#3B5FFF] text-[#3B5FFF] font-semibold' : 'bg-white border-[#EFE8DD] text-[#54514E] hover:border-[#3B5FFF]'}`}
         >
           2 portes
         </button>
       </div>
 
       <div className="mb-2">
-        <label className="text-[10px] text-stone-500 mb-1 block">Type de pose</label>
+        <label className="text-[10px] text-[#54514E] mb-1 block">Type de pose</label>
         <div className="flex gap-1.5 flex-wrap">
           {([
             { key: 'enveloppante' as DoorPoseType, label: 'Enveloppante', hint: 'recouvre la joue' },
@@ -177,7 +177,7 @@ export default function DoorConfigurator({ body, bodyIndex, state, onChange }: P
             <Tip key={pose.key} text={TIPS[`porte-pose-${pose.key}`] || `${pose.label} : la porte ${pose.hint}`}>
               <button
                 onClick={() => applyDoors({ ...config, poseType: pose.key })}
-                className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-all ${config.poseType === pose.key ? 'bg-orange-100 border-orange-300 text-orange-800 font-semibold' : 'bg-white border-stone-200 text-stone-500 hover:border-orange-200'}`}
+                className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-all ${config.poseType === pose.key ? 'bg-orange-100 border-orange-300 text-orange-800 font-semibold' : 'bg-white border-[#EFE8DD] text-[#54514E] hover:border-orange-200'}`}
               >
                 {pose.label}
               </button>
@@ -188,7 +188,7 @@ export default function DoorConfigurator({ body, bodyIndex, state, onChange }: P
 
       {/* Couverture verticale */}
       <div className="mb-2">
-        <label className="text-[10px] text-stone-500 mb-1 block">Couverture verticale</label>
+        <label className="text-[10px] text-[#54514E] mb-1 block">Couverture verticale</label>
         <div className="flex gap-1.5 flex-wrap">
           {([
             { key: 'pleine' as DoorPosition, label: 'Pleine hauteur', hint: 'toute la hauteur du corps' },
@@ -198,7 +198,7 @@ export default function DoorConfigurator({ body, bodyIndex, state, onChange }: P
             <Tip key={pos.key} text={`${pos.label} : ${pos.hint}`}>
               <button
                 onClick={() => applyDoors({ ...config, position: pos.key })}
-                className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-all ${position === pos.key ? 'bg-amber-100 border-amber-300 text-amber-800 font-semibold' : 'bg-white border-stone-200 text-stone-500 hover:border-amber-200'}`}
+                className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-all ${position === pos.key ? 'bg-[#E5EAFF] border-[#3B5FFF] text-[#3B5FFF] font-semibold' : 'bg-white border-[#EFE8DD] text-[#54514E] hover:border-[#3B5FFF]'}`}
               >
                 {pos.label}
               </button>
@@ -206,22 +206,22 @@ export default function DoorConfigurator({ body, bodyIndex, state, onChange }: P
           ))}
         </div>
         {position !== 'pleine' && (
-          <div className="mt-2 text-[11px] bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-2">
+          <div className="mt-2 text-[11px] bg-[#FFFCF7] border border-[#EFE8DD] rounded-lg px-2.5 py-2">
             {fixedTablettes.length === 0 ? (
-              <div className="text-amber-700">
+              <div className="text-[#3B5FFF]">
                 ⚠ Aucune tablette fixe positionnée — la séparation est calée automatiquement sur une hauteur de portes standard.
                 Ajoute une tablette fixe avec une hauteur (posY) pour forcer une séparation précise.
               </div>
             ) : (
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-stone-500">Plan de séparation :</span>
+                <span className="text-[#54514E]">Plan de séparation :</span>
                 <select
                   value={config.splitPosY ?? ''}
                   onChange={(e) => {
                     const v = parseFloat(e.target.value);
                     applyDoors({ ...config, splitPosY: isNaN(v) ? undefined : v });
                   }}
-                  className="text-[11px] px-2 py-1 rounded border border-stone-300 bg-white text-stone-700"
+                  className="text-[11px] px-2 py-1 rounded border border-[#EFE8DD] bg-white text-[#0E0D0C]"
                 >
                   {fixedTablettes.map((t) => (
                     <option key={t.id} value={t.posY}>

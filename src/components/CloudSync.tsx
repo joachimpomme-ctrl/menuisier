@@ -25,7 +25,7 @@ interface Props {
   onPull: (id: string, state: AppState) => void;
 }
 
-const cardClass = 'rounded-xl border border-stone-200 bg-white p-4';
+const cardClass = 'rounded-xl border border-[#EFE8DD] bg-white p-4';
 
 export default function CloudSync({
   isOpen,
@@ -135,17 +135,17 @@ export default function CloudSync({
   const localIds = new Set(localProjects.map((p) => p.id));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/40 p-4">
-      <div className="w-full max-w-lg max-h-[85vh] flex flex-col rounded-2xl border border-stone-200 bg-white shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0E0D0C]/40 p-4">
+      <div className="w-full max-w-lg max-h-[85vh] flex flex-col rounded-2xl border border-[#EFE8DD] bg-white shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#EFE8DD]">
           <div>
-            <h3 className="text-amber-700 font-bold text-sm">☁️ Cloud — Google Sheets</h3>
-            <p className="text-xs text-stone-500 mt-0.5">
+            <h3 className="text-[#3B5FFF] font-bold text-sm">☁️ Cloud — Google Sheets</h3>
+            <p className="text-xs text-[#54514E] mt-0.5">
               Sync tes projets entre appareils via Google Apps Script
             </p>
           </div>
-          <button onClick={onClose} className="text-stone-500 hover:text-stone-400 text-lg px-2">
+          <button onClick={onClose} className="text-[#54514E] hover:text-[#9A968F] text-lg px-2">
             x
           </button>
         </div>
@@ -154,7 +154,7 @@ export default function CloudSync({
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           {/* URL Config */}
           <div className={cardClass}>
-            <label className="text-xs font-medium text-stone-600 block mb-1.5">
+            <label className="text-xs font-medium text-[#54514E] block mb-1.5">
               URL du script Google Apps Script
             </label>
             <div className="flex gap-2">
@@ -164,17 +164,17 @@ export default function CloudSync({
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://script.google.com/macros/s/xxx/exec"
-                className="flex-1 rounded-lg border border-stone-300 bg-white px-3 py-2 text-xs text-stone-800 placeholder-stone-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                className="flex-1 rounded-lg border border-[#EFE8DD] bg-white px-3 py-2 text-xs text-[#0E0D0C] placeholder-[#9A968F] focus:border-[#3B5FFF] focus:outline-none focus:ring-2 focus:ring-[#3B5FFF]/20"
               />
               <button
                 onClick={handleSaveUrl}
-                className="text-xs px-3 py-2 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 transition-colors"
+                className="text-xs px-3 py-2 rounded-lg bg-[#3B5FFF] text-white font-medium hover:bg-[#1E3FCC] transition-colors"
               >
                 OK
               </button>
             </div>
-            <p className="text-[10px] text-stone-400 mt-1.5">
-              Voir le fichier <code className="bg-stone-100 px-1 rounded">google-apps-script.js</code> pour l'installation
+            <p className="text-[10px] text-[#9A968F] mt-1.5">
+              Voir le fichier <code className="bg-[#EFE8DD] px-1 rounded">google-apps-script.js</code> pour l'installation
             </p>
             {fromEnv && (
               <p className="text-[10px] text-sky-600 mt-1">
@@ -185,7 +185,7 @@ export default function CloudSync({
 
           {/* Messages */}
           {error && (
-            <div className="text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            <div className="text-xs text-[#FF6B4A] bg-[#FFE4DC] border border-[#FF6B4A] rounded-lg px-3 py-2">
               {error}
             </div>
           )}
@@ -202,14 +202,14 @@ export default function CloudSync({
                 <button
                   onClick={handlePushCurrent}
                   disabled={syncing}
-                  className="flex-1 text-xs px-3 py-2.5 rounded-lg bg-amber-50 text-amber-700 font-medium border border-amber-200 hover:bg-amber-100 disabled:opacity-50 transition-colors"
+                  className="flex-1 text-xs px-3 py-2.5 rounded-lg bg-[#E5EAFF] text-[#3B5FFF] font-medium border border-[#3B5FFF] hover:bg-[#D7DFFF] disabled:opacity-50 transition-colors"
                 >
                   {syncing ? '...' : '⬆ Envoyer ce projet'}
                 </button>
                 <button
                   onClick={handlePushAll}
                   disabled={syncing}
-                  className="flex-1 text-xs px-3 py-2.5 rounded-lg bg-stone-50 text-stone-600 font-medium border border-stone-200 hover:bg-stone-100 disabled:opacity-50 transition-colors"
+                  className="flex-1 text-xs px-3 py-2.5 rounded-lg bg-[#FFFCF7] text-[#54514E] font-medium border border-[#EFE8DD] hover:bg-[#EFE8DD] disabled:opacity-50 transition-colors"
                 >
                   {syncing ? '...' : '⬆ Tout envoyer'}
                 </button>
@@ -218,20 +218,20 @@ export default function CloudSync({
               {/* Cloud projects */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-xs font-semibold text-stone-500">
+                  <h4 className="text-xs font-semibold text-[#54514E]">
                     Projets dans le cloud {loading ? '...' : `(${cloudProjects.length})`}
                   </h4>
                   <button
                     onClick={refreshCloud}
                     disabled={loading}
-                    className="text-[10px] text-stone-400 hover:text-stone-600"
+                    className="text-[10px] text-[#9A968F] hover:text-[#54514E]"
                   >
                     Rafraîchir
                   </button>
                 </div>
 
                 {cloudProjects.length === 0 && !loading && (
-                  <p className="text-xs text-stone-400 text-center py-4">
+                  <p className="text-xs text-[#9A968F] text-center py-4">
                     Aucun projet dans le cloud — envoie-en un !
                   </p>
                 )}
@@ -242,8 +242,8 @@ export default function CloudSync({
                     return (
                       <div key={cp.id} className={cardClass + ' flex items-center justify-between gap-2'}>
                         <div className="min-w-0 flex-1">
-                          <div className="text-sm text-stone-700 font-medium truncate">{cp.name}</div>
-                          <div className="text-[10px] text-stone-400">
+                          <div className="text-sm text-[#0E0D0C] font-medium truncate">{cp.name}</div>
+                          <div className="text-[10px] text-[#9A968F]">
                             {cp.materialShort} · {cp.bodyCount} corps · {cp.updatedAt?.slice(0, 10)}
                           </div>
                         </div>
@@ -271,13 +271,13 @@ export default function CloudSync({
 
           {!configured && (
             <div className="text-center py-6">
-              <p className="text-sm text-stone-500 mb-3">
+              <p className="text-sm text-[#54514E] mb-3">
                 Configure l'URL de ton Google Apps Script pour commencer
               </p>
-              <ol className="text-xs text-stone-400 text-left space-y-1.5 max-w-sm mx-auto">
+              <ol className="text-xs text-[#9A968F] text-left space-y-1.5 max-w-sm mx-auto">
                 <li>1. Crée un Google Sheet "Menuisier"</li>
                 <li>2. Extensions → Apps Script</li>
-                <li>3. Colle le code de <code className="bg-stone-100 px-1 rounded">google-apps-script.js</code></li>
+                <li>3. Colle le code de <code className="bg-[#EFE8DD] px-1 rounded">google-apps-script.js</code></li>
                 <li>4. Déployer → Application Web → "Tout le monde"</li>
                 <li>5. Colle l'URL ci-dessus</li>
               </ol>
@@ -286,7 +286,7 @@ export default function CloudSync({
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-stone-200 text-[10px] text-stone-400">
+        <div className="px-5 py-3 border-t border-[#EFE8DD] text-[10px] text-[#9A968F]">
           Le localStorage reste la source principale — le cloud est un backup/sync.
         </div>
       </div>

@@ -17,7 +17,7 @@ interface DimLineProps {
   fontSize?: number;
 }
 
-function DimLine({ x1, y1, x2, y2, label, color = '#78716c', fontSize = 8 }: DimLineProps) {
+function DimLine({ x1, y1, x2, y2, label, color = '#9A968F', fontSize = 8 }: DimLineProps) {
   const isH = Math.abs(y2 - y1) < 2;
   const mx = (x1 + x2) / 2;
   const my = (y1 + y2) / 2;
@@ -82,20 +82,20 @@ export default function WallSurveyDiagram({ state, totalPhysical }: Props) {
       <h3 className={sectionTitle}>Relevé de cotes</h3>
       <div className="overflow-x-auto">
         <svg width={SVG_W} height={SVG_H} className="rounded-lg">
-          <rect width={SVG_W} height={SVG_H} fill="#faf8f5" rx="8" />
+          <rect width={SVG_W} height={SVG_H} fill="#FFFCF7" rx="8" />
 
           {/* Wall outline */}
-          <rect x={offsetX} y={offsetY} width={wallPx} height={ceilPx} fill="none" stroke="#a8a29e" strokeWidth="1.5" strokeDasharray="6,3" rx="2" />
+          <rect x={offsetX} y={offsetY} width={wallPx} height={ceilPx} fill="none" stroke="#9A968F" strokeWidth="1.5" strokeDasharray="6,3" rx="2" />
 
           {/* Floor line */}
-          <line x1={offsetX - 4} y1={offsetY + ceilPx} x2={offsetX + wallPx + 4} y2={offsetY + ceilPx} stroke="#78716c" strokeWidth="1.5" />
+          <line x1={offsetX - 4} y1={offsetY + ceilPx} x2={offsetX + wallPx + 4} y2={offsetY + ceilPx} stroke="#9A968F" strokeWidth="1.5" />
 
           {/* Ceiling line */}
-          <line x1={offsetX - 4} y1={offsetY} x2={offsetX + wallPx + 4} y2={offsetY} stroke="#78716c" strokeWidth="1" strokeDasharray="3,2" />
+          <line x1={offsetX - 4} y1={offsetY} x2={offsetX + wallPx + 4} y2={offsetY} stroke="#9A968F" strokeWidth="1" strokeDasharray="3,2" />
 
           {/* Plinth area */}
           {plinthH > 0 && (
-            <rect x={offsetX} y={offsetY + ceilPx - plinthPx} width={wallPx} height={plinthPx} fill="#d6cfc7" opacity="0.4" stroke="#a8a29e" strokeWidth="0.5" />
+            <rect x={offsetX} y={offsetY + ceilPx - plinthPx} width={wallPx} height={plinthPx} fill="#EFE8DD" opacity="0.4" stroke="#9A968F" strokeWidth="0.5" />
           )}
 
           {/* Bodies */}
@@ -125,7 +125,7 @@ export default function WallSurveyDiagram({ state, totalPhysical }: Props) {
                     y={offsetY + bodyH_px}
                     width={Math.max(bw_px - 6, 2)}
                     height={plinthPx - 1}
-                    fill="#faf8f5"
+                    fill="#FFFCF7"
                     stroke={color}
                     strokeWidth="0.5"
                     strokeDasharray="2,1"
@@ -182,7 +182,7 @@ export default function WallSurveyDiagram({ state, totalPhysical }: Props) {
               width={Math.max((wallPx - totalBodyW * sc) - 4, 0)}
               height={ceilPx - plinthPx - 4}
               fill="none"
-              stroke="#d6cfc7"
+              stroke="#EFE8DD"
               strokeWidth="1"
               strokeDasharray="4,3"
               rx="2"
@@ -193,7 +193,7 @@ export default function WallSurveyDiagram({ state, totalPhysical }: Props) {
               x={offsetX + totalBodyW * sc + (wallPx - totalBodyW * sc) / 2}
               y={offsetY + (ceilPx - plinthPx) / 2}
               textAnchor="middle"
-              fill="#a8a29e"
+              fill="#9A968F"
               fontSize="7"
               fontFamily="system-ui"
             >
@@ -205,20 +205,20 @@ export default function WallSurveyDiagram({ state, totalPhysical }: Props) {
           <DimLine
             x1={offsetX} y1={offsetY - 8}
             x2={offsetX + wallPx} y2={offsetY - 8}
-            label={`${wallW} cm`} color="#78716c"
+            label={`${wallW} cm`} color="#9A968F"
           />
 
           <DimLine
             x1={offsetX - 8} y1={offsetY}
             x2={offsetX - 8} y2={offsetY + ceilPx}
-            label={`${ceilH} cm`} color="#78716c"
+            label={`${ceilH} cm`} color="#9A968F"
           />
 
           {plinthH > 0 && (
             <DimLine
               x1={offsetX + wallPx + 6} y1={offsetY + ceilPx - plinthPx}
               x2={offsetX + wallPx + 6} y2={offsetY + ceilPx}
-              label={`${plinthH}`} color="#a8a29e" fontSize={7}
+              label={`${plinthH}`} color="#9A968F" fontSize={7}
             />
           )}
 
@@ -226,17 +226,17 @@ export default function WallSurveyDiagram({ state, totalPhysical }: Props) {
             <DimLine
               x1={offsetX} y1={offsetY + ceilPx + 10}
               x2={offsetX + totalPhysical * sc} y2={offsetY + ceilPx + 10}
-              label={`${totalPhysical.toFixed(1)} cm (meuble)`} color="#92400e" fontSize={7}
+              label={`${totalPhysical.toFixed(1)} cm (meuble)`} color="#1E3FCC" fontSize={7}
             />
           )}
         </svg>
       </div>
-      <div className="flex flex-wrap gap-3 mt-2 text-[10px] text-stone-400">
+      <div className="flex flex-wrap gap-3 mt-2 text-[10px] text-[#9A968F]">
         <span>Mur : {wallW} cm</span>
         <span>Hauteur : {ceilH} cm</span>
         {plinthH > 0 && <span>Plinthe : {plinthH} cm</span>}
         <span>Meuble : {totalPhysical.toFixed(1)} cm</span>
-        {remaining > 0 && <span className={remaining < 0 ? 'text-red-500 font-semibold' : ''}>Reste : {remaining.toFixed(1)} cm</span>}
+        {remaining > 0 && <span className={remaining < 0 ? 'text-[#FF6B4A] font-semibold' : ''}>Reste : {remaining.toFixed(1)} cm</span>}
         {shared.some(Boolean) && <span className="text-blue-600">{shared.filter(Boolean).length} joue(s) commune(s)</span>}
       </div>
     </div>

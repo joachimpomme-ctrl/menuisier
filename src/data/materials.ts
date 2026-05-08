@@ -89,6 +89,6 @@ export const PIECE_COLORS: Record<PieceType, string> = {
   autre: "#ec4899",
 };
 
-export const BODY_COLORS = ["#60a5fa", "#34d399", "#fbbf24", "#a78bfa", "#f472b6"];
+export const BODY_COLORS = ["#60a5fa", "#34d399", "#FFD23F", "#a78bfa", "#f472b6"];
 
 export const PIECE_TYPES: PieceType[] = ['joue', 'tablette-fixe', 'tablette-reglable', 'separateur', 'bandeau', 'porte', 'tiroir-facade', 'fond', 'autre'];

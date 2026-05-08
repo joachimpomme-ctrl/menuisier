@@ -115,21 +115,21 @@ export default function AdaptPanel({ state, onApplyState }: Props) {
   };
 
   return (
-    <div className="rounded-lg border border-[#c8b89a] bg-[#fdf8f2] mb-4 overflow-hidden">
+    <div className="rounded-lg border border-[#c8b89a] bg-[#FFFCF7] mb-4 overflow-hidden">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-[#6b4c2a] hover:bg-[#f5ede0] transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-[#3B5FFF] hover:bg-[#E5EAFF] transition-colors"
       >
         <span className="flex items-center gap-2">
           <span className="text-base">✦</span>
           Adapter le projet par description
         </span>
-        <span className="text-[#9d9089] text-xs">{open ? '▲' : '▼'}</span>
+        <span className="text-[#9A968F] text-xs">{open ? '▲' : '▼'}</span>
       </button>
 
       {open && (
         <div className="px-4 pb-4">
-          <p className="text-xs text-[#9d9089] mb-2">
+          <p className="text-xs text-[#9A968F] mb-2">
             Décris les changements souhaités — dimensions, nombre de corps, matériau… L'IA interprète et applique automatiquement.
           </p>
 
@@ -139,7 +139,7 @@ export default function AdaptPanel({ state, onApplyState }: Props) {
             onKeyDown={handleKeyDown}
             placeholder={"Exemple :\nDimensions : 249×25.8×250 cm\n3 corps au lieu de 5\nMélaminé 18 mm"}
             rows={5}
-            className="w-full rounded-lg border border-[#e0d8ce] bg-white px-3 py-2.5 text-sm text-[#1c1714] placeholder-[#c4b8ac] focus:border-[#6b4c2a] focus:outline-none resize-y transition-colors font-mono"
+            className="w-full rounded-lg border border-[#EFE8DD] bg-white px-3 py-2.5 text-sm text-[#0E0D0C] placeholder-[#9A968F] focus:border-[#3B5FFF] focus:outline-none resize-y transition-colors font-mono"
           />
 
           <div className="flex items-center justify-between mt-2">
@@ -147,7 +147,7 @@ export default function AdaptPanel({ state, onApplyState }: Props) {
             <button
               onClick={handleSubmit}
               disabled={loading || !description.trim()}
-              className="flex items-center gap-1.5 rounded-lg bg-[#6b4c2a] px-4 py-2 text-sm font-medium text-white hover:bg-[#5a3f24] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1.5 rounded-lg bg-[#3B5FFF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1E3FCC] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? (
                 <>
@@ -161,26 +161,26 @@ export default function AdaptPanel({ state, onApplyState }: Props) {
           </div>
 
           {error && (
-            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            <div className="mt-3 rounded-lg border border-[#FF6B4A] bg-[#FFE4DC] px-3 py-2 text-xs text-[#A52E16]">
               {error}
             </div>
           )}
 
           {result && (
-            <div className="mt-3 rounded-lg border border-[#b8d4a0] bg-[#f3faf0] px-3 py-3">
+            <div className="mt-3 rounded-lg border border-[#5DD4A0] bg-[#DEF7EC] px-3 py-3">
               <div className="flex items-start gap-2 mb-2">
                 <span className="text-green-600 mt-0.5">✓</span>
                 <p className="text-sm text-[#2d5a1a] font-medium">{result.explanation || 'Changements appliqués'}</p>
               </div>
               {result.summary.length > 0 && (
-                <ul className="text-xs text-[#4a7a30] space-y-0.5 ml-6">
+                <ul className="text-xs text-[#5DD4A0] space-y-0.5 ml-6">
                   {result.summary.map((line, i) => (
                     <li key={i}>• {line}</li>
                   ))}
                 </ul>
               )}
               {result.countChanged && (
-                <p className="mt-2 ml-6 text-xs text-[#8a6020] bg-[#fef9ec] border border-[#e8d87a] rounded px-2 py-1">
+                <p className="mt-2 ml-6 text-xs text-[#1E3FCC] bg-[#FFF4D6] border border-[#FFD23F] rounded px-2 py-1">
                   ⚠ Restructuration en {state.bodies.length} corps appliquée approximativement — vérifie les dimensions des pièces dans l'onglet Structure.
                 </p>
               )}

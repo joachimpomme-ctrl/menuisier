@@ -181,20 +181,20 @@ export default function StepType({ onSelect }: Props) {
   return (
     <div>
       <div className="mb-5">
-        <p className="text-[11px] uppercase tracking-widest text-[#9d9089] mb-1">Étape 1 / 3</p>
-        <h3 className="text-base font-semibold text-[#1c1714]">Quel meuble construire ?</h3>
+        <p className="text-[11px] uppercase tracking-widest text-[#9A968F] mb-1">Étape 1 / 3</p>
+        <h3 className="text-base font-semibold text-[#0E0D0C]">Quel meuble construire ?</h3>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {TYPES.map((t) => (
           <button
             key={t.id}
             onClick={() => onSelect(t.id)}
-            className="flex flex-col items-center gap-2 p-4 rounded-xl border border-[#e0d8ce] hover:border-[#6b4c2a] hover:bg-[#f2ebe0] transition-colors text-center text-[#695f56] hover:text-[#6b4c2a]"
+            className="flex flex-col items-center gap-2 p-4 rounded-xl border border-[#EFE8DD] hover:border-[#3B5FFF] hover:bg-[#E5EAFF] transition-colors text-center text-[#54514E] hover:text-[#3B5FFF]"
           >
             <span className="flex items-center justify-center h-10">
               {FURNITURE_SVGS[t.id] ?? DEFAULT_SVG}
             </span>
-            <span className="text-sm font-medium leading-tight text-[#1c1714]">{t.name}</span>
+            <span className="text-sm font-medium leading-tight text-[#0E0D0C]">{t.name}</span>
           </button>
         ))}
       </div>

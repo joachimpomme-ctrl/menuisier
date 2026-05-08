@@ -9,7 +9,7 @@ interface Props {
   state: AppState;
 }
 
-const cardClass = "rounded-2xl border border-stone-200 bg-white  p-4 mb-4";
+const cardClass = "rounded-2xl border border-[#EFE8DD] bg-white  p-4 mb-4";
 
 export default function MontageTab({ state }: Props) {
   const [showAll, setShowAll] = React.useState(false);
@@ -42,7 +42,7 @@ export default function MontageTab({ state }: Props) {
 
   return (
     <div>
-      <div className="text-sm text-stone-500 mb-4">
+      <div className="text-sm text-[#54514E] mb-4">
         <Tip text={TIPS['elevation']}>
           <span>Élévation frontale — {mat.short} {thickness * 10} mm</span>
         </Tip>
@@ -56,12 +56,12 @@ export default function MontageTab({ state }: Props) {
             viewBox={`0 0 ${SVG_WIDTH} ${svgHeight}`}
             className="rounded-lg"
           >
-            <rect width={SVG_WIDTH} height={svgHeight} fill="#f5f0eb" rx="8" />
+            <rect width={SVG_WIDTH} height={svgHeight} fill="#FFFCF7" rx="8" />
             {/* Floor line */}
             <line
               x1={MARGIN - 10} y1={MARGIN + usableHeight * scale}
               x2={SVG_WIDTH - MARGIN + 10} y2={MARGIN + usableHeight * scale}
-              stroke="#a8a29e" strokeWidth="1" strokeDasharray="6,3"
+              stroke="#9A968F" strokeWidth="1" strokeDasharray="6,3"
             />
 
             {state.bodies.map((b, bi) => {
@@ -120,9 +120,9 @@ export default function MontageTab({ state }: Props) {
 
                   {/* Plinthe cuts */}
                   {!sl && (
-                    <rect x={bx} y={MARGIN + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#f5f0eb" stroke="#a8a29e" strokeWidth=".5" />
+                    <rect x={bx} y={MARGIN + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#FFFCF7" stroke="#9A968F" strokeWidth=".5" />
                   )}
-                  <rect x={bx + bw - tw} y={MARGIN + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#f5f0eb" stroke="#a8a29e" strokeWidth=".5" />
+                  <rect x={bx + bw - tw} y={MARGIN + bh - state.project.plinthHeight * scale} width={tw} height={state.project.plinthHeight * scale} fill="#FFFCF7" stroke="#9A968F" strokeWidth=".5" />
 
                   {/* Fixed shelves */}
                   {fixedPositions.map((h, fi) => {
@@ -293,12 +293,12 @@ export default function MontageTab({ state }: Props) {
 
         return (
           <div className={cardClass}>
-            <h3 className="text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3">Quincaillerie - Liste d'achats</h3>
+            <h3 className="text-[#3B5FFF] font-semibold text-xs uppercase tracking-widest mb-3">Quincaillerie - Liste d'achats</h3>
             <div className="space-y-1.5">
               {(showAll ? items : items.slice(0, 3)).map((item) => (
-                <div key={item.label} className="flex items-center justify-between text-xs py-1.5 px-2 rounded-lg bg-stone-50">
-                  <span className="text-stone-700">{item.label}</span>
-                  <span className="font-mono font-semibold text-amber-700">{item.count} <span className="text-stone-400 font-normal">{item.unit}</span></span>
+                <div key={item.label} className="flex items-center justify-between text-xs py-1.5 px-2 rounded-lg bg-[#FFFCF7]">
+                  <span className="text-[#0E0D0C]">{item.label}</span>
+                  <span className="font-mono font-semibold text-[#3B5FFF]">{item.count} <span className="text-[#9A968F] font-normal">{item.unit}</span></span>
                 </div>
               ))}
             </div>
@@ -306,12 +306,12 @@ export default function MontageTab({ state }: Props) {
               <button
                 type="button"
                 onClick={() => setShowAll(v => !v)}
-                className="mt-2 text-[11px] text-amber-700 hover:text-amber-900 font-medium"
+                className="mt-2 text-[11px] text-[#3B5FFF] hover:text-[#1E3FCC] font-medium"
               >
                 {showAll ? 'Réduire' : `Voir toutes les étapes (${items.length - 3} de plus)`}
               </button>
             )}
-            <p className="text-[10px] text-stone-400 mt-3">Quantités estimées — prévoir 10-15 % de marge.</p>
+            <p className="text-[10px] text-[#9A968F] mt-3">Quantités estimées — prévoir 10-15 % de marge.</p>
           </div>
         );
       })()}
@@ -319,7 +319,7 @@ export default function MontageTab({ state }: Props) {
       {/* Hinge summary */}
       {hingeTotal > 0 && (
         <div className={cardClass}>
-          <h3 className="text-amber-700 font-semibold text-xs uppercase tracking-widest mb-3">Quincaillerie portes</h3>
+          <h3 className="text-[#3B5FFF] font-semibold text-xs uppercase tracking-widest mb-3">Quincaillerie portes</h3>
           <div className="space-y-2">
             {state.bodies.filter((b) => b.doorConfig).map((b) => {
               const dims = getDoorInfoFromPieces(b, thickness, mat.density);
@@ -337,7 +337,7 @@ export default function MontageTab({ state }: Props) {
                 </div>
               );
             })}
-            <div className="text-xs text-stone-500 mt-2">
+            <div className="text-xs text-[#54514E] mt-2">
               Total : <span className="font-semibold text-orange-700">{hingeTotal} charnières Ø35</span> + platines de montage
             </div>
           </div>
@@ -345,13 +345,13 @@ export default function MontageTab({ state }: Props) {
       )}
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 text-[10px] text-stone-500 mt-2 px-1">
+      <div className="flex flex-wrap gap-3 text-[10px] text-[#54514E] mt-2 px-1">
         <span className="flex items-center gap-1"><span className="w-3 h-2 bg-blue-400/30 border border-blue-400 rounded-sm inline-block"></span> Joues</span>
         {shared.some(Boolean) && (
           <span className="flex items-center gap-1"><span className="w-3 h-2 bg-blue-500/20 border border-blue-500 rounded-sm inline-block"></span> Joue commune</span>
         )}
-        <span className="flex items-center gap-1"><span className="w-3 h-2 bg-emerald-500/40 border border-emerald-500 rounded-sm inline-block"></span> Tabl. fixes</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-0.5 border-t-2 border-amber-500 border-dashed inline-block"></span> Tabl. réglables</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-2 bg-[#5DD4A0]/40 border border-[#5DD4A0] rounded-sm inline-block"></span> Tabl. fixes</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-0.5 border-t-2 border-[#3B5FFF] border-dashed inline-block"></span> Tabl. réglables</span>
         <span className="flex items-center gap-1"><span className="w-3 h-2 bg-orange-400/20 border border-orange-400 rounded-sm inline-block" style={{ borderStyle: 'dashed' }}></span> Portes</span>
         {hingeTotal > 0 && (
           <span className="flex items-center gap-1"><span className="w-2 h-2 bg-orange-500 rounded-full inline-block" style={{ opacity: 0.7 }}></span> Charnières</span>
