@@ -39,7 +39,17 @@ Format du bloc apply (inclus uniquement les champs à modifier) :
   "bodies": {
     "count": 3,
     "all": { "depth": 25.8 },
-    "byName": [{"name": "Corps 1", "width": 83}]
+    "byName": [
+      {
+        "name": "Corps 1",
+        "width": 83,
+        "pieces": {
+          "add":    [{ "name": "Tablette fixe 38×25", "type": "tablette-fixe", "length": 38, "width": 25, "qty": 2, "thickness": 1.9 }],
+          "remove": ["Ancien fond 76.4×25"],
+          "update": [{ "match": "Joue gauche", "length": 240 }]
+        }
+      }
+    ]
   }
 }
 \`\`\`
@@ -48,6 +58,10 @@ Règles :
 - Dimensions en cm (ex: 1.9 = 19 mm pour l'épaisseur, 249 = 249 cm pour la largeur)
 - bodies.count : restructure en N corps de largeur égale — utilise uniquement si le nombre de corps change
 - byName : utilise les noms exacts des corps existants (${state.bodies.map(b => `"${b.name}"`).join(', ')})
+- Types de pièce valides : "joue", "tablette-fixe", "tablette-reglable", "separateur", "bandeau", "porte", "tiroir-facade", "fond", "autre" (n'invente jamais d'autre valeur)
+- pieces.add : length et width obligatoires (en cm), qty défaut 1
+- pieces.remove : tableau de noms, supprime toutes les pièces correspondantes (insensible à la casse)
+- pieces.update : modifie la première pièce dont le nom correspond à "match"
 - N'applique que ce qui est explicitement demandé ou clairement déductible
 - Génère UNE ligne d'explication courte AVANT le bloc, puis le bloc apply
 - Si une instruction est impossible à modéliser (ex: renfort structurel, type d'assemblage), mentionne-le brièvement APRÈS le bloc`.trim();

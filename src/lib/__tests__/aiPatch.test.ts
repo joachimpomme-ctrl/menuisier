@@ -89,4 +89,113 @@ describe('aiPatch — applyPatch', () => {
     expect(next.project.ceilingHeight).toBe(s.project.ceilingHeight);
     expect(next.panel.thickness).toBe(s.panel.thickness);
   });
+
+  it('adds a piece to a body via byName.pieces.add', () => {
+    const s = createInitialState();
+    const target = s.bodies[0];
+    if (!target) return;
+    const before = target.pieces.length;
+    const next = applyPatch(s, {
+      bodies: {
+        byName: [{
+          name: target.name,
+          pieces: {
+            add: [{ name: 'Tablette test', type: 'tablette-fixe', length: 38, width: 25, qty: 2, thickness: 1.9 }],
+          },
+        }],
+      },
+    });
+    const updated = next.bodies.find(b => b.name === target.name)!;
+    expect(updated.pieces.length).toBe(before + 1);
+    const added = updated.pieces[updated.pieces.length - 1];
+    expect(added.name).toBe('Tablette test');
+    expect(added.type).toBe('tablette-fixe');
+    expect(added.length).toBe(38);
+    expect(added.width).toBe(25);
+    expect(added.qty).toBe(2);
+    expect(added.thickness).toBe(1.9);
+    expect(typeof added.id).toBe('string');
+  });
+
+  it('ignores add with invalid piece type', () => {
+    const s = createInitialState();
+    const target = s.bodies[0];
+    if (!target) return;
+    const before = target.pieces.length;
+    const next = applyPatch(s, {
+      bodies: {
+        byName: [{
+          name: target.name,
+          pieces: {
+            // @ts-expect-error invalid type
+            add: [{ name: 'Bidon', type: 'separation', length: 30, width: 25 }],
+          },
+        }],
+      },
+    });
+    const updated = next.bodies.find(b => b.name === target.name)!;
+    expect(updated.pieces.length).toBe(before);
+  });
+
+  it('removes pieces by name (case-insensitive)', () => {
+    const s = createInitialState();
+    const target = s.bodies[0];
+    if (!target || target.pieces.length === 0) return;
+    const victim = target.pieces[0].name;
+    const next = applyPatch(s, {
+      bodies: {
+        byName: [{ name: target.name, pieces: { remove: [victim.toUpperCase()] } }],
+      },
+    });
+    const updated = next.bodies.find(b => b.name === target.name)!;
+    expect(updated.pieces.find(p => p.name === victim)).toBeUndefined();
+  });
+
+  it('updates first matching piece via byName.pieces.update', () => {
+    const s = createInitialState();
+    const target = s.bodies[0];
+    if (!target || target.pieces.length === 0) return;
+    const matchName = target.pieces[0].name;
+    const next = applyPatch(s, {
+      bodies: {
+        byName: [{
+          name: target.name,
+          pieces: {
+            update: [{ match: matchName, length: 123, qty: 4 }],
+          },
+        }],
+      },
+    });
+    const updated = next.bodies.find(b => b.name === target.name)!;
+    const p = updated.pieces.find(p => p.name === matchName);
+    expect(p?.length).toBe(123);
+    expect(p?.qty).toBe(4);
+  });
+
+  it('matches body names case-insensitively', () => {
+    const s = createInitialState();
+    const target = s.bodies[0];
+    if (!target) return;
+    const next = applyPatch(s, {
+      bodies: { byName: [{ name: target.name.toUpperCase(), depth: 42 }] },
+    });
+    const updated = next.bodies.find(b => b.name === target.name)!;
+    expect(updated.depth).toBe(42);
+  });
+
+  it('does not mutate input state when modifying pieces', () => {
+    const s = createInitialState();
+    const target = s.bodies[0];
+    if (!target) return;
+    const snapshot = target.pieces.length;
+    applyPatch(s, {
+      bodies: {
+        byName: [{
+          name: target.name,
+          pieces: { add: [{ name: 'X', type: 'autre', length: 10, width: 10 }] },
+        }],
+      },
+    });
+    expect(s.bodies[0].pieces.length).toBe(snapshot);
+  });
 });

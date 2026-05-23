@@ -1,5 +1,15 @@
-import type { AppState, MaterialKey } from '../../types';
+import type { AppState, MaterialKey, Piece, PieceType } from '../../types';
 import { MATERIALS } from '../../data/materials';
+import { uid } from '../helpers';
+
+const VALID_PIECE_TYPES: PieceType[] = [
+  'joue', 'tablette-fixe', 'tablette-reglable', 'separateur',
+  'bandeau', 'porte', 'tiroir-facade', 'fond', 'autre',
+];
+
+function normalizeName(s: string): string {
+  return s.trim().toLowerCase();
+}
 
 // ---------------------------------------------------------------------------
 // AI Patch — small structured suggestion the IA can emit, applied with 1 clic
@@ -19,6 +29,35 @@ import { MATERIALS } from '../../data/materials';
 //
 // Only whitelisted fields are applied — anything else is ignored.
 
+export interface AIPatchPieceAdd {
+  name: string;
+  type: PieceType;
+  length: number;
+  width: number;
+  qty?: number;
+  thickness?: number;
+}
+
+export interface AIPatchPieceUpdate {
+  /** Exact (case-insensitive) name of the piece to update */
+  match: string;
+  name?: string;
+  type?: PieceType;
+  length?: number;
+  width?: number;
+  qty?: number;
+  thickness?: number;
+}
+
+export interface AIPatchBodyPieces {
+  /** Append new pieces to this body */
+  add?: AIPatchPieceAdd[];
+  /** Remove all pieces whose name (case-insensitive) matches any entry */
+  remove?: string[];
+  /** Update first piece whose name (case-insensitive) matches `match` */
+  update?: AIPatchPieceUpdate[];
+}
+
 export interface AIPatch {
   title?: string;
   project?: Partial<{
@@ -33,7 +72,12 @@ export interface AIPatch {
   material?: MaterialKey;
   bodies?: {
     all?: Partial<{ width: number; depth: number }>;
-    byName?: Array<{ name: string; width?: number; depth?: number }>;
+    byName?: Array<{
+      name: string;
+      width?: number;
+      depth?: number;
+      pieces?: AIPatchBodyPieces;
+    }>;
     /** Restructure to N equal-width bodies (pieces redistributed proportionally) */
     count?: number;
   };
@@ -108,6 +152,16 @@ function summarizePatch(p: AIPatch): string[] {
       if (b.width != null) items.push(`L ${b.width}`);
       if (b.depth != null) items.push(`P ${b.depth}`);
       if (items.length) lines.push(`${b.name} : ${items.join(', ')}`);
+      const pp = b.pieces;
+      if (pp?.add?.length) {
+        lines.push(`${b.name} : + ${pp.add.length} pièce(s) (${pp.add.map(a => a.name).join(', ')})`);
+      }
+      if (pp?.remove?.length) {
+        lines.push(`${b.name} : − ${pp.remove.length} pièce(s) (${pp.remove.join(', ')})`);
+      }
+      if (pp?.update?.length) {
+        lines.push(`${b.name} : modif ${pp.update.length} pièce(s) (${pp.update.map(u => u.match).join(', ')})`);
+      }
     });
   }
   return lines;
@@ -172,14 +226,66 @@ export function applyPatch(state: AppState, patch: AIPatch): AppState {
 
   if (patch.bodies?.byName) {
     for (const upd of patch.bodies.byName) {
+      const target = normalizeName(upd.name);
       next.bodies = next.bodies.map(b => {
-        if (b.name !== upd.name) return b;
-        return {
+        if (normalizeName(b.name) !== target) return b;
+        const dims = {
           ...b,
           width: typeof upd.width === 'number' ? clamp(upd.width, 10, 500) : b.width,
           depth: typeof upd.depth === 'number' ? clamp(upd.depth, 10, 200) : b.depth,
         };
+        return upd.pieces ? { ...dims, pieces: applyPieceOps(dims.pieces, upd.pieces) } : dims;
       });
+    }
+  }
+
+  return next;
+}
+
+function applyPieceOps(pieces: Piece[], ops: AIPatchBodyPieces): Piece[] {
+  let next = pieces.slice();
+
+  if (ops.remove?.length) {
+    const drop = new Set(ops.remove.map(normalizeName));
+    next = next.filter(p => !drop.has(normalizeName(p.name)));
+  }
+
+  if (ops.update?.length) {
+    for (const u of ops.update) {
+      const target = normalizeName(u.match);
+      let updated = false;
+      next = next.map(p => {
+        if (updated || normalizeName(p.name) !== target) return p;
+        updated = true;
+        const out: Piece = { ...p };
+        if (typeof u.name === 'string') out.name = u.name;
+        if (u.type && VALID_PIECE_TYPES.includes(u.type)) out.type = u.type;
+        if (typeof u.length === 'number') out.length = clamp(u.length, 1, 500);
+        if (typeof u.width === 'number') out.width = clamp(u.width, 1, 500);
+        if (typeof u.qty === 'number') out.qty = clamp(Math.round(u.qty), 1, 100);
+        if (typeof u.thickness === 'number') {
+          const v = clamp(u.thickness, 0.1, 5);
+          out.thickness = v;
+        }
+        return out;
+      });
+    }
+  }
+
+  if (ops.add?.length) {
+    for (const a of ops.add) {
+      if (!a.name || typeof a.length !== 'number' || typeof a.width !== 'number') continue;
+      if (!a.type || !VALID_PIECE_TYPES.includes(a.type)) continue;
+      const piece: Piece = {
+        id: uid(),
+        name: a.name,
+        type: a.type,
+        length: clamp(a.length, 1, 500),
+        width: clamp(a.width, 1, 500),
+        qty: typeof a.qty === 'number' ? clamp(Math.round(a.qty), 1, 100) : 1,
+      };
+      if (typeof a.thickness === 'number') piece.thickness = clamp(a.thickness, 0.1, 5);
+      next.push(piece);
     }
   }
 
@@ -192,7 +298,7 @@ function clamp(v: number, min: number, max: number): number {
 
 /** Snippet to add to the system prompt so the IA knows about the patch format */
 export const PATCH_INSTRUCTIONS = `
-Si l'utilisateur te demande d'ajuster des paramètres concrets du projet (dimensions, matériau, épaisseur, profondeur des corps...), tu PEUX inclure UN bloc structuré à la fin de ta réponse :
+Si l'utilisateur te demande d'ajuster des paramètres concrets du projet (dimensions, matériau, épaisseur, ajout/suppression/modification de pièces...), tu PEUX inclure UN bloc structuré à la fin de ta réponse :
 
 \`\`\`apply
 {
@@ -200,15 +306,34 @@ Si l'utilisateur te demande d'ajuster des paramètres concrets du projet (dimens
   "project": { "wallWidth": 280, "wallDepth": 35, "ceilingHeight": 240 },
   "panel": { "thickness": 1.9 },
   "material": "cp_bouleau",
-  "bodies": { "count": 3, "all": { "depth": 35 }, "byName": [{"name": "Corps 1", "width": 100}] }
+  "bodies": {
+    "count": 3,
+    "all": { "depth": 35 },
+    "byName": [
+      {
+        "name": "Corps 1",
+        "width": 100,
+        "pieces": {
+          "add":    [{ "name": "Tablette fixe 38×25", "type": "tablette-fixe", "length": 38, "width": 25, "qty": 2, "thickness": 1.9 }],
+          "remove": ["Ancien fond 76.4×25"],
+          "update": [{ "match": "Joue gauche", "length": 240, "qty": 1 }]
+        }
+      }
+    ]
+  }
 }
 \`\`\`
 
-Règles :
+Règles strictes :
 - N'inclus QUE les champs que tu veux modifier (les autres restent inchangés).
+- Toutes les dimensions sont en cm. Pour l'épaisseur : 1.9 = 19 mm.
 - Matériaux valides : cp_bouleau, cp_peuplier, cp_okoume, mdf, melamine, osb.
-- Épaisseurs en cm (ex: 1.9 = 19 mm).
+- Types de pièce valides (exactement, accent compris) : "joue", "tablette-fixe", "tablette-reglable", "separateur", "bandeau", "porte", "tiroir-facade", "fond", "autre". Ne jamais inventer de type (pas de "separation", "etagere", "shelf"…).
+- bodies.byName[].name doit correspondre au nom EXACT d'un corps existant.
+- pieces.add : crée une nouvelle pièce. length et width obligatoires, qty défaut 1, thickness optionnelle.
+- pieces.remove : tableau de noms — supprime TOUTES les pièces dont le nom correspond (insensible à la casse).
+- pieces.update : modifie la PREMIÈRE pièce dont le nom correspond à "match". Tous les autres champs sont optionnels.
 - bodies.count : restructure le projet en N corps de largeur égale (redistribution approx. des pièces).
-- Inclus le bloc UNIQUEMENT si l'utilisateur demande explicitement un changement de paramètres. Pour une simple question, n'en mets pas.
+- Inclus le bloc UNIQUEMENT si l'utilisateur demande explicitement un changement. Pour une simple question, n'en mets pas.
 - Le bloc ne remplace pas ton explication : commente d'abord, puis propose le patch.
 `.trim();
