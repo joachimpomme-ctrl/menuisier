@@ -10,6 +10,9 @@ export interface MoreMenuProps {
   onLibrary: () => void;
   onHelp: () => void;
   onProjects: () => void;
+  onNotice: () => void;
+  onValidation: () => void;
+  validationCount?: number;
   direction?: 'down' | 'up';
 }
 
@@ -30,7 +33,7 @@ export function isOutsideMoreMenu(root: { contains(node: Node): boolean } | null
   return !root.contains(target);
 }
 
-export default function MoreMenu({ onExport, onImport, onPdf, pdfLoading, onCloud, cloudConfigured, onLibrary, onHelp, onProjects, direction = 'down' }: MoreMenuProps) {
+export default function MoreMenu({ onExport, onImport, onPdf, pdfLoading, onCloud, cloudConfigured, onLibrary, onHelp, onProjects, onNotice, onValidation, validationCount, direction = 'down' }: MoreMenuProps) {
   const [open, setOpen] = useState(getInitialMoreMenuOpen);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -74,6 +77,25 @@ export default function MoreMenu({ onExport, onImport, onPdf, pdfLoading, onClou
             className="block w-full px-3 py-2.5 text-left text-sm text-[#0E0D0C] hover:bg-[#E5EAFF] border-b border-[#EFE8DD]"
           >
             Bibliothèque de pièces
+          </button>
+          <button
+            type="button"
+            onClick={() => { onNotice(); close(); }}
+            className="block w-full px-3 py-2.5 text-left text-sm text-[#0E0D0C] hover:bg-[#E5EAFF] border-b border-[#EFE8DD]"
+          >
+            Notice de montage
+          </button>
+          <button
+            type="button"
+            onClick={() => { onValidation(); close(); }}
+            className={`block w-full px-3 py-2.5 text-left text-sm hover:bg-[#E5EAFF] border-b border-[#EFE8DD] flex items-center justify-between ${validationCount && validationCount > 0 ? 'text-[#A52E16]' : 'text-[#0E0D0C]'}`}
+          >
+            <span>Contrôle qualité</span>
+            {validationCount !== undefined && validationCount > 0 && (
+              <span className="text-xs bg-[#FFE4DC] text-[#A52E16] border border-[#FF6B4A] rounded px-1.5 py-px font-medium">
+                {validationCount}
+              </span>
+            )}
           </button>
           <button
             type="button"

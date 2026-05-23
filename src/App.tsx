@@ -30,11 +30,11 @@ import HelpGuide from './components/HelpGuide';
 import Logo from './components/Logo';
 
 const TABS: { key: TabKey; label: string; shortLabel: string }[] = [
-  { key: 'structure', label: 'Structure', shortLabel: 'Struct.' },
-  { key: 'plans',     label: 'Plans 2D',  shortLabel: 'Plans'   },
-  { key: 'debit',     label: 'Débit',     shortLabel: 'Débit'   },
-  { key: 'montage',   label: 'Montage',   shortLabel: 'Mont.'   },
-  { key: 'export',    label: 'Export',    shortLabel: 'Export'  },
+  { key: 'structure', label: 'Structure',    shortLabel: 'Struct.' },
+  { key: 'plans',     label: 'Plans 2D',     shortLabel: 'Plans'   },
+  { key: 'debit',     label: 'Débit',        shortLabel: 'Débit'   },
+  { key: 'montage',   label: 'Montage',      shortLabel: 'Mont.'   },
+  { key: 'ia',        label: 'Assistant IA', shortLabel: 'IA'      },
 ];
 
 // Singleton repository — shared across renders
@@ -197,7 +197,7 @@ export default function App() {
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                tab === t.key || (t.key === 'export' && ['notice', 'validation', 'ia'].includes(tab))
+                tab === t.key
                   ? 'bg-[#E5EAFF] text-[#3B5FFF] font-semibold'
                   : 'text-[#54514E] hover:bg-[#FFFCF7] hover:text-[#0E0D0C]'
               }`}
@@ -225,6 +225,9 @@ export default function App() {
               onLibrary={() => setShowPartsLibrary(true)}
               onHelp={() => setShowHelp(true)}
               onProjects={() => setShowProjects(true)}
+              onNotice={() => setTab('notice')}
+              onValidation={() => setTab('validation')}
+              validationCount={validation.errors.length}
             />
           </div>
         </div>
@@ -268,6 +271,9 @@ export default function App() {
                 onLibrary={() => setShowPartsLibrary(true)}
                 onHelp={() => setShowHelp(true)}
                 onProjects={() => setShowProjects(true)}
+                onNotice={() => setTab('notice')}
+                onValidation={() => setTab('validation')}
+                validationCount={validation.errors.length}
               />
             </div>
           </div>
@@ -289,9 +295,14 @@ export default function App() {
               </span>
             )}
             {hasErrors && (
-              <span className="bg-[#FFE4DC] text-[#A52E16] border border-[#FF6B4A] rounded px-2 py-px font-medium">
-                {validation.errors.length} err.
-              </span>
+              <button
+                type="button"
+                onClick={() => setTab('validation')}
+                className="bg-[#FFE4DC] text-[#A52E16] border border-[#FF6B4A] rounded px-2 py-px font-medium hover:bg-[#FFD2C2] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A] transition-colors cursor-pointer"
+                aria-label={`Voir le contrôle qualité (${validation.errors.length} erreur${validation.errors.length > 1 ? 's' : ''})`}
+              >
+                {validation.errors.length} err. →
+              </button>
             )}
           </div>
 
@@ -392,7 +403,7 @@ export default function App() {
             <div className="relative mb-5 md:hidden">
               <div className="flex border-b border-[#EFE8DD] overflow-x-auto hide-scrollbar">
                 {TABS.map((t) => {
-                  const isActive = tab === t.key || (t.key === 'export' && ['notice', 'validation', 'ia'].includes(tab));
+                  const isActive = tab === t.key;
                   return (
                     <button
                       key={t.key}
@@ -477,33 +488,6 @@ export default function App() {
                 />
               )}
               {tab === 'montage' && <MontageTab state={state} />}
-              {tab === 'export' && (
-                <div className="space-y-3">
-                  <button
-                    onClick={() => setTab('notice' as TabKey)}
-                    className="w-full text-left rounded-xl border border-[#EFE8DD] bg-white px-4 py-3 text-sm font-medium text-[#54514E] hover:border-[#3B5FFF] hover:text-[#3B5FFF] transition-colors"
-                  >
-                    Notice PDF
-                  </button>
-                  <button
-                    onClick={() => setTab('validation' as TabKey)}
-                    className={`w-full text-left rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${
-                      hasErrors
-                        ? 'border-[#FF6B4A] bg-[#FFE4DC] text-[#A52E16] hover:border-[#A52E16]'
-                        : 'border-[#EFE8DD] bg-white text-[#54514E] hover:border-[#0E5A3D] hover:text-[#0E5A3D]'
-                    }`}
-                  >
-                    Contrôle qualité
-                    {hasErrors && <span className="ml-2 text-xs">({validation.errors.length} erreur{validation.errors.length > 1 ? 's' : ''})</span>}
-                  </button>
-                  <button
-                    onClick={() => setTab('ia' as TabKey)}
-                    className="w-full text-left rounded-xl border border-[#EFE8DD] bg-white px-4 py-3 text-sm font-medium text-[#54514E] hover:border-[#3B5FFF] hover:text-[#3B5FFF] transition-colors"
-                  >
-                    Assistant IA →
-                  </button>
-                </div>
-              )}
               {tab === 'notice' && <NoticeTab steps={steps} materialName={mat.name} thickness={state.panel.thickness} />}
               {tab === 'validation' && <ValidationTab validation={validation} onGoToStructure={() => setTab('structure')} />}
             </div>
