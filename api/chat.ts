@@ -14,9 +14,11 @@ const MAX_MESSAGES = 50;
 const MAX_SYSTEM_LENGTH = 20_000;
 const MAX_BODY_SIZE = 512_000; // ~500KB
 const MAX_CONTENT_ITEMS = 10;
-const FETCH_TIMEOUT_MS = 60_000;
+const FETCH_TIMEOUT_MS = 120_000;
 const VALID_ROLES = new Set(['user', 'assistant']);
 const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-5';
+
+export const maxDuration = 120;
 
 /**
  * Allowed origins for CORS. Configured via ALLOWED_ORIGINS env var
@@ -184,8 +186,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ reply });
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
-      console.error('Timeout Anthropic API après 60s');
-      return res.status(504).json({ error: 'Le service IA n\'a pas répondu à temps. Réessayez.' });
+      console.error(`Timeout Anthropic API après ${FETCH_TIMEOUT_MS / 1000}s`);
+      return res.status(504).json({ error: 'Le service IA n\'a pas répondu à temps (2 min). Essaie une question plus courte, retire les PDF/images, ou réessaie.' });
     }
 
     if (error instanceof SyntaxError) {
