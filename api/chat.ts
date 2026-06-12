@@ -16,7 +16,10 @@ const MAX_BODY_SIZE = 512_000; // ~500KB
 const MAX_CONTENT_ITEMS = 10;
 const FETCH_TIMEOUT_MS = 120_000;
 const VALID_ROLES = new Set(['user', 'assistant']);
-const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-5';
+// Modèle Claude par défaut. Override via env var ANTHROPIC_MODEL côté Vercel
+// (utile pour fallback si le slug par défaut n'est plus reconnu par l'API,
+// ex. retour à 'claude-opus-4-7' ou 'claude-sonnet-4-6').
+const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL ?? 'claude-opus-4-8';
 
 export const maxDuration = 120;
 
