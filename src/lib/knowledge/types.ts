@@ -222,6 +222,15 @@ export interface GeneratedPart {
   locked: boolean;
   /** Links to a StandardPart definition for the user's parts library */
   standard_part_id?: string;
+  /** Numéro atelier (1..N), attribué par assignPieceNumbers().
+   *  Tri stable corps → type → surface. Affiché "P{n}" dans débit, nesting,
+   *  plans cotés, PDF, CSV. */
+  pieceNumber?: number;
+}
+
+/** Label atelier "P{n}" pour une pièce, ou chaîne vide si non numérotée. */
+export function formatPieceLabel(part: { pieceNumber?: number }): string {
+  return part.pieceNumber !== undefined ? `P${part.pieceNumber}` : '';
 }
 
 // ---------------------------------------------------------------------------
@@ -509,6 +518,7 @@ export function generatedPartsToLegacy(
         qty: gp.qty,
         type: PART_TYPE_TO_PIECE_TYPE[gp.type],
       };
+      if (gp.pieceNumber !== undefined) piece.pieceNumber = gp.pieceNumber;
 
       // Thickness override: only set if different from what will be the panel default
       // (the caller sets panel.thickness on AppState — we can't know it here, so we

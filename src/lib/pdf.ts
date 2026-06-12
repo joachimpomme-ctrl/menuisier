@@ -546,13 +546,24 @@ export async function generatePdf(
 
         doc.rect(px, py, pw, ph, 'FD');
 
-        // Label (only if big enough)
-        if (pw > 12 && ph > 5) {
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(6);
+        // Label : num\u00e9ro pi\u00e8ce dominant + nom/dim si place dispo
+        if (pw > 6 && ph > 3) {
           doc.setTextColor(255, 255, 255);
-          const labelText = `${p.name} ${p.length}\u00d7${p.width}`;
-          doc.text(labelText, px + 1, py + 3.5, { maxWidth: pw - 2 });
+          if (p.pieceNumber !== undefined) {
+            const numFontSize = pw > 25 && ph > 12 ? 9 : pw > 12 && ph > 6 ? 7 : 5.5;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(numFontSize);
+            doc.text(`P${p.pieceNumber}`, px + pw / 2, py + ph / 2 + numFontSize * 0.15, {
+              align: 'center',
+              baseline: 'middle',
+            });
+          }
+          if (pw > 25 && ph > 12) {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(5.5);
+            const dim = `${p.length}\u00d7${p.width}`;
+            doc.text(dim, px + pw / 2, py + ph - 1.5, { align: 'center', maxWidth: pw - 2 });
+          }
         }
       }
 
@@ -759,8 +770,11 @@ export function generateCutListPdf(
     doc.text(`${pd.label} \u2014 ${pd.width}\u00d7${pd.height} cm, \u00e9p. ${pd.thickness * 10} mm`, CL_MARGIN, y);
     y += 5;
 
-    // Sort pieces by body then by type
+    // Sort pieces by pieceNumber (atelier order) if available, else by body+type
     const sorted = [...pieces].sort((a, b) => {
+      if (a.pieceNumber !== undefined && b.pieceNumber !== undefined) {
+        return a.pieceNumber - b.pieceNumber;
+      }
       const cmp = a.bodyName.localeCompare(b.bodyName);
       if (cmp !== 0) return cmp;
       return a.type.localeCompare(b.type);
@@ -776,8 +790,9 @@ export function generateCutListPdf(
       const surface = p.length * p.width * p.qty;
       sectionQty += p.qty;
       sectionSurface += surface;
+      const numLabel = p.pieceNumber !== undefined ? `P${p.pieceNumber}` : String(i + 1);
       rows.push([
-        String(i + 1),
+        numLabel,
         p.bodyName,
         p.name,
         p.type,

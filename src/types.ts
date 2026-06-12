@@ -61,6 +61,9 @@ export interface Piece {
   // posX : distance (cm) du bord intérieur gauche du corps au bord gauche d'un séparateur
   //        vertical. Utilisé par : separateur. undefined → auto-distribué.
   posX?: number;
+  // pieceNumber : numéro atelier séquentiel 1..N, attribué côté moteur V3 (geometry.ts).
+  //               Affiché "P{n}" dans débit, plans cotés, nesting, PDF, CSV.
+  pieceNumber?: number;
 }
 
 export interface SharedBoundarySnapshotPiece {
