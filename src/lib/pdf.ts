@@ -588,7 +588,177 @@ function drawSideView(
 }
 
 /**
- * Insère 3 pages de plans cotés (face, dessus, côté) dans le doc.
+ * Vue en coupe transversale (section verticale) — comme drawSideView mais on
+ * "coupe" la joue côté pour révéler l'intérieur : étagères en pleine largeur
+ * cotées H={posY}, profondeur utile cotée, dos en rainure visible.
+ */
+function drawCrossSection(
+  doc: jsPDF,
+  state: AppState,
+  origin: { x: number; y: number },
+  area: { w: number; h: number },
+): void {
+  const body = state.bodies[0];
+  if (!body) return;
+
+  const usableHeight = getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight);
+  const th = state.panel.thickness;
+  const joueLens = body.pieces.filter((p) => p.type === 'joue').map((p) => p.length);
+  const maxH_cm = Math.max(usableHeight, ...joueLens, 100);
+  const depth = body.depth;
+
+  const dimLeft = 12;
+  const dimBottom = 14;
+  const dimTop = 10;
+  const innerW = area.w - dimLeft - 12;
+  const innerH = area.h - dimBottom - dimTop;
+  const scale = Math.min(innerW / depth, innerH / maxH_cm);
+
+  const drawW = depth * scale;
+  const drawH = maxH_cm * scale;
+  const x0 = origin.x + dimLeft + (innerW - drawW) / 2;
+  const y0 = origin.y + dimTop;
+  const tw = Math.max(th * scale, 0.35);
+
+  const colorJoue = hexToRgb('#3b82f6');
+  const colorFond = hexToRgb('#6b7280');
+  const colorFixe = hexToRgb('#10b981');
+  const colorRegl = hexToRgb('#f59e0b');
+  const colorSep = hexToRgb('#0ea5e9');
+
+  // Mur (gauche)
+  doc.setDrawColor(150, 150, 150);
+  doc.setLineWidth(0.5);
+  doc.line(x0, y0 - 4, x0, y0 + drawH + 4);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6);
+  doc.setTextColor(...DIM_COLOR);
+  doc.text('MUR', x0 - 0.5, y0 - 5, { align: 'right' });
+
+  // Contour du caisson (joue côté virtuellement "coupée" → trait pointillé)
+  doc.setDrawColor(...colorJoue);
+  doc.setLineWidth(0.35);
+  doc.setLineDashPattern([1.5, 1], 0);
+  doc.rect(x0, y0, drawW, drawH);
+  doc.setLineDashPattern([], 0);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(5.5);
+  doc.setTextColor(...colorJoue);
+  doc.text('Joue (coupe)', x0 + drawW - 0.5, y0 + 2.5, { align: 'right' });
+
+  // Dos (en arrière, contre mur) — rect rempli mince
+  fillTintRect(doc, x0, y0, tw / 2.2, drawH, colorFond, 0.55);
+  const fondPiece = body.pieces.find((p) => p.type === 'fond');
+  drawPieceNumber(doc, fondPiece, x0, y0 + drawH / 2 - 2, tw / 2.2, 3, 4);
+
+  // Plinthe cutout (transparente)
+  const ph = state.project.plinthHeight;
+  const pd = state.project.plinthDepth;
+  if (ph > 0 && pd > 0) {
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(120, 120, 120);
+    doc.setLineWidth(0.18);
+    doc.rect(x0, y0 + drawH - ph * scale, pd * scale, ph * scale, 'FD');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(5);
+    doc.setTextColor(...DIM_COLOR);
+    doc.text(`plinthe ${ph}×${pd}`, x0 + 1, y0 + drawH - ph * scale / 2 + 0.5, { align: 'left' });
+  }
+
+  // Fixed shelves (en coupe : pleine largeur, opaque)
+  const fixedExpanded = body.pieces
+    .filter((p) => p.type === 'tablette-fixe')
+    .flatMap((p) => Array.from({ length: p.qty }, () => p));
+  fixedExpanded.forEach((p, i) => {
+    const posY = typeof p.posY === 'number'
+      ? p.posY
+      : fixedExpanded.length === 1
+        ? maxH_cm - 2
+        : i === 0
+          ? maxH_cm - 2
+          : i === 1
+            ? 2
+            : (maxH_cm * (i - 1)) / (fixedExpanded.length - 1);
+    const shelfY = y0 + drawH - posY * scale - tw / 2;
+    // Tablette commence après le dos (x0 + tw/2.2)
+    const shelfX = x0 + tw / 2.2;
+    const shelfW = drawW - tw / 2.2;
+    fillTintRect(doc, shelfX, shelfY, shelfW, tw, colorFixe, 0.55);
+    drawPieceNumber(doc, p, shelfX, shelfY, shelfW, tw, 5);
+    // Cote H= à gauche (entre mur et tablette)
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(5);
+    doc.setTextColor(...colorFixe);
+    doc.text(`H=${posY}`, x0 - 0.5, shelfY + tw / 2 + 1, { align: 'right' });
+  });
+
+  // Adjustable shelves (en coupe : lignes opaques)
+  const adjustExpanded = body.pieces
+    .filter((p) => p.type === 'tablette-reglable')
+    .flatMap((p) => Array.from({ length: p.qty }, () => p));
+  if (adjustExpanded.length > 0) {
+    doc.setDrawColor(...colorRegl);
+    adjustExpanded.forEach((p, i) => {
+      const posY = typeof p.posY === 'number'
+        ? p.posY
+        : 20 + (i + 1) * ((maxH_cm - 40) / (adjustExpanded.length + 1));
+      const shelfY = y0 + drawH - posY * scale;
+      doc.setLineWidth(0.5);
+      doc.setLineDashPattern([1.2, 0.8], 0);
+      doc.line(x0 + tw / 2.2 + 0.3, shelfY, x0 + drawW - 0.3, shelfY);
+      doc.setLineDashPattern([], 0);
+      // P{n} si premier réglable
+      if (i === 0 && p.pieceNumber !== undefined) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(5);
+        doc.setTextColor(...colorRegl);
+        doc.text(`P${p.pieceNumber} (régl.)`, x0 + drawW / 2, shelfY - 0.6, { align: 'center' });
+      }
+    });
+  }
+
+  // Séparateurs verticaux (vue de côté = trait vertical à la position posY)
+  // On les annote mais sans les dessiner pleins (puisque vu de profil ils sont fins)
+  const separators = body.pieces.filter((p) => p.type === 'separateur');
+  if (separators.length > 0) {
+    doc.setDrawColor(...colorSep);
+    doc.setLineWidth(0.4);
+    separators.forEach((sep) => {
+      const sepLen = sep.length * scale;
+      const sepBaseY = typeof sep.posY === 'number' ? sep.posY : (maxH_cm - sep.length) / 2;
+      const sepY = y0 + drawH - sepBaseY * scale - sepLen;
+      // Position approximative dans la profondeur (centré sur intérieur)
+      const sepDX = x0 + tw / 2.2 + (drawW - tw / 2.2) / 2;
+      doc.setLineDashPattern([0.6, 0.4], 0);
+      doc.line(sepDX, sepY, sepDX, sepY + sepLen);
+      doc.setLineDashPattern([], 0);
+      if (sep.pieceNumber !== undefined) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(4.5);
+        doc.setTextColor(...colorSep);
+        doc.text(`P${sep.pieceNumber}`, sepDX + 0.5, sepY + sepLen / 2, { align: 'left' });
+      }
+    });
+  }
+
+  // Body label
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...TEXT_COLOR);
+  doc.text(`${body.name} — coupe transversale`, x0 + drawW / 2, y0 - 1.2, { align: 'center' });
+
+  // Cotes
+  drawDimV(doc, y0, y0 + drawH, x0 + drawW + 2, `${maxH_cm}`, { offset: 5 });
+  drawDimH(doc, x0, x0 + drawW, y0 + drawH, `${depth}`, { offset: 4 });
+  // Profondeur utile (intérieur = depth - dos) sur 2ème ligne
+  const innerDepth = +(depth - (th / 2.2)).toFixed(1);
+  drawDimH(doc, x0 + tw / 2.2, x0 + drawW, y0 + drawH, `${innerDepth} utile`, {
+    offset: 9, color: DIM_ACCENT, fontSize: 6,
+  });
+}
+
+/**
+ * Insère 4 pages de plans cotés (face, dessus, côté, coupe) dans le doc.
  * Chaque page : titre + sous-titre matériau/épaisseur + plan + légende.
  */
 function appendPlanPages(doc: jsPDF, state: AppState): void {
@@ -614,6 +784,13 @@ function appendPlanPages(doc: jsPDF, state: AppState): void {
   y = MARGIN + 5;
   y = planSectionHeader(doc, y, 'Plans cotés — Vue de côté', subtitle);
   drawSideView(doc, state, { x: MARGIN, y }, { w: CONTENT_W, h: PAGE_H - y - 30 });
+  drawPlanLegend(doc, PAGE_H - 22);
+
+  // ---- Page : Coupe transversale (intérieur révélé) ----
+  doc.addPage();
+  y = MARGIN + 5;
+  y = planSectionHeader(doc, y, 'Plans cotés — Coupe transversale', subtitle);
+  drawCrossSection(doc, state, { x: MARGIN, y }, { w: CONTENT_W, h: PAGE_H - y - 30 });
   drawPlanLegend(doc, PAGE_H - 22);
 }
 
