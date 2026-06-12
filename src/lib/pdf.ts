@@ -939,7 +939,8 @@ export async function generatePdf(
   validation: ValidationResult,
   steps: Step[],
   v3Data?: V3PdfData,
-): Promise<void> {
+  options?: { returnBuffer?: boolean },
+): Promise<ArrayBuffer | void> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const mat = MATERIALS[state.materialKey];
   const usableHeight = getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight);
@@ -1589,8 +1590,11 @@ export async function generatePdf(
   addFooters(doc);
 
   // =========================================================================
-  // Save
+  // Save (ou returnBuffer pour scripts/tests)
   // =========================================================================
+  if (options?.returnBuffer) {
+    return doc.output('arraybuffer') as ArrayBuffer;
+  }
   const fileName = `${slugify(state.project.name)}-dossier-${isoDate()}.pdf`;
   doc.save(fileName);
 }
