@@ -1,17 +1,22 @@
 import React from 'react';
 import type { AppState } from '../types';
+import type { AssemblyStep } from '../lib/knowledge/types';
 import { MATERIALS, BODY_COLORS } from '../data/materials';
 import { isSharedLeft, getDoorInfoFromPieces, getUsableHeight } from '../lib/helpers';
 import Tip from './Tip';
 import TIPS from '../data/tips';
+import AssemblyGuide from './result/AssemblyGuide';
 
 interface Props {
   state: AppState;
+  /** Séquence d'assemblage V3 (13 étapes générées par le moteur).
+   *  Si présente, rendue en haut du tab dans une section dédiée. */
+  assemblyGuide?: AssemblyStep[];
 }
 
 const cardClass = "rounded-2xl border border-[#EFE8DD] bg-white  p-4 mb-4";
 
-export default function MontageTab({ state }: Props) {
+export default function MontageTab({ state, assemblyGuide }: Props) {
   const [showAll, setShowAll] = React.useState(false);
   const mat = MATERIALS[state.materialKey];
   const usableHeight = getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight);
@@ -42,6 +47,20 @@ export default function MontageTab({ state }: Props) {
 
   return (
     <div>
+      {/* Séquence d'assemblage V3 (si dispo) — affichée en tête car c'est
+          la première chose qu'on consulte avant d'attaquer le montage. */}
+      {assemblyGuide && assemblyGuide.length > 0 && (
+        <div className={cardClass}>
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <h4 className="text-[#3B5FFF] font-semibold text-xs uppercase tracking-widest">
+              Séquence d'assemblage — {assemblyGuide.length} étapes
+            </h4>
+            <span className="text-[10px] text-[#9A968F]">Suis l'ordre. P{'{n}'} = numéro atelier (cf. débit).</span>
+          </div>
+          <AssemblyGuide steps={assemblyGuide} />
+        </div>
+      )}
+
       <div className="text-sm text-[#54514E] mb-4">
         <Tip text={TIPS['elevation']}>
           <span>Élévation frontale — {mat.short} {thickness * 10} mm</span>

@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { AppState, Piece, ValidationResult, Step, PackedPiece, PanelDef } from '../types';
-import type { HardwareItem, Assumption } from './knowledge/types';
+import type { HardwareItem, Assumption, AssemblyStep } from './knowledge/types';
 import type { ProjectAnalysis } from './projectAnalysis';
 import { MATERIALS } from '../data/materials';
 import { getBodyInnerWidth, getUsableHeight, isSharedLeft } from './helpers';
@@ -831,6 +831,9 @@ interface V3PdfData {
   assumptions: Assumption[];
   edgeBandingParts: { name: string; sides: string }[];
   drillingParts?: { name: string; ops: string[] }[];
+  /** Séquence d'assemblage V3 (13 étapes par défaut). Si présent, remplace
+   *  la page Notice "Step[]" legacy pour un rendu atelier complet. */
+  assemblyGuide?: AssemblyStep[];
 }
 
 export async function generatePdf(
@@ -1355,40 +1358,132 @@ export async function generatePdf(
   y = MARGIN + 5;
   y = sectionTitle(doc, y, 'Notice de montage');
 
-  for (const step of steps) {
-    y = ensureSpace(doc, y, 20);
+  if (v3Data?.assemblyGuide && v3Data.assemblyGuide.length > 0) {
+    // Rendu V3 enrichi : step_number, title, instructions, parts_involved,
+    // hardware_involved, tip
+    const accent = hexToRgb('#3B5FFF');
+    const tipBg = hexToRgb('#FFF8DD');
+    const tipBorder = hexToRgb('#FFD23F');
+    const partsColor = hexToRgb('#9A968F');
 
-    // Step title
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(...TITLE_COLOR);
-    doc.text(step.title, MARGIN, y);
-    y += 6;
+    for (const step of v3Data.assemblyGuide) {
+      y = ensureSpace(doc, y, 24);
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+      // Step number badge (cobalt) + title
+      doc.setFillColor(...accent);
+      doc.circle(MARGIN + 3, y - 1.8, 2.6, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(255, 255, 255);
+      doc.text(String(step.step_number), MARGIN + 3, y - 0.5, { align: 'center' });
 
-    for (const item of step.items) {
-      y = ensureSpace(doc, y, 6);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(...TITLE_COLOR);
+      doc.text(step.title, MARGIN + 8, y);
+      y += 6;
 
-      const isWarning = item.startsWith('\u26a0');
-      if (isWarning) {
-        doc.setTextColor(...hexToRgb('#ea580c'));
-      } else {
+      // Instructions
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.5);
+      for (const instr of step.instructions) {
+        y = ensureSpace(doc, y, 6);
         doc.setTextColor(...TEXT_COLOR);
+        const lines = doc.splitTextToSize(`\u2022 ${instr}`, CONTENT_W - 8);
+        for (const line of lines) {
+          y = ensureSpace(doc, y, 5);
+          doc.text(line, MARGIN + 4, y);
+          y += 4.4;
+        }
       }
 
-      // Wrap long lines
-      const lines = doc.splitTextToSize(`\u2022 ${item}`, CONTENT_W - 8);
-      for (const line of lines) {
-        y = ensureSpace(doc, y, 5);
-        doc.text(line, MARGIN + 4, y);
-        y += 4.5;
+      // Parts involved (italic, dimmer)
+      if (step.parts_involved && step.parts_involved.length > 0) {
+        y = ensureSpace(doc, y, 6);
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(...partsColor);
+        const partsText = `Pi\u00e8ces : ${step.parts_involved.join(', ')}`;
+        const lines = doc.splitTextToSize(partsText, CONTENT_W - 8);
+        for (const line of lines) {
+          y = ensureSpace(doc, y, 5);
+          doc.text(line, MARGIN + 4, y);
+          y += 4;
+        }
       }
-      y += 1;
+
+      // Hardware involved
+      if (step.hardware_involved && step.hardware_involved.length > 0) {
+        y = ensureSpace(doc, y, 6);
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(...partsColor);
+        const hwText = `Quincaillerie : ${step.hardware_involved.join(', ')}`;
+        const lines = doc.splitTextToSize(hwText, CONTENT_W - 8);
+        for (const line of lines) {
+          y = ensureSpace(doc, y, 5);
+          doc.text(line, MARGIN + 4, y);
+          y += 4;
+        }
+      }
+
+      // Tip \u2014 jaune highlight box
+      if (step.tip) {
+        y = ensureSpace(doc, y, 8);
+        const tipLines = doc.splitTextToSize(`\ud83d\udca1 ${step.tip}`, CONTENT_W - 12);
+        const tipH = 4 + tipLines.length * 4;
+        doc.setFillColor(...tipBg);
+        doc.setDrawColor(...tipBorder);
+        doc.setLineWidth(0.3);
+        doc.rect(MARGIN + 4, y - 2.5, CONTENT_W - 8, tipH, 'FD');
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(...TEXT_COLOR);
+        let tipY = y;
+        for (const line of tipLines) {
+          doc.text(line, MARGIN + 6, tipY);
+          tipY += 4;
+        }
+        y += tipH;
+      }
+
+      y += 4;
     }
+  } else {
+    // Fallback legacy V2 : Step[]
+    for (const step of steps) {
+      y = ensureSpace(doc, y, 20);
 
-    y += 4;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(...TITLE_COLOR);
+      doc.text(step.title, MARGIN, y);
+      y += 6;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+
+      for (const item of step.items) {
+        y = ensureSpace(doc, y, 6);
+
+        const isWarning = item.startsWith('\u26a0');
+        if (isWarning) {
+          doc.setTextColor(...hexToRgb('#ea580c'));
+        } else {
+          doc.setTextColor(...TEXT_COLOR);
+        }
+
+        const lines = doc.splitTextToSize(`\u2022 ${item}`, CONTENT_W - 8);
+        for (const line of lines) {
+          y = ensureSpace(doc, y, 5);
+          doc.text(line, MARGIN + 4, y);
+          y += 4.5;
+        }
+        y += 1;
+      }
+
+      y += 4;
+    }
   }
 
   // =========================================================================
