@@ -234,9 +234,9 @@ function drawFaceView(
   state: AppState,
   origin: { x: number; y: number },
   area: { w: number; h: number },
-): void {
+): number {
   const bodies = state.bodies;
-  if (bodies.length === 0) return;
+  if (bodies.length === 0) return 0;
 
   const usableHeight = getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight);
   const th = state.panel.thickness;
@@ -418,6 +418,7 @@ function drawFaceView(
   doc.setFontSize(6.5);
   doc.setTextColor(...DIM_COLOR);
   doc.text(`ép. ${th * 10} mm`, origin.x + area.w - 1, origin.y + 2, { align: 'right' });
+  return scale;
 }
 
 /**
@@ -429,9 +430,9 @@ function drawTopView(
   state: AppState,
   origin: { x: number; y: number },
   area: { w: number; h: number },
-): void {
+): number {
   const bodies = state.bodies;
-  if (bodies.length === 0) return;
+  if (bodies.length === 0) return 0;
 
   const th = state.panel.thickness;
   const totalW_cm = bodies.reduce((s, b) => s + b.width, 0);
@@ -489,6 +490,7 @@ function drawTopView(
     // Depth (only on first body to avoid clutter)
     if (bi === 0) drawDimV(doc, y0, y0 + bd, bx - 1.5, `${b.depth}`, { offset: -6 });
   });
+  return scale;
 }
 
 /**
@@ -500,9 +502,9 @@ function drawSideView(
   state: AppState,
   origin: { x: number; y: number },
   area: { w: number; h: number },
-): void {
+): number {
   const body = state.bodies[0];
-  if (!body) return;
+  if (!body) return 0;
 
   const usableHeight = getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight);
   const th = state.panel.thickness;
@@ -585,6 +587,7 @@ function drawSideView(
   // Dims
   drawDimV(doc, y0, y0 + drawH, x0 + drawW + 1, `${maxH_cm}`, { offset: 4 });
   drawDimH(doc, x0, x0 + drawW, y0 + drawH, `${depth}`, { offset: 4 });
+  return scale;
 }
 
 /**
@@ -597,9 +600,9 @@ function drawCrossSection(
   state: AppState,
   origin: { x: number; y: number },
   area: { w: number; h: number },
-): void {
+): number {
   const body = state.bodies[0];
-  if (!body) return;
+  if (!body) return 0;
 
   const usableHeight = getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight);
   const th = state.panel.thickness;
@@ -755,43 +758,137 @@ function drawCrossSection(
   drawDimH(doc, x0 + tw / 2.2, x0 + drawW, y0 + drawH, `${innerDepth} utile`, {
     offset: 9, color: DIM_ACCENT, fontSize: 6,
   });
+  return scale;
+}
+
+/**
+ * Convertit le scale interne (mm PDF / cm réel) en notation cartographique
+ * standard "1:N". Arrondi au standard CAO le plus proche (10, 20, 25, 50, 100).
+ */
+function formatScaleAsRatio(scaleMmPerCm: number): string {
+  if (scaleMmPerCm <= 0) return '—';
+  // scale = mm PDF / cm réel → 1 mm PDF correspond à (10 / scale) mm réels
+  const realPerPdf = 10 / scaleMmPerCm;
+  // Standard scales for woodworking shop drawings
+  const STANDARDS = [5, 10, 15, 20, 25, 33, 50, 75, 100, 150, 200];
+  const closest = STANDARDS.reduce((best, s) =>
+    Math.abs(s - realPerPdf) < Math.abs(best - realPerPdf) ? s : best,
+  STANDARDS[0]);
+  // Si l'écart est < 15 %, on affiche la valeur standard, sinon la valeur exacte
+  const relativeError = Math.abs(closest - realPerPdf) / realPerPdf;
+  if (relativeError < 0.15) return `1:${closest}`;
+  return `1:${Math.round(realPerPdf)}`;
+}
+
+/**
+ * Cartouche de plan, conforme conventions CAO atelier : bloc en bas droite
+ * avec nom projet, date, matériau+épaisseur, dimensions hors-tout, vue,
+ * échelle calculée, concepteur. ~58×36 mm, encadré cobalt fin.
+ */
+function drawCartouche(
+  doc: jsPDF,
+  state: AppState,
+  viewLabel: string,
+  scaleMmPerCm: number,
+): void {
+  const W = 70;
+  const H = 38;
+  const x = PAGE_W - MARGIN - W;
+  const y = PAGE_H - MARGIN + 2 - H;
+
+  const mat = MATERIALS[state.materialKey];
+  const dims = state.bodies.length > 0
+    ? `${state.bodies.reduce((s, b) => s + b.width, 0)} × ${getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight)} × ${state.bodies[0]?.depth ?? state.project.wallDepth} cm`
+    : '—';
+  const designer = 'Atelier maison';
+  const ratio = formatScaleAsRatio(scaleMmPerCm);
+
+  // Cadre
+  doc.setDrawColor(...DIM_ACCENT);
+  doc.setLineWidth(0.3);
+  doc.rect(x, y, W, H);
+  // Header bar
+  doc.setFillColor(...DIM_ACCENT);
+  doc.rect(x, y, W, 5, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(255, 255, 255);
+  doc.text('CARTOUCHE', x + 2, y + 3.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.text(frenchDate(), x + W - 2, y + 3.5, { align: 'right' });
+
+  // Lignes du cartouche
+  const labelColor = DIM_COLOR;
+  const valueColor = TEXT_COLOR;
+  const lines: Array<[string, string]> = [
+    ['Projet', state.project.name],
+    ['Vue', viewLabel],
+    ['Échelle', ratio],
+    ['Matériau', `${mat.short} ${state.panel.thickness * 10} mm`],
+    ['Dim. h.t.', dims],
+    ['Concepteur', designer],
+  ];
+
+  let ly = y + 9;
+  for (const [label, value] of lines) {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6);
+    doc.setTextColor(...labelColor);
+    doc.text(label, x + 2, ly);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7);
+    doc.setTextColor(...valueColor);
+    const maxW = W - 18;
+    const truncated = doc.getTextWidth(value) > maxW
+      ? doc.splitTextToSize(value, maxW)[0]
+      : value;
+    doc.text(truncated, x + 16, ly);
+    ly += 4.5;
+  }
 }
 
 /**
  * Insère 4 pages de plans cotés (face, dessus, côté, coupe) dans le doc.
- * Chaque page : titre + sous-titre matériau/épaisseur + plan + légende.
+ * Chaque page : titre + sous-titre matériau/épaisseur + plan + légende + cartouche.
  */
 function appendPlanPages(doc: jsPDF, state: AppState): void {
   const mat = MATERIALS[state.materialKey];
   const subtitle = `${state.project.name} — ${mat.short} ${state.panel.thickness * 10} mm — dimensions en cm`;
+  // Hauteur réservée en bas pour cartouche + légende
+  const RESERVE = 55;
 
   // ---- Page : Vue de face ----
   doc.addPage();
   let y = MARGIN + 5;
   y = planSectionHeader(doc, y, 'Plans cotés — Vue de face', subtitle);
-  drawFaceView(doc, state, { x: MARGIN, y }, { w: CONTENT_W, h: PAGE_H - y - 30 });
-  drawPlanLegend(doc, PAGE_H - 22);
+  let scale = drawFaceView(doc, state, { x: MARGIN, y }, { w: CONTENT_W, h: PAGE_H - y - RESERVE });
+  drawPlanLegend(doc, PAGE_H - 47);
+  drawCartouche(doc, state, 'Face', scale);
 
   // ---- Page : Vue de dessus ----
   doc.addPage();
   y = MARGIN + 5;
   y = planSectionHeader(doc, y, 'Plans cotés — Vue de dessus', subtitle);
-  drawTopView(doc, state, { x: MARGIN, y }, { w: CONTENT_W, h: PAGE_H - y - 30 });
-  drawPlanLegend(doc, PAGE_H - 22);
+  scale = drawTopView(doc, state, { x: MARGIN, y }, { w: CONTENT_W, h: PAGE_H - y - RESERVE });
+  drawPlanLegend(doc, PAGE_H - 47);
+  drawCartouche(doc, state, 'Dessus', scale);
 
   // ---- Page : Vue de côté ----
   doc.addPage();
   y = MARGIN + 5;
   y = planSectionHeader(doc, y, 'Plans cotés — Vue de côté', subtitle);
-  drawSideView(doc, state, { x: MARGIN, y }, { w: CONTENT_W, h: PAGE_H - y - 30 });
-  drawPlanLegend(doc, PAGE_H - 22);
+  scale = drawSideView(doc, state, { x: MARGIN, y }, { w: CONTENT_W, h: PAGE_H - y - RESERVE });
+  drawPlanLegend(doc, PAGE_H - 47);
+  drawCartouche(doc, state, 'Côté', scale);
 
   // ---- Page : Coupe transversale (intérieur révélé) ----
   doc.addPage();
   y = MARGIN + 5;
   y = planSectionHeader(doc, y, 'Plans cotés — Coupe transversale', subtitle);
-  drawCrossSection(doc, state, { x: MARGIN, y }, { w: CONTENT_W, h: PAGE_H - y - 30 });
-  drawPlanLegend(doc, PAGE_H - 22);
+  scale = drawCrossSection(doc, state, { x: MARGIN, y }, { w: CONTENT_W, h: PAGE_H - y - RESERVE });
+  drawPlanLegend(doc, PAGE_H - 47);
+  drawCartouche(doc, state, 'Coupe', scale);
 }
 
 function drawPlanLegend(doc: jsPDF, y: number): void {
