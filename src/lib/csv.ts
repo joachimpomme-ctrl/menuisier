@@ -6,16 +6,25 @@ export function generateCutListCsv(
   state: AppState,
 ): string {
   const rows: string[] = [];
-  // BOM header
-  rows.push('Corps,Pièce,Type,Longueur (cm),Largeur (cm),Qté,Panneau,Épaisseur (mm)');
+  // En-têtes : N° atelier en première colonne pour faciliter la lecture en débit
+  rows.push('N°,Corps,Pièce,Type,Longueur (cm),Largeur (cm),Qté,Panneau,Épaisseur (mm)');
 
-  allPieces.forEach((p) => {
+  // Tri stable par pieceNumber pour cohérence avec PDF et UI atelier
+  const sorted = [...allPieces].sort((a, b) => {
+    if (a.pieceNumber !== undefined && b.pieceNumber !== undefined) {
+      return a.pieceNumber - b.pieceNumber;
+    }
+    return 0;
+  });
+
+  sorted.forEach((p) => {
     const panel = p.panelId ? allPanelDefs.find(pd => pd.id === p.panelId) : allPanelDefs[0];
     const panelLabel = panel?.label ?? 'Principal';
     const thicknessMm = (panel?.thickness ?? state.panel.thickness) * 10;
     // Escape CSV fields that might contain commas
     const escape = (s: string) => s.includes(',') ? `"${s}"` : s;
-    rows.push(`${escape(p.bodyName)},${escape(p.name)},${p.type},${p.length},${p.width},${p.qty},${escape(panelLabel)},${thicknessMm}`);
+    const numLabel = p.pieceNumber !== undefined ? `P${p.pieceNumber}` : '';
+    rows.push(`${numLabel},${escape(p.bodyName)},${escape(p.name)},${p.type},${p.length},${p.width},${p.qty},${escape(panelLabel)},${thicknessMm}`);
   });
 
   return rows.join('\n');

@@ -143,7 +143,18 @@ export default function App() {
     setPdfLoading(true);
     try {
       const { generatePdf } = await import('./lib/pdf');
-      await generatePdf(state, analysis, validation, steps);
+      // Si on a un résultat V3 (projet créé via wizard), enrichit le PDF avec
+      // hardware + assumptions + edge banding + assembly guide pour la notice
+      // atelier. Sinon, generatePdf retombe sur le Step[] legacy V2.
+      const v3Data = v3Result?.production
+        ? {
+            hardware: v3Result.hardware ?? [],
+            assumptions: v3Result.production.assumptions ?? [],
+            edgeBandingParts: [] as { name: string; sides: string }[],
+            assemblyGuide: v3Result.production.assembly_guide,
+          }
+        : undefined;
+      await generatePdf(state, analysis, validation, steps, v3Data);
     } catch (err) {
       console.error('Erreur PDF:', err);
     }
@@ -487,7 +498,12 @@ export default function App() {
                   analysis={analysis}
                 />
               )}
-              {tab === 'montage' && <MontageTab state={state} />}
+              {tab === 'montage' && (
+                <MontageTab
+                  state={state}
+                  assemblyGuide={v3Result?.production?.assembly_guide}
+                />
+              )}
               {tab === 'notice' && <NoticeTab steps={steps} materialName={mat.name} thickness={state.panel.thickness} />}
               {tab === 'validation' && <ValidationTab validation={validation} onGoToStructure={() => setTab('structure')} />}
             </div>

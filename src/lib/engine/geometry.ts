@@ -171,6 +171,65 @@ export function _resetPartCounter(): void {
   _partCounter = 0;
 }
 
+// Ordre logique de fabrication, utilisé pour la numérotation atelier P1..Pn.
+// Réfléchit l'ordre dans lequel on débite et monte : structure → fond → tablettes →
+// séparations → réglables → bandeaux/plinthe → portes → tiroirs → divers.
+const PIECE_TYPE_ORDER: Record<string, number> = {
+  joue: 1,
+  dessus: 2,
+  dessous: 3,
+  fond: 4,
+  'tablette-fixe': 5,
+  separateur: 6,
+  'tablette-reglable': 7,
+  'tablette-inclinee': 8,
+  bandeau: 9,
+  traverse: 10,
+  plinthe: 11,
+  porte: 12,
+  'tiroir-facade': 13,
+  'tiroir-cote': 14,
+  'tiroir-fond': 15,
+  'tiroir-dos': 16,
+  'taquet-arret': 17,
+  croisillon: 18,
+  assise: 19,
+  'devant-coffre': 20,
+  coffre: 21,
+};
+
+/**
+ * Attribue pieceNumber (1..N) à chaque part selon un tri stable :
+ *   1. corps : ordre d'apparition dans layout.bodies
+ *   2. type  : ordre logique de fabrication (PIECE_TYPE_ORDER)
+ *   3. surface décroissante (grandes pièces d'abord à type égal)
+ *   4. id    : tie-breaker pour stabilité absolue
+ *
+ * Le tableau d'entrée n'est pas réordonné : seul le champ pieceNumber est attribué
+ * sur place. Garantit qu'un même intent → mêmes numéros à chaque run.
+ */
+function assignPieceNumbers(parts: GeneratedPart[], layout: Layout): void {
+  const bodyRank = new Map<string, number>();
+  layout.bodies.forEach((b, idx) => bodyRank.set(b.body_id, idx));
+
+  const sorted = [...parts].sort((a, b) => {
+    const ba = bodyRank.get(a.body_id) ?? 999;
+    const bb = bodyRank.get(b.body_id) ?? 999;
+    if (ba !== bb) return ba - bb;
+    const ta = PIECE_TYPE_ORDER[a.type] ?? 99;
+    const tb = PIECE_TYPE_ORDER[b.type] ?? 99;
+    if (ta !== tb) return ta - tb;
+    const sa = a.length_mm * a.width_mm;
+    const sb = b.length_mm * b.width_mm;
+    if (sa !== sb) return sb - sa;
+    return a.id.localeCompare(b.id);
+  });
+
+  sorted.forEach((p, i) => {
+    p.pieceNumber = i + 1;
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Defaults
 // ---------------------------------------------------------------------------
@@ -561,5 +620,6 @@ export function generateParts(
     }
   }
 
+  assignPieceNumbers(allParts, layout);
   return allParts;
 }

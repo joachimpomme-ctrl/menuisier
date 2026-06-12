@@ -126,6 +126,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
             name: p.name,
             ops: aggregateDrillingOps(p.drilling!),
           })),
+        assemblyGuide: result.production?.assembly_guide,
       };
       const { generatePdf } = await import('../../lib/pdf');
       await generatePdf(appState, analysis, validation, steps, v3Data);

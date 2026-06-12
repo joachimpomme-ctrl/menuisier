@@ -298,11 +298,19 @@ function clamp(v: number, min: number, max: number): number {
 
 /** Snippet to add to the system prompt so the IA knows about the patch format */
 export const PATCH_INSTRUCTIONS = `
-Si l'utilisateur te demande d'ajuster des paramètres concrets du projet (dimensions, matériau, épaisseur, ajout/suppression/modification de pièces...), tu PEUX inclure UN bloc structuré à la fin de ta réponse :
+# Format \`apply\` — modifications appliquables
 
+Quand l'utilisateur demande une modification concrète du projet (dimensions, matériau, épaisseur, ajout/suppression/modification de pièces, restructuration), tu **DOIS** inclure UN bloc \`apply\` à la fin de ta réponse. Sans ce bloc, le bouton "Appliquer" est inopérant et l'utilisateur ne pourra pas valider ta proposition en un clic.
+
+Tu N'inclus PAS de bloc \`apply\` quand :
+- L'utilisateur pose une question d'information (ex : "pourquoi cette épaisseur ?", "ça tient combien de poids ?")
+- L'utilisateur demande une critique ou un avis sans demander explicitement de changement
+- Tu n'es pas sûr de la modification à proposer (demande clarification d'abord)
+
+Exemple :
 \`\`\`apply
 {
-  "title": "Description courte",
+  "title": "Description courte de la modification",
   "project": { "wallWidth": 280, "wallDepth": 35, "ceilingHeight": 240 },
   "panel": { "thickness": 1.9 },
   "material": "cp_bouleau",
@@ -334,6 +342,6 @@ Règles strictes :
 - pieces.remove : tableau de noms — supprime TOUTES les pièces dont le nom correspond (insensible à la casse).
 - pieces.update : modifie la PREMIÈRE pièce dont le nom correspond à "match". Tous les autres champs sont optionnels.
 - bodies.count : restructure le projet en N corps de largeur égale (redistribution approx. des pièces).
-- Inclus le bloc UNIQUEMENT si l'utilisateur demande explicitement un changement. Pour une simple question, n'en mets pas.
-- Le bloc ne remplace pas ton explication : commente d'abord, puis propose le patch.
+- Commente d'abord (explication courte), puis propose le bloc \`apply\` en fin de message.
+- Un seul bloc \`apply\` par réponse maximum.
 `.trim();

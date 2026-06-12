@@ -8,7 +8,7 @@ interface Props {
   state: AppState;
 }
 
-type ViewMode = 'face' | 'dessus' | 'cote';
+type ViewMode = 'face' | 'dessus' | 'cote' | 'coupe';
 
 const cardClass = "rounded-2xl border border-[#EFE8DD] bg-white p-4 mb-4";
 
@@ -373,19 +373,156 @@ export default function PlanTab({ state }: Props) {
     );
   };
 
+  // --- CROSS-SECTION (COUPE) VIEW ---
+  // Comme renderSide mais on "coupe" la joue côté pour révéler l'intérieur :
+  // étagères en pleine largeur cotées H={posY}, profondeur utile cotée, dos rainé visible.
+  const renderCut = () => {
+    const body = bodies[0];
+    if (!body) return <p className="text-[#9A968F] text-sm text-center py-8">Aucun corps à afficher</p>;
+
+    const depth = body.depth;
+    const height = maxH;
+    const scale = Math.min((SVG_W - M * 2 - 60) / depth, (400 - M * 2) / height);
+    const svgH = M * 2 + height * scale + 30;
+    const bx = M + 40;
+    const bd = depth * scale;
+    const bh = height * scale;
+    const tw = th * scale;
+
+    const fixedTab = body.pieces.filter(p => p.type === 'tablette-fixe');
+    const fixedExpanded = fixedTab.flatMap(p => Array.from({ length: p.qty }, () => p));
+    const fixedPositions: number[] = fixedExpanded.map((p, i) => {
+      if (typeof p.posY === 'number') return p.posY;
+      if (fixedExpanded.length === 1) return height - 2;
+      if (i === 0) return height - 2;
+      if (i === 1) return 2;
+      return (height * (i - 1)) / (fixedExpanded.length - 1);
+    });
+
+    const adjustTab = body.pieces.filter(p => p.type === 'tablette-reglable');
+    const adjustExpanded = adjustTab.flatMap(p => Array.from({ length: p.qty }, () => p));
+    const adjustPositions: number[] = adjustExpanded.map((p, ri) => {
+      if (typeof p.posY === 'number') return p.posY;
+      return 20 + (ri + 1) * ((height - 40) / (adjustExpanded.length + 1));
+    });
+
+    const fondPiece = body.pieces.find(p => p.type === 'fond');
+    const innerDepth = +(depth - th).toFixed(1);
+
+    return (
+      <svg width={SVG_W} height={svgH} viewBox={`0 0 ${SVG_W} ${svgH}`} className="rounded-lg">
+        <rect width={SVG_W} height={svgH} fill="#FFFCF7" rx="8" />
+        {/* Mur */}
+        <line x1={bx} y1={M - 5} x2={bx} y2={M + bh + 5} stroke="#EFE8DD" strokeWidth="1.5" />
+        <text x={bx - 5} y={M - 8} textAnchor="end" fill="#9A968F" fontSize="7" fontFamily="system-ui">MUR</text>
+
+        {/* Contour caisson (joue "coupée" → pointillé) */}
+        <rect x={bx} y={M} width={bd} height={bh} fill="none"
+          stroke={PIECE_COLORS.joue} strokeWidth="0.8" strokeDasharray="4,2" opacity=".7" rx="1" />
+        <text x={bx + bd - 4} y={M + 10} textAnchor="end" fill={PIECE_COLORS.joue} fontSize="6" fontFamily="system-ui" opacity=".8">
+          Joue (coupe)
+        </text>
+
+        {/* Dos (panneau de fond, contre mur) */}
+        <rect x={bx} y={M} width={tw / 2.2} height={bh}
+          fill={PIECE_COLORS.fond} opacity=".35" stroke={PIECE_COLORS.fond} strokeWidth="0.5" />
+        {fondPiece?.pieceNumber !== undefined && (
+          <text x={bx + tw / 4} y={M + bh / 2} textAnchor="middle" fill={PIECE_COLORS.fond} fontSize="6"
+            fontFamily="system-ui" fontWeight="700" transform={`rotate(-90,${bx + tw / 4},${M + bh / 2})`}>
+            P{fondPiece.pieceNumber}
+          </text>
+        )}
+
+        {/* Plinthe cutout (transparente) */}
+        {state.project.plinthHeight > 0 && (
+          <>
+            <rect x={bx} y={M + bh - state.project.plinthHeight * scale}
+              width={state.project.plinthDepth * scale} height={state.project.plinthHeight * scale}
+              fill="#FFFCF7" stroke="#9A968F" strokeWidth="0.5" strokeDasharray="2,2" />
+            <text x={bx + 3} y={M + bh - (state.project.plinthHeight * scale) / 2 + 2}
+              fill="#9A968F" fontSize="5.5" fontFamily="system-ui">
+              plinthe {state.project.plinthHeight}×{state.project.plinthDepth}
+            </text>
+          </>
+        )}
+
+        {/* Tablettes fixes (en coupe : pleine profondeur, cotées H=) */}
+        {fixedExpanded.map((p, i) => {
+          const posY = fixedPositions[i];
+          const shelfY = M + bh - posY * scale - tw / 2;
+          const shelfX = bx + tw / 2.2;
+          const shelfW = bd - tw / 2.2;
+          return (
+            <g key={`fix${i}`}>
+              <rect x={shelfX} y={shelfY} width={shelfW} height={tw}
+                fill={PIECE_COLORS['tablette-fixe']} opacity=".4"
+                stroke={PIECE_COLORS['tablette-fixe']} strokeWidth="0.5" />
+              {p.pieceNumber !== undefined && shelfW > 30 && (
+                <text x={shelfX + shelfW / 2} y={shelfY + tw / 2 + 1.8}
+                  textAnchor="middle" fill={PIECE_COLORS['tablette-fixe']}
+                  fontSize="6.5" fontWeight="700" fontFamily="system-ui">
+                  P{p.pieceNumber}
+                </text>
+              )}
+              <text x={bx - 3} y={shelfY + tw / 2 + 2}
+                textAnchor="end" fill={PIECE_COLORS['tablette-fixe']}
+                fontSize="6" fontFamily="system-ui" fontWeight="600">
+                H={posY}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Tablettes réglables (en coupe : trait épais pointillé) */}
+        {adjustPositions.map((posY, ri) => {
+          const shelfY = M + bh - posY * scale;
+          const p = adjustExpanded[ri];
+          return (
+            <g key={`adj${ri}`}>
+              <line x1={bx + tw / 2.2 + 0.5} y1={shelfY} x2={bx + bd - 0.5} y2={shelfY}
+                stroke={PIECE_COLORS['tablette-reglable']} strokeWidth="1.4"
+                strokeDasharray="3,2" />
+              {ri === 0 && p.pieceNumber !== undefined && (
+                <text x={bx + bd / 2} y={shelfY - 1.5}
+                  textAnchor="middle" fill={PIECE_COLORS['tablette-reglable']}
+                  fontSize="6" fontWeight="600" fontFamily="system-ui">
+                  P{p.pieceNumber} (régl.)
+                </text>
+              )}
+            </g>
+          );
+        })}
+
+        {/* Hauteur */}
+        <DimLine x1={bx + bd + 2} y1={M} x2={bx + bd + 2} y2={M + bh} label={`${height}`} offset={6} />
+        {/* Profondeur totale */}
+        <DimLine x1={bx} y1={M + bh} x2={bx + bd} y2={M + bh} label={`${depth}`} offset={18} />
+        {/* Profondeur utile (intérieur après dos) */}
+        <DimLine x1={bx + tw / 2.2} y1={M + bh} x2={bx + bd} y2={M + bh}
+          label={`${innerDepth} utile`} offset={32} color="#3B5FFF" fontSize={7} />
+
+        {/* Title */}
+        <text x={bx + bd / 2} y={M - 8} textAnchor="middle" fill="#9A968F" fontSize="8"
+          fontFamily="system-ui" fontWeight="500">
+          {body.name} — coupe transversale
+        </text>
+      </svg>
+    );
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-        <Tip text="Plans 2D cotés de votre meuble. Vue de face, vue de dessus et vue de côté avec toutes les dimensions en cm.">
+        <Tip text="Plans 2D cotés de votre meuble. Vue de face, dessus, côté et coupe transversale (intérieur révélé) avec toutes les dimensions en cm.">
           <span className="text-sm text-[#54514E]">{mat.short} {th * 10} mm — Plans cotés</span>
         </Tip>
         <div className="flex gap-1">
-          {(['face', 'dessus', 'cote'] as ViewMode[]).map(v => (
+          {(['face', 'dessus', 'cote', 'coupe'] as ViewMode[]).map(v => (
             <button key={v} onClick={() => setView(v)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 view === v ? 'bg-[#3B5FFF] text-white' : 'bg-white text-[#54514E] border border-[#EFE8DD] hover:bg-[#FFFCF7]'
               }`}>
-              {v === 'face' ? 'Face' : v === 'dessus' ? 'Dessus' : 'Côté'}
+              {v === 'face' ? 'Face' : v === 'dessus' ? 'Dessus' : v === 'cote' ? 'Côté' : 'Coupe'}
             </button>
           ))}
         </div>
@@ -415,6 +552,7 @@ export default function PlanTab({ state }: Props) {
           {view === 'face' && renderFace()}
           {view === 'dessus' && renderTop()}
           {view === 'cote' && renderSide()}
+          {view === 'coupe' && renderCut()}
         </div>
       </div>
 

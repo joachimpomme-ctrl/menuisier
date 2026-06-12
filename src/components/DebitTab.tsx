@@ -94,17 +94,26 @@ function PanelBinDiagram({ bin, binIndex, panelDef, kerf }: {
             const pw = p.pw * scale;
             const ph = p.ph * scale;
             const color = PIECE_COLORS[p.type] || PIECE_COLORS.autre;
+            const hasNum = p.pieceNumber !== undefined;
+            const showName = pw > 60 && ph > 24;
+            const showDim = pw > 30 && ph > 14;
+            const numY = py + ph / 2 + (showName || showDim ? -3 : 0);
             return (
               <g key={j}>
                 <rect x={px + 1} y={py + 1} width={Math.max(pw - 2, 1)} height={Math.max(ph - 2, 1)} fill={color} opacity=".2" stroke={color} strokeWidth="1.5" rx="3" />
-                {pw > 40 && ph > 14 && (
-                  <text x={px + pw / 2} y={py + ph / 2 - 3} textAnchor="middle" fill={color} fontSize="7.5" fontWeight="600" fontFamily="system-ui">
-                    {p.name?.split(" ").slice(0, 3).join(" ")}
+                {hasNum && pw > 18 && ph > 10 && (
+                  <text x={px + pw / 2} y={numY} textAnchor="middle" fill={color} fontSize={pw > 60 ? '10' : '8'} fontWeight="700" fontFamily="system-ui" dominantBaseline="middle">
+                    P{p.pieceNumber}
                   </text>
                 )}
-                {pw > 28 && ph > 10 && (
-                  <text x={px + pw / 2} y={py + ph / 2 + 7} textAnchor="middle" fill="#71717a" fontSize="7" fontFamily="system-ui">
-                    {p.rotated ? p.width : p.length}×{p.rotated ? p.length : p.width}{p.rotated ? " ↻" : ""}
+                {showName && (
+                  <text x={px + pw / 2} y={py + ph / 2 + 5} textAnchor="middle" fill={color} fontSize="6.5" fontWeight="500" fontFamily="system-ui">
+                    {p.name?.split(" ").slice(0, 2).join(" ")}
+                  </text>
+                )}
+                {showDim && (
+                  <text x={px + pw / 2} y={py + ph - 3} textAnchor="middle" fill="#71717a" fontSize="6.5" fontFamily="system-ui">
+                    {p.rotated ? p.width : p.length}×{p.rotated ? p.length : p.width}{p.rotated ? ' ↻' : ''}
                   </text>
                 )}
               </g>
@@ -462,7 +471,12 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
         </div>
         <div className="space-y-1">
           {[...allPieces]
-            .sort((a, b) => b.length * b.width * b.qty - a.length * a.width * a.qty)
+            .sort((a, b) => {
+              if (a.pieceNumber !== undefined && b.pieceNumber !== undefined) {
+                return a.pieceNumber - b.pieceNumber;
+              }
+              return b.length * b.width * b.qty - a.length * a.width * a.qty;
+            })
             .map((p, i) => {
               const panelLabel = p.panelId && p.panelId !== 'default'
                 ? allPanelDefs.find((pd) => pd.id === p.panelId)?.label
@@ -470,6 +484,9 @@ export default function DebitTab({ state, onChange, allPieces, nesting: _nesting
               return (
                 <div key={i} className="flex items-center justify-between gap-2 text-xs py-1.5 px-2 rounded-lg hover:bg-[#FFFCF7]">
                   <span className="flex items-center gap-2 min-w-0 flex-1">
+                    {p.pieceNumber !== undefined && (
+                      <span className="font-mono font-semibold text-[#3B5FFF] text-[11px] flex-shrink-0 w-8">P{p.pieceNumber}</span>
+                    )}
                     <span className="flex-shrink-0 flex items-center justify-center w-2 h-2"><TypeMarker type={p.type} /></span>
                     <span className="text-[#0E0D0C] truncate">{p.name}</span>
                     {p.standardPartId && (
