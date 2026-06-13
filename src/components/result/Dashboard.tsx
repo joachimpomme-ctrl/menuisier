@@ -17,7 +17,7 @@ interface Props {
   result: PipelineResult;
   materialKey: MaterialKey;
   onModify: () => void;
-  onClassicEditor: (appState: ReturnType<typeof pipelineResultToAppState>) => void;
+  onClassicEditor: () => void;
 }
 
 const DIFFICULTY_LABELS: Record<string, string> = {
@@ -376,7 +376,7 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
         <button
           onClick={() => {
             if (confirm('Basculer vers l\'éditeur classique ? Toutes les pièces, portes et dimensions sont conservées. Seul le détail des opérations de perçage n\'est pas transféré.')) {
-              onClassicEditor(pipelineResultToAppState(result, materialKey));
+              onClassicEditor();
             }
           }}
           className="px-4 py-2 text-sm border border-[#EFE8DD] rounded-lg text-[#54514E] hover:bg-[#FFFCF7] hover:text-[#0E0D0C] transition-colors"

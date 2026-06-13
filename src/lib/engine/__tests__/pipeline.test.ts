@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { runPipeline, pipelineResultToAppState } from '../pipeline';
+import { runPipeline, pipelineResultToAppState, intentFromState } from '../pipeline';
 import type { ProjectIntent, GeneratedPart, ProjectStateV3 } from '../../knowledge/types';
 import { _resetCounter as resetIntent } from '../intent';
 import { _resetCounter as resetLayout } from '../layout';
@@ -463,5 +463,58 @@ describe('runPipeline', () => {
       expect(s.locked).toBe(false);
       expect(s.length_mm).not.toBe(700);
     }
+  });
+});
+
+// ===========================================================================
+// intentFromState — classic editor / AI patch → V3 sync
+// ===========================================================================
+
+describe('intentFromState', () => {
+  const baseIntent: ProjectIntent = {
+    furniture_type: 'bibliotheque',
+    material_key: 'cp_bouleau',
+    space: { width_mm: 800, height_mm: 2000, depth_mm: 300, plinth_mm: 0, wall_type: 'concrete' },
+    zones: [
+      { module_id: 'shelf_adjustable', height_mm: 2000, config: { type: 'shelf_adjustable', count: 3, spacing_mm: 300 } },
+    ],
+  };
+
+  it('overrides dimensions + material from the editor state, preserves zones', () => {
+    resetAll();
+    const state = pipelineResultToAppState(runPipeline(baseIntent), 'cp_bouleau');
+    // User (or AI patch) edits depth 30 → 35 cm and switches material.
+    state.project.wallDepth = 35;
+    state.project.ceilingHeight = 210;
+    state.materialKey = 'melamine';
+
+    const merged = intentFromState(baseIntent, state);
+    expect(merged.space.depth_mm).toBe(350);
+    expect(merged.space.height_mm).toBe(2100);
+    expect(merged.space.width_mm).toBe(800); // untouched
+    expect(merged.material_key).toBe('melamine');
+    expect(merged.zones).toEqual(baseIntent.zones); // zones preserved
+  });
+
+  it('re-running the pipeline through the merge reflects the edited depth (no desync)', () => {
+    resetAll();
+    const before = runPipeline(baseIntent);
+    const state = pipelineResultToAppState(before, 'cp_bouleau');
+    state.project.wallDepth = 40; // deeper for heavy books
+
+    const after = runPipeline(intentFromState(baseIntent, state));
+    // A side panel (joue) spans the body depth → its width_mm tracks the depth.
+    const joueBefore = before.parts.find((p) => p.type === 'joue')!;
+    const joueAfter = after.parts.find((p) => p.type === 'joue')!;
+    expect(joueAfter.width_mm).toBeGreaterThan(joueBefore.width_mm);
+  });
+
+  it('falls back to the base depth when the editor has no wallDepth', () => {
+    resetAll();
+    const state = pipelineResultToAppState(runPipeline(baseIntent), 'cp_bouleau');
+    delete (state.project as { wallDepth?: number }).wallDepth;
+
+    const merged = intentFromState(baseIntent, state);
+    expect(merged.space.depth_mm).toBe(baseIntent.space.depth_mm);
   });
 });
