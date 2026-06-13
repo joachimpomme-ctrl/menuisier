@@ -84,6 +84,11 @@
       "code": "ERGO_ZONE_ACTIVE",
       "severity": "info",
       "blocking": false
+    },
+    {
+      "code": "VAL_TILT_CLEARANCE",
+      "severity": "warning",
+      "blocking": false
     }
   ],
   "pieces": [
@@ -2620,8 +2625,8 @@
       "qty": 1,
       "locked": false,
       "name": "Fond",
-      "length_mm": 498,
-      "width_mm": 2364,
+      "length_mm": 512,
+      "width_mm": 2378,
       "thickness_mm": 5,
       "type": "fond",
       "body_id": "body_1"
@@ -5282,8 +5287,8 @@
       "qty": 1,
       "locked": false,
       "name": "Fond",
-      "length_mm": 497,
-      "width_mm": 2364,
+      "length_mm": 511,
+      "width_mm": 2378,
       "thickness_mm": 5,
       "type": "fond",
       "body_id": "body_2"
@@ -7944,8 +7949,8 @@
       "qty": 1,
       "locked": false,
       "name": "Fond",
-      "length_mm": 497,
-      "width_mm": 2364,
+      "length_mm": 511,
+      "width_mm": 2378,
       "thickness_mm": 5,
       "type": "fond",
       "body_id": "body_3"
@@ -8118,7 +8123,7 @@
     {
       "id": "HW_017",
       "name": "Pied réglable h=80mm",
-      "quantity": 24,
+      "quantity": 12,
       "category": "strut",
       "reference": "pied_reglable",
       "unit_price_eur": 1.5
