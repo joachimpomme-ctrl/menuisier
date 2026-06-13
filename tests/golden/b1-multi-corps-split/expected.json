@@ -103,6 +103,11 @@
       "code": "VAL_TILT_CLEARANCE",
       "severity": "warning",
       "blocking": false
+    },
+    {
+      "code": "VAL_FIT_CLEARANCE",
+      "severity": "suggestion",
+      "blocking": false
     }
   ],
   "pieces": [
@@ -12134,7 +12139,7 @@
     {
       "id": "HW_024",
       "name": "Vis Confirmat 7×50mm",
-      "quantity": 120,
+      "quantity": 80,
       "category": "screw",
       "reference": "confirmat_7x50",
       "unit_price_eur": 0.08

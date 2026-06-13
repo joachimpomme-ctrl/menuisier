@@ -328,5 +328,26 @@ export function validateProject(
     ));
   }
 
+  // =========================================================================
+  // 12. Installation clearance for multi-body runs (VAL_FIT_CLEARANCE)
+  // The engine sizes the bodies to fill space.width_mm exactly. For a run of
+  // several caissons fitted side by side (often wall-to-wall, e.g. 3×800 in a
+  // 2400 alcove), real walls are never perfectly square/plumb, so a run with no
+  // play physically cannot be slid in and aligned. We can't detect an alcove
+  // (no flag in the model), so we only flag multi-body runs and keep it a
+  // non-blocking suggestion.
+  // =========================================================================
+  if (structure.bodies.length >= 2) {
+    issues.push(issue(
+      'suggestion',
+      false,
+      `${structure.bodies.length} caissons côte à côte sur ${intent.space.width_mm}mm : prévoir un jeu de pose. Les caissons calculés remplissent la largeur exactement (0mm de jeu).`,
+      'VAL_FIT_CLEARANCE',
+      {
+        suggestion: 'En niche/alcôve, garder ~5–10mm de jeu par côté et combler avec un bandeau de finition scribé sur le mur. Les murs sont rarement d\'équerre.',
+      },
+    ));
+  }
+
   return issues;
 }

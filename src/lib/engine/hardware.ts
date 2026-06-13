@@ -121,16 +121,19 @@ export function selectHardware(
   }
 
   // --- Assembly screws: Confirmat screws ---
-  // Count joints: each fixed shelf = 2, each side panel to top/bottom = 2, back panel = 4 corners
+  // Count carcass corner joints. A box has 4 corners; each top/bottom panel
+  // meets the 2 sides, so `topBottom × 2` already covers ALL corner joints of
+  // every body. Each fixed shelf adds 2 joints (one per side). We do NOT add a
+  // separate term for the sides — that would re-count the same corners a second
+  // time from the side's perspective (the old `+ totalSides` bug inflated a
+  // 3-body bookcase from 48 to 72 screws).
   const fixedShelves = parts.filter((p) => p.type === 'tablette-fixe');
   const totalFixed = fixedShelves.reduce((sum, p) => sum + p.qty, 0);
-  const sides = parts.filter((p) => p.type === 'joue');
-  const totalSides = sides.reduce((sum, p) => sum + p.qty, 0);
   const topBottom = parts.filter((p) => p.type === 'dessus' || p.type === 'dessous');
   const totalTopBottom = topBottom.reduce((sum, p) => sum + p.qty, 0);
 
-  // 4 screws per joint: fixed shelves × 2 joints + top/bottom × 2 joints each
-  const confirmatCount = (totalFixed * 2 + totalTopBottom * 2 + totalSides) * 4;
+  // 4 screws per joint: top/bottom × 2 joints each + fixed shelves × 2 joints
+  const confirmatCount = (totalFixed * 2 + totalTopBottom * 2) * 4;
   if (confirmatCount > 0) {
     items.push(item(
       'Vis Confirmat 7×50mm',
