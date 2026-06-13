@@ -124,6 +124,9 @@ export function computeProgressiveDrawerFronts(
   return heights;
 }
 
+/** Clearance left per side so a groove-mounted back panel slides in (mm). */
+const GROOVE_PANEL_CLEARANCE_MM = 1;
+
 /** Back panel dimensions accounting for groove depth. */
 export function computeBackPanelDimensions(
   spec: BackPanelSpec,
@@ -132,10 +135,14 @@ export function computeBackPanelDimensions(
   grooveDepth_mm: number,
 ): { w: number; h: number } {
   if (spec.type === 'groove') {
-    // Panel sits in grooves — add groove depth on each side
+    // The panel must be LARGER than the inner opening so its edges engage the
+    // grooves cut into the sides/top/bottom. It overlaps (grooveDepth − clearance)
+    // into each groove. Cutting it to the inner dimensions makes it fall straight
+    // through the carcass and provides zero anti-racking bracing.
+    const engagement = 2 * (grooveDepth_mm - GROOVE_PANEL_CLEARANCE_MM);
     return {
-      w: bodyW_mm - 2 * grooveDepth_mm + 2 * grooveDepth_mm, // = bodyW for groove fit
-      h: bodyH_mm - 2 * grooveDepth_mm + 2 * grooveDepth_mm,
+      w: bodyW_mm + engagement,
+      h: bodyH_mm + engagement,
     };
   }
   if (spec.type === 'rebate') {

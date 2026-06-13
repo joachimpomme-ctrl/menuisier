@@ -300,5 +300,33 @@ export function validateProject(
     ));
   }
 
+  // =========================================================================
+  // 11. Tilt-up clearance (VAL_TILT_CLEARANCE)
+  // A carcass assembled flat on the floor must be tilted upright in place. Its
+  // diagonal √(height² + depth²) always exceeds its height, so a floor-to-ceiling
+  // unit cannot be raised once built lying down. The engine has no separate
+  // ceiling field (space.height_mm is both furniture height and the ceiling for
+  // such pieces), so we warn for tall, non-suspended carcasses where this bites.
+  // =========================================================================
+  const TILT_MIN_HEIGHT_MM = 2000; // ~floor-to-ceiling: below this the room almost always has headroom
+  if (
+    intent.space.height_mm >= TILT_MIN_HEIGHT_MM &&
+    !SUSPENDED.has(intent.furniture_type)
+  ) {
+    const h = intent.space.height_mm;
+    const d = intent.space.depth_mm;
+    const diagonal = Math.round(Math.sqrt(h * h + d * d));
+    const maxJoue = Math.floor(Math.sqrt(Math.max(0, h * h - d * d)));
+    issues.push(issue(
+      'warning',
+      false,
+      `Caisson ${h}mm de haut × ${d}mm de profondeur : diagonale ${diagonal}mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~${h}mm.`,
+      'VAL_TILT_CLEARANCE',
+      {
+        suggestion: `Assembler le caisson debout (joues à la verticale) directement en place — ou, si le plafond fait ${h}mm, réduire la hauteur de joue à ${maxJoue}mm (= √(plafond²−profondeur²)) pour pouvoir le relever couché.`,
+      },
+    ));
+  }
+
   return issues;
 }

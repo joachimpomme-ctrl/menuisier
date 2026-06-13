@@ -404,7 +404,7 @@ function buildAssemblyGuide(
       ['joue', 'dessus', 'dessous', 'fond'].includes(p.type),
     ).map((p) => p.id),
     hardware_involved: hardware.filter((h) => h.category === 'screw').map((h) => h.id),
-    tip: 'Assembler à plat sur le sol, caisson couché sur le dos',
+    tip: 'Caisson bas : assembler à plat sur le sol, couché sur le dos. Caisson sol-plafond : l\'assembler debout en place — couché, sa diagonale dépasse la hauteur sous plafond et il ne se redresse plus.',
   });
 
   // Step 7: Fixed shelves

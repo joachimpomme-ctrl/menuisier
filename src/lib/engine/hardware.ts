@@ -163,9 +163,11 @@ export function selectHardware(
 
     // Plinth: adjustable legs
     if (body.plinth.type === 'legs') {
-      // 4 legs minimum, +2 for each 600mm beyond 600mm
-      const width = intent.space.width_mm;
-      const legCount = Math.max(4, 4 + Math.floor(width / 600) * 2);
+      // 4 legs at the corners, +2 per full 600mm of body width beyond the first
+      // 600mm. Use the per-body width, NOT the whole wall width — this loop runs
+      // once per body, so using the wall width multiplied the legs by body count.
+      const bodyWidth = intent.space.width_mm / structure.bodies.length;
+      const legCount = 4 + Math.floor(Math.max(0, bodyWidth - 600) / 600) * 2;
       items.push(item(
         `Pied réglable h=${body.plinth.height_mm}mm`,
         legCount,
