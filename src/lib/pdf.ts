@@ -5,6 +5,7 @@ import type { HardwareItem, Assumption, AssemblyStep } from './knowledge/types';
 import type { ProjectAnalysis } from './projectAnalysis';
 import { MATERIALS } from '../data/materials';
 import { getBodyInnerWidth, getUsableHeight, isSharedLeft } from './helpers';
+import { winAnsi } from './winAnsi';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -55,6 +56,19 @@ function slugify(s: string): string {
 
 function isoDate(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+/** Wrap doc.text so every string is WinAnsi-safe before it reaches the PDF. */
+function patchWinAnsi(doc: jsPDF): void {
+  const original = doc.text.bind(doc);
+  doc.text = function (text: string | string[], ...rest: unknown[]) {
+    const clean = Array.isArray(text)
+      ? text.map((t) => (typeof t === 'string' ? winAnsi(t) : t))
+      : typeof text === 'string'
+        ? winAnsi(text)
+        : text;
+    return (original as (...a: unknown[]) => jsPDF)(clean, ...rest);
+  } as typeof doc.text;
 }
 
 // ---------------------------------------------------------------------------
@@ -942,6 +956,7 @@ export async function generatePdf(
   options?: { returnBuffer?: boolean },
 ): Promise<ArrayBuffer | void> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  patchWinAnsi(doc);
   const mat = MATERIALS[state.materialKey];
   const usableHeight = getUsableHeight(state.project.ceilingHeight, state.project.plinthHeight);
   const date = frenchDate();
@@ -966,7 +981,7 @@ export async function generatePdf(
   y += 12;
 
   // Material
-  y = sectionTitle(doc, y, 'Materiau');
+  y = sectionTitle(doc, y, 'Matériau');
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setTextColor(...TEXT_COLOR);
@@ -992,7 +1007,7 @@ export async function generatePdf(
   y += 10;
 
   // Summary
-  y = sectionTitle(doc, y, 'Resume');
+  y = sectionTitle(doc, y, 'Résumé');
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setTextColor(...TEXT_COLOR);
@@ -1036,7 +1051,7 @@ export async function generatePdf(
     autoTable(doc, {
       startY: y,
       margin: { left: MARGIN, right: MARGIN },
-      head: [['Panneau', 'Dim. (cm)', 'Ep. (mm)', 'Qte', 'Efficacite', 'Cout']],
+      head: [['Panneau', 'Dim. (cm)', 'Ép. (mm)', 'Qté', 'Efficacité', 'Coût']],
       body: panelRows,
       styles: { font: 'helvetica', fontSize: 9, textColor: TEXT_COLOR },
       headStyles: {
@@ -1076,7 +1091,7 @@ export async function generatePdf(
     autoTable(doc, {
       startY: y,
       margin: { left: MARGIN, right: MARGIN },
-      head: [['Article', 'Qte', 'Categorie', 'Cout']],
+      head: [['Article', 'Qté', 'Catégorie', 'Coût']],
       body: hwRows,
       styles: { font: 'helvetica', fontSize: 9, textColor: TEXT_COLOR },
       headStyles: { fillColor: TITLE_COLOR, textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -1109,7 +1124,7 @@ export async function generatePdf(
 
   if (v3Data && v3Data.assumptions.length > 0) {
     y = ensureSpace(doc, y, 20);
-    y = sectionTitle(doc, y, 'Hypotheses et decisions');
+    y = sectionTitle(doc, y, 'Hypothèses et décisions');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
 
@@ -1126,7 +1141,7 @@ export async function generatePdf(
     if (decisions.length > 0) {
       doc.setTextColor(...hexToRgb('#4f46e5'));
       doc.setFont('helvetica', 'bold');
-      doc.text('Decisions du moteur :', MARGIN, y);
+      doc.text('Décisions du moteur :', MARGIN, y);
       y += 5;
       doc.setFont('helvetica', 'normal');
       for (const a of decisions) {
@@ -1144,7 +1159,7 @@ export async function generatePdf(
     if (toVerify.length > 0) {
       doc.setTextColor(...hexToRgb('#ea580c'));
       doc.setFont('helvetica', 'bold');
-      doc.text('A verifier :', MARGIN, y);
+      doc.text('À vérifier :', MARGIN, y);
       y += 5;
       doc.setFont('helvetica', 'normal');
       for (const a of toVerify) {
@@ -1162,7 +1177,7 @@ export async function generatePdf(
     if (auto.length > 0) {
       doc.setTextColor(...TEXT_COLOR);
       doc.setFont('helvetica', 'bold');
-      doc.text('Hypotheses et valeurs par defaut :', MARGIN, y);
+      doc.text('Hypothèses et valeurs par défaut :', MARGIN, y);
       y += 5;
       doc.setFont('helvetica', 'normal');
       for (const a of auto) {
@@ -1643,6 +1658,7 @@ export function generateCutListPdf(
   analysis: ProjectAnalysis,
 ): void {
   const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+  patchWinAnsi(doc);
   const mat = MATERIALS[state.materialKey];
 
   // ---- Header ----
