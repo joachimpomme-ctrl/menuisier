@@ -127,6 +127,12 @@ export default function Dashboard({ intent, result, materialKey, onModify, onCla
             ops: aggregateDrillingOps(p.drilling!),
           })),
         assemblyGuide: result.production?.assembly_guide,
+        wallMounting: result.structure.bodies[0]?.wall_mounting
+          ? {
+              type: result.structure.bodies[0].wall_mounting.type,
+              positionY_mm: result.structure.bodies[0].wall_mounting.position_y_mm,
+            }
+          : undefined,
       };
       const { generatePdf } = await import('../../lib/pdf');
       await generatePdf(appState, analysis, validation, steps, v3Data);

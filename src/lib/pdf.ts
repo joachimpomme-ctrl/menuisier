@@ -945,6 +945,8 @@ interface V3PdfData {
   /** Séquence d'assemblage V3 (13 étapes par défaut). Si présent, remplace
    *  la page Notice "Step[]" legacy pour un rendu atelier complet. */
   assemblyGuide?: AssemblyStep[];
+  /** Fixation murale calculée (rail de suspension ou anti-bascule) + hauteur. */
+  wallMounting?: { type: string; positionY_mm: number };
 }
 
 export async function generatePdf(
@@ -1470,6 +1472,24 @@ export async function generatePdf(
   doc.addPage();
   y = MARGIN + 5;
   y = sectionTitle(doc, y, 'Notice de montage');
+
+  // Fixation murale — position calculée (souvent omise des plans)
+  if (v3Data?.wallMounting) {
+    const wmLabel =
+      v3Data.wallMounting.type === 'rail'
+        ? 'Rail de suspension'
+        : 'Fixation anti-bascule';
+    y = ensureSpace(doc, y, 8);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(...hexToRgb('#3B5FFF'));
+    doc.text(
+      `Fixation murale : ${wmLabel} — H = ${v3Data.wallMounting.positionY_mm} mm depuis le bas du caisson`,
+      MARGIN,
+      y,
+    );
+    y += 7;
+  }
 
   if (v3Data?.assemblyGuide && v3Data.assemblyGuide.length > 0) {
     // Rendu V3 enrichi : step_number, title, instructions, parts_involved,
