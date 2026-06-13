@@ -14,7 +14,8 @@
       "hardwareCount": 4,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 300mm de profondeur : diagonale 2022mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -47,7 +48,8 @@
       "hardwareCount": 4,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 300mm de profondeur : diagonale 2022mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -80,7 +82,8 @@
       "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 300mm de profondeur : diagonale 2022mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -117,7 +120,8 @@
       "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 300mm de profondeur : diagonale 2022mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -185,7 +189,8 @@
       "hardwareCount": 5,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 300mm de profondeur : diagonale 2022mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -252,7 +257,8 @@
       "blockingErrors": [],
       "warnings": [
         "Bloc tiroirs : Tiroirs > 800mm : coulisses renforcées recommandées",
-        "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps"
+        "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Caisson 2400mm de haut × 600mm de profondeur : diagonale 2474mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2400mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -293,7 +299,8 @@
       "blockingErrors": [],
       "warnings": [
         "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2400mm de haut × 600mm de profondeur : diagonale 2474mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2400mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -334,7 +341,8 @@
         "Penderie courte (chemises/vestes) : hauteur zone 371mm < recommandé 1100mm",
         "Bloc tiroirs : Tiroirs > 800mm : coulisses renforcées recommandées",
         "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2400mm de haut × 600mm de profondeur : diagonale 2474mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2400mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -376,7 +384,8 @@
       "blockingErrors": [],
       "warnings": [
         "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2400mm de haut × 400mm de profondeur : diagonale 2433mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2400mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -415,7 +424,8 @@
       "blockingErrors": [],
       "warnings": [
         "Largeur 1200mm > portée max 836mm (CP bouleau) → 2 corps",
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2400mm de haut × 600mm de profondeur : diagonale 2474mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2400mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -449,7 +459,8 @@
       "blockingErrors": [],
       "warnings": [
         "Bloc tiroirs : Tiroirs > 800mm : coulisses renforcées recommandées",
-        "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps"
+        "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps",
+        "Caisson 2000mm de haut × 550mm de profondeur : diagonale 2074mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -490,7 +501,8 @@
       "blockingErrors": [],
       "warnings": [
         "Largeur 1000mm > portée max 836mm (CP bouleau) → 2 corps",
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 550mm de profondeur : diagonale 2074mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -527,7 +539,8 @@
       "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 550mm de profondeur : diagonale 2074mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -957,7 +970,8 @@
       "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 400mm de profondeur : diagonale 2040mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -994,7 +1008,8 @@
       "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 400mm de profondeur : diagonale 2040mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -1032,7 +1047,8 @@
       "hardwareCount": 7,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 400mm de profondeur : diagonale 2040mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -1072,7 +1088,8 @@
       "hardwareCount": 6,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 400mm de profondeur : diagonale 2040mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -1374,7 +1391,8 @@
       "hardwareCount": 4,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2200mm de haut × 800mm de profondeur : diagonale 2341mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2200mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -1410,7 +1428,9 @@
       "partCount": 17,
       "hardwareCount": 5,
       "blockingErrors": [],
-      "warnings": [],
+      "warnings": [
+        "Caisson 2200mm de haut × 800mm de profondeur : diagonale 2341mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2200mm."
+      ],
       "hasJoues": true,
       "hasTop": true,
       "hasBottom": true,
@@ -1449,7 +1469,8 @@
       "blockingErrors": [],
       "warnings": [
         "Banquette coffre : Hauteur d'assise idéale : 420-480mm",
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2200mm de haut × 800mm de profondeur : diagonale 2341mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2200mm."
       ],
       "hasJoues": true,
       "hasTop": true,
@@ -1487,7 +1508,8 @@
       "hardwareCount": 4,
       "blockingErrors": [],
       "warnings": [
-        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone"
+        "Zone active (400–1400mm) : placez les objets fréquents dans cette zone",
+        "Caisson 2000mm de haut × 400mm de profondeur : diagonale 2040mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~2000mm."
       ],
       "hasJoues": true,
       "hasTop": true,

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { TabKey } from './types';
 import { exportToJson, LocalProjectRepository } from './lib/storage';
 import { isCloudConfigured, getCloudUrl, setCloudUrl } from './lib/cloudSync';
@@ -20,8 +20,7 @@ import StepType from './components/wizard/StepType';
 import StepSpace from './components/wizard/StepSpace';
 import StepOrganize from './components/wizard/StepOrganize';
 import Dashboard from './components/result/Dashboard';
-import { runPipeline, pipelineResultToAppState } from './lib/engine/pipeline';
-import type { PipelineResult } from './lib/engine/pipeline';
+import { runPipeline, pipelineResultToAppState, intentFromState } from './lib/engine/pipeline';
 import type { FurnitureType, SpaceDimensions, ProjectIntent } from './lib/knowledge/types';
 import type { MaterialKey } from './types';
 import PartsLibraryManager from './components/library/PartsLibraryManager';
@@ -91,8 +90,17 @@ export default function App() {
   const [v3FurnitureType, setV3FurnitureType] = useState<FurnitureType>('bibliotheque');
   const [v3Space, setV3Space] = useState<SpaceDimensions | null>(null);
   const [v3MaterialKey, setV3MaterialKey] = useState<MaterialKey>('cp_bouleau');
+  // Base intent (zones/contents) — set on load, wizard generate, BriefIA.
   const [v3Intent, setV3Intent] = useState<ProjectIntent | null>(null);
-  const [v3Result, setV3Result] = useState<PipelineResult | null>(null);
+
+  // v3Result is DERIVED from the base intent merged with the live editor state
+  // (dimensions + material). This keeps the Dashboard, montage sequence and PDF
+  // dossier in sync with classic-editor and AI-patch edits instead of freezing
+  // at the value computed when the project was first loaded.
+  const v3Result = useMemo(
+    () => (v3Intent ? runPipeline(intentFromState(v3Intent, state)) : null),
+    [v3Intent, state],
+  );
 
   useEffect(() => {
     const full = loadFull(projectId);
@@ -103,13 +111,11 @@ export default function App() {
       setV3FurnitureType(full.v3.furnitureType);
       setV3MaterialKey(full.v3.materialKey);
       setV3Intent(intent);
-      setV3Result(runPipeline(intent));
       return;
     }
     setV3Mode(false);
     setWizardStep(1);
     setV3Intent(null);
-    setV3Result(null);
   }, [projectId, loadFull]);
 
   const handleNewProject = useCallback(() => {
@@ -381,7 +387,6 @@ export default function App() {
                 onGenerate={(intent) => {
                   setV3Intent(intent);
                   const result = runPipeline(intent);
-                  setV3Result(result);
                   const converted = pipelineResultToAppState(result, intent.material_key);
                   converted.project.name = intent.furniture_type.replace(/_/g, ' ');
                   setState(normalizeProject(converted));
@@ -397,12 +402,14 @@ export default function App() {
 
             {wizardStep === 4 && v3Intent && v3Result && (
               <Dashboard
-                intent={v3Intent}
+                intent={v3Result.intent}
                 result={v3Result}
                 materialKey={v3MaterialKey}
                 onModify={() => setWizardStep(3)}
-                onClassicEditor={(appState) => {
-                  setState(normalizeProject(appState));
+                onClassicEditor={() => {
+                  // Keep the current (possibly AI/manually edited) state — do NOT
+                  // overwrite it with a pipeline-regenerated one, which would drop
+                  // piece-level edits.
                   setV3Mode(false);
                 }}
               />
@@ -532,10 +539,9 @@ export default function App() {
         isOpen={showNewWizard}
         onClose={() => setShowNewWizard(false)}
         onCreate={handleCreateFromWizard}
-        onV3={() => { setV3Mode(true); setWizardStep(1); setV3Result(null); }}
+        onV3={() => { setV3Mode(true); setWizardStep(1); setV3Intent(null); }}
         onBriefIAResult={(intent, result, materialKey) => {
           setV3Intent(intent);
-          setV3Result(result);
           setV3MaterialKey(materialKey);
           const converted = pipelineResultToAppState(result, materialKey);
           converted.project.name = intent.furniture_type.replace(/_/g, ' ');

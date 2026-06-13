@@ -300,5 +300,54 @@ export function validateProject(
     ));
   }
 
+  // =========================================================================
+  // 11. Tilt-up clearance (VAL_TILT_CLEARANCE)
+  // A carcass assembled flat on the floor must be tilted upright in place. Its
+  // diagonal √(height² + depth²) always exceeds its height, so a floor-to-ceiling
+  // unit cannot be raised once built lying down. The engine has no separate
+  // ceiling field (space.height_mm is both furniture height and the ceiling for
+  // such pieces), so we warn for tall, non-suspended carcasses where this bites.
+  // =========================================================================
+  const TILT_MIN_HEIGHT_MM = 2000; // ~floor-to-ceiling: below this the room almost always has headroom
+  if (
+    intent.space.height_mm >= TILT_MIN_HEIGHT_MM &&
+    !SUSPENDED.has(intent.furniture_type)
+  ) {
+    const h = intent.space.height_mm;
+    const d = intent.space.depth_mm;
+    const diagonal = Math.round(Math.sqrt(h * h + d * d));
+    const maxJoue = Math.floor(Math.sqrt(Math.max(0, h * h - d * d)));
+    issues.push(issue(
+      'warning',
+      false,
+      `Caisson ${h}mm de haut × ${d}mm de profondeur : diagonale ${diagonal}mm. Assemblé à plat puis redressé, il ne passe pas si le plafond est à ~${h}mm.`,
+      'VAL_TILT_CLEARANCE',
+      {
+        suggestion: `Assembler le caisson debout (joues à la verticale) directement en place — ou, si le plafond fait ${h}mm, réduire la hauteur de joue à ${maxJoue}mm (= √(plafond²−profondeur²)) pour pouvoir le relever couché.`,
+      },
+    ));
+  }
+
+  // =========================================================================
+  // 12. Installation clearance for multi-body runs (VAL_FIT_CLEARANCE)
+  // The engine sizes the bodies to fill space.width_mm exactly. For a run of
+  // several caissons fitted side by side (often wall-to-wall, e.g. 3×800 in a
+  // 2400 alcove), real walls are never perfectly square/plumb, so a run with no
+  // play physically cannot be slid in and aligned. We can't detect an alcove
+  // (no flag in the model), so we only flag multi-body runs and keep it a
+  // non-blocking suggestion.
+  // =========================================================================
+  if (structure.bodies.length >= 2) {
+    issues.push(issue(
+      'suggestion',
+      false,
+      `${structure.bodies.length} caissons côte à côte sur ${intent.space.width_mm}mm : prévoir un jeu de pose. Les caissons calculés remplissent la largeur exactement (0mm de jeu).`,
+      'VAL_FIT_CLEARANCE',
+      {
+        suggestion: 'En niche/alcôve, garder ~5–10mm de jeu par côté et combler avec un bandeau de finition scribé sur le mur. Les murs sont rarement d\'équerre.',
+      },
+    ));
+  }
+
   return issues;
 }

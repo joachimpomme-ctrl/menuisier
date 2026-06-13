@@ -121,16 +121,19 @@ export function selectHardware(
   }
 
   // --- Assembly screws: Confirmat screws ---
-  // Count joints: each fixed shelf = 2, each side panel to top/bottom = 2, back panel = 4 corners
+  // Count carcass corner joints. A box has 4 corners; each top/bottom panel
+  // meets the 2 sides, so `topBottom × 2` already covers ALL corner joints of
+  // every body. Each fixed shelf adds 2 joints (one per side). We do NOT add a
+  // separate term for the sides — that would re-count the same corners a second
+  // time from the side's perspective (the old `+ totalSides` bug inflated a
+  // 3-body bookcase from 48 to 72 screws).
   const fixedShelves = parts.filter((p) => p.type === 'tablette-fixe');
   const totalFixed = fixedShelves.reduce((sum, p) => sum + p.qty, 0);
-  const sides = parts.filter((p) => p.type === 'joue');
-  const totalSides = sides.reduce((sum, p) => sum + p.qty, 0);
   const topBottom = parts.filter((p) => p.type === 'dessus' || p.type === 'dessous');
   const totalTopBottom = topBottom.reduce((sum, p) => sum + p.qty, 0);
 
-  // 4 screws per joint: fixed shelves × 2 joints + top/bottom × 2 joints each
-  const confirmatCount = (totalFixed * 2 + totalTopBottom * 2 + totalSides) * 4;
+  // 4 screws per joint: top/bottom × 2 joints each + fixed shelves × 2 joints
+  const confirmatCount = (totalFixed * 2 + totalTopBottom * 2) * 4;
   if (confirmatCount > 0) {
     items.push(item(
       'Vis Confirmat 7×50mm',
@@ -163,9 +166,11 @@ export function selectHardware(
 
     // Plinth: adjustable legs
     if (body.plinth.type === 'legs') {
-      // 4 legs minimum, +2 for each 600mm beyond 600mm
-      const width = intent.space.width_mm;
-      const legCount = Math.max(4, 4 + Math.floor(width / 600) * 2);
+      // 4 legs at the corners, +2 per full 600mm of body width beyond the first
+      // 600mm. Use the per-body width, NOT the whole wall width — this loop runs
+      // once per body, so using the wall width multiplied the legs by body count.
+      const bodyWidth = intent.space.width_mm / structure.bodies.length;
+      const legCount = 4 + Math.floor(Math.max(0, bodyWidth - 600) / 600) * 2;
       items.push(item(
         `Pied réglable h=${body.plinth.height_mm}mm`,
         legCount,

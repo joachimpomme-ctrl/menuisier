@@ -76,12 +76,12 @@ describe('generateParts', () => {
     expect(Math.abs(total - 590)).toBeLessThanOrEqual(2);
   });
 
-  it('back panel dimensions for groove spec match inner dimensions', () => {
+  it('back panel for groove spec is larger than inner opening so it engages the grooves', () => {
     const spec: BackPanelSpec = { type: 'groove', thickness_mm: 5 };
     const dims = computeBackPanelDimensions(spec, 764, 1964, 8);
-    // groove: w = innerW, h = innerH (groove adds back what it subtracts)
-    expect(dims.w).toBe(764);
-    expect(dims.h).toBe(1964);
+    // groove depth 8mm, 1mm slide clearance per side → +14mm each axis
+    expect(dims.w).toBe(778);
+    expect(dims.h).toBe(1978);
   });
 
   describe('partial door height', () => {

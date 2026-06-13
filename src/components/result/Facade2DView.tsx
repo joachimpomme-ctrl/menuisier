@@ -386,24 +386,42 @@ export default function Facade2DView({ model }: Facade2DViewProps) {
             );
           })}
 
-          {model.wallMounting && (
-            <g>
-              <line
-                x1={M}
-                x2={M + model.totalWidth_mm * scale}
-                y1={facadeYToSvg(model.wallMounting.positionY_mm, scale, svgH)}
-                y2={facadeYToSvg(model.wallMounting.positionY_mm, scale, svgH)}
-                stroke="#3b82f6"
-                strokeWidth="0.5"
-                strokeDasharray="4,2"
-              />
-              <polygon
-                points={`${M + 6},${facadeYToSvg(model.wallMounting.positionY_mm, scale, svgH) - 5} ${M + 14},${facadeYToSvg(model.wallMounting.positionY_mm, scale, svgH)} ${M + 6},${facadeYToSvg(model.wallMounting.positionY_mm, scale, svgH) + 5}`}
-                fill="#3b82f6"
-                opacity="0.8"
-              />
-            </g>
-          )}
+          {model.wallMounting && (() => {
+            const wmY = facadeYToSvg(model.wallMounting.positionY_mm, scale, svgH);
+            const wmLabel =
+              model.wallMounting.type === 'rail'
+                ? 'Rail de suspension'
+                : 'Fixation anti-bascule';
+            return (
+              <g>
+                <line
+                  x1={M}
+                  x2={M + model.totalWidth_mm * scale}
+                  y1={wmY}
+                  y2={wmY}
+                  stroke="#3B5FFF"
+                  strokeWidth="0.5"
+                  strokeDasharray="4,2"
+                />
+                <polygon
+                  points={`${M + 6},${wmY - 5} ${M + 14},${wmY} ${M + 6},${wmY + 5}`}
+                  fill="#3B5FFF"
+                  opacity="0.8"
+                />
+                <text
+                  x={M + model.totalWidth_mm * scale - 2}
+                  y={wmY - 3}
+                  textAnchor="end"
+                  fill="#3B5FFF"
+                  fontSize="8"
+                  fontWeight="600"
+                  fontFamily="ui-monospace, monospace"
+                >
+                  {wmLabel} — H={model.wallMounting.positionY_mm} mm
+                </text>
+              </g>
+            );
+          })()}
 
           <DimLine
             x1={M}

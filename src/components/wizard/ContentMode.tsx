@@ -99,7 +99,7 @@ export default function ContentMode({ furnitureType, space, onApply, onClose }: 
             <button
               onClick={handleGenerate}
               disabled={totalItems === 0}
-              className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-40"
+              className="px-3 py-1.5 text-sm bg-[#3B5FFF] text-white rounded-lg hover:bg-[#1E3FCC] disabled:opacity-40"
             >
               Générer les zones
             </button>

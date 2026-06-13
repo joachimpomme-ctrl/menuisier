@@ -98,6 +98,16 @@
       "code": "ERGO_ZONE_ACTIVE",
       "severity": "info",
       "blocking": false
+    },
+    {
+      "code": "VAL_TILT_CLEARANCE",
+      "severity": "warning",
+      "blocking": false
+    },
+    {
+      "code": "VAL_FIT_CLEARANCE",
+      "severity": "suggestion",
+      "blocking": false
     }
   ],
   "pieces": [
@@ -2442,8 +2452,8 @@
       "qty": 1,
       "locked": false,
       "name": "Fond",
-      "length_mm": 764,
-      "width_mm": 2164,
+      "length_mm": 778,
+      "width_mm": 2178,
       "thickness_mm": 5,
       "type": "fond",
       "body_id": "body_1"
@@ -4845,8 +4855,8 @@
       "qty": 1,
       "locked": false,
       "name": "Fond",
-      "length_mm": 764,
-      "width_mm": 2164,
+      "length_mm": 778,
+      "width_mm": 2178,
       "thickness_mm": 5,
       "type": "fond",
       "body_id": "body_2"
@@ -7248,8 +7258,8 @@
       "qty": 1,
       "locked": false,
       "name": "Fond",
-      "length_mm": 764,
-      "width_mm": 2164,
+      "length_mm": 778,
+      "width_mm": 2178,
       "thickness_mm": 5,
       "type": "fond",
       "body_id": "body_3"
@@ -9651,8 +9661,8 @@
       "qty": 1,
       "locked": false,
       "name": "Fond",
-      "length_mm": 764,
-      "width_mm": 2164,
+      "length_mm": 778,
+      "width_mm": 2178,
       "thickness_mm": 5,
       "type": "fond",
       "body_id": "body_4"
@@ -12054,8 +12064,8 @@
       "qty": 1,
       "locked": false,
       "name": "Fond",
-      "length_mm": 764,
-      "width_mm": 2164,
+      "length_mm": 778,
+      "width_mm": 2178,
       "thickness_mm": 5,
       "type": "fond",
       "body_id": "body_5"
@@ -12129,7 +12139,7 @@
     {
       "id": "HW_024",
       "name": "Vis Confirmat 7×50mm",
-      "quantity": 120,
+      "quantity": 80,
       "category": "screw",
       "reference": "confirmat_7x50",
       "unit_price_eur": 0.08

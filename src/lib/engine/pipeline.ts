@@ -15,7 +15,7 @@ import type {
   ProductionOutput,
   ProjectStateV3,
 } from '../knowledge/types';
-import type { MaterialKey } from '../../types';
+import type { AppState, MaterialKey } from '../../types';
 import { validateIntent } from './intent';
 import { generateLayout } from './layout';
 import { generateStructure } from './structure';
@@ -116,6 +116,42 @@ export function runPipeline(rawIntent: ProjectIntent): PipelineResult {
     validation,
     production,
     procurement,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// AppState → ProjectIntent merge (classic editor → V3 sync)
+// ---------------------------------------------------------------------------
+
+/**
+ * Rebuild a ProjectIntent from a base intent + the live classic-editor state.
+ *
+ * The classic editor and the AI patches mutate `AppState` (dimensions, material,
+ * plinth). The V3 outputs (Dashboard, assembly guide, hardware, PDF dossier) are
+ * produced by `runPipeline(intent)`. Without this merge they desync: editing the
+ * depth in the editor (or via the AI) never reached `v3Result`.
+ *
+ * We keep the base intent's zones/contents (not representable in AppState) and
+ * only override what the editor can change: space dimensions and material. So
+ * dimensional/material changes flow into a fresh `v3Result`. Piece-level edits
+ * (manual add/remove, AI `pieces.*`, `bodies.count` restructure) live only in
+ * AppState and still drive the cut list directly — they are not re-derived here.
+ */
+export function intentFromState(baseIntent: ProjectIntent, state: AppState): ProjectIntent {
+  const cmToMm = (cm: number) => Math.round(cm * 10);
+  return {
+    ...baseIntent,
+    material_key: state.materialKey,
+    space: {
+      ...baseIntent.space,
+      width_mm: cmToMm(state.project.wallWidth),
+      height_mm: cmToMm(state.project.ceilingHeight),
+      depth_mm:
+        state.project.wallDepth != null
+          ? cmToMm(state.project.wallDepth)
+          : baseIntent.space.depth_mm,
+      plinth_mm: cmToMm(state.project.plinthHeight),
+    },
   };
 }
 
